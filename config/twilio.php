@@ -1,0 +1,8 @@
+<?php
+
+return [
+    'TWILIO_SID' => env('TWILIO_SID'),
+    'TWILIO_TOKEN' => env('TWILIO_TOKEN'),
+    'TWILIO_SMS_NUMBER' => env('TWILIO_SMS_NUMBER'),
+    'TWILIO_WHATSAPP_NUMBER' => env('TWILIO_WHATSAPP_NUMBER'),
+];

@@ -1,0 +1,211 @@
+private void jugadaAdd(){
+        String monto = String.valueOf(txtMontojugar.getText());
+        String montoDisponible = String.valueOf(txtMontodisponible.getText());
+        String jugada = String.valueOf(txtJugada.getText());
+
+        getJugadas();
+
+        if(mUserItems.size() == 0){
+            Toast.makeText(getContext(), "Debe seleccionar una loteria", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(jugada == null || jugada == "" || jugada.length() == 0)
+            return;
+        if(montoDisponible == null || montoDisponible == "" || montoDisponible.length() == 0)
+            return;
+        if(monto == null || monto == "" || monto.length() == 0)
+            return;
+        else{
+            if(montoDisponible != "x"){
+                if((int)Float.parseFloat(monto) > Float.parseFloat(montoDisponible)){
+                    Toast.makeText(getActivity(), "No hay cantidad suficiente", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+        }
+
+        if(jugada.length() == 1)
+            return;
+
+        //validarJugadaSeaNumerica contenera la jugada numerica, osea, sin puntos ni signos de mas, etc..
+        StringBuilder validarJugadaSeaNumerica = new StringBuilder(jugada);
+        if(jugada.length() > 1){
+
+            if(jugada.length() == 3 || jugada.length() == 5){
+                //Si la jugada tiene 3 digitos y el ultimo digito
+                if(jugada.charAt(jugada.length() - 1) == '.' && jugada.length() == 3)
+                {
+                    validarJugadaSeaNumerica.setLength(jugada.length() - 1);
+                    Log.d("validar jug sea num.: ", validarJugadaSeaNumerica.toString());
+                }
+                else if(jugada.charAt(jugada.length() - 1) == '+' && jugada.length() == 5)
+                {
+                    validarJugadaSeaNumerica.setLength(jugada.length() - 1);
+                    Log.d("validar jug sea num+: ", validarJugadaSeaNumerica.toString());
+                }
+                else{
+                    Toast.makeText(getActivity(), "La jugada debe tener 2, 4 o 6 digitos", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            if(!isInteger(validarJugadaSeaNumerica.toString())){
+                Toast.makeText(getActivity(), "La jugada debe ser correcta", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+
+
+
+
+            JSONObject jugadaObject = new JSONObject();
+
+            if(mUserItems.size() == 1){
+                try {
+                    boolean existe = false, existeInvertida = false;
+                    if(jugadas.length() > 0){
+                        for (int i=0; i < jugadas.length(); i++){
+                            JSONObject item = (JSONObject)jugadas.get(i);
+
+                            String jugadaVerificarExiste = jugada;
+                            if(jugadaVerificarExiste.length() == 3)
+                                jugadaVerificarExiste = validarJugadaSeaNumerica.toString();
+
+                            if(item.getString("jugada").toString().equals(jugadaVerificarExiste) && item.getString("idLoteria").toString().equals(idLoteriasMap.get(mUserItems.get(0)))){
+                                item.put("monto", Integer.parseInt(item.getString("monto")) + Integer.parseInt(monto));
+                                existe = true;
+                            }
+                            if(jugada.length() == 3) {
+                                String primerDigito = validarJugadaSeaNumerica.toString().substring(0, 1);
+                                String segundoDigito = validarJugadaSeaNumerica.toString().substring(1);
+
+                                //Invertimos la jugada
+                                String jugadaInvertida = segundoDigito + primerDigito;
+
+                                //Verificamos si la jugada invertida existe en las jugadas
+                                if(item.getString("jugada").toString().equals(jugadaInvertida) && item.getString("idLoteria").toString().equals(idLoteriasMap.get(mUserItems.get(0)))){
+                                    item.put("monto", Integer.parseInt(item.getString("monto")) + Integer.parseInt(monto));
+                                    existeInvertida = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if(!existe){
+                        jugadaObject = new JSONObject();
+                        jugadaObject.put("idLoteria", idLoteriasMap.get(mUserItems.get(0)));
+                        jugadaObject.put("descripcion", listItems[mUserItems.get(0)]);
+                        jugadaObject.put("jugada", validarJugadaSeaNumerica.toString());
+                        jugadaObject.put("tam", txtJugada.getText().length());
+                        jugadaObject.put("monto", txtMontojugar.getText());
+                        jugadaObject.put("idBanca", 1);
+                        jugadas.put(jugadaObject);
+
+
+                    }
+
+                    if(jugada.length() == 3 && existeInvertida == false) {
+                        String primerDigito = validarJugadaSeaNumerica.toString().substring(0, 1);
+                        String segundoDigito = validarJugadaSeaNumerica.toString().substring(1);
+
+                        //Invertimos la jugada
+                        String jugadaInvertida = segundoDigito + primerDigito;
+
+                        Log.d("jugadainvertida:", jugadaInvertida);
+
+                        JSONObject jugadaObject2 = new JSONObject();
+                        jugadaObject2.put("idLoteria", idLoteriasMap.get(mUserItems.get(0)));
+                        jugadaObject2.put("descripcion", listItems[mUserItems.get(0)]);
+                        jugadaObject2.put("jugada", jugadaInvertida);
+                        jugadaObject2.put("tam", txtJugada.getText().length());
+                        jugadaObject2.put("monto", txtMontojugar.getText());
+                        jugadaObject2.put("idBanca", 1);
+                        jugadas.put(jugadaObject2);
+                    }
+
+                    txtJugada.setText("");
+                    txtMontodisponible.setText("");
+                }catch (Exception e){
+                    Log.e("Error jugada:", e.toString());
+                }
+            }else if(mUserItems.size() > 1){
+                for (int contadorLoteria = 0; contadorLoteria < mUserItems.size(); contadorLoteria++) {
+                    try {
+                        boolean existe = false, existeInvertida = false;
+                        if(jugadas.length() > 0){
+                            for (int i=0; i < jugadas.length(); i++){
+                                JSONObject item = (JSONObject)jugadas.get(i);
+//
+                                String jugadaVerificarExiste = txtJugada.getText().toString();
+                                if(jugadaVerificarExiste.length() == 3)
+                                    jugadaVerificarExiste = validarJugadaSeaNumerica.toString();
+
+                                if(item.getString("jugada").toString().equals(jugadaVerificarExiste) && item.getString("idLoteria").toString().equals(idLoteriasMap.get(mUserItems.get(contadorLoteria)))){
+                                    item.put("monto", Integer.parseInt(item.getString("monto")) + Integer.parseInt(monto));
+                                    existe = true;
+                                }
+                                if(jugada.length() == 3) {
+                                    String primerDigito = validarJugadaSeaNumerica.toString().substring(0, 1);
+                                    String segundoDigito = validarJugadaSeaNumerica.toString().substring(1);
+
+                                    //Invertimos la jugada
+                                    String jugadaInvertida = segundoDigito + primerDigito;
+
+                                    //Verificamos si la jugada invertida existe en las jugadas
+                                    if(item.getString("jugada").toString().equals(jugadaInvertida) && item.getString("idLoteria").toString().equals(idLoteriasMap.get(mUserItems.get(contadorLoteria)))){
+                                        item.put("monto", Integer.parseInt(item.getString("monto")) + Integer.parseInt(monto));
+                                        existeInvertida = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if(!existe){
+                            if(jugada.length() == 3){
+                                jugada = validarJugadaSeaNumerica.toString();
+                            }
+                            jugadaObject = new JSONObject();
+                            jugadaObject.put("idLoteria", idLoteriasMap.get(mUserItems.get(contadorLoteria)));
+                            jugadaObject.put("descripcion", listItems[contadorLoteria]);
+                            jugadaObject.put("jugada", jugada);
+                            jugadaObject.put("tam", txtJugada.getText().length());
+                            jugadaObject.put("monto", txtMontojugar.getText());
+                            jugadaObject.put("idBanca", 1);
+                            jugadas.put(jugadaObject);
+
+                            //Toast.makeText(getContext(), "lot:"+listItems[contadorLoteria] + " id:" + idLoteriasMap.get(contadorLoteria), Toast.LENGTH_SHORT).show();
+                        }
+
+                        if(jugada.length() == 3 && existeInvertida == false) {
+                            String primerDigito = validarJugadaSeaNumerica.toString().substring(0, 1);
+                            String segundoDigito = validarJugadaSeaNumerica.toString().substring(1);
+
+                            //Invertimos la jugada
+                            String jugadaInvertida = segundoDigito + primerDigito;
+
+                            Log.d("jugadainvertida:", jugadaInvertida);
+
+                            JSONObject jugadaObject2 = new JSONObject();
+                            jugadaObject2.put("idLoteria", idLoteriasMap.get(mUserItems.get(contadorLoteria)));
+                            jugadaObject2.put("descripcion", listItems[contadorLoteria]);
+                            jugadaObject2.put("jugada", jugadaInvertida);
+                            jugadaObject2.put("tam", txtJugada.getText().length());
+                            jugadaObject2.put("monto", txtMontojugar.getText());
+                            jugadaObject2.put("idBanca", 1);
+                            jugadas.put(jugadaObject2);
+                        }
+                        txtJugada.setText("");
+                        txtMontodisponible.setText("");
+                    }catch (Exception e){
+                        Log.e("Error jugada:", e.toString());
+                    }
+                }
+            }
+
+
+        //Log.d("jugadas:", jugadas.toString());
+        getJugadas();
+
+    } //End jugadasAdd

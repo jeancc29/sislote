@@ -1,0 +1,10 @@
+The FastCGI process exited unexpectedly	
+
+	accedemos a la ruta para confirmar si el modulo de 	php esta instalado
+cd "C:\Program Files (x86)\iis express\PHP\v7.3\"
+
+	Verificamos modulo
+#) php -m
+#) Si da error eso quiere decir que no esta instalado entonces debemos descargar Visual C++ Redistributable for visual studio 2015, enlace: https://www.microsoft.com/en-us/download/details.aspx?id=48145
+
+#)una vez descargado entonces nuevamente comprobamos para ver si el modulo fue instalado, en el cmd introducimos el comando php -m
