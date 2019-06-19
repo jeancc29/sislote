@@ -199,5 +199,18 @@ class Helper{
         return $ans;
     }
 
+    function isNumber($number){
+        $c = true;
+        try {
+            //code...
+            number_format($number);
+        } catch (\Throwable $th) {
+            //throw $th;
+            $c = false;
+        }
+
+        return $c;
+    }
+
 
 }

@@ -941,7 +941,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                             </a>
                         </li>
                         <li class="nav-item ">
-                            <a class="nav-link" href="{{route('loterias.bloqueos')}}">
+                            <a class="nav-link" href="{{route('bloqueos')}}">
                               <span class="sidebar-mini"> B </span>
                               <span class="sidebar-normal"> Bloqueos </span>
                             </a>
@@ -954,6 +954,14 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 <a class="nav-link" href="{{route('bancas')}}">
                     <i class="material-icons">format_list_numbered</i>
                     <p> Bancas 
+                       
+                    </p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="{{route('premios')}}">
+                    <i class="material-icons">format_list_numbered</i>
+                    <p> Premios 
                        
                     </p>
                 </a>

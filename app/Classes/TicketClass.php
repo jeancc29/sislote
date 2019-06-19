@@ -75,27 +75,30 @@ class TicketClass{
             $this->openRowJugadas();
                 $ventasDetallesOrdenadasPorLoteria = $this->ventasDetalles->sortByDesc('idLoteria');
                 $idLoteria = 0;
-                $loterias = $this->ventaColeccion->map(function($v){
-                    return $v->loterias;
+                $loterias = $this->ventasDetalles->map(function($v){
+                    return $v['idLoteria'];
                 });;
+                $loterias = Lotteries::whereIn('id', $loterias)->get();
+                //return $loterias;
                 foreach($loterias as $l){
                     $contadorJugadasLoteria = 0;
                     if($idLoteria != $l['id']){
-                        $idLoteria = $loteria->id;
-                        $total = $this->getTotalLoteria($loteria->id);
-                        $this->setLoteriaTotal($loteria->descripcion, $total);
+                        $idLoteria = $l->id;
+                        $total = $this->getTotalLoteria($l->id);
+                        $this->setLoteriaTotal($l->descripcion, $total);
                     }
-                    if($this->contadorJugadas > 3){
+                    //if($this->contadorJugadas > 2){
                         $this->openColXs6();
-                    }else{
-                        $this->openColXs12();
-                    }
+                    // }else{
+                    //     $this->openColXs12();
+                    // }
 
                     $this->openTable();
                                 $this->setTableHead();
                                 $this->openTableBody();
                     foreach($this->ventasDetalles as $d){
-                        $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                        if($l->id == $d['idLoteria']){
+                            $loteria = Lotteries::whereId($d['idLoteria'])->first();
                         $contadorJugadasLoteria++;
                         //Si la variable $idLoteria es diferente de $loteria->id entonces agregamos el header con el nombre de la loteria y su total
                         // if($idLoteria != $loteria->id){
@@ -108,10 +111,12 @@ class TicketClass{
                         // if($this->contadorJugadas > 3 && $contadorJugadasLoteria == 1){
                         //     $this->openColXs6();
                         // }
-                        if($this->contadorJugadas > 3 && $contadorJugadasLoteria > round($this->contadorJugadas / 2)){
+                        if($this->contadorJugadas > 2 && $contadorJugadasLoteria > round($this->contadorJugadas / 2)){
                                 $this->closeTableBody();
                                 $this->closeTable();
                             $this->closeCol();
+
+                            
 
                             $this->openColXs6();
                             $this->openTable();
@@ -129,14 +134,31 @@ class TicketClass{
                         //     $this->closeTable();
                         // $this->closeCol();
 
+                        }//END IF loteria
                         
-                    }
+                    } //END foreach
+
+                    
 
                     $this->closeTableBody();
                     $this->closeTable();
                 $this->closeCol();
+
+                if($this->contadorJugadas < 3){
+                        $this->openColXs6();
+                                $this->openTable();
+                                $this->setTableHead();
+                                $this->openTableBody();
+
+                                $this->closeTableBody();
+                                $this->closeTable();
+                            $this->closeCol();
+                    }
                 }
+
+                
             $this->closeRowJugadas();
+            $this->setTotal();
         $this->closeTicket();
         $this->closeHeader();
 
@@ -146,7 +168,19 @@ class TicketClass{
         fwrite($file, $this->html);
         fclose($file);
 
-        return $this->html;
+        ob_start();
+        $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --width 314 ";
+        $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\" . $this->venta->idTicket . ".html ";
+        $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
+        system($command, $return_var);
+        $salida = \ob_get_contents();
+        \ob_end_clean();
+
+        $ruta = public_path() . "\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
+        $img = \file_get_contents($ruta);
+        $data = base64_encode($img);
+
+        return $data;
     }
 
     function getTotalLoteria($id){
@@ -238,7 +272,8 @@ class TicketClass{
     }
 
     function setCodigoBarra(){
-        $this->html .= "<h5 class='text-center my-0 font-weight-bold'> barra". $this->codigoBarra ."</h5>";
+        $codigoBarra = Tickets::whereId($this->venta->idTicket)->first()->codigoBarra;
+        $this->html .= "<h5 class='text-center my-0 font-weight-bold'>". $codigoBarra ."</h5>";
     }
 
     function openRowJugadas(){
@@ -297,5 +332,16 @@ class TicketClass{
         <td class='text-center' style='font-size: 14px'>$jugada</td>
         <td class='text-center' style='font-size: 14px'>$monto</td>
     </tr> ";
+    }
+
+    function setTotal(){
+        $this->html .="<div class='row'>";
+        if((int)$this->venta->descuentoMonto > 0){
+            $this->html .= "<h5 class='text-center my-0'> Descuento:". $this->venta->descuentoMonto ."</h5>";
+            $this->html .= "<h5 class='text-center my-0'>subTotal:". $this->venta->subTotal ."</h5>";
+        }
+        $this->html .= "<h4 class='text-center my-0'>- Total:". $this->venta->total ." -</h4>";
+
+        $this->html .="</div>";
     }
 }

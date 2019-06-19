@@ -7,6 +7,7 @@ use Request;
 use Illuminate\Support\Facades\Route; 
 use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
+use App\Classes\Helper;
 
 
 use Faker\Generator as Faker;
@@ -251,13 +252,13 @@ class BranchesController extends Controller
     
             /********************* COMISIONES ************************/
             //Obtengo y guardo en un objeto los id de las loterias que han sido recibidas
-            $idLoterias = collect($datos['comisiones']['loterias'])->map(function($id){
+            $idLoterias = collect($datos['loteriasSeleccionadas'])->map(function($id){
                 return $id['id'];
             });
             //Eliminamos las loterias que no esten incluidas en las loterias que han sido recibidas
             // Commissions::where('idBanca', $banca['id'])->whereNotIn('idLoteria', $idLoterias)->delete();
             Commissions::where('idBanca', $banca['id'])->delete();
-            foreach($datos['comisiones']['loterias'] as $l){
+            foreach($datos['loteriasSeleccionadas'] as $l){
                 if($banca->loterias()->wherePivot('idLoteria', $l['id'])->first() != null){
                     Commissions::create([
                         'idBanca' => $banca['id'],
@@ -274,26 +275,60 @@ class BranchesController extends Controller
     
              /********************* PAGOS COMBINACIONES ************************/
             //Obtengo y guardo en un objeto los id de las loterias que han sido recibidas
-            $idLoterias = collect($datos['pagosCombinaciones']['loterias'])->map(function($id){
+            $idLoterias = collect($datos['loteriasSeleccionadas'])->map(function($id){
                 return $id['id'];
             });
+            // return Response::json([
+            //     'errores' => 0,
+            //     'mensaje' => 'Se ha guardado correctamente',
+            //     'banca' => $datos['loteriasSeleccionadas']
+            // ], 201);
             //Eliminamos las loterias que no esten incluidas en las loterias que han sido recibidas
             // Payscombinations::where('idBanca', $banca['id'])->whereNotIn('idLoteria', $idLoterias)->delete();
+            
             Payscombinations::where('idBanca', $banca['id'])->delete();
-            foreach($datos['pagosCombinaciones']['loterias'] as $l){
+            foreach($datos['loteriasSeleccionadas'] as $l){
                 if($banca->loterias()->wherePivot('idLoteria', $l['id'])->first() != null){
+                  
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['primera']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo primera no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['segunda']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo segunda no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['tercera']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo tercera no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['primeraSegunda']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo primeraSegunda no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['primeraTercera']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo primeraTercera no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['segundaTercera']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo segundaTercera no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['tresNumeros']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo tresNumeros no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['dosNumeros']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo dosNumeros no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['primerPago']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo primerPago no tiene formato correcto'], 201);
+                    }
                     Payscombinations::create([
                         'idBanca' => $banca['id'],
                         'idLoteria' => $l['id'],
-                        'primera' => $l['pagosCombinaciones']['primera'],
-                        'segunda' => $l['pagosCombinaciones']['segunda'],
-                        'tercera' => $l['pagosCombinaciones']['tercera'],
-                        'primeraSegunda' => $l['pagosCombinaciones']['primeraSegunda'],
-                        'primeraTercera' => $l['pagosCombinaciones']['primeraTercera'],
-                        'segundaTercera' => $l['pagosCombinaciones']['segundaTercera'],
-                        'tresNumeros' => $l['pagosCombinaciones']['tresNumeros'],
-                        'dosNumeros' => $l['pagosCombinaciones']['dosNumeros'],
-                        'primerPago' => $l['pagosCombinaciones']['primerPago'],
+                        'primera' => (int)$l['pagosCombinaciones']['primera'],
+                        'segunda' => (int)$l['pagosCombinaciones']['segunda'],
+                        'tercera' => (int)$l['pagosCombinaciones']['tercera'],
+                        'primeraSegunda' => (int)$l['pagosCombinaciones']['primeraSegunda'],
+                        'primeraTercera' => (int)$l['pagosCombinaciones']['primeraTercera'],
+                        'segundaTercera' => (int)$l['pagosCombinaciones']['segundaTercera'],
+                        'tresNumeros' => (int)$l['pagosCombinaciones']['tresNumeros'],
+                        'dosNumeros' => (int)$l['pagosCombinaciones']['dosNumeros'],
+                        'primerPago' => (int)$l['pagosCombinaciones']['primerPago'],
                     ]);
                 }
             }

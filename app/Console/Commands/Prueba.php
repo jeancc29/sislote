@@ -63,14 +63,26 @@ class Prueba extends Command
 
         $monto = (new Helper)->montodisponible("55", 1, 1);
 
-        $h = new TicketClass(2);
+        $h = new TicketClass(5);
         $a = new AwardsClass(2);
         $a->primera = "";
         $a->segunda = 02;
         $a->tercera = 23;
 
+        $c = "bueno";
+
+        try {
+            //code...
+            number_format("adfa");
+        } catch (\Throwable $th) {
+            //throw $th;
+            $c = "malo";
+        }
+
         // $this->info("Awardsclasss: " . $a->combinacionesNula());
-       $this->info("Awardsclasss: " . $h->generate()); 
+       $this->info("Awardsclasss: " . $h->generate());
+    // $this->info("Awardsclasss: " . $c); 
+
 
         // $this->info(public_path("assets") . "\\");
         // $this->info(".." . rand(1111111111, getrandmax()));

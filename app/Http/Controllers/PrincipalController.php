@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response; 
 use Carbon\Carbon;
 use App\Classes\Helper;
+use App\Classes\TicketClass;
+
 
 // use Faker\Generator as Faker;
 use App\Lotteries;
@@ -874,11 +876,18 @@ class PrincipalController extends Controller
 
     
     } //END if validacion si hay errores
+
+        $img = null;
+        if($sale != null){
+            $img = new TicketClass($sale->id);
+            $img = $img->generate();
+        }
     
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'venta' => ($sale != null) ? new SalesResource($sale) : null
+            'venta' => ($sale != null) ? new SalesResource($sale) : null,
+            'img' => $img
         ], 201);
     }
 
