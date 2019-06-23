@@ -124,16 +124,13 @@ class AwardsController extends Controller
         
     
         $fecha = getdate();
-    
         $errores = 0;
         $mensaje = '';
-    
         $idBanca = Branches::whereId($datos['idBanca'])->whereStatus(1)->first();
         if($idBanca == null){
             $idBanca = Branches::
                 where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
-                ->first()->id;
-                
+                ->first()->id;         
         }else{
             $idBanca = $idBanca->id;
         }
@@ -149,95 +146,23 @@ class AwardsController extends Controller
         $awardsClass->numerosGanadores = $l['primera'] . $l['segunda'] . $l['tercera'];
 
         
-    //$numerosGanadores = $l['primera'] . $l['segunda'] . $l['tercera'];
     
-        //Validar combinaciones no sean nulas
-        // $es_superpale = Lotteries::whereId($l['id'])->first()->sorteos()->whereDescripcion('Super pale')->first();
-        // if($es_superpale == null){
-        //     //Si uno de estos campos es nulo entonces eso quiere decir que esta loteria no se insertara, asi que pasaremos a la siguiente loteria
-        //     if($l['primera'] == null || $l['segunda'] == null || $l['tercera'] == null)
-        //     continue;
-        // }else{
-        //     if($l['primera'] == null || $l['segunda'] == null)
-        //     continue;
-        // }
     
         if($awardsClass->combinacionesNula() == true){
             continue;
         }
-
         if(!is_numeric($awardsClass->numerosGanadores)){
             return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
         }
-
-       
-    
-        /************* VALIDAMOS DIAS DE LA LOTERIA ***************/
-        // $loteria = Lotteries::whereId($l['id'])->get()->first();
-    
-        // $loteriaWday = $loteria->dias()->whereWday(getdate()['wday'])->get()->first();
-        // if($loteriaWday == null){
-        //     return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $loteria['descripcion'] .' no abre este dia '], 201);
-        // }
         if(!$awardsClass->loteriaAbreDiaActual()){
             return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
+        }  
+        if($awardsClass->insertarPremio() == false){
+            return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
         }
-        /************* END VALIDAMOS DIAS DE LA LOTERIA ***************/
-    
-    
-        
-            // $fechaActual = getdate();
+
+
            
-            // $numeroGanador = Awards::where('idLoteria', $l['id'])
-            // ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->get()->first();
-
-            //     //Si es diferente de nulo entonces existe, asi que debo actualizar los numeros ganadores
-            //     if($numeroGanador != null){
-            //         $numeroGanador['numeroGanador'] = $numerosGanadores;
-            //         $numeroGanador['primera'] =  $l['primera'];
-            //         $numeroGanador['segunda'] = $l['segunda'];
-            //         $numeroGanador['tercera'] =  $l['tercera'];
-            //         $numeroGanador->save();
-    
-                    
-            //         $mensaje = "Los numeros ganadores se han guardado correctamente";
-            //     }else{
-            //         Awards::create([
-            //             'idUsuario' => $datos['idUsuario'],
-            //             'idLoteria' => $l['id'],
-            //             'numeroGanador' => $numerosGanadores,
-            //             'primera' => $l['primera'],
-            //             'segunda' => $l['segunda'],
-            //             'tercera' => $l['tercera']
-            //         ]);
-    
-            //         $mensaje = "Los numeros ganadores se han guardado correctamente";
-            //     }
-            if($awardsClass->insertarPremio() == false){
-                return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
-            }
-
-
-            // }else{
-            //     $errores = 1;
-            //     $mensaje = "La loteria aun no ha cerrado";
-            // }
-            // }else{
-            //     $errores = 1;
-            //     $mensaje = "Los numeros ganadores no son correctos";
-            // }
-    
-            //Obtenemos todas las jugadas pertenecientes a dicha loteria y utilizamos un Foreach para actualizar premios de la tabla SalesDetails
-            // $idVentas = Sales::select('sales.id')
-            //     ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
-            //     ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            //     ->where('salesdetails.idLoteria', $l['id'])->where('sales.status', '!=', 0)->get();
-
-            // $jugadas = Salesdetails::whereIn('idVenta', $idVentas)
-            //             ->orderBy('jugada', 'asc')
-            //             ->get();
-            
-                        // return Response::json(['errores' => 1,'mensaje' => $jugadas], 201);
             $c = 0;
             $colleccion = null;
             
@@ -251,102 +176,15 @@ class AwardsController extends Controller
 
 
     
-                // return Response::json(['errores' => 1,'mensaje' => strlen($j['jugada'])], 201);
+                
                 if(strlen($j['jugada']) == 2){
-                    // $busqueda = strpos($numerosGanadores, $j['jugada']);
-                    
-                    
-                    // if(gettype($busqueda) == "integer"){
-                    //     $venta = Sales::whereId($j['idVenta'])->first()
-                    //     $idBanca = Branches::whereId()
-                    //     if($busqueda == 0) $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('primera');
-                    //     else if($busqueda == 2) $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('segunda');
-                    //     else if($busqueda == 4) $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('tercera');
-                    // }
-                    // else
-                    //     $j['premio'] = 0;
-                    //return Response::json(['busqueda' => $busqueda,'jugada' => $j['jugada'], 'premio' => $j['premio'], 'monto' => $j['monto'], 'segunda' => Payscombinations::where('idLoteria',$datos['idLoteria'])->value('segunda')], 201);
                     $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
                 }
                 else if(strlen($j['jugada']) == 4){
-                //    // return Response::json(['numGanador' => $numeroGanador['numeroGanador'],'juada' => substr('jean', 0, 2)], 201);
-                //     $busqueda1 = strpos($numerosGanadores, substr($j['jugada'], 0, 2));
-                //     $busqueda2 = strpos($numerosGanadores, substr($j['jugada'], 2, 2));
-    
-                //    $sorteo = Draws::whereId($j['idSorteo'])->first();
-    
-                //    //Si el sorteo es diferente de super pale entonces es un pale normal
-                //     if($sorteo['descripcion'] != "Super pale"){
-                //         //Verificamos que los tipos de datos de las busquedas sean enteros
-                //         if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
-                //             //Primera y segunda
-                //             if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
-                //                 $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('primeraSegunda');
-                //             }
-                //             //Primera y tercera
-                //             else if($busqueda1 == 0 && $busqueda2 == 4 || $busqueda2 == 0 && $busqueda1 == 4){
-                //                 $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('primeraTercera');
-                //             }
-                //             //Segunda y tercera
-                //             else if($busqueda1 == 2 && $busqueda2 == 4 || $busqueda2 == 2 && $busqueda1 == 4){
-                //                 $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('segundaTercera');
-                //             }
-                //         }else $j['premio'] = 0;
-                //     }else{
-                //         //Verificamos que los tipos de datos de las busquedas sean enteros
-                //         if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
-                //             if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
-                //                 $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('primerPago');
-                //             }
-                //         }else $j['premio'] = 0;
-
-                       
-                        
-                //     }
-
-                    // return Response::json([
-                    //     'a' =>  $busqueda1,
-                    //     'a1' =>  $busqueda2,
-                    //     'a2' =>  $numerosGanadores,
-                    //     'a3' =>  $sorteo,
-                    //     'errores' => 0,
-                    //     'mensaje' => 'Se ha guardado correctamente',
-                    //     //'colleccon' => $colleccion
-                    // ], 201);
-    
-                    // if($j['premio'] > 0)
-                    //  {
-                    //     $j['status'] = 1;
-                    //     $j->save();
-                    //  }
-
-                    $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], $j['idSorteo']);
+                    $j['premio'] = $awardsClass->paleBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], $j['idSorteo']);
                 }
                 else if(strlen($j['jugada']) == 6){
-                    // $contador = 0;
-                    // $busqueda1 = strpos($numerosGanadores, substr($j['jugada'], 0, 2));
-                    // $busqueda2 = strpos($numerosGanadores, substr($j['jugada'], 2, 2));
-                    // $busqueda3 = strpos($numerosGanadores, substr($j['jugada'], 4, 2));
-    
-                    // if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer" && gettype($busqueda3) == "integer"){
-                    //     $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('tresNumeros');
-                    // }
-                    // else{
-                    //     if(gettype($busqueda1) == "integer")
-                    //         $contador++;
-                    //     if(gettype($busqueda2) == "integer")
-                    //         $contador++;
-                    //     if(gettype($busqueda3) == "integer")
-                    //         $contador++;
-                        
-                    //     //Si el contador es = 2 entonces hay premio
-                    //     if($contador == 2)
-                    //         $j['premio'] = $j['monto'] * Payscombinations::where(['idLoteria' => $l['id'], 'idBanca' => $idBanca])->value('dosNumeros');
-                    //     else
-                    //         $j['premio'] = 0;
-                    // }
-                    
-                    $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+                    $j['premio'] = $awardsClass->tripletaBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
                 }
     
     
@@ -422,6 +260,89 @@ class AwardsController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
+            //'colleccon' => $colleccion
+        ], 201);
+    }
+
+
+
+    public function erase(Request $request)
+    {
+        $datos = request()->validate([
+            //'datos.idLoteria' => 'required',
+            //'datos.numerosGanadores' => 'required|min:2|max:6',
+            'datos.idUsuario' => 'required',
+            'datos.idLoteria' => 'required',
+            'datos.idBanca' => 'required',
+        ])['datos'];
+
+        
+    
+        $fecha = getdate();
+        $errores = 0;
+        $mensaje = '';
+        $idBanca = Branches::whereId($datos['idBanca'])->whereStatus(1)->first();
+        if($idBanca == null){
+            $idBanca = Branches::
+                where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
+                ->first()->id;         
+        }else{
+            $idBanca = $idBanca->id;
+        }
+
+        $awardsClass = new AwardsClass($datos['idLoteria']);
+        $awardsClass->idUsuario = $datos['idUsuario'];
+        $awardsClass->primera = "";
+        $awardsClass->segunda = "";
+        $awardsClass->tercera = "";
+        $awardsClass->numerosGanadores = "";
+        if($awardsClass->insertarPremio() == false){
+            return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
+        }
+
+            foreach($awardsClass->getJugadasDeHoy($datos['idLoteria']) as $j){
+                $j['premio'] = 0;
+                $j['status'] = 0;
+                $j->save();
+            }
+    
+            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->get();
+    
+            foreach($ventas as $v){
+                $todas_las_jugadas_realizadas = Salesdetails::where(['idVenta' => $v['id']])->count();
+                $todas_las_jugadas_que_ya_salieron = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->count();
+                $cantidad_premios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
+                
+                //Si la cantidad de jugadas realizadas es la que misma que la cantidad que jugadas que se 
+                //han marcado como que ya salieron los premios entonces la venta debe cambiar de status pendiente a ganadores o perdedores
+                if($todas_las_jugadas_realizadas == $todas_las_jugadas_que_ya_salieron)
+                {
+                    if($cantidad_premios > 0)
+                    {
+                        $montoPremios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
+                        $v['premios'] = $montoPremios;
+                        $v['status'] = 2;
+                    }    
+                    else{
+                        $v['premios'] = 0;
+                        $v['status'] = 3;
+                    }
+                        
+    
+                    $v->save();
+                }else{
+                    $v['premios'] = 0;
+                    $v['status'] = 1;
+                    $v->save();
+                }
+            }
+    
+    
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha eliminado correctamente',
             //'colleccon' => $colleccion
         ], 201);
     }

@@ -210,7 +210,16 @@ var myApp = angular
                 "monto" : null,
                 "fechaDesde" : new Date(),
                 "fechaHasta" : new Date(),
-            }
+            },
+            'buscar' : {
+                "dias" : null,
+                "bancas" : null,
+                "fechaDesde" : new Date(),
+                "fechaHasta" : new Date(),
+            },
+            "tabSelectedDia" : {},
+            "tabSelectedBanca" : {},
+            "tabSelectedLoteria" : {}
         }
 
         
@@ -226,7 +235,8 @@ var myApp = angular
                 $scope.datos.optionsBancas = response.data.bancas;
                 $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
 
-
+                $scope.datos.buscar.optionsBancas = response.data.bancas;
+                $scope.datos.buscar.optionsDias = response.data.dias;
                 
 
 
@@ -249,6 +259,10 @@ var myApp = angular
                     array[indice].monto = '';
                     $scope.datos.sorteos.push(array[indice]);
                 });
+                $scope.datos.optionsSorteos = jsonSorteos;
+                $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+
+                console.log('inicializarDatos bloqueo2.js: ', $scope.datos.optionsSorteos);
 
 
 
@@ -275,13 +289,26 @@ var myApp = angular
                 $scope.datos.bloqueoJugada.optionsBancas = responseJugadas.data.bancas;
                 $scope.datos.bloqueoJugada.selectedBanca = $scope.datos.bloqueoJugada.optionsBancas[0];
 
-
+                $scope.datos.buscar.optionsBancas = response.data.bancas;
+                $scope.datos.buscar.optionsDias = response.data.dias;
 
                 $scope.datos.bloqueoJugada.loterias= [];
                 jsonLoterias.forEach(function(valor, indice, array){
                     array[indice].seleccionado = false;
                     $scope.datos.bloqueoJugada.loterias.push(array[indice]);
                 });
+
+                var jsonSorteos = responseJugadas.data.sorteos;
+                $scope.datos.sorteos = [];
+                jsonSorteos.forEach(function(valor, indice, array){
+                    array[indice].monto = '';
+                    $scope.datos.sorteos.push(array[indice]);
+                });
+                $scope.datos.optionsSorteos = jsonSorteos;
+                $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+
+                console.log('inicializarDatos bloqueo2.js: ', $scope.datos.optionsSorteos);
+
 
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
@@ -307,8 +334,8 @@ var myApp = angular
                 $scope.datos.optionsBancas = response.data.bancas;
                 $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
 
-
-                
+                $scope.datos.buscar.optionsBancas = response.data.bancas;
+                $scope.datos.buscar.optionsDias = response.data.dias;
 
 
 
@@ -348,6 +375,18 @@ var myApp = angular
                     array[indice].seleccionado = false;
                     $scope.datos.bloqueoJugada.loterias.push(array[indice]);
                 });
+
+                var jsonSorteos = response.data.sorteos;
+                $scope.datos.sorteos = [];
+                jsonSorteos.forEach(function(valor, indice, array){
+                    array[indice].monto = '';
+                    $scope.datos.sorteos.push(array[indice]);
+                });
+                $scope.datos.optionsSorteos = jsonSorteos;
+                $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+
+                console.log('inicializarDatos bloqueo2.js: ', $scope.datos.optionsSorteos);
+
 
 
                 $timeout(function() {
@@ -423,10 +462,12 @@ var myApp = angular
         
         if($scope.datos.selectedTipoBloqueos.idTipoBloqueo == 1){
             $scope.datos.bancas =  $scope.datos.optionsBancas;
+        }else{
+            if(Object.keys($scope.datos.bancas).length == 0){
+                alert("Debe seleccionar una banca")
+                return;
+            }
         }
-     
-        // else
-        //     $scope.datos.bancas.push($scope.datos.selectedBanca);
             
           $http.post(rutaGlobal+"/api/bloqueos/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
              .then(function(response){
@@ -448,41 +489,27 @@ var myApp = angular
 
         $scope.actualizarJugadas = function(){
          
-        //   var contador = 0;
-        //     $scope.datos.loterias.forEach(function(valor, indice, array){
-        //         if(array[indice].seleccionado == true)
-        //             contador++;
-        //     });
+            if($scope.datos.bloqueoJugada.selectedTipoBloqueos.idTipoBloqueo == 1){
+                $scope.datos.bloqueoJugada.bancas =  $scope.datos.bloqueoJugada.optionsBancas;
+            }else{
+                if(Object.keys($scope.datos.bloqueoJugada.bancas).length == 0){
+                    alert("Debe seleccionar una banca")
+                    return;
+                }
+            }
 
-        //     if(contador == 0){
-        //         alert("Debe seleccionar al menos una loteria");
-        //         return;
-        //     }
-           
-       
-
-       
-
-
-        
-        if($scope.datos.bloqueoJugada.selectedTipoBloqueos.idTipoBloqueo == 1){
-            $scope.datos.bloqueoJugada.bancas =  $scope.datos.bloqueoJugada.optionsBancas;
-        }
-     
-        // else
-        //     $scope.datos.bancas.push($scope.datos.selectedBanca);
 
             $scope.datos.bloqueoJugada.idUsuario = $scope.datos.idUsuario;
-            
-           
-          $http.post(rutaGlobal+"/api/bloqueos/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
-             .then(function(response){
+            $scope.datos.bloqueoJugada.idSorteo = $scope.datos.selectedSorteo.id;
+                
+            $http.post(rutaGlobal+"/api/bloqueos/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
+                .then(function(response){
                 console.log(response);
                 if(response.data.errores == 0){
                     
                             $scope.inicializarDatos($scope.datos.idUsuario, null, response);
                             alert("Se ha guardado correctamente");
-                     
+                        
                 }else{
                     alert(response.data.mensaje);
                     return;
@@ -687,10 +714,57 @@ var myApp = angular
             console.log('existe: ', existe);
             return existe;
         }
+
+
+        $scope.buscar = function(){
+            $scope.datos.buscar.idUsuario = idUsuario;
+            $http.post(rutaGlobal+"/api/bloqueos/loterias/buscar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.buscar})
+             .then(function(response){
+                console.log(response.data);
+                $scope.datos.buscar.resultados = response.data.dias;
+                $scope.tabDiasChanged($scope.datos.buscar.resultados[0]);
+                $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0]);
+                $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
+                if(response.data.errores == 0){
+                    
+                            // $scope.inicializarDatos($scope.datos.idUsuario, response);
+                            // alert("Se ha guardado correctamente");
+                     
+                }else{
+                    //alert(response.data.mensaje);
+                    return;
+                }
+                
+            });
+        }
+
+        $scope.contador = 0;
+        $scope.tabDiasChanged = function(dia, first = null){
+            $scope.contador++;
+            $scope.datos.tabSelectedDia = dia;
+            $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0])
+            $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
+
+            // $scope.datos.indexLoteriaComisiones = $scope.datos.ckbLoterias.findIndex( x => x.id == loteria.id);
+        }
+    
+        $scope.tabBancasChanged = function(banca, first = null){
+            $scope.datos.tabSelectedBanca = banca;
+            console.log("tabBancasChanged",$scope.datos.tabSelectedDia);
+            // $scope.datos.indexLoteriaComisiones = $scope.datos.ckbLoterias.findIndex( x => x.id == loteria.id);
+        }
+    
+        $scope.tabLoteriasChanged = function(loteria, first = null){
+            $scope.datos.tabSelectedLoteria = loteria;
+            // $scope.datos.indexLoteriaComisiones = $scope.datos.ckbLoterias.findIndex( x => x.id == loteria.id);
+        }
        
 
 
     })
+
+
+   
 
 
 

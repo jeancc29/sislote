@@ -67,6 +67,7 @@ class BlocksplaysController extends Controller
         $datos = request()->validate([
             'datos.loterias' => 'required',
             'datos.idUsuario' => 'required',
+            'datos.idSorteo' => 'required',
             'datos.bancas' => 'required',
             'datos.jugada' => 'required',
             'datos.monto' => 'required',
@@ -100,6 +101,7 @@ class BlocksplaysController extends Controller
                             'idBanca' => $banca['id'], 
                             'idLoteria' => $l['id'], 
                             'jugada' => $datos['jugada'],
+                            'idSorteo' => $datos['idSorteo'],
                             'status' => 1
                         ])
                         ->where('fechaDesde', '<=', $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00')
@@ -113,7 +115,7 @@ class BlocksplaysController extends Controller
                         Blocksplays::create([
                             'idBanca' => $banca['id'],
                             'idLoteria' => $l['id'],
-                            'idSorteo' => 1,
+                            'idSorteo' => $datos['idSorteo'],
                             'jugada' => $datos['jugada'],
                             'montoInicial' => $datos['monto'],
                             'monto' => $datos['monto'],
@@ -135,8 +137,39 @@ class BlocksplaysController extends Controller
         return Response::json([
             'loterias' => LotteriesResource::collection($loterias),
             'bancas' => BranchesResource::collection($bancas),
+            'sorteos' => Draws::all(),
+            'dias' => Days::all(),
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente'
+        ], 201);
+    }
+
+
+    public function buscar(Request $request)
+    {
+        $datos = request()->validate([
+            'datos.bancas' => 'required',
+            'datos.dias' => 'required',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+    
+    
+        $idDias = collect($datos['dias'])->map(function($d){
+            return $d->id;
+        });
+        $idBancas = collect($datos['bancas'])->map(function($d){
+            return $d->id;
+        });
+
+        $dias = Days::whereIn('id', $idDias)->get();
+        $dias = collect($dias)->map(function($d){
+            return ["id" => $d->id, "descripcion" => $d->descripcion, "wday" => $d->wday, "bancas" => BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', [1,2])->get())];
+        });
+
+        
+    
+        return Response::json([
+            'dias' => $dias
         ], 201);
     }
 

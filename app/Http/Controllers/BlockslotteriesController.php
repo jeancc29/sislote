@@ -63,6 +63,53 @@ class BlockslotteriesController extends Controller
         ], 201);
     }
 
+    public function buscar(Request $request)
+    {
+        $datos = request()->validate([
+            'datos.bancas' => 'required',
+            'datos.dias' => 'required',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+    
+    
+        $idDias = collect($datos['dias'])->map(function($d){
+            return $d['id'];
+        });
+        $idBancas = collect($datos['bancas'])->map(function($d){
+            return $d['id'];
+        });
+
+        $dias = Days::whereIn('id', $idDias)->get();
+        //COLLECT DIAS
+        $dias = collect($dias)->map(function($d){
+            $bancas = BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', [1,2])->get());
+            //COLLECT BANCAS
+            $bancas = collect($bancas)->map(function($b) use($d){
+                //COLLECT LOTERIAS
+                $loterias = collect($b['loterias'])->map(function($l) use($b, $d){
+                    //COLLECT SORTEOS
+                    $sorteos = collect($l['sorteos'])->map(function($s) use($d, $b, $l){
+                        $bloqueo = Blockslotteries::where(['idBanca' => $b['id'], 'idLoteria' => $l['id'], 'idSorteo' => $s['id'], 'idDia' => $d['id']])->first();
+                        if($bloqueo != null)
+                            $bloqueo = $bloqueo['monto'];
+                        else
+                            $bloqueo = null;
+                        return ["id" => $s['id'], "descripcion" => $s['descripcion'], "bloqueo" => $bloqueo];
+                    });
+                    return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos];
+                });
+                return ["id" => $b['id'], "descripcion" => $b['descripcion'], "loterias" => $loterias];
+            });
+            return ["id" => $d->id, "descripcion" => $d->descripcion, "wday" => $d->wday, "bancas" => $bancas];
+        });
+
+        
+    
+        return Response::json([
+            'dias' => $dias
+        ], 201);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -106,6 +153,7 @@ class BlockslotteriesController extends Controller
             });
            
         
+          
     
     
     foreach($datos['bancas'] as $banca):

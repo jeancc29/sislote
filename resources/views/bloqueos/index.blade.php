@@ -68,7 +68,7 @@
           <div class="wizard-navigation">
             <ul class="nav nav-pills">
               <li ng-init="tabActiva = 1" class="nav-item">
-                <a class="nav-link" href="#buscar" data-toggle="tab" role="tab">
+                <a ng-click="tabActiva = 1" class="nav-link" href="#buscar" data-toggle="tab" role="tab">
                   Buscar
                 </a>
               </li>
@@ -95,156 +95,168 @@
 
                    
                     
+                    <div class="col-12">
+
+                    
+
+                    </div>
                     
                    
 
                       <div class="col-12">
-                        <form novalidate>
-
-                        
 
                       <div class="row">
-                      
-
-                          
-
-                            
-                            <div class="col-12 text-center">
+                      <div class="col-5 text-center">
                             <div class="input-group">
-                              
-                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                              
-
-                                <div  class=" col-sm-8 col-10">
-                                <select 
-                                    ng-change="cbxTipoBloqueosChanged()"
-                                    ng-model="datos.selectedTipoBloqueos"
-                                    ng-options="o.descripcion for o in datos.optionsTipoBloqueos"
-                                    class="selectpicker col-12" 
-                                    data-style="select-with-transition" 
-                                    title="Select tipo regla">
-                              </select>
-                              </div>
-                            </div> <!-- END INPUT GROUP -->
-                          </div>
-                          
-
-                          <div ng-show="datos.selectedTipoBloqueos.idTipoBloqueo == 2" class="col-12 text-center">
-                            <div class="input-group">
-                              
-                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Bancas</label>                              
-
-                                <div  class=" col-sm-8 col-10">
+                            <label  for="jugada" class="bmd-label-floating font-weight-bold">Dias</label>
+                              <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Dias</label>                               -->
+                                <style>
+                                  #multiselectDias{
+                                    font-size: 8px;
+                                  }
+                                </style>
+                                <!-- <div  class="col-9"> -->
                                   <select 
-                                  id="multiselect"
-                                      ng-model="datos.bancas"
-                                      ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
-                                      class="selectpicker col-12" 
+                                  id="multiselectDias"
+                                      ng-model="datos.buscar.dias"
+                                      ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
+                                      class="selectpicker w-100" 
                                       data-style="select-with-transition" 
                                       multiple title="Seleccionar bancas"
                                       data-size="7" aria-setsize="2">
                                   </select>
-                              </div>
+                              <!-- </div> -->
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
-                        <div class="col-12 col-md-2 ">
-                          <div class="row justify-content-center">
-
-                            <div class="col-12 ">
-                              <h3>Dias</h3>
-                            </div>
-
-                            <div class="col-sm-12 checkbox-radios">
-
+                          <div class="col-5">
+                            <div class="input-group">
                               
-                              <div ng-repeat="d in datos.ckbDias" class="form-check form-check-inline">
-                                <label class="form-check-label">
-                                  <input ng-model="d.existe" ng-change="ckbDias_changed(ckbDias, d)" class="form-check-input" type="checkbox" value=""> @{{d.descripcion}}
-                                  <span class="form-check-sign">
-                                    <span class="check"></span>
-                                  </span>
-                                </label>
+                              <!-- <label class="d-none d-sm-block  col-sm-2 col-form-label  font-weight-bold " style="color: black;">Bancas</label>                               -->
+                              <label  for="jugada" class="bmd-label-floating font-weight-bold">Bancas</label>
+                                <!-- <div  class="col-10"> -->
+                                  <select 
+                                  id="multiselectBancas"
+                                      ng-model="datos.buscar.bancas"
+                                      ng-options="o.descripcion for o in datos.buscar.optionsBancas track by o.id"
+                                      class="selectpicker w-100" 
+                                      data-style="select-with-transition" 
+                                      multiple title="Seleccionar bancas"
+                                      data-size="7" aria-setsize="2">
+                                  </select>
+                              <!-- </div> -->
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                          <div class="col-2">
+                            <a href="#" class="btn btn-success mt-4" ng-click="buscar()">Buscar</a>
+                          </div>
+                      </div><!-- END ROW CONTENEDOR DATOS BUSQUEDA -->
+
+
+                        <div class="card text-center" ng-show="datos.buscar.resultados.length > 0">
+                          <div class="card-header2" style="background-color: #f4f4f4;">
+                            <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                              <li 
+                                ng-repeat="d in datos.buscar.resultados" 
+                                ng-click="tabDiasChanged(d)"
+                                class="nav2-item" style="padding: 0px;">
+                                <a ng-class="{'active': datos.tabSelectedDia.id == d.id}" class="nav2-link" href="#">@{{d.descripcion}}</a>
+                              </li>
+                              <!-- <li class="nav2-item" style="padding: 0px;">
+                                <a class="nav2-link" href="#">Link</a>
+                              </li>
+                              <li class="nav2-item" style="padding: 0px;">
+                                <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                              </li> -->
+                            </ul>
+                          </div>
+                          <div class="card-body" style="padding-bottom: 0px;">
+                            <!-- CARD2 -->
+                            <div class="card text-center" style="padding-top: 0px; margin-top:0px;">
+                              <div class="card-header2" style="background-color: #f4f4f4;">
+                                <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                  <li ng-repeat="b in datos.tabSelectedDia.bancas" 
+                                      ng-click="tabBancasChanged(b)" 
+                                      class="nav2-item" style="padding: 0px;">
+                                    <a ng-class="{'active': datos.tabSelectedBanca.id == b.id}" class="nav2-link" href="#">@{{b.descripcion}}</a>
+                                  </li>
+                                  <!-- <li class="nav2-item" style="padding: 0px;">
+                                    <a class="nav2-link" href="#">Link</a>
+                                  </li>
+                                  <li class="nav2-item" style="padding: 0px;">
+                                    <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                  </li> -->
+                                </ul>
                               </div>
+                              <div class="card-body">
+                                <!-- CARD3 -->
+                            <div class="card text-center" style="padding-top: 0px; margin-top:0px;">
+                              <div class="card-header2" style="background-color: #f4f4f4;">
+                                <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                  <li ng-repeat="l in datos.tabSelectedBanca.loterias" 
+                                      ng-click="tabLoteriasChanged(l)" 
+                                   class="nav2-item" style="padding: 0px;">
+                                    <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                  </li>
+                                  <!-- <li class="nav2-item" style="padding: 0px;">
+                                    <a class="nav2-link" href="#">Link</a>
+                                  </li>
+                                  <li class="nav2-item" style="padding: 0px;">
+                                    <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                  </li> -->
+                                </ul>
+                              </div>
+                              <div class="card-body">
+                                <div class="col-12">
+                                  <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                            <th scope="col" class="text-center">ID</th>
+                                            <th scope="col" class="text-center">SORTEO</th>
+                                            <th scope="col" class="text-center">BLOQUEO</th>
+                                            <!-- <th scope="col" class="text-center"></th> -->
+                                            <!-- <th scope="col" class="text-center">Cerrado</th> -->
+                                            
+                                            
 
-
-
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                          <!-- | filter:datos.monitoreo.datosBusqueda -->
+                                            <tr ng-repeat="c in datos.tabSelectedLoteria.sorteos">
+                                                <td scope="col" class="text-center" style="font-size: 14px">@{{$index + 1}}</td>
+                                                <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
+                                                <td scope="col" class="text-center">@{{c.descripcion}}</td>
+                                                <td scope="col" class="text-center">
+                                                  <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="d-inline  bg-primary p-1 text-white rounded">@{{c.bloqueo | currency}}</a>
+                                                </td>
+                                                <!-- <td scope="col" class="text-center">@{{c.frecuencia.descripcion}}</td>
+                                                <td scope="col" class="text-center">@{{toFecha(c.fechaInicio) | date:"dd/MM/yyyy"}}</td>
+                                                <td scope="col" class="text-center">@{{toFecha(c.fechaProximoGasto) | date:"dd/MM/yyyy"}}</td>
+                                                 -->
+                                                
+                                                <td>
+                                                  <!-- <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a> -->
+                                                  <!-- <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a> -->
+                                                </td>
+                                            </tr>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div> <!-- END COL-12 -->
+                              </div> <!-- END CARD-BODY -->
                             </div>
-                          </div> <!-- END ROW -->
-                        </div> <!-- END COL-4 -->
-                        
-                        <div class="col-8">
 
-                        <div class="row justify-content-center">
-                        
-                              <h3>Monto</h3>
+                            <!-- END CARD3 -->
+                              </div>
+                            </div>
+
+                            <!-- END CARD2 -->
                             
+                          </div>
                         </div>
 
-                          <div ng-repeat="d in datos.sorteos" class="row my-0 justify-content-center">
-                            <div class="col-8">
-                                <div class="row my-0">
-                                  <label class="d-none d-sm-block text-right col-sm-3 col-form-label font-weight-bold mt-2" style="color: black;">@{{d.descripcion}}</label>
-                                  <div class="col-sm-5">
-                                    <div class="form-group">
-                                    <input ng-model="datos.sorteos[$index].monto" type="text"  name="@{{d.descripcion}}" id="@{{d.descripcion}}" type="text" class="form-control" >
-                                    </div>
-                                  </div>
-                                </div>
-                              </div> <!-- END COL-6 -->
-                          </div> <!-- END ROW -->
-
-                          
-                        
-                        </div> <!-- END COL-8 SORTEOS -->
-
-                        
-
-                      </div> <!-- END ROW -->
-
-                      <div class="row justify-content-center">
-                          <div class="col-12 text-center">
-                            <h3>Loterias</h3>
-                          </div>
-                          <div class="col-12 text-center">
-                                <style>
-                                  .btn-outline-info.active2{
-                                    background-color: #00bcd4!important;
-                                    color: #fff!important;
-                                  }
-
-                                  .btn-group-toggle > .btn,
-                                    .btn-group-toggle2 > .btn-group > .btn {
-                                    margin-bottom: 0;
-                                    }
-
-                                    .btn-group-toggle2 > .btn input[type="radio"],
-                                    .btn-group-toggle2 > .btn input[type="checkbox"],
-                                    .btn-group-toggle2 > .btn-group > .btn input[type="radio"],
-                                    .btn-group-toggle2 > .btn-group > .btn input[type="checkbox"] {
-                                    position: absolute;
-                                    clip: rect(0, 0, 0, 0);
-                                    pointer-events: none;
-                                    }
-
-                                </style>
-                                <div class="btn-group btn-group-sm">
-                                    <button 
-                                    ng-repeat="l in datos.loterias"
-                                    ng-class="{'active2': l.seleccionada == 'true'}"
-                                    ng-click="rbxLoteriasChanged(l, $index)"
-                                    id="btnLoteria@{{$index}}"
-                                    type="button" 
-                                    class="btn btn-outline-info">@{{l.descripcion}}</button>
-                                    <!-- <button type="button" class="btn btn-outline-info">6</button>
-                                    <button type="button" class="btn btn-outline-info">7</button> -->
-                                </div>
-                                      <!-- ng-init="rbxLoteriasChanged(l, $first)" -->
-                                
-                              </div><!-- END COL-12 -->
-                        </div> <!-- END ROW LOTERIAS -->
-
-
-                        </form>
 
                       </div> <!-- END DIV FORMULARIO -->
 
@@ -473,7 +485,7 @@
                                 <div  class=" col-sm-8 col-10">
                                   <select 
                                   id="multiselect"
-                                      ng-model="datos.bancas"
+                                      ng-model="datos.bloqueoJugada.bancas"
                                       ng-options="o.descripcion for o in datos.bloqueoJugada.optionsBancas track by o.id"
                                       class="selectpicker col-12" 
                                       data-style="select-with-transition" 
@@ -508,6 +520,23 @@
                               </div>
 
                               
+
+                              <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                            <label  for="jugada" class="bmd-label-floating">Sorteo</label>
+                                <!-- <div  class=" col-sm-8 col-10"> -->
+                                
+                                <select 
+                                    ng-model="datos.selectedSorteo"
+                                    ng-options="o.descripcion for o in datos.optionsSorteos"
+                                    class="selectpicker w-100" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              <!-- </div> -->
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
 
                               <div class="col-12 col-md-12">
                                   <div id="divInputJugada" class="form-group">

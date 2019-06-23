@@ -445,6 +445,42 @@ class PrincipalController extends Controller
         ], 201);
     }
 
+
+
+
+    public function copiarTicket()
+    {
+        $idBanca = 0;
+        
+
+        $datos = request()->validate([
+            'datos.idTicket' => 'required'
+        ])['datos'];
+
+        $idVenta = Sales::where('idTicket', $datos['idTicket'])->first();
+        if($idVenta == null){
+            $idVenta = $idVenta->id;
+        }else{
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'El ticket no existe',
+                'img' => null
+            ], 201);
+        }
+
+       
+    
+        $img = new TicketClass($sale->id);
+        $img = $img->generate();
+    
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => '',
+            'img' => $img
+        ], 201);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

@@ -339,6 +339,11 @@ var myApp = angular
                
                 
                 
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
             });
 
            
@@ -743,6 +748,11 @@ var myApp = angular
                     return;
                 }
                 
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
             });
         
 
@@ -760,6 +770,11 @@ var myApp = angular
                     alert(response.data.mensaje);
                 }
                 
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
             });
         }
        

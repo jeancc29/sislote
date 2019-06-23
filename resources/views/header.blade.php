@@ -34,6 +34,7 @@ if($controlador != "login"){
 <!-- Extra details for Live View on GitHub Pages -->
 
 <link href="{{asset('assets/css/material-dashboard.css')}}" rel="stylesheet" />
+<link href="{{asset('assets/css/prueba.css')}}" rel="stylesheet" />
 
 
 <!--     Fonts and icons     -->

@@ -146,8 +146,8 @@ class AwardsClass{
     public function paleBuscarPremio($idVenta, $idLoteria, $jugada, $monto, $idSorteo){
         // return Response::json(['numGanador' => $numeroGanador['numeroGanador'],'juada' => substr('jean', 0, 2)], 201);
         $premio = 0;
-        $busqueda1 = strpos($numerosGanadores, substr($jugada, 0, 2));
-        $busqueda2 = strpos($numerosGanadores, substr($jugada, 2, 2));
+        $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
+        $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
 
         $venta = Sales::whereId($idVenta)->first();
         $idBanca = Branches::whereId($venta->idBanca)->first()->id;
@@ -185,9 +185,9 @@ class AwardsClass{
     public function tripletaBuscarPremio($idVenta, $idLoteria, $jugada, $monto){
         $premio = 0;
         $contador = 0;
-        $busqueda1 = strpos($numerosGanadores, substr($jugada, 0, 2));
-        $busqueda2 = strpos($numerosGanadores, substr($jugada, 2, 2));
-        $busqueda3 = strpos($numerosGanadores, substr($jugada, 4, 2));
+        $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
+        $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
+        $busqueda3 = strpos($this->numerosGanadores, substr($jugada, 4, 2));
 
         $venta = Sales::whereId($idVenta)->first();
         $idBanca = Branches::whereId($venta->idBanca)->first()->id;

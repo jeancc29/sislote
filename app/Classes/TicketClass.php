@@ -169,7 +169,7 @@ class TicketClass{
         fclose($file);
 
         ob_start();
-        $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --width 314 ";
+        $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --zoom 2.125 --width 314 ";
         $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\" . $this->venta->idTicket . ".html ";
         $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
         system($command, $return_var);
@@ -268,7 +268,7 @@ class TicketClass{
     }
 
     function setTicket(){
-        $this->html .= "<p class='text-center my-0'>Ticket:". (new Helper)->toSecuencia($this->venta->idTicket) ."</p>";
+        $this->html .= "<p class='text-center my-0'>Ticket: ". $this->banca->codigo . "-" . (new Helper)->toSecuencia($this->venta->idTicket) ."</p>";
     }
 
     function setCodigoBarra(){

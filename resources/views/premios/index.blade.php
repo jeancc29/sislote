@@ -80,56 +80,7 @@
  
                   <div class="col-12 col-md-8">
 
-                    <!-- <div class="row">
-                      <div class="col-12">
-                      <style>
-                          .dropdown-menu{
-                              width: 100%;
-                          }
-                      </style>
-
-                        <select 
-                            ng-change="cbxLoteriasChanged()"
-                            ng-model="datos.selectedLoteria"
-                            ng-options="o.descripcion for o in datos.optionsLoterias"
-                            class="selectpicker w-100" 
-                             data-style="btn btn-info btn-round" 
-                            title="Seleccionar loterias">
-                        </select>
-                      </div>
-                    </div> -->
-
-                    <!-- SORTEO -->
-                    <!-- <div class="row">
-                      <div class="col-12">
-                      <style>
-                          .dropdown-menu{
-                              width: 100%;
-                          }
-                      </style>
-
-                        <select 
-                            ng-model="datos.selectedSorteo"
-                            ng-options="o.descripcion for o in datos.optionsSorteos"
-                            class="selectpicker w-100" 
-                             data-style="btn btn-info btn-round" 
-                            title="Seleccionar loterias">
-                        </select>
-                      </div>
-                    </div> -->
-                    
-                    <!-- <div class="input-group form-control-lg">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i class="material-icons">money</i>
-                        </span>
-                      </div>
-                      <div class="form-group">
-                        <label for="exampleInput1" class="bmd-label-floating">Numeros ganadores</label>
-                        <input ng-model="datos.numerosGanadores" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
-                      </div>
-                    </div> -->
-
+                   
                     
                     <div class="row">
                         <div ng-repeat="l in datos.loterias" class="col-12">
@@ -167,33 +118,7 @@
 
 
                   </div> <!-- END COL-12 -->
-                  <!-- <div class="col-lg-7 mt-3">
-                    <div class="input-group form-control-lg">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i class="material-icons">av_timer</i>
-                        </span>
-                      </div>
-                      <div class="form-group">
-                        <label for="exampleInput1" class="bmd-label-floating">Hora de cierre</label>
-                        <input type="text" class="form-control timepicker" value="10/05/2016" required>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-3 mt-4">
-                    <div class="input-group form-control-lg">
-                      <div class="form-group">
-                        <div class="form-check">
-                          <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" value="" checked> Activa
-                            <span class="form-check-sign">
-                              <span class="check"></span>
-                            </span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div> -->
+                  
                 </div>
               </div>
               <div class="tab-pane" id="account">
@@ -206,7 +131,7 @@
                     <form novalidate autocomplete="off">
                     
 
-                      <div class="col-3 col-md-4">
+                      <!-- <div class="col-3 col-md-4">
                           <div id="divInputJugada" class="form-group">
                                         <label  for="jugada" class="bmd-label-floating">Loteria</label>
                                         <input 
@@ -217,28 +142,82 @@
                                             type="text" name="text" 
                                             minLength="2" maxLength="6"  />
                                     </div>
+                      </div> -->
+
+                      
+
+                      <div class="col-12">
+                        <div class="row">
+                          <div class="col-3">
+                              <div id="divInputFechaDesde" class="form-group">
+                                  <label  for="jugada" class="bmd-label-floating">Fecha</label>
+                                  <input ng-model="datos.desde" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
+                              </div>
+                          </div>
+
+                          
+
+                          <div class="col-3">
+                            <div class="togglebutton mt-3">
+                              <label style="color: black;">
+                                <input type="checkbox" checked="">
+                                <span class="toggle"></span>
+                                Procesar jugadas
+                              </label>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
                       
 
-                      <div class="col-3">
-                          <div id="divInputFechaDesde" class="form-group">
-                              <label  for="jugada" class="bmd-label-floating">Desde</label>
-                              <input ng-model="datos.desde" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
-                          </div>
-                      </div>
 
-                      <div class="col-3">
-                          <div id="divInputFechaHasta" class="form-group">
-                              <label for="jugada" class="bmd-label-floating">Hasta</label>
-                              <input ng-model="datos.hasta"  id="fechaHasta" type="date" class="form-control" value="10/06/2018" required>
-                          </div>
-                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <div class="row">
+                            <div class="col-3 mt-1 ml-4">
+                              <div class="form-group">
+                                  <select 
+                                      ng-model="datos.selectedLoteria"
+                                      ng-change="cbxLoteriasChanged()"
+                                      ng-options="o.descripcion for o in datos.optionsLoterias"
+                                      class="selectpicker w-100" 
+                                      data-style="select-with-transition" 
+                                      title="Select loteria">
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-2">
+                              <div class="input-group form-control-lg">
+                                <div id="primeraVentanaSencilla" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">1era</label>
+                                  <input ng-model="datos.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+                            <div class="col-2">
+                              <div class="input-group form-control-lg">
+                                <div id="segundaVentanaSencilla" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">2da</label>
+                                  <input ng-model="datos.segunda" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+                            <div class="col-2" ng-hide="datos.existeSorteo">
+                              <div class="input-group form-control-lg">
+                                <div id="terceraVentanaSencilla" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">3era</label>
+                                  <input ng-model="datos.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
 
-                      <div class="col-1">
-                          <!-- <a class="col-1 p-2 rounded-circle bg-primary">+</a> -->
-                          <a ng-click="buscar()" class="btn btn-outline-danger">Buscar</a>
-                      </div>
+                            <div class="col-1 text-center">
+                              <a ng-click="actualizar(true)" class="btn btn-success">Add</a>
+                            </div>
+                           </div> <!-- END ROW -->
+                        </div> <!-- END COL-23 -->
+                    </div> <!-- END ROW -->
 
                     </form> 
                    
@@ -246,33 +225,39 @@
                     <div class="col-12">
                          <!-- INICIO TABLA-->
                         <table 
-                        ng-class="{'table-fixed-2': p() <= 3, 'table-fixed-3': p() >= 4}"
+                    
                         class="table mt-1 ">
-                        <thead class="thead-dark">
+                        <thead class="">
                             <tr>
-                            <th class="text-center font-weight-bold col-2 col-sm-3" style="font-size: 13px">Ganadores</th>
-                            <th class="text-center font-weight-bold col-2 col-sm-3" style="font-size: 13px">Loteria</th>
-                            <th class="text-center font-weight-bold col-3 col-sm-3" style="font-size: 13px">Sorteo</th>
-                            <th class="text-center font-weight-bold col-3 col-sm-2" style="font-size: 13px">fecha</th>
-                            <!-- <th class="text-center font-weight-bold col-3 col-sm-3" style="font-size: 13px">HASTA</th> -->
-                            <th class="text-center font-weight-bold col-3 col-sm-1" style="font-size: 13px">X</th>
+                            <th class="text-center font-weight-bold " style="font-size: 15px">Lot</th>
+                            <th class="text-center font-weight-bold " style="font-size: 15px">1ra</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">2da</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">3ra</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">Cash 3</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">Play 4</th>
+                            <!-- <th class="text-center font-weight-bold" style="font-size: 15px">HASTA</th> -->
+                            <th class="text-center font-weight-bold" style="font-size: 15px">Editar</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">Limpiar</th>
                             <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
                             </tr>
                         </thead>
                         <tbody id="table_body" class="">
-                            <tr ng-repeat="c in datos.premios" @{{p($last)}}>
-                            <td class="text-center font-weight-bold col-2 col-sm-3" style="font-size: 14px">@{{agregar_guion(c.numerosGanadores)}}</td>
-                            <td class="text-center font-weight-bold col-2 col-sm-3" style="font-size: 14px">@{{c.loteria}}</td>
-                            <td class="text-center font-weight-bold col-2 col-sm-3" style="font-size: 14px">@{{c.sorteo}}</td>
-                            <td class="text-center font-weight-bold col-2 col-sm-2" style="font-size: 14px">@{{c.fecha}}</td>
-                            <!-- <td class="text-center font-weight-bold col-2 col-sm-3" style="font-size: 14px">
+                            <tr ng-repeat="c in datos.loterias" @{{p($last)}}>
+                            <td class="text-center font-weight-bold " style="font-size: 14px">@{{c.descripcion}}</td>
+                            <td class="text-center font-weight-bold " style="font-size: 14px">@{{c.primera}}</td>
+                            <td class="text-center font-weight-bold " style="font-size: 14px">@{{c.segunda}}</td>
+                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.tercera}}</td>
+                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.cash3}}</td>
+                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.cash4}}</td>
+                            <!-- <td class="text-center font-weight-bold " style="font-size: 14px">
                                 @{{c.fechaHasta}}
                                
                             </td> -->
-                            <td class="text-center font-weight-bold col-2 col-sm-1" style="font-size: 14px">
-                                <button ng-click="eliminar(c)" type="button" rel="tooltip" data-placement="left" class=" btn btn-outline-danger m-0 p-1 d-inline ">
-                                  <i class="material-icons">close</i>
-                                </button>
+                            <td class="text-center font-weight-bold " style="font-size: 14px">
+                              <a style="cursor: pointer" ng-click="editarPremio(c.id)" class="ion-edit d-inline  py-1 text-success rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                            </td>
+                            <td class="text-center font-weight-bold " style="font-size: 14px">
+                              <a style="cursor: pointer" ng-click="borrar(c.id)" class="ion-edit d-inline  py-1 text-danger rounded abrir-wizard-editar"><i class="material-icons">delete_outline</i></a>
                             </td>
                             
                             <!-- <td class="td-actions text-center col-1">

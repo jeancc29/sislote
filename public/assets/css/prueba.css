@@ -1,0 +1,93 @@
+.nav2 {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+  }
+
+  .nav2-link {
+    display: block;
+    padding: 0.5rem 1rem;
+  }
+  
+  .nav2-link:hover, .nav2-link:focus {
+    text-decoration: none;
+  }
+  
+  .nav2-link.disabled {
+    color: #6c757d;
+  }
+  
+  .nav2-tabs {
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .nav2-tabs .nav2-item {
+    margin-bottom: -1px;
+  }
+
+  
+  .nav2-tabs .nav2-link {
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+  }
+  
+  .nav2-tabs .nav2-link:hover, .nav2-tabs .nav2-link:focus {
+    border-color: #e9ecef #e9ecef #dee2e6;
+  }
+  
+  .nav2-tabs .nav2-link.disabled {
+    color: #6c757d;
+    background-color: transparent;
+    border-color: transparent;
+  }
+  
+  .nav2-tabs .nav2-link.active,
+  .nav2-tabs .nav2-item.show .nav2-link {
+    color: #495057;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+  }
+
+
+  .nav2-tabs .dropdown-menu {
+    margin-top: -1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  
+  .nav2-pills .nav2-link {
+    border-radius: 0.25rem;
+  }
+  
+  .nav2-pills .nav2-link.active,
+  .nav2-pills .show > .nav2-link {
+    color: #fff;
+    background-color: #007bff;
+  }
+  
+  .nav2-fill .nav2-item {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    text-align: center;
+  }
+  
+  .nav2-justified .nav2-item {
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    text-align: center;
+  }
+  
+  .tab-content > .tab-pane {
+    display: none;
+  }
+  
+  .tab-content > .active {
+    display: block;
+  }

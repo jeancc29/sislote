@@ -27,7 +27,8 @@ var myApp = angular
             "selectedLoteria" : {},
             "optionsSorteos" : [],
             "selectedSorteo" : {},
-            "loterias" : []
+            "loterias" : [],
+            "existeSorteo" : false
         }
 
 
@@ -50,15 +51,9 @@ var myApp = angular
                 let idx = 0;
                 if(idLoteria > 0)
                     idx = $scope.datos.optionsLoterias.findIndex(x => x.id == idLoteria);
-
-                // let idx2 = 0;
-                // if(idSorteo > 0)
-                //     idx2 = $scope.datos.optionsSorteos.findIndex(x => x.idSorteo == idSorteo);
-
-
                  $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[idx];
-                 //$scope.datos.selectedSorteo = $scope.datos.optionsSorteos[idx2];
-                
+                 $scope.cbxLoteriasChanged();
+    
 
                  $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
@@ -69,13 +64,12 @@ var myApp = angular
                   })
             
 
-                // $scope.datos.quiniela = $scope.datos.selectedLoteria.quinielaBloqueoLoteria;
-                // $scope.datos.pale = $scope.datos.selectedLoteria.paleBloqueoLoteria;
-                // $scope.datos.tripleta = $scope.datos.selectedLoteria.tripletaBloqueoLoteria;
-
-                // $scope.datos.optionsSorteos =JSON.parse(response.data[0].sorteos);
-                // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
-                
+               
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
             });
        
         }
@@ -86,19 +80,44 @@ var myApp = angular
             $scope.datos.idBanca = idBanca;
             console.log('idUsuario', $scope.datos.idUsuario);
             $scope.inicializarDatos(0, 0);
-           
         }
 
       
         
 
-        $scope.actualizar = function(){
+        $scope.actualizar = function(vistaSencilla = false){
             
             console.log($scope.datos.loterias);
             var errores = false, mensaje = "";
             
 
+            if(vistaSencilla == true){
+                if($scope.datos.optionsLoterias.find(x => x.id == $scope.datos.selectedLoteria.id) == undefined){
+                    alert("Debe seleccionar una loteria");
+                    return;
+                }
 
+                if($scope.existeSorteo('Super pale', $scope.datos.selectedLoteria) == false){
+                    if($scope.empty($scope.datos.primera, 'number') == true || $scope.empty($scope.datos.segunda, 'number') == true || $scope.empty($scope.datos.tercera, 'number') == true){
+                        alert("Hay campos vacios");
+                        return;
+                    }
+                }else if($scope.existeSorteo('Super pale', $scope.datos.selectedLoteria) == true){
+                    if($scope.empty($scope.datos.primera, 'number') == true || $scope.empty($scope.datos.segunda, 'number') == true){
+                        alert("Hay campos vacios");
+                        return;
+                    }
+                }
+                
+                let idx = $scope.datos.loterias.findIndex(x => x.id == $scope.datos.selectedLoteria.id);
+                $scope.datos.loterias[idx].primera = $scope.datos.primera;
+                $scope.datos.loterias[idx].segunda = $scope.datos.segunda;
+                $scope.datos.loterias[idx].tercera = $scope.datos.tercera;
+
+                // console.log('actualizar: ', idx);
+                // return;
+            }
+            
             $scope.datos.loterias.forEach(function(valor, indice, array){
                 
               
@@ -139,29 +158,7 @@ var myApp = angular
                  return;
              }
 
-            // if(Number($scope.datos.numerosGanadores) != $scope.datos.numerosGanadores)
-            // {
-            //     alert("El monto quiniela debe ser numerico");
-            //     return;
-            // }
-
-            /*Si la hora actual del sistema es menor que la hora de cierre de la loteria seleccionada 
-                entonces eso quiere decir que los numeros no han salido por lo tanto es un error */
-            // if((new Date() < new Date($scope.datos.selectedLoteria.fecha_actual_horaCierre)))
-            // {
-            //     alert("Error, la loteria aun no ha cerrado");
-            //     return;
-            // }
-
-            // if($scope.datos.numerosGanadores.length != 6)
-            // {
-            //     alert("Debe registrar 6 numeros ganadores");
-            //     return;
-            // }
            
-
-            //$scope.datos.idLoteria = $scope.datos.selectedLoteria.id;
-            //$scope.datos.idSorteo = $scope.datos.selectedSorteo.idSorteo;
    
             console.log('actualizar: ', $scope.datos);
           
@@ -175,10 +172,39 @@ var myApp = angular
                     alert(response.data.mensaje);
                 }
 
+            },
+            function(response) {
+                // Handle error here
+                console.log('Error jean: ', response);
+                alert("Error");
             });
 
         }
 
+        $scope.borrar = function(id){
+
+            if($scope.datos.optionsLoterias.find(x => x.id == id) == undefined){
+                return;
+            }
+
+            $scope.datos.idLoteria = id;
+            $http.post(rutaGlobal+"/api/premios/erase", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
+             .then(function(response){
+                console.log(response);
+                if(response.data.errores == 0){
+                    $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
+                    alert("Se ha borrado correctamente");
+                }else if(response.data.errores == 1){
+                    alert(response.data.mensaje);
+                }
+
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
+            });
+        }
 
         $scope.buscar = function(){
 
@@ -194,6 +220,11 @@ var myApp = angular
                 //     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
                 //     alert("Se ha guardado correctamente");
                 // }
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
             });
 
         }
@@ -211,6 +242,11 @@ var myApp = angular
                     alert(response.data[0].mensaje);
                 }
                 
+            },
+            function(response) {
+                // Handle error here
+                //console.log('Error jean: ', response);
+                alert("Error");
             });
         }
 
@@ -223,7 +259,28 @@ var myApp = angular
        
 
         $scope.cbxLoteriasChanged = function(){
-            $scope.datos.numerosGanadores = $scope.datos.selectedLoteria.numerosGanadoresHoy;
+           $scope.datos.primera =  $scope.datos.selectedLoteria.primera;
+           $scope.datos.segunda =  $scope.datos.selectedLoteria.segunda;
+           $scope.datos.tercera =  $scope.datos.selectedLoteria.tercera;
+           $scope.datos.existeSorteo = $scope.existeSorteo('Super pale', $scope.datos.selectedLoteria);
+           console.log("Changed sorteo", $scope.datos.selectedLoteria);
+
+           if($scope.empty($scope.datos.selectedLoteria.primera, "number") == false)
+                $('#primeraVentanaSencilla').addClass('is-filled');
+           if($scope.empty($scope.datos.selectedLoteria.segunda, "number") == false)
+                $('#segundaVentanaSencilla').addClass('is-filled');
+           if($scope.empty($scope.datos.selectedLoteria.tercera, "number") == false)
+                $('#terceraVentanaSencilla').addClass('is-filled');
+        }
+
+        $scope.editarPremio = function(id){
+            if($scope.datos.optionsLoterias.find(x => x.id == id) != undefined){
+                $scope.datos.selectedLoteria = $scope.datos.optionsLoterias.find(x => x.id == id);
+                $scope.cbxLoteriasChanged();
+                $timeout(function() {
+                    $('.selectpicker').selectpicker("refresh");
+                  })
+            }
         }
 
         $scope.cbxLoteriasChanged2 = function(){

@@ -85,11 +85,13 @@ Route::post('/horarios/normal/guardar', 'HorariosController@store');
 
 
 Route::get('/premios', 'AwardsController@index');
+Route::post('/premios/erase', 'AwardsController@erase');
 Route::post('/premios/guardar', 'AwardsController@store');
 
 Route::get('/bloqueos', 'BlockslotteriesController@index');
 Route::post('/bloqueos/loterias/guardar', 'BlockslotteriesController@store');
 Route::post('/bloqueos/jugadas/guardar', 'BlocksplaysController@store');
+Route::post('/bloqueos/loterias/buscar', 'BlockslotteriesController@buscar');
 
 
 
