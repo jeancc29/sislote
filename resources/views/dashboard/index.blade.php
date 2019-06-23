@@ -40,215 +40,198 @@
 
 
 
-<div class="container-fluid">
+<div class="container-fluid ">
   
-  <div class="col-md-12 col-12 mr-auto ml-auto">
+  <div class="col-md-12 col-12 mr-auto mx-0 px-0">
 
-
-<div class="row">
-      <div class="col-md-6">
-        <div class="card ">
-          <div class="card-header card-header-success card-header-icon">
-            <div class="card-icon">
-              <i class="material-icons"></i>
+      <div class="row">
+      <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="card card-stats">
+                      <div class="card-header card-header-rose card-header-icon">
+                        <div class="card-icon">
+                          <i class="material-icons">equalizer</i>
+                        </div>
+                        <p class="card-category">Website Visits</p>
+                        <h3 class="card-title">75.521</h3>
+                      </div>
+                      <div class="card-footer">
+                        <div class="stats">
+                          <i class="material-icons">local_offer</i> Tracked from Google Analytics
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="card card-stats">
+                      <div class="card-header card-header-success card-header-icon">
+                        <div class="card-icon">
+                          <i class="material-icons">store</i>
+                        </div>
+                        <p class="card-category">Revenue</p>
+                        <h3 class="card-title">$34,245</h3>
+                      </div>
+                      <div class="card-footer">
+                        <div class="stats">
+                          <i class="material-icons">date_range</i> Last 24 Hours
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+      </div>
+      <div class="row py-0 mb-0">
+        <div class="col-md-6 py-0 mb-0">
+          <div class="card py-0 mb-1">
+            <div class="card-header card-header-success card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons"></i>
+              </div>
+              <h4 class="card-title">Grafica de ventas neta</h4>
             </div>
-            <h4 class="card-title">Global Sales by Top Locations</h4>
-          </div>
-          <div class="card-body ">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="table-responsive table-sales">
-                  <table class="table">
-                    <tbody>
-                      <tr>
-                        <td>
-                          Lotekaaa
+            <div class="card-body ">
+              <div class="row">
+                <div class="col-md-12">
+                <div id="myfirstchart" class="col-md-12" style="height: 250px;"></div>
+                </div> <!-- END COL-MD-12 -->
+                    <!-- <div class="col-md-6 ml-auto mr-auto">
+                      <div id="worldMap" style="height: 300px;"></div>
+                    </div> -->
+              </div> <!-- END ROW -->
+            </div> <!-- END CARD-BODY -->
+          </div> <!-- END CARD -->
+        </div> <!-- END COL-MD-6 -->
+
+        <div class="col-md-6 py-0 mb-0">
+          <div class="card py-0 mb-1">
+            <div class="card-header card-header-success card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons"></i>
+              </div>
+              <h4 class="card-title">Ventas por lotería</h4>
+            </div>
+            <div class="card-body ">
+              <div class="row">
+                <div class="col-12">
+
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-fixed-dashboard">
+                                <thead class="">
+                                    <tr>
+                                    <th class="font-weight-bold col-5 text-center">Loteria</th>
+                                    <th class="font-weight-bold col-4 text-center">Venta total</th>
+                                    <th class="font-weight-bold col-3 text-center">Premios</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                @foreach ($loterias as $l)
+                                <tr>
+                                    <td class="col-5  text-center">{{$l->descripcion}}</td>
+                                    <td class="col-4 text-center">{{$l->ventas}}</td>
+                                    <td class="col-3 text-center">{{$l->premios}}</td>
+                                  </tr>
+                                @endforeach
+                                    <!-- <tr>
+                                    <td class="font-weight-bold col-5  text-center" style="font-size: 18px;">Total</td>
+                                    <td class="font-weight-bold col-4 text-center" style="font-size: 18px;">200</td>
+                                    <td class="font-weight-bold col-3 text-center" style="font-size: 18px;">200</td>
+                                    </tr> -->
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                                <!-- <div class="float-right mt-3">
+                                        <div style="font-size: 16px;" class="font-weight-bold">
+                                            Total
+                                            <small class="h3 ml-3">&euro;0</small>
+                                        </div> 
+                                        
+                                </div> -->
+                            </div> <!-- END RESPONSIVE TABLE -->
+                        </div><!-- END ROW CONTENEDOR TABLA -->
+                        <div class="row mt-2">
+                          <h4 class="font-weight-bold col-5  text-center" style="font-size: 18px;">Total</h4>
+                          <h4 class="font-weight-bold col-4 text-center" style="font-size: 18px;">200</h4>
+                          <h4 class="font-weight-bold col-3 text-center" style="font-size: 18px;">200</h4>
+                        </div>
+                         <!-- <h4 class="text-right">Total: @{{datos.total_palet | currency}}</h4> -->
+                    </div> <!-- COL-3 -->
+
+              </div> <!-- END ROW -->
+            </div> <!-- END CARD-BODY -->
+          </div> <!-- END CARD -->
+        </div> <!-- END COL-MD-6 -->
+
+      </div> <!-- END ROW -->
+
+      <div class="row justify-content-center">
+        @foreach ($sorteos as $s)
+        <div class="card my-0 mx-1 d-inline-block mx-0" style="min-width: 160px; max-width: 160px; min-height: 290px; max-height: 290px; width: 15.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+                <div class="card-header card-header-info card-header-icon my-0 py-0">
+               
+                <h4 class="card-title py-0 my-0 text-center">{{$s['descripcion']}}</h4>
+                </div>
+                <div class="card-body px-0 mx-0 pt-0 mt-0"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
+                <div class="">
+                    <table class="table">
+                    <thead>
+                        <tr>
+                        <th class="font-weight-bold" style="font-size: 11px">LOT</th>
+                        <th class="font-weight-bold " style="font-size: 11px">NUM</th>
+                        <th class="text-right font-weight-bold" style="font-size: 11px">MONT</th>
+                        <!-- <th class="text-right font-weight-bold  d-md-block d-lg-none" style="font-size: 11px">MONT</th> -->
+                        <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
+                        </tr>
+                    </thead>
+                    <tbody class="">
+                    @foreach ($s['jugadas'] as $j)
+                        <tr>
+                        <td  style="font-size: 11px;">{{$j['abreviatura']}}</td>
+                        <td  style="font-size: 11px;">{{$j['jugada']}}</td>
+                        <td class="text-center" style="font-size: 12px;">
+                        {{$j['monto']}}
+                           
                         </td>
-                        <td class="text-right">
-                          2.920
-                        </td>
-                        <td class="text-right">
-                          53.23%
-                        </td>
-                      </tr>
-                    
-                      
-                      
-                      
+                        
+                        </tr>
+                      @endforeach
+                        
                     </tbody>
-                  </table>
-                  </div>
-                  </div>
-                  <!-- <div class="col-md-6 ml-auto mr-auto">
-                    <div id="worldMap" style="height: 300px;"></div>
-                  </div> -->
-                  </div>
-                  </div>
-                  </div>
-        </div>
-</div>
+                    </table>
+                    
+                </div>
+                   
+                </div>
+            </div> <!-- END CARD -->
+        @endforeach
+          
+        <!-- <tr>
+                        <td  style="font-size: 11px;">LN PM</td>
+                        <td  style="font-size: 11px;">23-22-22</td>
+                        <td class="text-center" style="font-size: 12px;">
+                            20
+                           
+                        </td>
+                        
+                        </tr> -->
+
+            
+
+      </div> <!-- END ROW -->
   
   
-  </div>
-</div>
+  </div> <!-- END COL-12 COL-MD-12 -->
+</div> <!-- END CONTAINER-FLUID -->
 
                   </div>
 
-                  <footer class="footer" >
-    <div class="container-fluid">
-        <nav class="float-left">
-          <ul>
-              <li>
-                  <a href="https://www.creative-tim.com">
-                      Creative Tim
-                  </a>
-              </li>
-              <li>
-                  <a href="https://creative-tim.com/presentation">
-                      About Us
-                  </a>
-              </li>
-              <li>
-                  <a href="http://blog.creative-tim.com">
-                      Blog
-                  </a>
-              </li>
-              <li>
-                  <a href="https://www.creative-tim.com/license">
-                      Licenses
-                  </a>
-              </li>
-          </ul>
-        </nav>
-        <div class="copyright float-right">
-            &copy;
-            <script>
-                document.write(new Date().getFullYear())
-            </script>, made with <i class="material-icons">favorite</i> by
-            <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a> for a better web.
-        </div>
-    </div>
-</footer>
+                  
 
                
              </div>
           
         </div>
         
-            <div class="fixed-plugin">
-    <div class="dropdown show-dropdown">
-        <a href="#" data-toggle="dropdown">
-        <i class="fa fa-cog fa-2x"> </i>
-        </a>
-        <ul class="dropdown-menu">
-			<li class="header-title"> Sidebar Filters</li>
-            <li class="adjustments-line">
-                <a href="javascript:void(0)" class="switch-trigger active-color">
-                  <div class="badge-colors ml-auto mr-auto">
-                    <span class="badge filter badge-purple" data-color="purple"></span>
-                    <span class="badge filter badge-azure" data-color="azure"></span>
-                    <span class="badge filter badge-green" data-color="green"></span>
-                    <span class="badge filter badge-warning" data-color="orange"></span>
-                    <span class="badge filter badge-danger" data-color="danger"></span>
-                    <span class="badge filter badge-rose active" data-color="rose"></span>
-                  </div>
-                  <div class="clearfix"></div>
-                </a>
-            </li>
-
-            
-            <li class="header-title">Sidebar Background</li>
-              <li class="adjustments-line">
-                  <a href="javascript:void(0)" class="switch-trigger background-color">
-                      <div class="ml-auto mr-auto">
-                        <span class="badge filter badge-black active" data-background-color="black"></span>
-                        <span class="badge filter badge-white" data-background-color="white"></span>
-                        <span class="badge filter badge-red" data-background-color="red"></span>
-                      </div>
-                      <div class="clearfix"></div>
-                  </a>
-              </li>
-
-              <li class="adjustments-line">
-                  <a href="javascript:void(0)" class="switch-trigger">
-                      <p>Sidebar Mini</p>
-                      <label class="ml-auto">
-                        <div class="togglebutton switch-sidebar-mini">
-                          <label>
-                            <input type="checkbox">
-                            <span class="toggle"></span>
-                          </label>
-                        </div>
-                      </label>
-                      <div class="clearfix"></div>
-                  </a>
-              </li>
-
-              <li class="adjustments-line">
-                  <a href="javascript:void(0)" class="switch-trigger">
-                      <p>Sidebar Images</p>
-                      <label class="switch-mini ml-auto">
-                        <div class="togglebutton switch-sidebar-image">
-                          <label>
-                            <input type="checkbox" checked="">
-                            <span class="toggle"></span>
-                          </label>
-                        </div>
-                      </label>
-                      <div class="clearfix"></div>
-                  </a>
-              </li>
-
-              <li class="header-title">Images</li>
-
-              <li class="active">
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                  <img src="../../assets/img/sidebar-1.jpg" alt="">
-                </a>
-              </li>
-              <li>
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                  <img src="../../assets/img/sidebar-2.jpg" alt="">
-                </a>
-              </li>
-              <li>
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                  <img src="../../assets/img/sidebar-3.jpg" alt="">
-                </a>
-              </li>
-              <li>
-                <a class="img-holder switch-trigger" href="javascript:void(0)">
-                  <img src="../../assets/img/sidebar-4.jpg" alt="">
-                </a>
-              </li>
-
-
-            <li class="button-container">
-              <a href="https://www.creative-tim.com/product/material-dashboard-pro" target="_blank" class="btn btn-rose btn-block btn-fill">Buy Now</a>
-              <a href="https://demos.creative-tim.com/material-dashboard-pro/docs/2.0/getting-started/introduction.html" target="_blank" class="btn btn-default btn-block">
-                  Documentation
-              </a>
-              <a href="https://www.creative-tim.com/product/material-dashboard" target="_blank" class="btn btn-info btn-block">
-                  Get Free Demo!
-              </a>
-            </li>
-            
-
-            
-            <li class="button-container github-star">
-                <a class="github-button" href="https://github.com/creativetimofficial/ct-material-dashboard-pro" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star ntkme/github-buttons on GitHub">Star</a>
-            </li>
-            <li class="header-title">Thank you for 95 shares!</li>
-
-            <li class="button-container text-center">
-                <button id="twitter" class="btn btn-round btn-twitter"><i class="fa fa-twitter"></i> &middot; 45</button>
-                <button id="facebook" class="btn btn-round btn-facebook"><i class="fa fa-facebook-f"></i> &middot; 50</button>
-                <br>
-                <br>
-            </li>
-        </ul>
-    </div>
-</div>
+     
 
         
         
@@ -340,10 +323,46 @@
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 <script src="{{asset('assets/demo/demo.js')}}"></script>
 
+<?php if($controlador == "dashboard"):?>
+    <script src="{{asset('assets/js/raphael-min.js')}}" ></script>
+    <script src="{{asset('assets/js/morris.min.js')}}" ></script>
+<?php endif; ?> 
 
 
 
+<script>
+    new Morris.Bar({
+  // ID of the element in which to draw the chart.
+  element: 'myfirstchart',
+  // Chart data records -- each entry in this array corresponds to a point on
+  // the chart.
 
+  // data: [
+  //   { year: '2008', sales: 200, value: 20 },
+  //   { year: '2009', sales: 100, value: 10 },
+  //   { year: '2010', sales: 70, value: 5 },
+  //   { year: '2011', sales: 50, value: 5 },
+  //   { year: '2012', sales: 200, value: 20 }
+  // ],
+  data: <?php echo $ventasGrafica ?>,
+  // The name of the data record attribute that contains x-values.
+  xkey: 'dia',
+  // A list of names of data record attributes that contain y-values.
+  ykeys: ['total', 'neto'],
+  // Labels for the ykeys -- will be displayed when you hover over the
+  // chart.
+  labels: ['total', 'neto'],
+  // stacked: true,
+  barSize: 50,
+  resize: true,
+  barColors: function (row, series, type) {
+    console.log('row: ', series);
+    if(series.key == "neto")
+        return "#75b281";
+    return "#c2c2d6";
+    }
+});
+    </script>
 
 
 

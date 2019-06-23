@@ -35,6 +35,9 @@ if($controlador != "login"){
 
 <link href="{{asset('assets/css/material-dashboard.css')}}" rel="stylesheet" />
 <link href="{{asset('assets/css/prueba.css')}}" rel="stylesheet" />
+<?php if($controlador == "dashboard"):?>
+    <link href="{{asset('assets/css/morris.css')}}" rel="stylesheet" />
+<?php endif; ?> 
 
 
 <!--     Fonts and icons     -->
@@ -81,6 +84,8 @@ if($controlador != "login"){
     //     console.log('header ruta:', rutaGlobal);
     // }
 </script>
+
+
 
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>

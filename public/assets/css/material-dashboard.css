@@ -251,6 +251,36 @@ li.disabled a{
 
 
 
+
+
+.table-fixed-dashboard thead,
+.table-fixed-dashboard tfoot{
+  width: 97%;
+}
+
+.table-fixed-dashboard tbody {
+  height: 143px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.table-fixed-dashboard thead,
+.table-fixed-dashboard tbody,
+.table-fixed-dashboard tfoot,
+.table-fixed-dashboard tr,
+.table-fixed-dashboard td,
+.table-fixed-dashboard th {
+  display: block;
+}
+
+.table-fixed-dashboard tbody td,
+.table-fixed-dashboard thead > tr> th,
+.table-fixed-dashboard tfoot > tr> td{
+  float: left;
+  border-bottom-width: 0;
+}
+
+
 /* El codigo de la plantilla css comienza aqui */
 
 
