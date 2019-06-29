@@ -180,6 +180,13 @@ class TicketClass{
         $img = \file_get_contents($ruta);
         $data = base64_encode($img);
 
+
+
+        $output_file = public_path() . "\\assets\\ticket\\" . "ticket" . ".txt";
+        $file = fopen($output_file, "wb");
+        fwrite($file, $data);
+        fclose($file);
+
         return $data;
     }
 

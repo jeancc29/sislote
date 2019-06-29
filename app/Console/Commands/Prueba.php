@@ -63,7 +63,7 @@ class Prueba extends Command
 
         $monto = (new Helper)->montodisponible("55", 1, 1);
 
-        $h = new TicketClass(5);
+        $h = new TicketClass(17);
         $a = new AwardsClass(2);
         $a->primera = "";
         $a->segunda = 02;

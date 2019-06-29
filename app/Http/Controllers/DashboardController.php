@@ -70,13 +70,13 @@ class DashboardController extends Controller
         $fecha6DiasAtras = $fecha6DiasAtras->toDateString() . ' 00:00:00';
 
         $daysSpanish = [
-            0 => 'lun',
-            1 => 'mar',
-            2 => 'mié',
-            3 => 'jue',
-            4 => 'vie',
-            5 => 'sáb',
-            6 => 'dom',
+            1 => 'lun',
+            2 => 'mar',
+            3 => 'mié',
+            4 => 'jue',
+            5 => 'vie',
+            6 => 'sáb',
+            0 => 'dom',
         ];
 
         //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
@@ -87,12 +87,14 @@ class DashboardController extends Controller
             //->orderBy('created_at', 'asc')
             ->get();
 
-
+       
         $ventasGrafica = collect($ventasGrafica)->map(function($d) use($daysSpanish){
             $fecha = new Carbon($d['date']);
             $dia = $daysSpanish[$fecha->dayOfWeek] . ' ' . $fecha->day;
             return ["total" => $d['subTotal'], "neto" => $d['total'], "dia" => $dia];
         });
+
+        
 
         //VENTAS Y PREMIOS AGRUPADOS POR LOTERIA
         $fechaInicial = Carbon::now();
@@ -132,10 +134,10 @@ class DashboardController extends Controller
             return $id['idBanca'];
         });
 
-        $bancasConVentas = Branches::whereIn('id', $idBancas)->get();
-        $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->get();
+        $bancasConVentas = Branches::whereIn('id', $idBancas)->count();
+        $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->count();
 
-        return view('dashboard.index', compact('controlador', 'ventasGrafica', 'loterias', 'sorteos'));
+        return view('dashboard.index', compact('controlador', 'ventasGrafica', 'loterias', 'sorteos', 'bancasConVentas', 'bancasSinVentas'));
         
     }
 

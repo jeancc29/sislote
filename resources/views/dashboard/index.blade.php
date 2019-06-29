@@ -45,34 +45,34 @@
   <div class="col-md-12 col-12 mr-auto mx-0 px-0">
 
       <div class="row">
-      <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="card card-stats">
-                      <div class="card-header card-header-rose card-header-icon">
-                        <div class="card-icon">
-                          <i class="material-icons">equalizer</i>
-                        </div>
-                        <p class="card-category">Website Visits</p>
-                        <h3 class="card-title">75.521</h3>
-                      </div>
-                      <div class="card-footer">
-                        <div class="stats">
-                          <i class="material-icons">local_offer</i> Tracked from Google Analytics
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="card card-stats">
+      <div class="col-lg-4 col-md-6 col-sm-6 ">
+                    <div class="card card-stats py-0 mb-0">
                       <div class="card-header card-header-success card-header-icon">
                         <div class="card-icon">
                           <i class="material-icons">store</i>
                         </div>
-                        <p class="card-category">Revenue</p>
-                        <h3 class="card-title">$34,245</h3>
+                        <p class="card-category">Bancas con ventas</p>
+                        <h3 class="card-title">{{$bancasConVentas}}</h3>
                       </div>
                       <div class="card-footer">
                         <div class="stats">
-                          <i class="material-icons">date_range</i> Last 24 Hours
+                          <i class="material-icons">date_range</i> Hoy
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card card-stats py-0 mb-0">
+                      <div class="card-header card-header-rose card-header-icon">
+                        <div class="card-icon">
+                          <i class="material-icons">cancel_presentation</i>
+                        </div>
+                        <p class="card-category">Bancas sin ventas</p>
+                        <h3 class="card-title">{{$bancasSinVentas}}</h3>
+                      </div>
+                      <div class="card-footer">
+                        <div class="stats">
+                          <i class="material-icons">date_range</i> Hoy
                         </div>
                       </div>
                     </div>
@@ -81,9 +81,9 @@
       <div class="row py-0 mb-0">
         <div class="col-md-6 py-0 mb-0">
           <div class="card py-0 mb-1">
-            <div class="card-header card-header-success card-header-icon">
+            <div class="card-header card-header-info card-header-icon">
               <div class="card-icon">
-                <i class="material-icons"></i>
+                <i class="material-icons">insert_chart</i>
               </div>
               <h4 class="card-title">Grafica de ventas neta</h4>
             </div>
@@ -102,9 +102,9 @@
 
         <div class="col-md-6 py-0 mb-0">
           <div class="card py-0 mb-1">
-            <div class="card-header card-header-success card-header-icon">
+            <div class="card-header card-header-info card-header-icon">
               <div class="card-icon">
-                <i class="material-icons"></i>
+                <i class="material-icons">assignment</i>
               </div>
               <h4 class="card-title">Ventas por lotería</h4>
             </div>
@@ -126,8 +126,8 @@
                                 @foreach ($loterias as $l)
                                 <tr>
                                     <td class="col-5  text-center">{{$l->descripcion}}</td>
-                                    <td class="col-4 text-center">{{$l->ventas}}</td>
-                                    <td class="col-3 text-center">{{$l->premios}}</td>
+                                    <td class="col-4 text-center">{{($l->ventas) ? $l->ventas : 0}}</td>
+                                    <td class="col-3 text-center">{{($l->premios) ? $l->premios : 0}}</td>
                                   </tr>
                                 @endforeach
                                     <!-- <tr>
@@ -165,10 +165,12 @@
 
       <div class="row justify-content-center">
         @foreach ($sorteos as $s)
-        <div class="card my-0 mx-1 d-inline-block mx-0" style="min-width: 160px; max-width: 160px; min-height: 290px; max-height: 290px; width: 15.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+        <div class="card my-0 mx-1 d-inline-block mx-0" style="min-width: 160px; max-width: 160px; min-height: 290px; width: 15.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon my-0 py-0">
-               
-                <h4 class="card-title py-0 my-0 text-center">{{$s['descripcion']}}</h4>
+                  <div class="card-icon" style="width:20%!important; height: 25%!important; padding: 2px; margin-right: 0px; margin-left: 0px; margin-top: 0px;">
+                    <i class="material-icons" style="width: 0px; height: 0px; margin: 0 auto; padding: 0 auto; line-height: 0px; margin-top: 20px;" >assignment</i>
+                  </div>
+                  <h4 class="card-title py-0 my-0 text-center">{{$s['descripcion']}}</h4>
                 </div>
                 <div class="card-body px-0 mx-0 pt-0 mt-0"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="">
@@ -353,7 +355,7 @@
   // chart.
   labels: ['total', 'neto'],
   // stacked: true,
-  barSize: 50,
+  barSize: 30,
   resize: true,
   barColors: function (row, series, type) {
     console.log('row: ', series);
