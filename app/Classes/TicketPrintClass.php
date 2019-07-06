@@ -36,7 +36,7 @@ use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
 
 
-class TicketClass{
+class TicketPrintClass{
     private $html;
     private $banca;
     private $venta;
@@ -123,7 +123,6 @@ class TicketClass{
                             $this->openTable();
                                 $this->setTableHead();
                                 $this->openTableBody();
-
                             $yaAbrioSegundaTabla = true;
                         }
                         // else{
@@ -165,7 +164,25 @@ class TicketClass{
         $this->closeTicket();
         $this->closeHeader();
 
+        //Ruta servidor
+        // $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
+        // $file = fopen($output_file, "wb");
+        // fwrite($file, $this->html);
+        // fclose($file);
 
+        // ob_start();
+        // $command = "C:\\loteria\\public\\assets\\ticket\\wkhtmltoimage --zoom 2.125 --width 314 ";
+        // $command .= "C:\\loteria\\public\\assets\\ticket\\" . $this->venta->idTicket . ".html ";
+        // $command .= "C:\\loteria\\public\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
+        // system($command, $return_var);
+        // $salida = \ob_get_contents();
+        // \ob_end_clean();
+
+        // $ruta = public_path() . "\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
+        // $img = \file_get_contents($ruta);
+        // $data = base64_encode($img);
+
+        /*************** RUTA PC DEBUG **************************/
         $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
         $file = fopen($output_file, "wb");
         fwrite($file, $this->html);
@@ -183,8 +200,6 @@ class TicketClass{
         $img = \file_get_contents($ruta);
         $data = base64_encode($img);
 
-        
-
         return $data;
     }
 
@@ -200,13 +215,13 @@ class TicketClass{
 
         $this->contadorJugadas = $contadorJugadas;
 
-        return $total;
+        return (float)$total;
     }
 
     function openHeader()
     {
         $this->html = "<!DOCTYPE html>
-        <html lang='en' ng-app='myModule' style='min-width: 300px; max-width: 302px;'>
+        <html lang='en' ng-app='myModule' style='min-width: 400px; max-width: 402px;'>
         <head>
           <meta charset='UTF-8'>
           <title>Document</title>
@@ -216,10 +231,32 @@ class TicketClass{
          <script src='angular.min.js'></script> -->
         
          
-         <link href='bootstrap3/dist/css/bootstrap.css' rel='stylesheet' />
+         <!-- <link href='bootstrap3/dist/css/bootstrap.css' rel='stylesheet' /> -->
         <!-- <script src='./bootstrap/css/bootstrap.min.css' type='text/javascript'></script> -->
         
+        
         <style>
+        #banca, #imprimir{
+            width: 100%;
+            text-align: center;
+          }
+
+          .loterias{
+            margin: 0 auto;
+            width: 90%;
+          }
+
+          .contenedor-tabla{
+            width: 50%;
+            float: left;
+          }
+          .contenedor-total{
+            clear: both;
+            display: block;
+            width: 100%;
+            text-align: center;
+          }
+
             .table { 
     
                 border-bottom:0px !important; 
@@ -239,7 +276,6 @@ class TicketClass{
             }
         </style>
         
-        
         </head>
         <body>";
     }
@@ -252,9 +288,9 @@ class TicketClass{
 
     function setBanca()
     {
-        $this->html .= "<div class='row'>
+        $this->html .= "<div id='banca' class='row'>
         <div class='col-xs-12 text-center'>
-          <h1>" . $this->banca->descripcion . "</h1>
+          <h1 style='margin-top: 0px; margin-bottom:0px;'>" . $this->banca->descripcion . "</h1>
         </div>
       </div>";
     }
@@ -271,7 +307,7 @@ class TicketClass{
     }
 
     function setOriginal(){
-        $this->html .= "<h5 class='text-center my-0'>**ORIGINAL**</h5>";
+        $this->html .= "<h2 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'><strong>** ORIGINAL **</strong></h2>";
     }
 
     function setFirstFecha(){
@@ -279,7 +315,7 @@ class TicketClass{
         $hora = $fecha->format('g:i A');
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;
-        $this->html .= "<h5 class='text-center my-0'>". $fechaCompleta ."</h5>";
+        $this->html .= "<h3 class='text-center' style='margin-top: 0px; margin-bottom:0px;'><strong>". $fechaCompleta ."</strong></h3>";
     }
 
     function setSecondFecha(){
@@ -287,20 +323,20 @@ class TicketClass{
         $hora = $fecha->format('g:i A');
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;
-        $this->html .= "<p class='text-center my-0'>Fecha:". $fechaCompleta ."</p>";
+        $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>Fecha: ". $fechaCompleta ."</h3>";
     }
 
     function setTicket(){
-        $this->html .= "<p class='text-center my-0'>Ticket: ". $this->banca->codigo . "-" . (new Helper)->toSecuencia($this->venta->idTicket) ."</p>";
+        $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>Ticket: ". (new Helper)->toSecuencia($this->venta->idTicket) ."</h3>";
     }
 
     function setCodigoBarra(){
         $codigoBarra = Tickets::whereId($this->venta->idTicket)->first()->codigoBarra;
-        $this->html .= "<h5 class='text-center my-0 font-weight-bold'>". $codigoBarra ."</h5>";
+        $this->html .= "<h2 class='text-center my-0'><strong>". $codigoBarra ."</strong></h2>";
     }
 
     function openRowJugadas(){
-        $this->html .= "<div class='row justify-content-center'>";
+        $this->html .= "<div  class='row justify-content-center'>";
     }
 
     function closeRowJugadas(){
@@ -308,13 +344,14 @@ class TicketClass{
     }
 
     function setLoteriaTotal($loteria, $total){
-        $this->html .= "<div class='col-xs-12 text-center'>
-        <p style='border-top-style: dashed; border-bottom-style: dashed; padding: 8px; width: 75%; margin: auto; font-size: 17px;'  class='text-center font-weight-bold py-1 mt-2 mb-0'>$loteria:$total</p>
+        $loteria = strtoupper($loteria);
+        $this->html .= "<div class='loterias col-xs-12 text-center' style='border-top-style: dashed; border-bottom-style: dashed;'>
+        <h3 style=' padding: 8px; width: 75%; margin: auto; '  class='text-center font-weight-bold py-1 mt-2 mb-0'>$loteria: $total</h3>
       </div>";
     }
 
     function openColXs6(){
-        $this->html .="<div class='col-xs-6'>";
+        $this->html .="<div class='col-xs-6 contenedor-tabla' >";
     }
 
     function openColXs12(){
@@ -335,9 +372,9 @@ class TicketClass{
 
     function setTableHead(){
         $this->html .= "<thead>
-        <tr>
-            <th class='text-center' scope='col'>Jugada</th>
-            <th class='text-center' scope='col'>Monto</th>
+        <tr style='width: 100%;'>
+            <th class='text-center' scope='col' style='font-size: 18px; margin-left: 0px; margin-right: 0px;'>JUGADA</th>
+            <th class='text-center' scope='col' style='font-size: 18px; margin-left: 0px; margin-right: 0px;'>MONTO</th>
         </tr>
         </thead>";
     }
@@ -352,18 +389,18 @@ class TicketClass{
 
     function setJugada($jugada, $monto){
         $this->html .= "<tr >
-        <td class='text-center' style='font-size: 14px'>$jugada</td>
-        <td class='text-center' style='font-size: 14px'>$monto</td>
+        <td class='text-center' style='font-size: 20px'>$jugada</td>
+        <td class='text-center' style='font-size: 20px'>$monto</td>
     </tr> ";
     }
 
     function setTotal(){
-        $this->html .="<div class='row'>";
+        $this->html .="<div class='row contenedor-total style='margin-bottom: 39px;'>";
         if((int)$this->venta->descuentoMonto > 0){
-            $this->html .= "<h5 class='text-center my-0'> Descuento:". $this->venta->descuentoMonto ."</h5>";
-            $this->html .= "<h5 class='text-center my-0'>subTotal:". $this->venta->subTotal ."</h5>";
+            $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->venta->descuentoMonto ."</h3>";
+            $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>subTotal:". $this->venta->subTotal ."</h3>";
         }
-        $this->html .= "<h4 class='text-center my-0'>- Total:". $this->venta->total ." -</h4>";
+        $this->html .= "<h2 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'><strong>- Total:". $this->venta->total ." -</strong></h2>";
 
         $this->html .="</div>";
     }

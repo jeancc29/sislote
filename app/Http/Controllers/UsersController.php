@@ -131,7 +131,7 @@ class UsersController extends Controller
                 }
             }
     
-            $id = Users::whereEmail($datos['usuario'])->first();
+            $id = Users::whereUsuario($datos['usuario'])->first();
            if($id != null){
             if($usuario->id != $id->id){
                 return Response::json([
@@ -166,7 +166,7 @@ class UsersController extends Controller
                     'mensaje' => 'El correo ya existe, elija uno diferente'
                 ], 201);
             }
-            if(Users::whereEmail($datos['usuario'])->first() != null){
+            if(Users::whereUsuario($datos['usuario'])->first() != null){
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => 'El usuario ya existe, elija uno diferente'

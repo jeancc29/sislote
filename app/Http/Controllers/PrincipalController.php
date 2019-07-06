@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response; 
 use Carbon\Carbon;
 use App\Classes\Helper;
-use App\Classes\TicketClass;
+use App\Classes\TicketPrintClass;
 
 
 // use Faker\Generator as Faker;
@@ -915,7 +915,8 @@ class PrincipalController extends Controller
 
         $img = null;
         if($sale != null){
-            $img = new TicketClass($sale->id);
+            // $img = new TicketClass($sale->id);\
+            $img = new TicketPrintClass($sale->id);
             $img = $img->generate();
         }
     

@@ -69,9 +69,7 @@ class LoginController extends Controller
         
 
         $u = Users::where(['usuario' => $data['usuario']])->get()->first();
-        //dd($u->id);
         $idBanca = Branches::where('idUsuario', $u->id)->first();
-    
         if($idBanca != null){
             $idBanca = $idBanca->id;
         }
@@ -89,6 +87,15 @@ class LoginController extends Controller
                 'password' => 'Contraseña incorrecta'
             ]);
         }
+
+       
+        if(!$u->tienePermiso("Acceso al sistema") == true){
+            return redirect('login')->withErrors([
+                'acceso' => 'Usuario no tiene acceso al sistema'
+            ]);
+        }
+
+        
         
         //Session::put('idUsuario', $u->id);
 
@@ -97,8 +104,11 @@ class LoginController extends Controller
        session(['permisos' => $u->permisos]);
 
       
-
-       return redirect()->route('principal');
+       $role = Roles::whereId($u->idRole)->first();
+       if($role->descripcion == "Administrador" || $role->descripcion == "Supervisor")
+            return redirect()->route('dashboard');
+        else
+            return redirect()->route('principal');
     }
 
     public function accederApi(Request $request)
@@ -143,6 +153,13 @@ class LoginController extends Controller
             return Response::json([
                 'errores' => 1,
                 'mensaje' => 'Este usuario no tiene banca asignada'
+            ], 201);
+        }
+
+        if(!$u->tienePermiso("Acceso al sistema")){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Este usuario no tiene acceso al sistema'
             ], 201);
         }
         

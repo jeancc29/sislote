@@ -1,0 +1,6 @@
+Buscar apk de la aplicacion en el cel de valentin a travez de team view
+Implementar qr en android
+Unir bitmap ticket y qr
+Enviar por sms y whatsapp
+
+Reparar la impresion de ticket

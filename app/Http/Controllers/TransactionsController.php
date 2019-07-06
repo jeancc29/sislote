@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Classes\Helper;
 
 use App\transactions;
 use Request;
@@ -55,9 +56,20 @@ class TransactionsController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
+            
+            if(!(new Helper)->existe_sesion()){
+                return redirect()->route('login');
+            }
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar transacciones") == true){
+                return Redirect::back();
+            }
             return view('transacciones.index', compact('controlador'));
         }
 
+
+        
+       
         
 
         $fechaActual = strtotime(date("d-m-Y H:i:00",time()));

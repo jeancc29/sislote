@@ -45,7 +45,7 @@ class PermissionSeeder extends Seeder
 
 
 
-
+        //Estos idTipo que esta aqui no estan registrado en la table tipos, solo son para manejarlos de manera superficial
 
 
         //Usuarios idTipo == 1
@@ -137,9 +137,42 @@ class PermissionSeeder extends Seeder
         //Acceso al sistema idTipo == 6
         //14
         p::create([
+            'descripcion' => 'Acceso al sistema',
+            'status' => 1,
+            'idTipo' => 6
+        ]);
+        
+        p::create([
             'descripcion' => 'Ver menus',
             'status' => 1,
             'idTipo' => 6
+        ]);
+
+
+        //Transacciones idTipo == 7
+        //16
+        p::create([
+            'descripcion' => 'Crear ajustes',
+            'status' => 1,
+            'idTipo' => 7
+        ]);
+
+        p::create([
+            'descripcion' => 'Crear cobror',
+            'status' => 1,
+            'idTipo' => 7
+        ]);
+
+        p::create([
+            'descripcion' => 'Crear pagos',
+            'status' => 1,
+            'idTipo' => 7
+        ]);
+
+        p::create([
+            'descripcion' => 'Manejar transacciones',
+            'status' => 1,
+            'idTipo' => 7
         ]);
 
     }

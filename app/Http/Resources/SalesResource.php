@@ -6,6 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Salesdetails;
 use App\Cancellations;
 use App\Lotteries;
+use Carbon\Carbon;
 
 class SalesResource extends JsonResource
 {
@@ -43,7 +44,8 @@ class SalesResource extends JsonResource
                                 return $id->idLoteria;
                             }) 
                         )->get(),
-            'jugadas' => Salesdetails::where('idVenta', $this->id)->get()
+            'jugadas' => Salesdetails::where('idVenta', $this->id)->get(),
+            'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A')
         ];
     }
 }

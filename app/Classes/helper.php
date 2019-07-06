@@ -94,13 +94,14 @@ class Helper{
     }
 
 
-    function verificar_session()
+    function existe_sesion()
     {
         if(!session()->has('idUsuario'))
         {
-            redirect()->route('login');
+            return false;
         }
 
+        return true;
     }
 
     function cerrar_session()
