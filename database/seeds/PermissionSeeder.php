@@ -158,7 +158,7 @@ class PermissionSeeder extends Seeder
         ]);
 
         p::create([
-            'descripcion' => 'Crear cobror',
+            'descripcion' => 'Crear cobros',
             'status' => 1,
             'idTipo' => 7
         ]);

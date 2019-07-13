@@ -12,6 +12,10 @@ class Commissions extends Model
         'directo', 
         'pale',
         'tripleta',
-        'superPale'
+        'superPale',
+        'pick3Straight',
+        'pick3Box',
+        'pick4Straight',
+        'pick4Box',
     ];
 }

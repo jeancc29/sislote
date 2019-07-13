@@ -78,17 +78,17 @@
                 <h5 class="info-text"> Let's start with the basic information (with validation)</h5>
                 <div class="row justify-content-center">
  
-                  <div class="col-12 col-md-8">
+                  <div class="col-12 col-md-12">
 
                    
                     
                     <div class="row">
                         <div ng-repeat="l in datos.loterias" class="col-12">
                           <div class="row">
-                            <div class="col-4 col-md-5 text-right mt-4">
+                            <div class="col-3 col-md-2 text-right mt-4">
                               <h6>@{{l.descripcion}}</h6>
                             </div>
-                            <div class="col-2">
+                            <div class="col-2 col-md-1">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">1era</label>
@@ -96,7 +96,7 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2">
+                            <div class="col-2 col-md-1">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">2da</label>
@@ -104,7 +104,7 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2" ng-hide="existeSorteo('Super pale', l)">
+                            <div class="col-2 col-md-1" ng-hide="existeSorteo('Super pale', l)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
@@ -112,6 +112,26 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
+                            
+
+                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 3 Box', l) || existeSorteo('Pick 3 Straight', l)">
+                              <div class="input-group form-control-lg">
+                                <div class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Pick3</label>
+                                  <input ng-model="l.pick3" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
+                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 4 Box', l) || existeSorteo('Pick 4 Straight', l)">
+                              <div class="input-group form-control-lg">
+                                <div class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Pick4</label>
+                                  <input ng-model="l.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
                            </div> <!-- END ROW -->
                         </div> <!-- END COL-23 -->
                     </div> <!-- END ROW -->
@@ -187,7 +207,7 @@
                                 </select>
                               </div>
                             </div>
-                            <div class="col-2">
+                            <div class="col-2" ng-show="existeSorteo('Directo', datos.selectedLoteria) || existeSorteo('Super pale', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="primeraVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">1era</label>
@@ -195,7 +215,7 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2">
+                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) || existeSorteo('Super pale', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="segundaVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">2da</label>
@@ -203,11 +223,29 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2" ng-hide="datos.existeSorteo">
+                            <div class="col-2" ng-hide="existeSorteo('Super pale', datos.selectedLoteria)" ng-show="existeSorteo('Tripleta', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="terceraVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
                                   <input ng-model="datos.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
+                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 3 Box', datos.selectedLoteria) || existeSorteo('Pick 3 Straight', datos.selectedLoteria)">
+                              <div class="input-group form-control-lg">
+                                <div class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Pick3</label>
+                                  <input ng-model="l.pick3" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
+                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 4 Box', datos.selectedLoteria) || existeSorteo('Pick 4 Straight', datos.selectedLoteria)">
+                              <div class="input-group form-control-lg">
+                                <div class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Pick4</label>
+                                  <input ng-model="l.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
@@ -221,20 +259,28 @@
 
                     </form> 
                    
-
+                    <style>
+                      .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+                        background-color: #f5f2f2;
+                      }
+                      /* .table-striped{
+                        background: #cccaca!important;
+                      } */
+                    
+                    </style>
                     <div class="col-12">
                          <!-- INICIO TABLA-->
                         <table 
                     
-                        class="table mt-1 ">
+                        class="table table-striped mt-1 ">
                         <thead class="">
                             <tr>
                             <th class="text-center font-weight-bold " style="font-size: 15px">Lot</th>
                             <th class="text-center font-weight-bold " style="font-size: 15px">1ra</th>
                             <th class="text-center font-weight-bold" style="font-size: 15px">2da</th>
                             <th class="text-center font-weight-bold" style="font-size: 15px">3ra</th>
-                            <th class="text-center font-weight-bold" style="font-size: 15px">Cash 3</th>
-                            <th class="text-center font-weight-bold" style="font-size: 15px">Play 4</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">Pick 3</th>
+                            <th class="text-center font-weight-bold" style="font-size: 15px">Pick 4</th>
                             <!-- <th class="text-center font-weight-bold" style="font-size: 15px">HASTA</th> -->
                             <th class="text-center font-weight-bold" style="font-size: 15px">Editar</th>
                             <th class="text-center font-weight-bold" style="font-size: 15px">Limpiar</th>
@@ -247,8 +293,8 @@
                             <td class="text-center font-weight-bold " style="font-size: 14px">@{{c.primera}}</td>
                             <td class="text-center font-weight-bold " style="font-size: 14px">@{{c.segunda}}</td>
                             <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.tercera}}</td>
-                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.cash3}}</td>
-                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.cash4}}</td>
+                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.pick3}}</td>
+                            <td class="text-center font-weight-bold" style="font-size: 14px">@{{c.pick4}}</td>
                             <!-- <td class="text-center font-weight-bold " style="font-size: 14px">
                                 @{{c.fechaHasta}}
                                

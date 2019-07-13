@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
 
 
+use App\Userssesions;
 use App\Lotteries;
 use App\Generals;
 use App\Sales;
@@ -104,6 +105,10 @@ class LoginController extends Controller
        session(['permisos' => $u->permisos]);
 
       
+       Userssesions::create([
+           'idUsuario' => $u->id,
+           'esCelular' => false
+       ]);
        $role = Roles::whereId($u->idRole)->first();
        if($role->descripcion == "Administrador" || $role->descripcion == "Supervisor")
             return redirect()->route('dashboard');
@@ -168,6 +173,10 @@ class LoginController extends Controller
     //    session(['idUsuario' => $u->id]);
     //    session(['permisos' => $u->permisos]);
 
+        Userssesions::create([
+            'idUsuario' => $u->id,
+            'esCelular' => true
+        ]);
       
        return Response::json([
         'errores' => 0,

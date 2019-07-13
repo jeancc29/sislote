@@ -232,6 +232,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         //'Countries' => 'Webpatser\Countries\CountriesFacade',
         'Image' => Intervention\Image\Facades\Image::class,
+        'Helper' =>  App\Classes\Helper::class
 
     ],
 

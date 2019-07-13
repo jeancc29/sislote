@@ -79,6 +79,7 @@ Route::post('/bancas/eliminar', 'BranchesController@destroy');
 Route::get('/usuarios', 'UsersController@index');
 Route::post('/usuarios/guardar', 'UsersController@store');
 Route::post('/usuarios/eliminar', 'UsersController@destroy');
+Route::post('/usuarios/sesiones', 'UserssesionsController@buscar');
 
 Route::get('/horarios', 'HorariosController@index');
 Route::post('/horarios/normal/guardar', 'HorariosController@store');

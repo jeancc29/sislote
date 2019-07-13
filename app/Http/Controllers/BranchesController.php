@@ -267,6 +267,10 @@ class BranchesController extends Controller
                         'pale' => $l['comisiones']['pale'],
                         'tripleta' => $l['comisiones']['tripleta'],
                         'superPale' => $l['comisiones']['superPale'],
+                        'pick3Straight' => $l['comisiones']['pick3Straight'],
+                        'pick3Box' => $l['comisiones']['pick3Box'],
+                        'pick4Straight' => $l['comisiones']['pick4Straight'],
+                        'pick4Box' => $l['comisiones']['pick4Box'],
                     ]);
                 }
             }
@@ -317,6 +321,30 @@ class BranchesController extends Controller
                     if((new Helper)->isNumber($l['pagosCombinaciones']['primerPago']) == false){
                         return Response::json(['errores' => 1,'mensaje' => 'Campo primerPago no tiene formato correcto'], 201);
                     }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick3TodosEnSecuencia']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick3 TodosEnSecuencia no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick33Way']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick3 3-way no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick36Way']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick3 6-way no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick4TodosEnSecuencia']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 TodosEnSecuencia no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick44Way']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 4-way no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick46Way']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 6-way no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick412Way']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 12-way no tiene formato correcto'], 201);
+                    }
+                    if((new Helper)->isNumber($l['pagosCombinaciones']['pick424Way']) == false){
+                        return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 24-way no tiene formato correcto'], 201);
+                    }
                     Payscombinations::create([
                         'idBanca' => $banca['id'],
                         'idLoteria' => $l['id'],
@@ -329,6 +357,12 @@ class BranchesController extends Controller
                         'tresNumeros' => (int)$l['pagosCombinaciones']['tresNumeros'],
                         'dosNumeros' => (int)$l['pagosCombinaciones']['dosNumeros'],
                         'primerPago' => (int)$l['pagosCombinaciones']['primerPago'],
+                        'pick3TodosEnSecuencia' => (int)$l['pagosCombinaciones']['pick3TodosEnSecuencia'],
+                        'pick4TodosEnSecuencia' => (int)$l['pagosCombinaciones']['pick4TodosEnSecuencia'],
+                        'pick44Way' => (int)$l['pagosCombinaciones']['pick44Way'],
+                        'pick46Way' => (int)$l['pagosCombinaciones']['pick46Way'],
+                        'pick412Way' => (int)$l['pagosCombinaciones']['pick412Way'],
+                        'pick424Way' => (int)$l['pagosCombinaciones']['pick424Way'],
                     ]);
                 }
             }

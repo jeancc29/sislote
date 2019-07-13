@@ -35,6 +35,7 @@ use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 
 use Illuminate\Support\Facades\Crypt;
+use App\Classes\Helper;
 
 class AwardsController extends Controller
 {
@@ -47,6 +48,13 @@ class AwardsController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar transacciones") == true){
+                return redirect()->route('principal');
+            }
             return view('premios.index', compact('controlador'));
         }
 
@@ -64,7 +72,7 @@ class AwardsController extends Controller
 
 
 
-        $loterias = Lotteries::whereStatus(1)->get();
+        $loterias = Lotteries::whereStatus(1)->has('sorteos')->get();
 
         $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
             $primera = null;

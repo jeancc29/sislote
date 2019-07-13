@@ -12,9 +12,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->truncateTables([
-                    'users','permissions', 
+                    'users',
+                    'permissions', 
                     'roles', 'permission_role', 
-                    'lotteries', 'draws', 
+                    'lotteries', 
+                    'draws', 
                     'blockslotteries', 
                     'blocksplays', 
                     'branches', 
@@ -22,12 +24,16 @@ class DatabaseSeeder extends Seeder
                     'days', 
                     'types', 
                     'entities', 
-                    'drawsrelations', 'frecuencies']);
+                    'drawsrelations', 
+                    'frecuencies'
+                    ]);
+
+        $this->call('DrawsSeeder');
 
         $this->call('CountriesSeeder');
         $this->call('PermissionSeeder');
         $this->call('LotteriesSeeder');
-        $this->call('DrawsSeeder');
+        
         $this->call('RolesSeeder');
         $this->call('PermissionRoleSeeder');
         $this->call('UsersSeeder');

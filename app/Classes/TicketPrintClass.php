@@ -161,6 +161,7 @@ class TicketPrintClass{
                 
             $this->closeRowJugadas();
             $this->setTotal();
+            $this->setPieDePagina();
         $this->closeTicket();
         $this->closeHeader();
 
@@ -183,24 +184,24 @@ class TicketPrintClass{
         // $data = base64_encode($img);
 
         /*************** RUTA PC DEBUG **************************/
-        $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
-        $file = fopen($output_file, "wb");
-        fwrite($file, $this->html);
-        fclose($file);
+        // $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
+        // $file = fopen($output_file, "wb");
+        // fwrite($file, $this->html);
+        // fclose($file);
 
-        ob_start();
-        $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --zoom 2.125 --width 314 ";
-        $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\" . $this->venta->idTicket . ".html ";
-        $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
-        system($command, $return_var);
-        $salida = \ob_get_contents();
-        \ob_end_clean();
+        // ob_start();
+        // $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --zoom 2.125 --width 314 ";
+        // $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\" . $this->venta->idTicket . ".html ";
+        // $command .= "C:\\loterias\\lote\\public\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
+        // system($command, $return_var);
+        // $salida = \ob_get_contents();
+        // \ob_end_clean();
 
-        $ruta = public_path() . "\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
-        $img = \file_get_contents($ruta);
-        $data = base64_encode($img);
+        // $ruta = public_path() . "\\assets\\ticket\\img\\" . $this->venta->idTicket . ".png";
+        // $img = \file_get_contents($ruta);
+        // $data = base64_encode($img);
 
-        return $data;
+        return $this->html;
     }
 
     function getTotalLoteria($id){
@@ -395,13 +396,31 @@ class TicketPrintClass{
     }
 
     function setTotal(){
-        $this->html .="<div class='row contenedor-total style='margin-bottom: 39px;'>";
+        $this->html .="<div class='row contenedor-total' style='margin-bottom: 2px;'>";
         if((int)$this->venta->descuentoMonto > 0){
             $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->venta->descuentoMonto ."</h3>";
             $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>subTotal:". $this->venta->subTotal ."</h3>";
         }
         $this->html .= "<h2 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'><strong>- Total:". $this->venta->total ." -</strong></h2>";
 
+        $this->html .="</div>";
+    }
+
+    function setPieDePagina(){
+        $this->html .="<div class='row contenedor-total' style='margin-bottom: 150px;'>";
+        if($this->banca->piepagina1 != null){
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina1 ."</h4>";
+        }
+        if($this->banca->piepagina2 != null){
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina2 ."</h4>";
+        }
+        if($this->banca->piepagina3 != null){
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina3 ."</h4>";
+        }
+        if($this->banca->piepagina4 != null){
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina4 ."</h4>";
+        }
+        
         $this->html .="</div>";
     }
 }

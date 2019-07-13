@@ -94,7 +94,7 @@ class Helper{
     }
 
 
-    function existe_sesion()
+    static function existe_sesion()
     {
         if(!session()->has('idUsuario'))
         {

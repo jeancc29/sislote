@@ -308,7 +308,7 @@ var myApp = angular
         }
 
 
-        $scope.monto_disponible = function(blur = false){
+        $scope.monto_disponible = function(esBlur = false){
             
             
             
@@ -334,7 +334,7 @@ var myApp = angular
                 
                 if($scope.datos.jugada != null){
                     if(Object.keys($scope.datos.loterias).length <= 0){
-                        if(blur == false)
+                        if(esBlur == false)
                             alert("Debes seleccionar una loteria");
                         return;
                     }

@@ -40,6 +40,34 @@ class DrawsSeeder extends Seeder
             'status' => 1
         ]);
 
+        d::create([
+            'descripcion' => 'Pick 3 Straight',
+            'bolos' => 3,
+            'cantidadNumeros' => 3,
+            'status' => 1
+        ]);
+
+        d::create([
+            'descripcion' => 'Pick 3 Box',
+            'bolos' => 3,
+            'cantidadNumeros' => 3,
+            'status' => 1
+        ]);
+
+        d::create([
+            'descripcion' => 'Pick 4 Straight',
+            'bolos' => 4,
+            'cantidadNumeros' => 4,
+            'status' => 1
+        ]);
+
+        d::create([
+            'descripcion' => 'Pick 4 Box',
+            'bolos' => 4,
+            'cantidadNumeros' => 4,
+            'status' => 1
+        ]);
+
         // d::create([
         //     'descripcion' => 'Super pale real',
         //     'bolos' => 3,

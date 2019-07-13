@@ -292,10 +292,18 @@ var myApp = angular
             $http.post(rutaGlobal+"/api/transacciones/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
             .then(function(response){
                console.log(response.data);
-               $scope.datos.grupos = response.data.grupos;
-               limpiar();
-               $scope.datos.addTransaccion = [];
-               alert('Se ha guardado correctamente');
+               if(response.data.errores != 1){
+                    $scope.datos.grupos = response.data.grupos;
+                    limpiar();
+                    $scope.datos.addTransaccion = [];
+                    alert('Se ha guardado correctamente');
+               }else{
+                limpiar();
+                $scope.datos.addTransaccion = [];
+                alert(response.data.mensajes);
+               }
+               
+               
                
             },
             function(response) {

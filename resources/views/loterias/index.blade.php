@@ -73,11 +73,11 @@
                   Loteria
                 </a>
               </li>
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a ng-click="mostrarPagos = true" class="nav-link" href="#account" data-toggle="tab" role="tab">
                   Jugadas
                 </a>
-              </li>
+              </li> -->
             </ul>
           </div>
           <div class="card-body">

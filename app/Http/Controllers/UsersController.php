@@ -33,6 +33,7 @@ use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 
 use Illuminate\Support\Facades\Crypt;
+use App\Classes\Helper;
 
 class UsersController extends Controller
 {
@@ -45,6 +46,13 @@ class UsersController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar usuarios") == true){
+                return redirect()->route('principal');
+            }
             return view('usuarios.index', compact('controlador'));
         }
 

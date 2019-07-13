@@ -65,6 +65,13 @@ if($controlador != "login"){
     window.idUsuario = "<?php echo session('idUsuario') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
 
+    window.toSecuencia = function(idTicket){
+            var str = "" + idTicket;
+            var pad = "000000000";
+            var ans = pad.substring(0, pad.length - str.length) + str;
+            return ans;
+        }
+
     var prueba = function(){
         alert("Preuba");
     }
@@ -109,6 +116,10 @@ if($controlador != "login"){
         <script src="{{asset('assets/js/angular/usuarios.js')}}" ></script>
     <?php endif; ?>
 
+    <?php if($controlador == "usuarios.sesiones" ):?>
+        <script src="{{asset('assets/js/angular/sesiones.js')}}" ></script>
+    <?php endif; ?>
+
     <?php if($controlador == "loterias"):?>
         <script src="{{asset('assets/js/angular/loteria.js')}}" ></script>
     <?php endif; ?>
@@ -147,6 +158,10 @@ if($controlador != "login"){
     <?php endif; ?>
     <?php if($controlador == "transacciones.grupo"):?>
         <script src="{{asset('assets/js/angular/transacciones-grupo.js')}}" ></script>
+    <?php endif; ?>
+
+    <?php if($controlador == "monitoreo.tickets" ):?>
+        <script src="{{asset('assets/js/angular/monitoreo.tickets.js')}}" ></script>
     <?php endif; ?>
 
 <style>
@@ -924,7 +939,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
         <ul class="nav">
 
             <li class="nav-item ">
-                <a class="nav-link" href="principal">
+                <a class="nav-link" href="{{route('principal')}}">
                     <i class="material-icons">dashboard</i>
                     <p> Principal </p>
                 </a>
@@ -979,6 +994,58 @@ if(session('idUsuario') == null && $controlador != 'login'){
                        
                     </p>
                 </a>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#usuariosToggle">
+                    <i class="material-icons">image</i>
+                    <p> Usuarios 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="usuariosToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('usuarios')}}">
+                              <span class="sidebar-mini"> E </span>
+                              <span class="sidebar-normal"> Editar </span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('usuarios.sesiones')}}">
+                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-normal"> Sesiones de usuarios </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#transaccionesToggle">
+                    <i class="material-icons">image</i>
+                    <p> Transacciones 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="transaccionesToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('transacciones')}}">
+                              <span class="sidebar-mini"> E </span>
+                              <span class="sidebar-normal"> Transacciones </span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('transacciones.grupo')}}">
+                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-normal"> Grupo transacciones </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
 
             <li class="nav-item active">

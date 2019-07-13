@@ -16,7 +16,7 @@ class CreateLotteriesTable extends Migration
         Schema::create('lotteries', function (Blueprint $table) {
             $table->increments('id');
             $table->string('descripcion', 50);
-            $table->string('abreviatura', 5);
+            $table->string('abreviatura', 10);
             // $table->time('horaCierre');
             $table->integer('status');
             $table->timestamps();

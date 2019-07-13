@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Classes\Helper;
+use Illuminate\Support\Facades\Redirect;
 
 use App\transactions;
 use Request;
@@ -62,7 +63,7 @@ class TransactionsController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar transacciones") == true){
-                return Redirect::back();
+                return redirect()->route('principal');
             }
             return view('transacciones.index', compact('controlador'));
         }
@@ -317,7 +318,37 @@ class TransactionsController extends Controller
 
         $grupo = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);
 
-        
+        $u = Users::whereId($datos['idUsuario'])->first();
+        foreach($datos['addTransaccion'] as $t){
+            if($t['tipo']['descripcion'] == "Ajuste"){
+                if(!$u->tienePermiso("Crear ajustes") == true){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensajes' => "No tiene permisos para realizar esta accion",
+                    ], 201);
+                }
+            }
+
+            if($t['tipo']['descripcion'] == "Cobro"){
+                if(!$u->tienePermiso("Crear cobros") == true){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensajes' => "No tiene permisos para realizar esta accion",
+                    ], 201);
+                }
+            }
+
+            if($t['tipo']['descripcion'] == "Pago"){
+                if(!$u->tienePermiso("Crear pagos") == true){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensajes' => "No tiene permisos para realizar esta accion",
+                    ], 201);
+                }
+            }
+           
+            
+        }
 
         $c = 0;
         foreach($datos['addTransaccion'] as $t){
@@ -374,6 +405,8 @@ class TransactionsController extends Controller
        
 
        return Response::json([
+           'errores' => 0,
+           'mensaje' => "Se ha guardado correctamente",
         'bancas' => Branches::whereStatus(1)->get(),
         'entidades' => Entity::whereStatus(1)->get(),
         'tipos' => Types::whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago'])->get(),

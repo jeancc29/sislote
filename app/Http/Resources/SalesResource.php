@@ -7,6 +7,7 @@ use App\Salesdetails;
 use App\Cancellations;
 use App\Lotteries;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt; 
 
 class SalesResource extends JsonResource
 {
@@ -33,6 +34,7 @@ class SalesResource extends JsonResource
             'idTicket' => $this->idTicket,
             'ticket' => $this->ticket->id,
             'codigoBarra' => $this->ticket->codigoBarra,
+            'codigoQr' => base64_encode($this->ticket->codigoBarra),
             'status' => $this->status, 
             'created_at' => $this->created_at,
             'premio' => Salesdetails::where('idVenta', $this->id)->sum('premio'),

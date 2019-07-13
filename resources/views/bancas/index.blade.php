@@ -693,6 +693,58 @@
                       </div> <!-- END COL-6 -->
                    </div> <!-- END ROW -->
 
+                   <div class="row" ng-if="existeSorteo('Pick 3 Straight')">
+                    <div class="col-8">
+                        <div class="row mt-2">
+                          <label class="d-none d-sm-block text-right col-sm-3 col-form-label font-weight-bold mt-2" style="color: black;">Pick 3 Straight</label>
+                          <div class="col-sm-5">
+                            <div class="form-group">
+                            <input ng-model="datos.ckbLoterias[datos.indexLoteriaComisiones].comisiones.pick3Straight" type="text"  name="superPale" id="superPale" type="text" class="form-control" >
+                            </div>
+                          </div>
+                        </div>
+                      </div> <!-- END COL-6 -->
+                   </div> <!-- END ROW -->
+
+                   <div class="row" ng-if="existeSorteo('Pick 3 Straight')">
+                    <div class="col-8">
+                        <div class="row mt-2">
+                          <label class="d-none d-sm-block text-right col-sm-3 col-form-label font-weight-bold mt-2" style="color: black;">Pick 3 Box</label>
+                          <div class="col-sm-5">
+                            <div class="form-group">
+                            <input ng-model="datos.ckbLoterias[datos.indexLoteriaComisiones].comisiones.pick3Box" type="text"  name="superPale" id="superPale" type="text" class="form-control" >
+                            </div>
+                          </div>
+                        </div>
+                      </div> <!-- END COL-6 -->
+                   </div> <!-- END ROW -->
+
+                   <div class="row" ng-if="existeSorteo('Pick 3 Straight')">
+                    <div class="col-8">
+                        <div class="row mt-2">
+                          <label class="d-none d-sm-block text-right col-sm-3 col-form-label font-weight-bold mt-2" style="color: black;">Pick 4 Straight</label>
+                          <div class="col-sm-5">
+                            <div class="form-group">
+                            <input ng-model="datos.ckbLoterias[datos.indexLoteriaComisiones].comisiones.pick4Straight" type="text"  name="superPale" id="superPale" type="text" class="form-control" >
+                            </div>
+                          </div>
+                        </div>
+                      </div> <!-- END COL-6 -->
+                   </div> <!-- END ROW -->
+
+                   <div class="row" ng-if="existeSorteo('Pick 3 Straight')">
+                    <div class="col-8">
+                        <div class="row mt-2">
+                          <label class="d-none d-sm-block text-right col-sm-3 col-form-label font-weight-bold mt-2" style="color: black;">Pick 4 Box</label>
+                          <div class="col-sm-5">
+                            <div class="form-group">
+                            <input ng-model="datos.ckbLoterias[datos.indexLoteriaComisiones].comisiones.pick4Box" type="text"  name="superPale" id="superPale" type="text" class="form-control" >
+                            </div>
+                          </div>
+                        </div>
+                      </div> <!-- END COL-6 -->
+                   </div> <!-- END ROW -->
+
                   </div> <!-- END COL 12 PRINCIPAL -->
                  
                 </div>
@@ -871,7 +923,135 @@
                         </div> <!-- END ROW COL-LG-4 -->
                       </div> <!-- END COL-LG-4 -->
 
+
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                            <h4 class="font-weight-bold m-0">Pick 3 Straight</h4>
+                            </div>
+                            <div class="col-12">
+                              <div class="row justify-content-center">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">Todos en secuencia</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <!-- <label for="fechaBusqueda" class="bmd-label-floating font-weight-bold" style="color: black;">Todos en secuencia</label> -->
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick3TodosEnSecuencia" type="text"  name="primeraSegunda" id="primeraSegunda" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+                            
+                           
+                        </div> <!-- END ROW COL-LG-4 -->
+                      </div> <!-- END COL-LG-4 -->
+
+                      
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                            <h4 class="font-weight-bold m-0">Pick 3 Box</h4>
+                            </div>
+                            <div class="col-12">
+                              <div class="row ">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">3-way: 2 identicos</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick33Way" type="text"  name="primeraSegunda" id="primeraSegunda" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+                            <div class="col-12">
+                              <div class="row ">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">6-way: 3 unicos</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick36Way" type="text"  name="primeraTercera" id="primeraTercera" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+                            
+                        </div> <!-- END ROW COL-LG-4 -->
+                      </div> <!-- END COL-LG-4 -->
+
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                            <h4 class="font-weight-bold m-0">Pick 4 Straight</h4>
+                            </div>
+                            <div class="col-12">
+                              <div class="row justify-content-center">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">Todos en secuencia</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <!-- <label for="fechaBusqueda" class="bmd-label-floating font-weight-bold" style="color: black;">Todos en secuencia</label> -->
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick4TodosEnSecuencia" type="text"  name="primeraSegunda" id="primeraSegunda" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+                            
+                           
+                        </div> <!-- END ROW COL-LG-4 -->
+                      </div> <!-- END COL-LG-4 -->
+
+
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                            <h4 class="font-weight-bold m-0">Pick 3 Box</h4>
+                            </div>
+                            <div class="col-12">
+                              <div class="row ">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">4-way: 3 identicos</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick44Way" type="text"  name="primeraSegunda" id="primeraSegunda" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+                            <div class="col-12">
+                              <div class="row ">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">6-way: 2 identicos</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick46Way" type="text"  name="primeraTercera" id="primeraTercera" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+                           
+                            <div class="col-12">
+                              <div class="row ">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">12-way: 2 identicos</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick412Way" type="text"  name="primeraTercera" id="primeraTercera" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+
+                            <div class="col-12">
+                              <div class="row ">
+                                <label class="d-none d-sm-block text-right col-sm-5 col-form-label  mt-2" style="color: black;">24-way: 2 identicos</label>
+                                <div class="col-sm-5">
+                                  <div class="form-group">
+                                  <input ng-model="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].pagosCombinaciones.pick424Way" type="text"  name="primeraTercera" id="primeraTercera" type="text" class="form-control" >
+                                  </div>
+                                </div>
+                              </div>
+                            </div> <!-- END COL-12 -->
+
+                        </div> <!-- END ROW COL-LG-4 -->
+                      </div> <!-- END COL-LG-4 -->
+
                    </div> <!-- END ROW -->
+
+
+                   
 
                    
 

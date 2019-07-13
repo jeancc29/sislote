@@ -262,6 +262,10 @@ var myApp = angular
                     array[indice].comisiones.pale = 0;
                     array[indice].comisiones.tripleta = 0;
                     array[indice].comisiones.superPale = 0;
+                    array[indice].comisiones.pick3Straight = 0;
+                    array[indice].comisiones.pick3Box = 0;
+                    array[indice].comisiones.pick4Straight = 0;
+                    array[indice].comisiones.pick4Box = 0;
                     
                     array[indice].pagosCombinaciones = {};
                     array[indice].pagosCombinaciones.primera = 0;
@@ -273,6 +277,14 @@ var myApp = angular
                     array[indice].pagosCombinaciones.tresNumeros = 0;
                     array[indice].pagosCombinaciones.dosNumeros = 0;
                     array[indice].pagosCombinaciones.primerPago = 0;
+                    array[indice].pagosCombinaciones.pick3TodosEnSecuencia = 0;
+                    array[indice].pagosCombinaciones.pick33Way = 0;
+                    array[indice].pagosCombinaciones.pick36Way = 0;
+                    array[indice].pagosCombinaciones.pick4TodosEnSecuencia = 0;
+                    array[indice].pagosCombinaciones.pick44Way = 0;
+                    array[indice].pagosCombinaciones.pick46Way = 0;
+                    array[indice].pagosCombinaciones.pick412Way = 0;
+                    array[indice].pagosCombinaciones.pick424Way = 0;
 
                     array[indice].existe = true;
 
@@ -490,6 +502,10 @@ var myApp = angular
                             $scope.datos.ckbLoterias[idx].comisiones.pale = array[indice].pale;
                             $scope.datos.ckbLoterias[idx].comisiones.tripleta = array[indice].tripleta;
                             $scope.datos.ckbLoterias[idx].comisiones.superPale = array[indice].superPale;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Straight = array[indice].pick3Straight;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Box = array[indice].pick3Box;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Straight = array[indice].pick4Straight;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Box = array[indice].pick4Box;
 
                             $scope.datos.comisiones.loterias.push($scope.datos.ckbLoterias[idx]);
                         }else{
@@ -498,6 +514,10 @@ var myApp = angular
                             $scope.datos.ckbLoterias[idx].comisiones.pale = 0;
                             $scope.datos.ckbLoterias[idx].comisiones.tripleta = 0;
                             $scope.datos.ckbLoterias[idx].comisiones.superPale = 0;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Straight = 0;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Box = 0;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Straight = 0;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Box = 0;
                         }
                     }
 
@@ -520,6 +540,14 @@ var myApp = angular
                             $scope.datos.ckbLoterias[idx].pagosCombinaciones.tresNumeros = array[indice].tresNumeros;
                             $scope.datos.ckbLoterias[idx].pagosCombinaciones.dosNumeros = array[indice].dosNumeros;
                             $scope.datos.ckbLoterias[idx].pagosCombinaciones.primerPago = array[indice].primerPago;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick3TodosEnSecuencia = array[indice].pick3TodosEnSecuencia;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick33Way = array[indice].pick33Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick36Way = array[indice].pick36Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick4TodosEnSecuencia = array[indice].pick4TodosEnSecuencia;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick44Way = array[indice].pick44Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick46Way = array[indice].pick46Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick412Way = array[indice].pick412Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick424Way = array[indice].pick424Way;
 
                             $scope.datos.pagosCombinaciones.loterias.push($scope.datos.ckbLoterias[idx]);
                         }else{
@@ -533,6 +561,14 @@ var myApp = angular
                             $scope.datos.ckbLoterias[idx].pagosCombinaciones.tresNumeros = 0;
                             $scope.datos.ckbLoterias[idx].pagosCombinaciones.dosNumeros = 0;
                             $scope.datos.ckbLoterias[idx].pagosCombinaciones.primerPago = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick3TodosEnSecuencia = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick33Way = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick36Way = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick4TodosEnSecuencia = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick44Way = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick46Way = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick412Way = 0;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick424Way = 0;
                         }
                     }
 
@@ -645,38 +681,43 @@ var myApp = angular
 
             $scope.datos.ckbLoterias.forEach(function(valor, indice, array){
                 if(array[indice].existe == true){
-                    if(array[indice].sorteos.find(x => x.descripcion == "Directo") != undefined){
-                        if($scope.empty(array[indice].pagosCombinaciones.primera, 'number') == true ||
-                        $scope.empty(array[indice].pagosCombinaciones.primera, 'number') == true ||
-                        $scope.empty(array[indice].pagosCombinaciones.primera, 'number') == true
-                        ){
-                            errores = true;
-                            alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
-                        }
-                    }
-                    if(array[indice].sorteos.find(x => x.descripcion == "Pale") != undefined){
-                        if($scope.empty(array[indice].pagosCombinaciones.primeraSegunda, 'number') == true ||
-                        $scope.empty(array[indice].pagosCombinaciones.primeraTercera, 'number') == true ||
-                        $scope.empty(array[indice].pagosCombinaciones.segundaTercera, 'number') == true
-                        ){
-                            errores = true;
-                            alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
-                        }
-                    }
-                    if(array[indice].sorteos.find(x => x.descripcion == "Tripleta") != undefined){
-                        if($scope.empty(array[indice].pagosCombinaciones.tresNumeros, 'number') == true ||
-                        $scope.empty(array[indice].pagosCombinaciones.dosNumeros, 'number') == true
-                        ){
-                            errores = true;
-                            alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
-                        }
-                    }
-                    if(array[indice].sorteos.find(x => x.descripcion == "Super pale") != undefined){
-                        if($scope.empty(array[indice].pagosCombinaciones.primerPago, 'number') == true
-                        ){
-                            errores = true;
-                            alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
-                        }
+                    // if(array[indice].sorteos.find(x => x.descripcion == "Directo") != undefined){
+                    //     if($scope.empty(array[indice].pagosCombinaciones.primera, 'number') == true ||
+                    //     $scope.empty(array[indice].pagosCombinaciones.primera, 'number') == true ||
+                    //     $scope.empty(array[indice].pagosCombinaciones.primera, 'number') == true
+                    //     ){
+                    //         errores = true;
+                    //         alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
+                    //     }
+                    // }
+                    // if(array[indice].sorteos.find(x => x.descripcion == "Pale") != undefined){
+                    //     if($scope.empty(array[indice].pagosCombinaciones.primeraSegunda, 'number') == true ||
+                    //     $scope.empty(array[indice].pagosCombinaciones.primeraTercera, 'number') == true ||
+                    //     $scope.empty(array[indice].pagosCombinaciones.segundaTercera, 'number') == true
+                    //     ){
+                    //         errores = true;
+                    //         alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
+                    //     }
+                    // }
+                    // if(array[indice].sorteos.find(x => x.descripcion == "Tripleta") != undefined){
+                    //     if($scope.empty(array[indice].pagosCombinaciones.tresNumeros, 'number') == true ||
+                    //     $scope.empty(array[indice].pagosCombinaciones.dosNumeros, 'number') == true
+                    //     ){
+                    //         errores = true;
+                    //         alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
+                    //     }
+                    // }
+                    // if(array[indice].sorteos.find(x => x.descripcion == "Super pale") != undefined){
+                    //     if($scope.empty(array[indice].pagosCombinaciones.primerPago, 'number') == true
+                    //     ){
+                    //         errores = true;
+                    //         alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
+                    //     }
+                    // }
+
+                    if(pagosCombinacionesDatosValidos == false){
+                        errores = true;
+                        alert('Hay campos de premios vacios en la loteria ',  array[indice].descripcion, ' ', array[indice]);
                     }
                 }//Primer if
             });
@@ -748,14 +789,98 @@ var myApp = angular
                     return;
                 }
                 
-            },
+            }
+            ,
             function(response) {
                 // Handle error here
-                //console.log('Error jean: ', response);
+                console.log('Error jean: ', response);
                 alert("Error");
-            });
+            }
+            );
         
 
+        }
+
+        function pagosCombinacionesDatosValidos(loteria){
+            var validos = true;
+            if(loteria.sorteos.find(x => x.descripcion == "Directo") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.primera, 'number') == true ||
+                $scope.empty(loteria.pagosCombinaciones.primera, 'number') == true ||
+                $scope.empty(loteria.pagosCombinaciones.primera, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+            if(loteria.sorteos.find(x => x.descripcion == "Pale") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.primeraSegunda, 'number') == true ||
+                $scope.empty(loteria.pagosCombinaciones.primeraTercera, 'number') == true ||
+                $scope.empty(loteria.pagosCombinaciones.segundaTercera, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+            if(loteria.sorteos.find(x => x.descripcion == "Tripleta") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.tresNumeros, 'number') == true ||
+                $scope.empty(loteria.pagosCombinaciones.dosNumeros, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+            if(loteria.sorteos.find(x => x.descripcion == "Super pale") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.primerPago, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+
+            if(loteria.sorteos.find(x => x.descripcion == "Pick 3 Straight") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.pick3TodosEnSecuencia, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+
+            if(loteria.sorteos.find(x => x.descripcion == "Pick 3 Box") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.pick33Way, 'number') == true
+                ){
+                    validos = false;
+                }
+
+                if($scope.empty(loteria.pagosCombinaciones.pick36Way, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+
+            if(loteria.sorteos.find(x => x.descripcion == "Pick 4 Straight") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.pick4TodosEnSecuencia, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+
+            if(loteria.sorteos.find(x => x.descripcion == "Pick 4 Box") != undefined){
+                if($scope.empty(loteria.pagosCombinaciones.pick44Way, 'number') == true
+                ){
+                    validos = false;
+                }
+
+                if($scope.empty(loteria.pagosCombinaciones.pick46Way, 'number') == true
+                ){
+                    validos = false;
+                }
+
+                if($scope.empty(loteria.pagosCombinaciones.pick412Way, 'number') == true
+                ){
+                    validos = false;
+                }
+                if($scope.empty(loteria.pagosCombinaciones.pick424Way, 'number') == true
+                ){
+                    validos = false;
+                }
+            }
+
+            return validos;
         }
 
 

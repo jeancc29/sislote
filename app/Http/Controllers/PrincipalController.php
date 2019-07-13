@@ -220,8 +220,24 @@ class PrincipalController extends Controller
     public function duplicar()
     {
         $codigoBarra = request()->validate([
-            'datos.codigoBarra' => 'required'
+            'datos.codigoBarra' => '',
+            'datos.codigoQr' => ''
         ])['datos'];
+
+        
+        if(isset($codigoBarra['codigoBarra'])){
+            if(!(new Helper)->isNumber($codigoBarra['codigoBarra'])){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+            if(strlen($codigoBarra['codigoBarra']) != 10){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+        }
+        else if(isset($codigoBarra['codigoQr']) && !isset($codigoBarra['codigoBarra'])){
+            $codigoBarra['codigoBarra'] = base64_decode($codigoBarra['codigoQr']);
+        }else{
+            return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
+        }
     
         $errores = 0;
         $mensaje = '';
@@ -275,7 +291,8 @@ class PrincipalController extends Controller
     public function pagar()
     {
         $datos = request()->validate([
-            'datos.codigoBarra' => 'required',
+            'datos.codigoBarra' => '',
+            'datos.codigoQr' => '',
             'datos.idUsuario' => 'required'
         ])['datos'];
     
@@ -285,6 +302,20 @@ class PrincipalController extends Controller
                 'errores' => 1,
                 'mensaje' => 'No tiene permisos para realizar esta accion'
             ], 201);
+        }
+
+        if(isset($datos['codigoBarra'])){
+            if(!(new Helper)->isNumber($datos['codigoBarra'])){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+            if(strlen($datos['codigoBarra']) != 10){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+        }
+        else if(isset($datos['codigoQr']) && !isset($datos['codigoBarra'])){
+            $datos['codigoBarra'] = Crypt::decryptString($datos['codigoQr']);
+        }else{
+            return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
         }
     
         $fecha = getdate();
@@ -334,7 +365,7 @@ class PrincipalController extends Controller
         ])['datos'];
     
         $usuario = Users::whereId($datos['idUsuario'])->first();
-        if(!$usuario->tienePermiso("Cancelar tickets en cualquier momento")){
+        if(!$usuario->tienePermiso("Eliminar ticket")){
             return Response::json([
                 'errores' => 1,
                 'mensaje' => 'No tiene permisos para realizar esta accion'
@@ -364,35 +395,36 @@ class PrincipalController extends Controller
                 $minutoTicketJugado =  getdate(strtotime($venta['created_at']));
                 $minutoActual = $fecha['minutes'];
     
-                if($minutoTicketJugado['year'] != $fecha['year']){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar",
-                        'ticket' => $minutoTicketJugado
-                    ], 201);
+                if(!$usuario->tienePermiso("Cancelar tickets en cualquier momento")){
+                    if($minutoTicketJugado['year'] != $fecha['year']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar",
+                            'ticket' => $minutoTicketJugado
+                        ], 201);
+                    }
+                    if($minutoTicketJugado['mon'] != $fecha['mon']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
+                        ], 201);
+                    }
+                    if($minutoTicketJugado['mday'] != $fecha['mday']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
+                        ], 201);
+                    }
+                    if($minutoTicketJugado['hours'] != $fecha['hours']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
+                        ], 201);
+                    }
                 }
-                if($minutoTicketJugado['mon'] != $fecha['mon']){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
-                    ], 201);
-                }
-                if($minutoTicketJugado['mday'] != $fecha['mday']){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
-                    ], 201);
-                }
-                if($minutoTicketJugado['hours'] != $fecha['hours']){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
-                    ], 201);
-                }
-    
                // return ($minutoActual - $minutoTicketJugado) . " - " .$banca[' minutosCancelarTicket'];
     
-                if(($minutoActual - $minutoTicketJugado['minutes']) < $banca['minutosCancelarTicket']){
+                if(($minutoActual - $minutoTicketJugado['minutes']) < $banca['minutosCancelarTicket'] || $usuario->tienePermiso("Cancelar tickets en cualquier momento")){
                     $venta['status'] = 0;
                     $venta->save();
     

@@ -17,6 +17,14 @@ class Payscombinations extends Model
         'segundaTercera', 
         'tresNumeros', 
         'dosNumeros',
-        'primerPago'
+        'primerPago',
+        'pick3TodosEnSecuencia',
+        'pick33Way',
+        'pick36Way',
+        'pick4TodosEnSecuencia',
+        'pick44Way',
+        'pick46Way',
+        'pick412Way',
+        'pick424Way',
     ];
 }
