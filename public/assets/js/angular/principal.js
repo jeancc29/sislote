@@ -313,23 +313,24 @@ var myApp = angular
             
             
         
-            if(Number($scope.datos.jugada) != $scope.datos.jugada)
-                {
-                    //$('#inputJugada').focus(); Este focus bloquea toda la pagina asi que dicidi comentarlo
-                    $scope.datos.monto = null;
-                    $scope.datos.jugada = null;
-                    $scope.jugada = null;
+            // if(Number($scope.datos.jugada) != $scope.datos.jugada)
+            //     {
+            //         //$('#inputJugada').focus(); Este focus bloquea toda la pagina asi que dicidi comentarlo
+            //         $scope.datos.monto = null;
+            //         $scope.datos.jugada = null;
+            //         $scope.jugada = null;
 
-                    return;
-                }
+            //         return;
+            //     }
 
-            if($scope.datos.jugada != undefined && $scope.datos.jugada > 0){
+           
+            if($scope.datos.jugada != undefined){
                 
                 
                 
                 
          
-                $scope.datos.jugada = ($scope.datos.jugada.length >= 2 &&  $scope.datos.jugada.length <= 6 && $scope.datos.jugada.length != 3 && $scope.datos.jugada.length != 5) ? $scope.datos.jugada : null;
+                $scope.datos.jugada = ($scope.datos.jugada.length >= 2 &&  $scope.datos.jugada.length <= 6) ? $scope.datos.jugada : null;
                 //jugada = parseInt(jugada);
                 
                 if($scope.datos.jugada != null){
@@ -363,9 +364,40 @@ var myApp = angular
             $scope.datos.montoExistente = 0;
           }
   
+          
+          $scope.jugadaCorrecta = function(){
+              if($scope.datos.jugada == undefined || $scope.datos.jugada == null)
+                return false;
+              var jugada = '';
+              for (let index = 0; index < $scope.datos.jugada.length; index++) {
+                  if($scope.datos.jugada[index] != '+' && $scope.datos.jugada[index] != '-')
+                   jugada += $scope.datos.jugada[index];
+                  
+              }
+
+              if(Number(jugada) == jugada)
+                  return true;
+              else
+                return false;
+          }
+
+          $scope.esPick3Pick4UOtro = function(jugada){
+            if(jugada.length == 3){
+                return 'pick3Straight'
+            }
+            else if(jugada.length == 4 && jugada.indexOf('+') != -1)
+                return 'pick3Box'
+            else if(jugada.length == 5 && jugada.indexOf('+') != -1)
+                return 'pick4Box'
+            else if(jugada.length == 5 && jugada.indexOf('-') != -1)
+                return 'pick4Straight'
+            else
+                return 'otro';
+          }
   
           $scope.jugada_insertar = function(evento, sinevento = false){
            
+            $scope.jugadaCorrecta();
            
                 if(sinevento){
                     evento = {};
@@ -375,16 +407,16 @@ var myApp = angular
                 if($scope.datos.jugada != null && evento.keyCode == 13){
                     $scope.datos.loterias.forEach(function(valor, indice, array){
                         
-                    if(Number($scope.datos.jugada) != $scope.datos.jugada)
-                    {
-                        $('#inputJugada').focus();
-                        $scope.datos.monto = null;
-                        $scope.datos.jugada = null;
-                        $scope.jugada = null;
+                    // if(Number($scope.datos.jugada) != $scope.datos.jugada)
+                    // {
+                    //     $('#inputJugada').focus();
+                    //     $scope.datos.monto = null;
+                    //     $scope.datos.jugada = null;
+                    //     $scope.jugada = null;
                         
     
-                        return;
-                    }
+                    //     return;
+                    // }
                     // console.log('insertar, foreach: ', array[indice], ' monto: ', $scope.datos.monto, ' jugada: ', $scope.datos.jugada);
                     
                     if($scope.datos.monto > 0){
@@ -393,7 +425,11 @@ var myApp = angular
                         if(Object.keys($scope.datos.loterias).length > 0){
                             //Verificamos que la jugada sea numerica
                             
-                            if(Number($scope.datos.jugada) == $scope.datos.jugada){
+                            if($scope.jugadaCorrecta() == false){
+                                alert("Jugada incorrecta");
+                                return;
+                            }
+                            //if(Number($scope.datos.jugada) == $scope.datos.jugada){
                                 /*Verificamos que el monto sea menor que el montoExistentte cuando las loterias seleccionadas sea una
                                 o verificamos que las loterias seleccionadas sean mas de una y el monto existente sea igual a X,
                                 Si se cumple unas de estas dos condiciones entonces se insertara o actualizara la jugada, de lo contrario
@@ -429,10 +465,10 @@ var myApp = angular
                                 // else{
                                 //     alert("No hay existencia suficiente para ese monto");
                                 // }
-                            }
-                            else{
-                                alert("La jugada debe ser numerica");
-                            }
+                            // }
+                            // else{
+                            //     alert("La jugada debe ser numerica");
+                            // }
                         }
                         else{
                             alert("Debes seleccionar una loteria");
@@ -622,16 +658,55 @@ var myApp = angular
         }
 
         $scope.inputJugadaKeyup = function(evento){
-            if($scope.datos.jugada != null && evento.keyCode == 13) $scope.monto_disponible();
+            //console.log('inputJugadaKeyup: ', evento.key);
+            if($scope.datos.jugada != undefined){
+                if(evento.key == '+'){
+                    if($scope.datos.jugada.length != 4 && $scope.datos.jugada.length != 5){
+                        $scope.datos.jugada = $scope.datos.jugada.substring(0, $scope.datos.jugada.length - 1);
+                        return;
+                    }
+                }
+                if(evento.key == '-'){
+                    if($scope.datos.jugada.length != 5){
+                        $scope.datos.jugada = $scope.datos.jugada.substring(0, $scope.datos.jugada.length - 1);
+                        return;
+                    }
+                }
+            }
+
+            
+            
+            if(($scope.datos.jugada != null && evento.keyCode == 13) || ($scope.datos.jugada != null && evento.key == '+') || ($scope.datos.jugada != null && evento.key == '-')){
+                console.log('inputJugadaKeyup: ', $scope.datos.jugada.length);
+                $scope.monto_disponible();
+            }
         }
+        // $scope.inputJugadaKeypress = function(evento){
+        //     // if(evento.key == '-'){
+        //     //     if($scope.datos.jugada == undefined)
+        //     //     if($scope.datos.jugada.length == 3)
+        //     // }
+        //     if($scope.datos.jugada != undefined)
+        //         console.log('inputJugadaKeypress: ', $scope.datos.jugada.length);
+        //     //if($scope.datos.jugada != null && evento.keyCode == 13) $scope.monto_disponible();
+        // }
 
 
         $scope.agregar_guion = function(cadena){
-            if(cadena.length == 4){
+            if(cadena.length == 4 && $scope.esPick3Pick4UOtro(cadena) == "otro"){
                 cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3];
             }
-            if(cadena.length == 6){
+            else if(cadena.length == 6){
                 cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3] + '-' + cadena[4] + cadena[5];
+            }
+            else if($scope.esPick3Pick4UOtro(cadena) == "pick3Box"){
+                cadena = cadena.substring(0, cadena.length - 1)
+            }
+            else if($scope.esPick3Pick4UOtro(cadena) == "pick4Box"){
+                cadena = cadena.substring(0, cadena.length - 1)
+            }
+            else if($scope.esPick3Pick4UOtro(cadena) == "pick4Straight"){
+                cadena = cadena.substring(0, cadena.length - 1)
             }
            return cadena;
         }

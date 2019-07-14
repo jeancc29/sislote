@@ -519,24 +519,33 @@
                                   </div>
                               </div>
 
-                              
+                              <style>
+                            .dropdown-menu{
+                                width: 100%;
+                            }
+                        </style>
+                          <div class="col-12">
 
-                              <div class="col-12 text-center">
-                            <div class="input-group">
-                              
-                            <label  for="jugada" class="bmd-label-floating">Sorteo</label>
-                                <!-- <div  class=" col-sm-8 col-10"> -->
-                                
+                            <div class="input-group form-control-lg m-0 p-0">
+                                <div class="form-group w-100">
+                                <label for="porcentajecaid" class="bmd-label-floating">Entidad #1</label>
+                                <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
                                 <select 
-                                    ng-model="datos.selectedSorteo"
+                                ng-model="datos.selectedSorteo"
                                     ng-options="o.descripcion for o in datos.optionsSorteos"
-                                    class="selectpicker w-100" 
-                                    data-style="select-with-transition" 
-                                    title="Select tipo regla">
-                              </select>
-                              <!-- </div> -->
-                            </div> <!-- END INPUT GROUP -->
-                          </div>
+                                        ng-change="cbxBancasChange(o)"
+                                        class="selectpicker w-100" 
+                                        id="entidad1"
+                                        data-style="select-with-transition" 
+                                        title="Select Usuario">
+                                </select>
+                                </div>
+                            </div>
+                          
+                          </div> <!-- END COL-12 -->
+
+                              
+                              
 
                               <div class="col-12 col-md-12">
                                   <div id="divInputJugada" class="form-group">
@@ -550,6 +559,8 @@
                                                     minLength="2" maxLength="6"  />
                                             </div>
                               </div>
+
+                             
 
                               <div class="col-12 col-md-12">
                                   <div id="divInputJugada" class="form-group">

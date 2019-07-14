@@ -139,6 +139,7 @@
                                             ng-blur="monto_disponible(true)"
                                             ng-model="datos.jugada"
                                             ng-keyup="inputJugadaKeyup($event)"
+                                            
                                             class="form-control h4" 
                                             id="inputJugada" 
                                             type="text" name="text" 
@@ -163,7 +164,7 @@
                                         ng-keyup="jugada_insertar($event)"
                                         id="inputMonto"
                                         class="form-control h4" id="monto" 
-                                        type="text" name="number" number="true" minLength="1" required="true" />
+                                        type="number" name="number" number="true" minLength="1" maxLength="4" required="true" />
                                 </div>
                             </div>
                     
@@ -566,7 +567,7 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12 d-none d-sm-none d-md-block text-center">
-            <div class="card my-0 mx-2 d-inline-block " style="min-height: 370px; max-height: 370px; width: 29.7%;"> <!-- min-height: 455px; max-height: 455px; ultima modificacion min-height: 370px; max-height: 370px; width: 24.7%;-->
+            <div class="card my-0 mx-0 d-inline-block " style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; ultima modificacion min-height: 370px; max-height: 370px; width: 24.7%;-->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
@@ -633,12 +634,12 @@
                     </div>
                 </div>
             </div>
-            <div class="card my-0 mx-2 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 29.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
                 </div>
-                <h4 class="card-title">Pale</h4>
+                <h4 class="card-title">Pale y tripleta</h4>
                 </div>
                 <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="table-responsive">
@@ -653,15 +654,15 @@
                         </tr>
                     </thead>
                     <tbody class="">
-                        <tr ng-if="c.tam == 4" ng-repeat="c in datos.jugadas ">
-                        <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
-                        <td class="col-4">@{{agregar_guion(c.jugada)}}</td>
-                        <td class="text-right col-4">
-                            @{{c.monto}}
-                            <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
-                                    <i class="material-icons">close</i>
-                            </button>
-                        </td>
+                        <tr ng-if="(c.tam == 4 || c.tam == 6) && esPick3Pick4UOtro(c.jugada) == 'otro'" ng-repeat="c in datos.jugadas ">
+                            <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
+                            <td class="col-4">@{{agregar_guion(c.jugada)}}</td>
+                            <td class="text-right col-4">
+                                @{{c.monto}}
+                                <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                                        <i class="material-icons">close</i>
+                                </button>
+                            </td>
                         <!-- <td class="td-actions text-center col-1">
                             <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
                                 <i class="material-icons">close</i>
@@ -689,12 +690,12 @@
                 </div>
             </div>
 
-            <div class="card my-0 mx-2 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 29.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
                 </div>
-                <h4 class="card-title">Tripleta</h4>
+                <h4 class="card-title">Pick3</h4>
                 </div>
                 <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="table-responsive">
@@ -709,9 +710,13 @@
                         </tr>
                     </thead>
                     <tbody class="">
-                    <tr ng-if="c.tam == 6" ng-repeat="c in datos.jugadas ">
+                    <tr ng-if="esPick3Pick4UOtro(c.jugada) == 'pick3Straight' || esPick3Pick4UOtro(c.jugada) == 'pick3Box'" ng-repeat="c in datos.jugadas ">
                         <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
-                        <td class="col-4">@{{agregar_guion(c.jugada)}}</td>
+                        <td class="col-4">
+                            @{{agregar_guion(c.jugada)}}
+                            <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick3Box'" class="text-danger font-weight-bold">B</small>
+                            <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick3Straight'" class="text-primary font-weight-bold">S</small>
+                        </td>
                         <td class="text-right col-4">
                             @{{c.monto}}
                             <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
@@ -750,7 +755,67 @@
                 <div class="float-right">
                             <div style="font-size: 16px;" class="font-weight-bold">
                                 Total
-                                <small class="">@{{datos.total_tripleta | currency}}</small>
+                                <small class="">@{{datos.total_pick3 | currency}}</small>
+                            </div>   
+                    </div>
+                </div>
+            </div>
+
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+                <div class="card-header card-header-info card-header-icon">
+                <div class="card-icon">
+                    <i class="material-icons">assignment</i>
+                </div>
+                <h4 class="card-title">Pick4</h4>
+                </div>
+                <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
+                <div class="table-responsive">
+                    <table class="table table-fixed">
+                    <thead>
+                        <tr>
+                        <th class="font-weight-bold col-2 col-sm-3" style="font-size: 14px">LOT</th>
+                        <th class="font-weight-bold col-4" style="font-size: 14px">NUM</th>
+                        <th class="text-right font-weight-bold col-4 d-md-none d-lg-block" style="font-size: 14px">MONTO</th>
+                        <th class="text-right font-weight-bold col-4 d-md-block d-lg-none" style="font-size: 14px">MONT</th>
+                        <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
+                        </tr>
+                    </thead>
+                    <tbody class="">
+                        <tr ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight' || esPick3Pick4UOtro(c.jugada) == 'pick4Box'" ng-repeat="c in datos.jugadas ">
+                        <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
+                        <td class="col-4">
+                            @{{agregar_guion(c.jugada)}}
+                            <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Box'" class="text-danger font-weight-bold">B</small>
+                            <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight'" class="text-primary font-weight-bold">S</small>
+                        </td>
+                        <td class="text-right col-4">
+                            @{{c.monto}}
+                            <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                                    <i class="material-icons">close</i>
+                            </button>
+                        </td>
+                        <!-- <td class="td-actions text-center col-1">
+                            <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                <i class="material-icons">close</i>
+                            </button>
+                            </td> -->
+                        </tr>
+                        
+                    </tbody>
+                    </table>
+                    <hr class="mb-0">
+                    
+                    <!-- <div class="float-right">
+                            <div style="font-size: 16px;" class="font-weight-bold">
+                                Total
+                                <small class="">&euro;0</small>
+                            </div>   
+                    </div> -->
+                </div>
+                    <div class="float-right">
+                            <div style="font-size: 16px;" class="font-weight-bold">
+                                Total
+                                <small class="">@{{datos.total_pick4 | currency}}</small>
                             </div>   
                     </div>
                 </div>

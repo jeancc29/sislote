@@ -78,6 +78,8 @@ class AwardsController extends Controller
             $primera = null;
             $segunda = null;
             $tercera = null;
+            $pick3 = null;
+            $pick4 = null;
             $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
                             ->where('idLoteria', $l['id'])
                             ->first();
@@ -86,6 +88,8 @@ class AwardsController extends Controller
                 $primera = $premios->primera;
                 $segunda = $premios->segunda;
                 $tercera = $premios->tercera;
+                $pick3 = $premios->pick3;
+                $pick4 = $premios->pick4;
             }
             return [
                     'id' => $l['id'],
@@ -94,6 +98,8 @@ class AwardsController extends Controller
                     'primera' => $primera,
                     'segunda' => $segunda,
                     'tercera' => $tercera,
+                    'pick3' => $pick3,
+                    'pick4' => $pick4,
                     'sorteos' => $l->sorteos
                 ];
         });

@@ -993,47 +993,53 @@ class PrincipalController extends Controller
     
         $loteria = Lotteries::whereId($datos['idLoteria'])->first();
     
-       if(strlen($datos['jugada']) == 2){
-            $idSorteo = 1;
-       }
-       else if(strlen($datos['jugada']) == 4){
-            if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
-                $idSorteo = 2;
-            else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
-                $idSorteo = 4;
-       }
-       else if(strlen($datos['jugada']) == 6){
-            $idSorteo = 3;
-       }
+    //    if(strlen($datos['jugada']) == 2){
+    //         $idSorteo = 1;
+    //    }
+    //    else if(strlen($datos['jugada']) == 4){
+    //         if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
+    //             $idSorteo = 2;
+    //         else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
+    //             $idSorteo = 4;
+    //    }
+    //    else if(strlen($datos['jugada']) == 6){
+    //         $idSorteo = 3;
+    //    }
+
+        $idSorteo = (new Helper)->determinarSorteo($datos['jugada'], $loteria->id);
     
        $bloqueo = Stock::where([   
            'idLoteria' => $datos['idLoteria'], 
            'idBanca' => $datos['idBanca'], 
-           'jugada' => $datos['jugada']
+           'jugada' => $datos['jugada'],
+           'idSorteo' => $idSorteo,
         ])
        ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->value('monto');
        
     //Verificamos que la variable $stock no sea nula
-    if($bloqueo == null){
-        $bloqueo = Blocksplays::where(
-            [
-                'idBanca' => $datos['idBanca'],
-                'idLoteria' => $datos['idLoteria'], 
-                'jugada' => $datos['jugada'],
-                'status' => 1
-            ])
-            ->where('fechaDesde', '<=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00')
-            ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->value('monto');
+    // if($bloqueo == null){
+    //     $bloqueo = Blocksplays::where(
+    //         [
+    //             'idBanca' => $datos['idBanca'],
+    //             'idLoteria' => $datos['idLoteria'], 
+    //             'jugada' => $datos['jugada'],
+    //             'idSorteo' => $idSorteo,
+    //             'status' => 1
+    //         ])
+    //         ->where('fechaDesde', '<=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00')
+    //         ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->value('monto');
     
-        if($bloqueo == null){
-            $bloqueo = Blockslotteries::where([
-                'idBanca' => $datos['idBanca'], 
-                'idLoteria' => $datos['idLoteria'], 
-                'idDia' => $idDia,
-                'idSorteo' => $idSorteo
-            ])->value('monto');
-        }
-    }
+    //     if($bloqueo == null){
+    //         $bloqueo = Blockslotteries::where([
+    //             'idBanca' => $datos['idBanca'], 
+    //             'idLoteria' => $datos['idLoteria'], 
+    //             'idDia' => $idDia,
+    //             'idSorteo' => $idSorteo
+    //         ])->value('monto');
+    //     }
+    // }
+
+    $bloqueo = (new Helper)->montodisponible($datos['jugada'], $datos['idLoteria'], $datos['idBanca']);
     
        
     

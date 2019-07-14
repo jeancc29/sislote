@@ -62,12 +62,12 @@
             <ul class="nav nav-pills">
               <li class="nav-item">
                 <a ng-init="mostrarBloqueosJugadas = false" ng-click="mostrarBloqueosJugadas = false" class="nav-link active" href="#about" data-toggle="tab" role="tab">
-                  Loteria
+                  Vista completa
                 </a>
               </li>
               <li class="nav-item">
                 <a ng-click="mostrarBloqueosJugadas = true" class="nav-link" href="#account" data-toggle="tab" role="tab">
-                  Jugadas
+                  Vista sencilla
                 </a>
               </li>
             </ul>
@@ -207,7 +207,10 @@
                                 </select>
                               </div>
                             </div>
-                            <div class="col-2" ng-show="existeSorteo('Directo', datos.selectedLoteria) || existeSorteo('Super pale', datos.selectedLoteria)">
+                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
+                                || existeSorteo('Directo', datos.selectedLoteria) 
+                                || existeSorteo('Tripleta', datos.selectedLoteria)
+                                || existeSorteo('Super pale', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="primeraVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">1era</label>
@@ -215,7 +218,10 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) || existeSorteo('Super pale', datos.selectedLoteria)">
+                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
+                                || existeSorteo('Directo', datos.selectedLoteria) 
+                                || existeSorteo('Tripleta', datos.selectedLoteria)
+                                || existeSorteo('Super pale', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="segundaVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">2da</label>
@@ -223,7 +229,9 @@
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2" ng-hide="existeSorteo('Super pale', datos.selectedLoteria)" ng-show="existeSorteo('Tripleta', datos.selectedLoteria)">
+                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
+                                || existeSorteo('Directo', datos.selectedLoteria) 
+                                || existeSorteo('Tripleta', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="terceraVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
@@ -232,7 +240,7 @@
                               </div>
                             </div> <!-- END COL-2 -->
 
-                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 3 Box', datos.selectedLoteria) || existeSorteo('Pick 3 Straight', datos.selectedLoteria)">
+                            <div class="col-2 col-md-2" ng-show="existeSorteo('Pick 3 Box', datos.selectedLoteria) || existeSorteo('Pick 3 Straight', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">Pick3</label>
@@ -241,7 +249,7 @@
                               </div>
                             </div> <!-- END COL-2 -->
 
-                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 4 Box', datos.selectedLoteria) || existeSorteo('Pick 4 Straight', datos.selectedLoteria)">
+                            <div class="col-2 col-md-2" ng-show="existeSorteo('Pick 4 Box', datos.selectedLoteria) || existeSorteo('Pick 4 Straight', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">Pick4</label>
