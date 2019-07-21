@@ -390,8 +390,14 @@ class MonitoreoController extends Controller
         $controlador = Route::getCurrentRoute()->getName();
         $usuario = Users::whereId(session('idUsuario'))->first();
         if(!strpos(Request::url(), '/api/')){
-            return view('monitoreo.tickets', compact('controlador', 'usuario'));
+            $bancas = Branches::whereStatus(1)->get()->toJson();
+            $loterias = Lotteries::whereStatus(1)->get()->toJson();
+            $sorteos = Draws::whereStatus(1)->get()->toJson();
+            return view('monitoreo.tickets', compact('controlador', 'usuario', 'bancas', 'loterias', 'sorteos'));
         }
+
+        
+        
 
     }
 
@@ -399,13 +405,21 @@ class MonitoreoController extends Controller
     {
         $datos = request()->validate([
             'datos.fecha' => 'required',
-            'datos.idUsuario' => 'required',
+            'datos.idUsuario' => '',
             'datos.idBanca' => '',
+            'datos.idLoteria' => '',
+            'datos.idSorteo' => '',
+            'datos.jugada' => '',
             'datos.layout' => ''
         ])['datos'];
+
+     
     
         $usuario = Users::whereId($datos['idUsuario'])->first();
+        
+       
         if(!$usuario->tienePermiso("Monitorear ticket")){
+          
             // return Response::json([
             //     'errores' => 1,
             //     'mensaje' => 'No tiene permisos para realizar esta accion'
@@ -428,13 +442,7 @@ class MonitoreoController extends Controller
             }
         }
 
-        if(isset($datos['idBanca'])){
-            $datos['idBanca'] = Branches::where(['id' => $datos['idBanca'], 'status' => 1])->first();
-            if($datos['idBanca'] != null)
-                $datos['idBanca'] = $datos['idBanca']->id;
-        }else{
-            $datos['idBanca'] = Branches::where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
-        }
+        
     
         $fecha = getdate(strtotime($datos['fecha']));
     
@@ -455,14 +463,53 @@ class MonitoreoController extends Controller
         //             //->sum('sales.id')
         //             ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
         //             ->get();
-    
-    
-        $monitoreo = Sales::whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-                    ->where('idBanca', $datos['idBanca'])
+        $consultaVentas = array();
+        $consultaVentasDetalles = array();
+        if(isset($datos['idBanca'])){
+            $consultaVentas['idBanca'] = $datos['idBanca'];
+        }
+        if(isset($datos['idLoteria'])){
+            $consultaVentasDetalles['idLoteria'] = $datos['idLoteria'];
+        }
+        if(isset($datos['idSorteo'])){
+            $consultaVentasDetalles['idSorteo'] = $datos['idSorteo'];
+        }
+        if(isset($datos['jugada'])){
+            $consultaVentasDetalles['jugada'] = $datos['jugada'];
+        }
+
+        
+        $idVentas = Sales::select('id')
+                    ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                    ->where($consultaVentas)
+                    ->where('status', '!=', '5') //Eliminado
                     ->orderBy('id', 'desc')
                     ->get();
-    
+
+                    // return Response::json([
+                    //     'ad' => $consultaVentasDetalles,
+                    //     'av' => $consultaVentas,
+                    //     'af' => $fecha,
+                    //     'idVentas' => $idVentas,
+                    //     'errores' => 1,
+                    //     'mensaje' => 'No tiene permisos para realizar esta accion'
+                    // ], 201);
+
+        $idVentas = collect($idVentas)->map(function($d){
+            return $d['id'];
+        });
+
+        $ventasDetalles = Salesdetails::whereIn('idVenta', $idVentas)
+                    ->where($consultaVentasDetalles)
+                    ->orderBy('id', 'desc')
+                    ->get();
        // return $ventas;
+
+       $idVentas = collect($ventasDetalles)->map(function($d){
+            return $d['idVenta'];
+        });
+
+        $monitoreo = Sales::whereIn('id', $idVentas)->get();
         
     
         return Response::json([

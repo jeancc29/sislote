@@ -611,12 +611,14 @@ var myApp = angular
         }
 
         $scope.calcularTotal = function(){
-            var monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_monto_total = 0;
+            var monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, total_pick3 = 0, total_pick4 = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_monto_total = 0;
              $scope.datos.jugadas.forEach(function(valor, indice, array){
 
                 if(array[indice].tam == 2) total_directo += parseFloat(array[indice].monto);
                 if(array[indice].tam == 4) total_pale += parseFloat(array[indice].monto);
                 if(array[indice].tam == 6) total_tripleta += parseFloat(array[indice].monto);
+                if($scope.esPick3Pick4UOtro(array[indice].jugada).indexOf('pick3') != -1) total_pick3 += parseFloat(array[indice].monto);
+                if($scope.esPick3Pick4UOtro(array[indice].jugada).indexOf('pick4') != -1) total_pick4 += parseFloat(array[indice].monto);
                 if(array[indice].tam == 4 || array[indice].tam == 6) total_palet_tripleta += parseFloat(array[indice].monto);
 
                 monto_a_pagar +=  parseFloat(array[indice].monto);
@@ -635,6 +637,8 @@ var myApp = angular
              $scope.datos.total_directo =  total_directo;
              $scope.datos.total_pale =  total_pale;
              $scope.datos.total_tripleta = total_tripleta;
+             $scope.datos.total_pick3 = total_pick3;
+             $scope.datos.total_pick4 = total_pick4;
              $scope.datos.total_palet_tripleta =  total_palet_tripleta;
              $scope.datos.total_jugadas =  Object.keys($scope.datos.jugadas).length;
              $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_a_pagar) / parseFloat($scope.datos.selectedBancas.deCada)) * parseFloat($scope.datos.selectedBancas.descontar)  : 0;

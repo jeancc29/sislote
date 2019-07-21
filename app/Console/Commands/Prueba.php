@@ -63,11 +63,15 @@ class Prueba extends Command
 
         $monto = (new Helper)->montodisponible("55", 1, 1);
 
-        $h = new TicketClass(17);
+        //$h = new TicketClass(17);
         $a = new AwardsClass(2);
-        $a->primera = "";
+        $a->primera = 25;
         $a->segunda = 02;
         $a->tercera = 23;
+        $a->pick3 = 111;
+        $a->pick4 = 1234;
+
+        //$a->pick3BuscarPremio(1, 1, '122', 1, false);
 
         $c = "bueno";
 
@@ -80,7 +84,17 @@ class Prueba extends Command
         }
 
         // $this->info("Awardsclasss: " . $a->combinacionesNula());
-       $this->info("Awardsclasss: " . $h->generate());
+    //    $this->info("Awardsclasss: " . Helper::contarNumerosIdenticos("1211"));
+    $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, true));
+    $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '131', 1, false));
+    $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, false));
+
+       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1234', 1, true));
+       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1222', 1, false));
+       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1221', 1, false));
+       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '2324', 1, false));
+       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '4231', 1, false));
+    //    $this->info("Awardsclasss: " . $a->pick3BuscarPremio(1, 1, '122', 1, false));
     // $this->info("Awardsclasss: " . $c); 
 
 

@@ -63,13 +63,34 @@ if($controlador != "login"){
 <script>
     window.rutaGlobal = (false) ? "<?php echo url('') ?>" : '';
     window.idUsuario = "<?php echo session('idUsuario') ?>";
+    window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
+    window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
+    window.loteriasGlobal = <?php if(isset($loterias)) echo $loterias; else echo 'null'; ?>;
+    window.sorteosGlobal = <?php if(isset($sorteos)) echo $sorteos; else echo 'null'; ?>;
+
+    console.log('header:', bancasGlobal);
+   
 
     window.toSecuencia = function(idTicket){
             var str = "" + idTicket;
             var pad = "000000000";
             var ans = pad.substring(0, pad.length - str.length) + str;
             return ans;
+        }
+
+    window.esPick3Pick4UOtro = function(jugada){
+        if(jugada.length == 3){
+            return 'pick3Straight'
+        }
+        else if(jugada.length == 4 && jugada.indexOf('+') != -1)
+            return 'pick3Box'
+        else if(jugada.length == 5 && jugada.indexOf('+') != -1)
+            return 'pick4Box'
+        else if(jugada.length == 5 && jugada.indexOf('-') != -1)
+            return 'pick4Straight'
+        else
+            return 'otro';
         }
 
     var prueba = function(){

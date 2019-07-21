@@ -21,8 +21,8 @@ class CreateAwardsTable extends Migration
             $table->string('primera', 2)->nullable();
             $table->string('segunda', 2)->nullable();
             $table->string('tercera', 2)->nullable();
-            $table->string('pick3', 2)->nullable();
-            $table->string('pick4', 2)->nullable();
+            $table->string('pick3', 3)->nullable();
+            $table->string('pick4', 4)->nullable();
             $table->integer('idUsuario');
             $table->integer('status')->default(0);
             $table->timestamps();

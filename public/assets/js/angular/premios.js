@@ -10,12 +10,12 @@ var myApp = angular
             "idBanca":0,
             "idLoteria":0,
             "idSorteo": 0,
-            "fecha" : null,
             "numerosGanadores" : 0,
             "horaCierre": moment().format('YYYY/MM/DD'),
 
 
             "loteria" : null,
+            "fecha" : new Date(),
             "desde" : new Date(),
             "hasta" : new Date(),
             "premios" : [],
@@ -97,14 +97,30 @@ var myApp = angular
                     return;
                 }
 
-                if($scope.existeSorteo('Super pale', $scope.datos.selectedLoteria) == false){
+                if(
+                    $scope.existeSorteo('Directo', $scope.datos.selectedLoteria) == true 
+                    || $scope.existeSorteo('Pale', $scope.datos.selectedLoteria) == true
+                    || $scope.existeSorteo('Tripleta', $scope.datos.selectedLoteria) == true){
                     if($scope.empty($scope.datos.primera, 'number') == true || $scope.empty($scope.datos.segunda, 'number') == true || $scope.empty($scope.datos.tercera, 'number') == true){
-                        alert("Hay campos vacios");
+                        alert("Hay campos vacios otros: ");
                         return;
                     }
-                }else if($scope.existeSorteo('Super pale', $scope.datos.selectedLoteria) == true){
+                }
+                else if($scope.existeSorteo('Super pale', $scope.datos.selectedLoteria) == true){
                     if($scope.empty($scope.datos.primera, 'number') == true || $scope.empty($scope.datos.segunda, 'number') == true){
-                        alert("Hay campos vacios");
+                        alert("Hay campos vacios super pale");
+                        return;
+                    }
+                }
+                else if($scope.existeSorteo('Pick 3 Straight', $scope.datos.selectedLoteria) == true || $scope.existeSorteo('Pick 3 Box', $scope.datos.selectedLoteria) == true){
+                    if($scope.empty($scope.datos.pick3, 'number') == true){
+                        alert("Hay campos vacios pick3");
+                        return;
+                    }
+                }
+                else if($scope.existeSorteo('Pick 4 Straight', $scope.datos.selectedLoteria) == true || $scope.existeSorteo('Pick 4 Box', $scope.datos.selectedLoteria) == true){
+                    if($scope.empty($scope.datos.pick4, 'number') == true){
+                        alert("Hay campos vacios pick4");
                         return;
                     }
                 }
@@ -113,71 +129,112 @@ var myApp = angular
                 $scope.datos.loterias[idx].primera = $scope.datos.primera;
                 $scope.datos.loterias[idx].segunda = $scope.datos.segunda;
                 $scope.datos.loterias[idx].tercera = $scope.datos.tercera;
+                $scope.datos.loterias[idx].pick3 = $scope.datos.pick3;
+                $scope.datos.loterias[idx].pick4 = $scope.datos.pick4;
 
                 // console.log('actualizar: ', idx);
                 // return;
-            }
-            
-            $scope.datos.loterias.forEach(function(valor, indice, array){
+            }else{
+                $scope.datos.loterias.forEach(function(valor, indice, array){
                 
-              
-
-                //Verificamos que todos los datos no esten vacios y que el sorteo 'Super pale' no exista
-                if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == false && $scope.existeSorteo('Super pale', array[indice]) == false){
-                    if(array[indice].primera.length != 2){
-                        alert('El valor del compa 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
-                        errores = true;
+                
+                    if(
+                        $scope.existeSorteo('Directo', array[indice]) == true 
+                        || $scope.existeSorteo('Pale', array[indice]) == true
+                        || $scope.existeSorteo('Tripleta', array[indice]) == true){
+                        if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true || $scope.empty(array[indice].tercera, 'number') == true){
+                            alert("Hay campos vacios otros");
+                            errores = true;
+                        }
                     }
-                    if(array[indice].segunda.length != 2){
-                        alert('El valor del compa 2da de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
-                        errores = true;
+                    if($scope.existeSorteo('Super pale', array[indice]) == true){
+                        if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true){
+                            alert("Hay campos vacios super pale");
+                            errores = true;
+                        }
                     }
-                    if(array[indice].tercera.length != 2){
-                        alert('El valor del compa 3era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
-                        errores = true;
+                    if($scope.existeSorteo('Pick 3 Straight', array[indice]) == true || $scope.existeSorteo('Pick 3 Box', array[indice]) == true){
+                        if($scope.empty(array[indice].pick3, 'number') == true){
+                            alert("Hay campos vacios pick3");
+                            errores = true;
+                        }
                     }
-                }
-                //Verificamos que todos los datos no esten vacios, excepto la tripleta y que el sorteo 'Super pale' si exista
-                else if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == true && $scope.existeSorteo('Super pale', array[indice]) == true){
-                    if(array[indice].primera.length != 2){
-                        alert('El valor del compa 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
-                        errores = true;
+                    if($scope.existeSorteo('Pick 4 Straight', array[indice]) == true || $scope.existeSorteo('Pick 4 Box', array[indice]) == true){
+                        console.log('existe pick4 hola: ', $scope.existeSorteo('Pick 4 Box', array[indice]));
+                        if($scope.empty(array[indice].pick4, 'number') == true){
+                            alert("Hay campos vacios pick4");
+                            errores = true;
+                        }
                     }
-                    if(array[indice].segunda.length != 2){
-                        alert('El valor del compa 2da de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
-                        errores = true;
-                    }
-                }
-
-               
-
-             });
+                  
+    
+                    // //Verificamos que todos los datos no esten vacios y que el sorteo 'Super pale' no exista
+                    // if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == false && $scope.existeSorteo('Super pale', array[indice]) == false){
+                    //     if(array[indice].primera.length != 2){
+                    //         alert('El valor del campo 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
+                    //         errores = true;
+                    //     }
+                    //     if(array[indice].segunda.length != 2){
+                    //         alert('El valor del campo 2da de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
+                    //         errores = true;
+                    //     }
+                    //     if(array[indice].tercera.length != 2){
+                    //         alert('El valor del campo 3era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
+                    //         errores = true;
+                    //     }
+                    // }
+                    // //Verificamos que todos los datos no esten vacios, excepto la tripleta y que el sorteo 'Super pale' si exista
+                    // else if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == true && $scope.existeSorteo('Super pale', array[indice]) == true){
+                    //     if(array[indice].primera.length != 2){
+                    //         alert('El valor del campo 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
+                    //         errores = true;
+                    //     }
+                    //     if(array[indice].segunda.length != 2){
+                    //         alert('El valor del campo 2da de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
+                    //         errores = true;
+                    //     }
+                    // }
+    
+                   
+    
+                 });
+            }
 
              if(errores){
-                 alert(mensaje);
                  return;
              }
 
            
    
             console.log('actualizar: ', $scope.datos);
+
+            if(vistaSencilla == true){
+                $scope.datos.layout = 'vistaSencilla';
+            }else{
+                $scope.datos.layout = 'vistaNormal';
+            }
+
+
           
           $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
              .then(function(response){
                 console.log(response);
                 if(response.data.errores == 0){
                     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
-                    alert("Se ha guardado correctamente");
+                    alert(response.data.mensaje);
                 }else if(response.data.errores == 1){
+                    $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
                     alert(response.data.mensaje);
                 }
 
-            },
-            function(response) {
-                // Handle error here
-                console.log('Error jean: ', response);
-                alert("Error");
-            });
+            }
+            // ,
+            // function(response) {
+            //     // Handle error here
+            //     console.log('Error jean: ', response);
+            //     alert("Error");
+            // }
+            );
 
         }
 
@@ -256,12 +313,15 @@ var myApp = angular
        
 
 
+
        
 
         $scope.cbxLoteriasChanged = function(){
            $scope.datos.primera =  $scope.datos.selectedLoteria.primera;
            $scope.datos.segunda =  $scope.datos.selectedLoteria.segunda;
            $scope.datos.tercera =  $scope.datos.selectedLoteria.tercera;
+           $scope.datos.pick3 =  $scope.datos.selectedLoteria.pick3;
+           $scope.datos.pick4 =  $scope.datos.selectedLoteria.pick4;
            $scope.datos.existeSorteo = $scope.existeSorteo('Super pale', $scope.datos.selectedLoteria);
            console.log("Changed sorteo", $scope.datos.selectedLoteria);
 
@@ -271,6 +331,134 @@ var myApp = angular
                 $('#segundaVentanaSencilla').addClass('is-filled');
            if($scope.empty($scope.datos.selectedLoteria.tercera, "number") == false)
                 $('#terceraVentanaSencilla').addClass('is-filled');
+           if($scope.empty($scope.datos.selectedLoteria.pick3, "number") == false)
+                $('#pick3VentanaSencilla').addClass('is-filled');
+           if($scope.empty($scope.datos.selectedLoteria.pick4, "number") == false)
+                $('#pick4VentanaSencilla').addClass('is-filled');
+        }
+
+        $scope.changeFocus = function(event, elementIdToSetFocus,  lengthOfStringToChangeFocus, string, element = undefined, index = -1){
+            if(string != undefined){
+
+                if(element != undefined && index == -1){
+                    
+                    if(element == 'datosPick3'){
+                        
+                        // if(string.length == 2){
+                        //     $scope.datos.primera = string.substr(1, string.length - 1);
+                        // }
+                        // else if(string.length == 3){
+                        //     $scope.datos.primera = string.substr(1, 2);
+                        // }
+
+                        if(string == undefined || string == '' || string == null){
+                            $scope.datos.primera = undefined;
+                        }
+                        else if(string.length == 1)
+                        {
+                            $scope.datos.primera = undefined;
+                        }
+                        else if(string.length == 2){
+                            $scope.datos.primera = string.substr(1, string.length - 1);
+                        }
+                        else if(string.length == 3){
+                            $scope.datos.primera = string.substr(1, 2);
+                        }
+                    }
+                    
+
+                    if(element == 'datosPick4'){
+                        if(string == undefined || string == '' || string == null){
+                            
+                            $scope.datos.segunda = undefined;
+                            $scope.datos.tercera = undefined;
+                        }
+                        else if(string.length == 1){
+                            $scope.datos.segunda = string;
+                            $scope.datos.tercera = undefined;
+                        }
+                        else if(string.length == 2){
+                            $scope.datos.segunda = string;
+                            $scope.datos.tercera = undefined;
+                        }
+                        else if(string.length == 3){
+                            $scope.datos.tercera = string.substr(2, string.length - 1);
+                        }
+                        else if(string.length == 4){
+                            if($scope.datos.tercera != undefined && $scope.datos.tercera != '' && $scope.datos.tercera != null){
+                                if($scope.datos.tercera.length == 1)
+                                    $scope.datos.tercera += string.substr(3, string.length - 1);
+                                else if($scope.datos.tercera.length == 2){
+                                    $scope.datos.tercera = string.substr(2, 2);
+                                }
+
+                                $scope.datos.segunda = string.substr(0, 2);
+                            }else{
+                                $scope.datos.tercera = string.substr(2, 2);
+                                $scope.datos.segunda = string.substr(0, 2);
+                            }
+                            //$scope.datos.tercera += string.substr(3, string.length - 1);
+                        }
+                    }
+
+                    
+                }
+                else{
+                    if(element == 'ngRepeatPick3'){
+                        if(string == undefined || string == '' || string == null){
+                            $scope.datos.loterias[index].primera = undefined;
+                        }
+                        else if(string.length == 1)
+                        {
+                            $scope.datos.loterias[index].primera = undefined;
+                        }
+                        else if(string.length == 2){
+                            $scope.datos.loterias[index].primera = string.substr(1, string.length - 1);
+                        }
+                        else if(string.length == 3){
+                            $scope.datos.loterias[index].primera = string.substr(1, 2);
+                        }
+                    }
+                    
+
+                    if(element == 'ngRepeatPick4'){
+                        console.log('changeFocus length: ', string == '');
+                        if(string == undefined || string == '' || string == null){
+                            
+                            $scope.datos.loterias[index].segunda = undefined;
+                            $scope.datos.loterias[index].tercera = undefined;
+                        }
+                        else if(string.length == 1){
+                            $scope.datos.loterias[index].segunda = string;
+                            $scope.datos.loterias[index].tercera = undefined;
+                        }
+                        else if(string.length == 2){
+                            $scope.datos.loterias[index].segunda = string;
+                            $scope.datos.loterias[index].tercera = undefined;
+                        }
+                        else if(string.length == 3){
+                            $scope.datos.loterias[index].tercera = string.substr(2, string.length - 1);
+                        }
+                        else if(string.length == 4){
+                            if($scope.datos.loterias[index].tercera != undefined && $scope.datos.loterias[index].tercera != '' && $scope.datos.loterias[index].tercera != null){
+                                if($scope.datos.loterias[index].tercera.length == 1)
+                                    $scope.datos.loterias[index].tercera += string.substr(3, string.length - 1);
+                                else if($scope.datos.loterias[index].tercera.length == 2){
+                                    $scope.datos.loterias[index].tercera = string.substr(2, 2);
+                                }
+                                $scope.datos.loterias[index].segunda = string.substr(0, 2);
+                            }else{
+                                $scope.datos.loterias[index].tercera = string.substr(2, 2);
+                                $scope.datos.loterias[index].segunda = string.substr(0, 2);
+                            }
+                        }
+                    }
+                }
+                if(string.length == lengthOfStringToChangeFocus && elementIdToSetFocus != 'no'){
+                    $('#'+elementIdToSetFocus).focus();
+                    $('#'+elementIdToSetFocus).focus();
+                }
+            }
         }
 
         $scope.editarPremio = function(id){
@@ -308,8 +496,9 @@ var myApp = angular
         }
 
 
-        $scope.agregar_guion = function(cadena){
-            if(cadena.length == 4){
+        $scope.agregar_guion = function(cadena, sorteo = undefined){
+            console.log('agregar_guion:', sorteo);
+            if(cadena.length == 4 && sorteo == 'Pale'){
                 cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3];
             }
             if(cadena.length == 6){
@@ -340,6 +529,7 @@ var myApp = angular
         }
 
         $scope.empty = function(valor, tipo){
+            console.log('empty:', valor);
             if(tipo === 'number'){
                 if(Number(valor) == undefined || valor == '' || valor == null || Number(valor) <= 0)
                     return true;
@@ -374,4 +564,52 @@ var myApp = angular
 
 
 
-    })
+    });
+
+
+    myApp.directive('selectAllOnClick', [function() {
+        return {
+          restrict: 'A',
+          link: function(scope, element, attrs) {
+            var hasSelectedAll = false;
+            element.on('click', function($event) {
+              if (!hasSelectedAll) {
+                try {
+                  //IOs, Safari, thows exception on Chrome etc
+                  this.selectionStart = 0;
+                  this.selectionEnd = this.value.length + 1;
+                  hasSelectedAll = true;
+                } catch (err) {
+                  //Non IOs option if not supported, e.g. Chrome
+                  this.select();
+                  hasSelectedAll = true;
+                }
+              }
+            });
+            //On blur reset hasSelectedAll to allow full select
+            element.on('blur', function($event) {
+              hasSelectedAll = false;
+            });
+          }
+        };
+      }]);
+
+      myApp.run(function($rootScope) {
+        $rootScope.typeOf = function(value) {
+          return typeof value;
+        };
+      })
+
+      myApp.directive('stringToNumber', function() {
+        return {
+          require: 'ngModel',
+          link: function(scope, element, attrs, ngModel) {
+            ngModel.$parsers.push(function(value) {
+              return '' + value;
+            });
+            ngModel.$formatters.push(function(value) {
+              return parseFloat(value);
+            });
+          }
+        };
+      });

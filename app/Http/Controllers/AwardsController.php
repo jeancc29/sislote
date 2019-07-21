@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Response;
 
 
 use Faker\Generator as Faker;
+use Carbon\Carbon;
 use App\Lotteries;
 use App\Generals;
 use App\Sales;
@@ -130,14 +131,28 @@ class AwardsController extends Controller
         $datos = request()->validate([
             //'datos.idLoteria' => 'required',
             //'datos.numerosGanadores' => 'required|min:2|max:6',
+            'datos.fecha' => '',
+            'datos.layout' => '',
             'datos.idUsuario' => 'required',
             'datos.loterias' => 'required',
             'datos.idBanca' => 'required',
         ])['datos'];
 
-        
-    
         $fecha = getdate();
+
+        if($datos['layout'] == "vistaSencilla"){
+
+            $fechaRequest = new Carbon($datos['fecha']);
+            $fechaActual = Carbon::now();
+      
+            if($fechaRequest->greaterThan($fechaActual)){
+                return Response::json(['errores' => 1,'mensaje' => 'No está permitido actualizar resultados para fechas en el futuro'], 201);
+            }else{
+                $fecha = getdate(strtotime($datos['fecha']));
+            }
+        }
+    
+        
         $errores = 0;
         $mensaje = '';
         $idBanca = Branches::whereId($datos['idBanca'])->whereStatus(1)->first();
@@ -157,16 +172,19 @@ class AwardsController extends Controller
         $awardsClass->primera = $l['primera'];
         $awardsClass->segunda = $l['segunda'];
         $awardsClass->tercera = $l['tercera'];
+        $awardsClass->pick3 = $l['pick3'];
+        $awardsClass->pick4 = $l['pick4'];
         $awardsClass->numerosGanadores = $l['primera'] . $l['segunda'] . $l['tercera'];
 
         
     
     
+        
         if($awardsClass->combinacionesNula() == true){
             continue;
         }
-        if(!is_numeric($awardsClass->numerosGanadores)){
-            return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+        if($awardsClass->datosValidos() == false){
+            return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
         }
         if(!$awardsClass->loteriaAbreDiaActual()){
             return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
@@ -188,17 +206,40 @@ class AwardsController extends Controller
                 $busqueda2 = false;
                 $busqueda3 = false;
 
+                $sorteo = Draws::whereId($j['idSorteo'])->first();
 
+                
     
                 
-                if(strlen($j['jugada']) == 2){
+                if($sorteo->descripcion == "Directo"){
+                    if(!is_numeric($awardsClass->numerosGanadores)){
+                        return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+                    }
                     $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
                 }
-                else if(strlen($j['jugada']) == 4){
+                else if($sorteo->descripcion == "Pale"){
+                    if(!is_numeric($awardsClass->numerosGanadores)){
+                        return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+                    }
                     $j['premio'] = $awardsClass->paleBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], $j['idSorteo']);
                 }
-                else if(strlen($j['jugada']) == 6){
+                else if($sorteo->descripcion == "Tripleta"){
+                    if(!is_numeric($awardsClass->numerosGanadores)){
+                        return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+                    }
                     $j['premio'] = $awardsClass->tripletaBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+                }
+                else if($sorteo->descripcion == "Pick 3 Straight"){
+                    $j['premio'] = $awardsClass->pick3BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+                }
+                else if($sorteo->descripcion == "Pick 3 Box"){
+                    $j['premio'] = $awardsClass->pick3BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], false);
+                }
+                else if($sorteo->descripcion == "Pick 4 Straight"){
+                    $j['premio'] = $awardsClass->pick4BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+                }
+                else if($sorteo->descripcion == "Pick 4 Box"){
+                    $j['premio'] = $awardsClass->pick4BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], false);
                 }
     
     

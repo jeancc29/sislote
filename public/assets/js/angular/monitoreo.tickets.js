@@ -20,31 +20,17 @@ var myApp = angular
         $scope.es_cliente = false;
         $scope.datos =  {
             "idVenta":0,
-        "idUsuario": 0,
-        "idBanca" : 1,
-        "codigoBarra":"barra29",
-        "total": 0,
-        "subTotal":0,
-        "descuentoPorcentaje":0,
-        "descuentoMonto":0,
-        "hayDescuento":0,
-        "sms":true,
-        "whatsapp":0,
-        "estado":0,
-        "loterias": [],
-        "jugadas":[],
-
+        "idBanca" : null,
+        "idLoteria" : null,
+        "idSorteo" : null,
+        "jugada" : null,
+        
         'optionsBancas' : [],
         'selectedBancas' : {},
 
     'optionsLoterias':[],
-    'loterias':[],
-    'jugada':null,
+    
 
-    'estadisticas_ventas' : {
-        'total' : 0,
-        'total_jugadas' : 0
-    },
 
     'monto_a_pagar': 0,
     'total_jugadas': 0,
@@ -67,140 +53,40 @@ var myApp = angular
             'total_pendientes' : 0,
             'total_cancelados' : 0
         },
-        'duplicar' : {
-            'numeroticket' : null
-        },
-        'jugadasReporte' : {
-            'optionsLoterias':[],
-            'selectedLoteria' : {},
-            'fecha' : new Date(),
-            'jugadas' : [],
-
-            'total_directo' : 0,
-            'total_palet' : 0,
-            'total_tripleta' : 0,
-            'monto_total' : 0
-        },
-        'pagar' : {
-            'codigoBarra' : null
-        },
-        'ventasReporte' : {
-            'ventas' : {
-                'pendientes' : 0,
-                'ganadores' : 0,
-                'perdedores' : 0,
-                'total' : 0,
-                'ventas' : 0,
-                'comisiones' : 0,
-                'descuentos' : 0,
-                'premios' : 0,
-                'neto' : 0,
-                'balance' : 0,
-            },
-            'loterias' : [],
-            'ticketsGanadoresSinPagar' : [],
-            'fecha' : new Date()
-        },
         'cancelar' : {
             'codigoBarra' : null,
             'razon' : null,
         },
-        'enviarSMS' : {}
+        'pagar' : {
+            'codigoBarra' : null
+        }
         
     }
         $scope.inicializarDatos = function(response = null){
 
             
+           //console.log('bancasGlobal', bancasGlobal);
+            
+            $scope.datos.optionsBancas = bancasGlobal;
+            $scope.datos.optionsLoterias = loteriasGlobal;
+            $scope.datos.optionsSorteos = sorteosGlobal;
+            $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsLoterias.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsSorteos.unshift({'id' : 0, 'descripcion' : 'N/A'});
+
+            $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
+            $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
+            $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+            
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                //$('#multiselect').selectpicker('val', []);
+                $('#multiselect').selectpicker("refresh");
+                $('.selectpicker').selectpicker("refresh");
+                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+              })
+
            
-            
-            $scope.datos.idVenta = 0;
-            $scope.datos.total = 0;
-            $scope.datos.subTotal = 0;
-            $scope.datos.descuentoPorcentaje = 0;
-            $scope.datos.descuentoMonto = 0;
-            $scope.datos.loterias = [];
-            
-            $scope.datos.jugadas = [];
-            $scope.datos.optionsLoterias = [];
-
-            $scope.datos.jugada = null;
-            $scope.datos.monto_a_pagar = 0;
-            $scope.datos.total_jugadas = 0;
-            $scope.datos.total_directo = 0;
-            $scope.datos.total_palet_tripleta = 0;
-
-            $scope.datos.jugadasReporte.jugadas = [];
-            $scope.datos.jugadasReporte.optionsLoterias = [];
-            $scope.datos.jugadasReporte.selectedLoteria = {};
-            
-            if(response != null){
-                $scope.datos.optionsBancas = response.data.bancas;
-                let idx = 0;
-                if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
-                    idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
-                $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
-                $scope.datos.idBanca = response.data.idBanca;
-
-
-                $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
-                $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
-                $scope.datos.optionsLoterias =response.data.loterias;
-                $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
-                $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
-
-                $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
-                $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
-                
-                
-                $timeout(function() {
-                    $('#multiselect').selectpicker("refresh");
-                    $('.selectpicker').selectpicker("refresh");
-                  })
-
-                  return;
-            }
-
-            $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
-             .then(function(response){
-
-                console.log(response)
-
-                $scope.datos.optionsBancas = response.data.bancas;
-                let idx = 0;
-                if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
-                    idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
-                $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
-                $scope.datos.idBanca = response.data.idBanca;
-
-                $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
-                $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
-                 $scope.datos.optionsLoterias =response.data.loterias;
-                 console.log('select: ',$scope.datos.selectedVentas);
-                //  console.log($scope.datos.optionsLoterias);
-                $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
-                $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
-
-                $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
-                $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
-                // // $scope.datos.loterias.push($scope.datos.optionsLoterias[0]);
-                // // $scope.datos.loterias.push($scope.datos.optionsLoterias[1]);
-                // //$scope.datos.loterias = [$scope.datos.optionsLoterias[0], $scope.datos.optionsLoterias[1]];
-                
-                // $scope.datos.caracteristicasGenerales =JSON.parse(response.data[0].caracteristicasGenerales);
-                // var estadisticas_ventas =JSON.parse(response.data[0].estadisticas_ventas);
-                // $scope.datos.estadisticas_ventas.total = (estadisticas_ventas[0].total != undefined) ? estadisticas_ventas[0].total : 0;
-                // $scope.datos.estadisticas_ventas.total_jugadas = (estadisticas_ventas[0].total_jugadas != undefined) ? estadisticas_ventas[0].total_jugadas : 0;
-
-
-                
-                $timeout(function() {
-                    // anything you want can go here and will safely be run on the next digest.
-                    //$('#multiselect').selectpicker('val', []);
-                    $('#multiselect').selectpicker("refresh");
-                    $('.selectpicker').selectpicker("refresh");
-                    //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
-                  })
-            });
        
         }
         
@@ -278,8 +164,8 @@ var myApp = angular
 
 
 
-        $scope.agregar_guion = function(cadena){
-            if(cadena.length == 4){
+        $scope.agregar_guion = function(cadena, sorteo = undefined){
+            if(cadena.length == 4 && sorteo == 'Pale'){
                 cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3];
             }
             if(cadena.length == 6){
@@ -305,7 +191,12 @@ var myApp = angular
         }
 
       
+        $scope.seleccionarTicket = function(ticket){
+            $scope.mostrarVentanaTicket = true;
+            $scope.datos.selectedTicket = ticket;
+        }
 
+       
         $scope.buscar = function(){
 
             console.log('monitoreo before addClass',$scope.datos.monitoreo);
@@ -315,8 +206,24 @@ var myApp = angular
             
             $scope.datos.monitoreo.idUsuario = $scope.datos.idUsuario;
             $scope.datos.monitoreo.layout = 'Principal';
+
+            if($scope.datos.selectedBanca.id == 0){
+                $scope.datos.idBanca = null;
+            }else
+                $scope.datos.idBanca = $scope.datos.selectedBanca.id;
+            if($scope.datos.selectedLoteria.id == 0){
+                $scope.datos.idLoteria = null;
+            }else
+                $scope.datos.idLoteria = $scope.datos.selectedLoteria.id;
+            if($scope.datos.selectedSorteo.id == 0){
+                $scope.datos.idSorteo = null;
+            }else
+                $scope.datos.idSorteo = $scope.datos.selectedSorteo.id;
           
-          $http.post(rutaGlobal+"/api/reportes/monitoreo", {'action':'sp_ventas_buscar', 'datos': $scope.datos.monitoreo})
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            console.log('buscar: ', $scope.datos);
+
+          $http.post(rutaGlobal+"/api/monitoreo/tickets", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
              .then(function(response){
                 console.log('monitoreo ',response);
                 if(response.data.errores == 0){
@@ -400,28 +307,26 @@ var myApp = angular
 
 
 
-        $scope.cancelar = function(){
+        $scope.cancelar = function(ticket){
 
-            if($scope.datos.cancelar.codigoBarra == null || $scope.datos.cancelar.codigoBarra == undefined)
+            if(ticket.codigoBarra == null || ticket.codigoBarra == undefined)
             {
                 alert('El codigo del ticket no debe estar vacio');
                 return;
             }
 
-            if(Number($scope.datos.cancelar.codigoBarra) != $scope.datos.cancelar.codigoBarra)
+            if(Number(ticket.codigoBarra) != ticket.codigoBarra)
             {
                 alert('El codigo del ticket debe ser numerico');
                 return;
             }
 
-            if($scope.datos.cancelar.razon == null || $scope.datos.cancelar.razon == undefined)
-            {
-                alert('La razon no debe estar vacia');
-                return;
-            }
+            
 
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = $scope.datos.selectedBancas.id;
+            $scope.datos.cancelar.razon = "Cancelado desde monitoreo ticket";
+            $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
 
             $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
@@ -436,6 +341,41 @@ var myApp = angular
                 }else if(response.data.errores == 0){
                     $scope.datos.cancelar.codigoBarra = null;
                     $scope.inicializarDatos(response);
+                    alert(response.data.mensaje);
+                }
+
+            });
+        }
+
+        $scope.pagar = function(ticket){
+
+            if(ticket.codigoBarra == null || ticket.codigoBarra == undefined)
+            {
+                alert('El codigo del ticket no debe estar vacio');
+                return;
+            }
+
+            if(Number(ticket.codigoBarra) != ticket.codigoBarra)
+            {
+                alert('El codigo del ticket debe ser numerico');
+                return;
+            }
+
+
+            $scope.datos.pagar.idUsuario = idUsuarioGlobal;
+            $scope.datos.pagar.codigoBarra = ticket.codigoBarra;
+
+            // console.log($scope.datos.pagar, ' Pagar idUsuario');
+
+            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': $scope.datos.pagar})
+             .then(function(response){
+
+
+                if(response.data.errores == 1){
+                    alert(response.data.mensaje);
+                    return;
+                }else if(response.data.errores == 0){
+                    $scope.datos.pagar.codigoBarra = null;
                     alert(response.data.mensaje);
                 }
 

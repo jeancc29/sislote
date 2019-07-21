@@ -614,7 +614,6 @@ class PrincipalController extends Controller
             }
         }
     
-        //return 'codiog: ' . $codigoBarra . ' faker: ' . $faker->isbn10;
         
         /***************** Validamos la existencia de la jugada ***********************/
         //foreach($datos['loterias'] as $l){
@@ -624,29 +623,7 @@ class PrincipalController extends Controller
 
                $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
                 
-            //     if(strlen($d['jugada']) == 2){
-            //         $idSorteo = 1;
-            //    }
-            //    else if(strlen($d['jugada']) == 4){
-            //        if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
-            //             $idSorteo = 2;
-            //         else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
-            //             $idSorteo = 4;
-            //    }
-            //    else if(strlen($d['jugada']) == 6){
-            //         $idSorteo = 3;
-            //    }
-
-
-    
-               //$loteria = Lotteries::whereId($d['idLoteria'])->first();
-    
-            //    if(Branches::whereId($datos['idBanca'])->first()->loteriaExiste($loteria->id) == false){
-            //         return Response::json([
-            //             'errores' => 1,
-            //             'mensaje' => 'La loteria ' . $loteria->descripcion . ' no esta permitida en esta banca'
-            //         ], 201);
-            //     }
+           
 
             $banca = Branches::whereId($datos['idBanca'])->first();
             $sorteo = Draws::whereId($idSorteo)->first();
@@ -698,61 +675,7 @@ class PrincipalController extends Controller
                         $mensaje = 'No hay existencia suficiente para la jugada ' . $d['jugada'] .' en la loteria ' . $d['descripcion'];
                         break;
                 }
-                   
-            //    //Verificamos que la variable $stock no sea nula
-            //    if($stock != null){
-            //        //Si el monto en la variable $stock es menor que el monto que se jugara entonces no hay exitencia suficiente
-            //         if($stock['monto'] < $d['monto']){
-            //             $errores = 1;
-            //             $mensaje = 'No hay existencia suficiente para la jugada ' . $d['jugada'] .' en la loteria ' . $d['descripcion'];
-            //             break;
-            //         }
-            //    }else{
-    
-            //         //Obtenemos el stock de la jugada en el bloqueo jugada
-            //         $stock = Blocksplays::where(
-            //             [
-            //             'idBanca' => $datos['idBanca'],
-            //             'idLoteria' => $d['idLoteria'], 
-            //             'jugada' => $d['jugada'], 'status' => 1])
-            //             ->where('fechaDesde', '<=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00')
-            //             ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->first();
-                
-            //         //Verificamos que no sea nulo
-            //         if($stock != null){
-            //             //Si el monto en la variable $stock es mejor que el monto que se jugara entonces no hay exitencia suficiente
-            //             if($stock['monto'] < $d['monto']){
-            //                 $errores = 1;
-            //                 $mensaje = 'No hay existencia suficiente para la jugada ' . $d['jugada'] .' en la loteria ' . $d['descripcion'];
-            //                 break;
-            //             }
-            //         }else{
-            //             //Como la variable $stock esta nula porque no se encontro bloqueo de la jugada entonces vamos a obtener el bloqueo de la loteria para el sorteo
-            //             $stock = Blockslotteries::where([
-            //                 'idBanca' => $datos['idBanca'],
-            //                 'idLoteria' => $d['idLoteria'], 
-            //                 'idDia' => $fecha['wday'],
-            //                 'idSorteo' => $idSorteo
-            //             ])->first();
-    
-    
-            //             //Verificamos que la variable $stock no sea nula
-            //             if($stock != null){
-            //                 //Si el monto en la variable $stock es mejor que el monto que se jugara entonces no hay exitencia suficiente
-            //                 if($stock['monto'] < $d['monto']){
-            //                     $errores = 1;
-            //                     $mensaje = 'No hay existencia suficiente para la jugada ' . $d['jugada'] .' en la loteria ' . $d['descripcion'];
-            //                     break;
-            //                 }
-            //             }else{
-            //                 //Como la variable $stock esta nula porque no se encontro bloqueo de la loteria entonces no hay existencia
-            //                 $errores = 1;
-            //                 $mensaje = 'No hay existencia suficiente para la jugada ' . $d['jugada'] .' en la loteria ' . $d['descripcion'];
-            //                 break;
-            //             }
-            //         }
-    
-            //    }
+            
                
             }
         //}
@@ -774,89 +697,7 @@ class PrincipalController extends Controller
     
        /***************** Insertar el datelle ventas ***********************/
     
-    //    foreach($datos['loterias'] as $l){
-    
-    //     $coleccionJugadas = collect($datos['jugadas']);
-    //     list($jugadasLoterias, $no) = $coleccionJugadas->partition(function($j) use($l){
-    //         return $j['idLoteria'] == $l['id'];
-    //     });
-    
-    //     foreach($jugadasLoterias as $d){
-
-    //         $loteria = Lotteries::whereId($d['idLoteria'])->first();
-            
-    //         if(strlen($d['jugada']) == 2){
-    //             $idSorteo = 1;
-    //        }
-    //        else if(strlen($d['jugada']) == 4){
-    //             if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
-    //                 $idSorteo = 2;
-    //             else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
-    //                 $idSorteo = 4;
-    //        }
-    //        else if(strlen($d['jugada']) == 6){
-    //             $idSorteo = 3;
-    //        }
-    
-    //        $stock = Stock::where(['idLoteria' => $d['idLoteria'],'idBanca' => $datos['idBanca'], 'jugada' => $d['jugada']])
-    //                 ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
-                    
-    //            //Verificamos que la variable $stock no sea nula
-    //            if($stock != null){
-    //                //Restamos el monto jugado a la tabla stock y guardamos
-    //                $stock['monto'] = $stock['monto'] - $d['monto'];
-    //                $stock->save();
-    //            }else{
-    //                //Obtenemos el stock de la tabla bloqueo jugadas
-    //                 $stock = Blocksplays::where(
-    //                     ['idBanca' => $datos['idBanca'], 
-    //                     'idLoteria' => $d['idLoteria'],
-    //                     'jugada' => $d['jugada'], 'status' => 1])
-    //                     ->where('fechaDesde', '<=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00')
-    //                     ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->first();
-                
-    //                 //Verificamos que no sea nulo
-    //                 if($stock != null){
-    //                     //Si el monto en la variable $stock es mejor que el monto que se jugara entonces no hay exitencia suficiente
-    //                     Stock::create([
-    //                         'idBanca' => $datos['idBanca'],
-    //                         'idLoteria' => $d['idLoteria'],
-    //                         'idSorteo' => $idSorteo,
-    //                         'jugada' => $d['jugada'],
-    //                         'montoInicial' => $stock['monto'],
-    //                         'monto' => $stock['monto'] - $d['monto']
-    //                     ]);
-    //                 }else{
-    //                     $stock = Blockslotteries::where([
-    //                         'idBanca' => $datos['idBanca'], 
-    //                         'idLoteria' => $d['idLoteria'], 
-    //                         'idSorteo' => $idSorteo
-    //                     ])->first();
-    
-    //                     Stock::create([
-    //                         'idBanca' => $datos['idBanca'],
-    //                         'idLoteria' => $d['idLoteria'],
-    //                         'idSorteo' => $idSorteo,
-    //                         'jugada' => $d['jugada'],
-    //                         'montoInicial' => $stock['monto'],
-    //                         'monto' => $stock['monto'] - $d['monto']
-    //                     ]);
-    //                 }
-    //            }
-    
-    //      Salesdetails::create([
-    //          'idVenta' => Sales::where('idTicket', $idTicket)->value('id'),
-    //          'idLoteria' => $d['idLoteria'],
-    //          'idSorteo' => $idSorteo,
-    //          'jugada' => $d['jugada'],
-    //          'monto' => $d['monto'],
-    //          'premio' => 0,
-    //          'monto' => $d['monto'],
-    //      ]);
-    
-    //     }
-    // } //End foreach
-
+   
     $coleccionJugadas = collect($datos['jugadas']);
         // list($jugadasLoterias, $no) = $coleccionJugadas->partition(function($j) use($l){
         //     return $j['idLoteria'] == $l['id'];
@@ -866,20 +707,10 @@ class PrincipalController extends Controller
 
             $loteria = Lotteries::whereId($d['idLoteria'])->first();
             
-            if(strlen($d['jugada']) == 2){
-                $idSorteo = 1;
-           }
-           else if(strlen($d['jugada']) == 4){
-                if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
-                    $idSorteo = 2;
-                else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
-                    $idSorteo = 4;
-           }
-           else if(strlen($d['jugada']) == 6){
-                $idSorteo = 3;
-           }
+           $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
+           $d['jugada'] = Helper::quitarUltimoCaracter($d['jugada'], $idSorteo);
     
-           $stock = Stock::where(['idLoteria' => $d['idLoteria'],'idBanca' => $datos['idBanca'], 'jugada' => $d['jugada']])
+           $stock = Stock::where(['idLoteria' => $d['idLoteria'],'idBanca' => $datos['idBanca'], 'jugada' => $d['jugada'], 'idSorteo' => $idSorteo])
                     ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
                     
                //Verificamos que la variable $stock no sea nula
@@ -892,7 +723,9 @@ class PrincipalController extends Controller
                     $stock = Blocksplays::where(
                         ['idBanca' => $datos['idBanca'], 
                         'idLoteria' => $d['idLoteria'],
-                        'jugada' => $d['jugada'], 'status' => 1])
+                        'idSorteo' => $idSorteo,
+                        'jugada' => $d['jugada'], 
+                        'status' => 1])
                         ->where('fechaDesde', '<=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00')
                         ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->first();
                 

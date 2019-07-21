@@ -88,46 +88,81 @@
                             <div class="col-3 col-md-2 text-right mt-4">
                               <h6>@{{l.descripcion}}</h6>
                             </div>
-                            <div class="col-2 col-md-1">
+                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pale', l) 
+                                || existeSorteo('Directo', l) 
+                                || existeSorteo('Tripleta', l)
+                                || existeSorteo('Super pale', l)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">1era</label>
-                                  <input ng-model="l.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                      ng-disabled="existeSorteo('Pick 3 Box', l) || existeSorteo('Pick 3 Straight', l)"
+                                      id="ngRepeatPrimera@{{l.id}}"
+                                      maxLength="2" 
+                                      select-all-on-click ng-keyup="changeFocus($event, 'ngRepeatSegunda'+l.id, 2, l.primera)" 
+                                      ng-model="l.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2 col-md-1">
-                              <div class="input-group form-control-lg">
+                            <div class="col-2 col-md-1" >
+                              <div class="input-group form-control-lg" ng-show="
+                                existeSorteo('Pale', l) 
+                                || existeSorteo('Directo', l) 
+                                || existeSorteo('Tripleta', l)
+                                || existeSorteo('Super pale', l)">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">2da</label>
-                                  <input ng-model="l.segunda" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                      ng-disabled="existeSorteo('Pick 4 Box', l) || existeSorteo('Pick 4 Straight', l)"
+                                      id="ngRepeatSegunda@{{l.id}}"
+                                      maxLength="2" 
+                                      select-all-on-click ng-keyup="changeFocus($event, 'ngRepeatTercera'+l.id, 2, l.segunda)" 
+                                  ng-model="l.segunda" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2 col-md-1" ng-hide="existeSorteo('Super pale', l)">
+                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pale', l) 
+                                || existeSorteo('Directo', l) 
+                                || existeSorteo('Tripleta', l)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
-                                  <input ng-model="l.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                      ng-disabled="existeSorteo('Pick 4 Box', l) || existeSorteo('Pick 4 Straight', l)"
+                                      id="ngRepeatTercera@{{l.id}}"
+                                      maxLength="2" 
+                                      select-all-on-click ng-keyup="changeFocus($event, 'ngRepeatPick3'+l.id, 2, l.tercera)" 
+                                  ng-model="l.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
                             
 
-                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 3 Box', l) || existeSorteo('Pick 3 Straight', l)">
+                            <div class="col-2 col-md-2" ng-show="existeSorteo('Pick 3 Box', l) || existeSorteo('Pick 3 Straight', l)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">Pick3</label>
-                                  <input ng-model="l.pick3" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                      id="ngRepeatPick3@{{l.id}}"
+                                      maxLength="3" 
+                                      select-all-on-click id="datos-pick3" 
+                                      ng-keyup="changeFocus($event, 'ngRepeatPick4'+l.id, 3, l.pick3, 'ngRepeatPick3', $index)" 
+                                      ng-model="l.pick3" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
 
-                            <div class="col-2 col-md-1" ng-show="existeSorteo('Pick 4 Box', l) || existeSorteo('Pick 4 Straight', l)">
+                            <div class="col-2 col-md-2" ng-show="existeSorteo('Pick 4 Box', l) || existeSorteo('Pick 4 Straight', l)">
                               <div class="input-group form-control-lg">
                                 <div class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">Pick4</label>
-                                  <input ng-model="l.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                    id="ngRepeatPick4@{{l.id}}" 
+                                    maxLength="4" 
+                                    select-all-on-click 
+                                    ng-keyup="changeFocus($event, 'no', 4, l.pick4, 'ngRepeatPick4', $index)" 
+                                   
+                                  ng-model="l.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
@@ -171,7 +206,7 @@
                           <div class="col-3">
                               <div id="divInputFechaDesde" class="form-group">
                                   <label  for="jugada" class="bmd-label-floating">Fecha</label>
-                                  <input ng-model="datos.desde" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
+                                  <input ng-model="datos.fecha" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
                               </div>
                           </div>
 
@@ -207,53 +242,79 @@
                                 </select>
                               </div>
                             </div>
-                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
+                            <div class="col-2 col-sm-1" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
                                 || existeSorteo('Directo', datos.selectedLoteria) 
                                 || existeSorteo('Tripleta', datos.selectedLoteria)
                                 || existeSorteo('Super pale', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="primeraVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">1era</label>
-                                  <input ng-model="datos.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input
+                                      ng-disabled="existeSorteo('Pick 3 Box', datos.selectedLoteria) || existeSorteo('Pick 3 Straight', datos.selectedLoteria)" 
+                                      maxLength="2" 
+                                      select-all-on-click ng-keyup="changeFocus($event, 'datos-segunda', 2, datos.primera)" 
+                                      ng-model="datos.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
+                            <div class="col-2 col-sm-1" 
+                              ng-show="
+                                existeSorteo('Pale', datos.selectedLoteria) 
                                 || existeSorteo('Directo', datos.selectedLoteria) 
                                 || existeSorteo('Tripleta', datos.selectedLoteria)
                                 || existeSorteo('Super pale', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="segundaVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">2da</label>
-                                  <input ng-model="datos.segunda" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                          ng-disabled="existeSorteo('Pick 4 Box', datos.selectedLoteria) || existeSorteo('Pick 4 Straight', datos.selectedLoteria)"
+                                          select-all-on-click 
+                                          maxLength="2"
+                                          id="datos-segunda" 
+                                          ng-keyup="changeFocus($event, 'datos-tercera', 2, datos.segunda)" 
+                                          ng-model="datos.segunda" 
+                                          autocomplete="off" 
+                                          type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
+                            <div class="col-2 col-sm-1" ng-show="existeSorteo('Pale', datos.selectedLoteria) 
                                 || existeSorteo('Directo', datos.selectedLoteria) 
                                 || existeSorteo('Tripleta', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
                                 <div id="terceraVentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
-                                  <input ng-model="datos.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                  ng-disabled="existeSorteo('Pick 4 Box', datos.selectedLoteria) || existeSorteo('Pick 4 Straight', datos.selectedLoteria)"
+                                  select-all-on-click id="datos-tercera" ng-keyup="changeFocus($event, 'datos-pick3', 2, datos.tercera)" ng-model="datos.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
 
                             <div class="col-2 col-md-2" ng-show="existeSorteo('Pick 3 Box', datos.selectedLoteria) || existeSorteo('Pick 3 Straight', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
-                                <div class="form-group">
+                                <div id="pick3VentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">Pick3</label>
-                                  <input ng-model="l.pick3" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                      maxLength="3" 
+                                      select-all-on-click id="datos-pick3" 
+                                      ng-keyup="changeFocus($event, 'datos-pick4', 3, datos.pick3, 'datosPick3')" 
+                                      ng-model="datos.pick3" 
+                                      autocomplete="off" type="text"  class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
 
                             <div class="col-2 col-md-2" ng-show="existeSorteo('Pick 4 Box', datos.selectedLoteria) || existeSorteo('Pick 4 Straight', datos.selectedLoteria)">
                               <div class="input-group form-control-lg">
-                                <div class="form-group">
+                                <div id="pick4VentanaSencilla" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">Pick4</label>
-                                  <input ng-model="l.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  <input 
+                                    maxLength="4" 
+                                    select-all-on-click 
+                                    ng-keyup="changeFocus($event, 'no', 4, datos.pick4, 'datosPick4')" 
+                                    id="datos-pick4" 
+                                    ng-model="datos.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->

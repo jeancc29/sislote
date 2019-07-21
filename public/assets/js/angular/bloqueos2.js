@@ -289,8 +289,8 @@ var myApp = angular
                 $scope.datos.bloqueoJugada.optionsBancas = responseJugadas.data.bancas;
                 $scope.datos.bloqueoJugada.selectedBanca = $scope.datos.bloqueoJugada.optionsBancas[0];
 
-                $scope.datos.buscar.optionsBancas = response.data.bancas;
-                $scope.datos.buscar.optionsDias = response.data.dias;
+                // $scope.datos.buscar.optionsBancas = response.data.bancas;
+                // $scope.datos.buscar.optionsDias = response.data.dias;
 
                 $scope.datos.bloqueoJugada.loterias= [];
                 jsonLoterias.forEach(function(valor, indice, array){

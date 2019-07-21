@@ -119,18 +119,7 @@ class Helper{
     public function determinarSorteo($jugada, $idLoteria){
         $loteria = Lotteries::whereId($idLoteria)->first();
         $idSorteo = 0;
-    //     if(strlen($jugada) == 2){
-    //         $idSorteo = 1;
-    //    }
-    //    else if(strlen($jugada) == 4){
-    //        if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
-    //             $idSorteo = 2;
-    //         else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
-    //             $idSorteo = 4;
-    //    }
-    //    else if(strlen($jugada) == 6){
-    //         $idSorteo = 3;
-    //    }
+  
 
     if(strlen($jugada) == 2){
         $idSorteo = 1;
@@ -173,6 +162,132 @@ class Helper{
 
 
        return $idSorteo;
+    }
+
+    public static function determinarSorteoDescripcion($jugada, $idLoteria){
+        $loteria = Lotteries::whereId($idLoteria)->first();
+        $idSorteo = "";
+  
+
+    if(strlen($jugada) == 2){
+        $idSorteo = "Directo";
+    }
+   else if(strlen($jugada) == 3){
+        $idSorteo = Draws::whereDescripcion("Pick 3 Straight")->first();
+        if($idSorteo != null){
+            $idSorteo = $idSorteo->descripcion;
+        }
+   }
+   else if(strlen($jugada) == 4){
+        if(gettype(strpos($jugada, '+')) == "integer"){
+            $idSorteo = Draws::whereDescripcion("Pick 3 Box")->first();
+            if($idSorteo != null){
+                $idSorteo = $idSorteo->descripcion;
+            }
+        }
+        else if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
+            $idSorteo = "Pale";
+        else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
+            $idSorteo = "Super pale";
+   }
+    else if(strlen($jugada) == 5){
+            if(gettype(strpos($jugada, '+')) == "integer"){
+                $idSorteo = Draws::whereDescripcion("Pick 4 Box")->first();
+                if($idSorteo != null){
+                    $idSorteo = $idSorteo->descripcion;
+                }
+            }
+            else if(gettype(strpos($jugada, '-')) == "integer"){
+                $idSorteo = Draws::whereDescripcion("Pick 4 Straight")->first();
+                if($idSorteo != null){
+                    $idSorteo = $idSorteo->descripcion;
+                }
+            }
+    }
+    else if(strlen($jugada) == 6){
+            $idSorteo = "Tripleta";
+    }
+
+
+       return $idSorteo;
+    }
+
+    static function quitarUltimoCaracter($cadena, $idSorteo){
+        $sorteo = Draws::whereId($idSorteo)->first();
+        if($sorteo == null){
+            return $cadena;
+        }
+        else if($sorteo->descripcion == 'Pick 3 Box' || $sorteo->descripcion == 'Pick 4 Straight' || $sorteo->descripcion == 'Pick 4 Box'){
+            if(strlen($cadena) == 0)
+            return "";
+            else{
+                return substr($cadena, 0, strlen($cadena) - 1);
+            }
+        }
+
+        return $cadena;
+    }
+
+    static function existenNumerosIdenticos($numeros){
+        $contador = 0;
+        if(strlen($numeros) > 0){
+            for ($c1=0; $c1 < strlen($numeros); $c1++) { 
+                for ($c2=0; $c2 < strlen($numeros); $c2++) { 
+                    //Si $numeros[$c1] y $numeros[$c2] son iguales y los contador $c1 y $c2 son distintos
+                    //esto quiere decir que existen numeros identicos en diferentes posiciones 
+                    if($numeros[$c1] == $numeros[$c2] && $c1 != $c2)
+                        $contador++;
+                }
+            }
+        }
+        return ($contador > 0) ? true : false;
+    }
+
+    static function contarNumerosIdenticos($numeros){
+        $contador = 0;
+        $contadorTotal = 0;
+        $vecesEntro = 0;
+        
+  
+        for ($c1=0; $c1 < strlen($numeros); $c1++) { 
+            session()->forget('_'.$numeros[$c1]);
+        }
+        if(strlen($numeros) > 0){
+            for ($c1=0; $c1 < strlen($numeros); $c1++) { 
+                $contador = 0;
+                for ($c2=0; $c2 < strlen($numeros); $c2++) { 
+                    //Si $numeros[$c1] y $numeros[$c2] son iguales y los contador $c1 y $c2 son distintos
+                    //esto quiere decir que existen numeros identicos en diferentes posiciones 
+                    if($numeros[$c1] == $numeros[$c2])
+                        $contador++;
+                }
+
+                if(session()->has('_'.$numeros[$c1]) == false && $contador > 1){
+                    //El nombre de la sesion sera _1
+                        session(['_'.$numeros[$c1] => $contador]);
+                    
+                }
+
+                if($c1 + 1 == strlen($numeros)){
+                    for ($c3=0; $c3 < strlen($numeros); $c3++) { 
+                        if(session()->has('_'.$numeros[$c3]) == true){
+                            //El nombre de la sesion sera _1
+                            $contadorTotal += session('_'.$numeros[$c3]);
+
+                            
+                        }
+
+                        session()->forget('_'.$numeros[$c3]);
+                    }
+                }
+                
+                
+                
+            }
+        }
+        return $contadorTotal;
+        // return session()->has('_'."1") == false;
+        // return   session('_'."1") . ':' . session('_'."2"). ':' . session('_'."3") . ':'. session('_'."4");
     }
 
     function montodisponible($jugada, $idLoteria, $idBanca){
@@ -222,11 +337,14 @@ class Helper{
        else if(strlen($jugada) == 6){
             $idSorteo = 3;
        }
+
+       $jugada = Helper::quitarUltimoCaracter($jugada, $idSorteo);
     
        $bloqueo = Stock::where([   
            'idLoteria' => $idLoteria, 
            'idBanca' => $idBanca, 
-           'jugada' => $jugada
+           'jugada' => $jugada,
+           'idSorteo' => $idSorteo
         ])
        ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->value('monto');
        
@@ -268,7 +386,7 @@ class Helper{
         return $ans;
     }
 
-    function isNumber($number){
+    static function isNumber($number){
         $c = true;
         try {
             //code...

@@ -358,6 +358,8 @@ class BranchesController extends Controller
                         'dosNumeros' => (int)$l['pagosCombinaciones']['dosNumeros'],
                         'primerPago' => (int)$l['pagosCombinaciones']['primerPago'],
                         'pick3TodosEnSecuencia' => (int)$l['pagosCombinaciones']['pick3TodosEnSecuencia'],
+                        'pick33Way' => (int)$l['pagosCombinaciones']['pick33Way'],
+                        'pick36Way' => (int)$l['pagosCombinaciones']['pick36Way'],
                         'pick4TodosEnSecuencia' => (int)$l['pagosCombinaciones']['pick4TodosEnSecuencia'],
                         'pick44Way' => (int)$l['pagosCombinaciones']['pick44Way'],
                         'pick46Way' => (int)$l['pagosCombinaciones']['pick46Way'],

@@ -934,7 +934,11 @@
                 .modal-lg {
             max-width: 90% !important;
         }
+
+        
     </style>
+
+    
 
     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg mt-1">
@@ -1015,6 +1019,8 @@
                             <!-- <th scope="col" class="text-center">Marcar pago</th> -->
                             <th scope="col" class="text-center">Imprimir</th>
 
+                            
+
                             <!--<th scope="col" class="text-center">Cancelar/Eliminar</th> -->
 
                             </tr>
@@ -1035,6 +1041,7 @@
                                     <a ng-click="imprimirTicket(c)" href="javascript:void(0)" class="btn btn-outline-primary px-1 py-1"><i class="material-icons">print</i></a>
                                 </td>
                             </tr>
+
                             
                         </tbody>
                     </table>

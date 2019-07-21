@@ -111,3 +111,6 @@ Route::post('/transacciones/saldo', 'TransactionsController@saldo');
 Route::post('/transacciones/guardar', 'TransactionsController@store');
 Route::post('/transacciones/buscar', 'TransactionsController@buscar');
 Route::post('/transacciones/buscarTransaccion', 'TransactionsController@buscarTransaccion');
+
+
+Route::post('/monitoreo/tickets', 'MonitoreoController@monitoreo');

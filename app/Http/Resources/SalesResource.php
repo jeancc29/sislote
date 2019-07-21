@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Salesdetails;
+use App\Draws;
 use App\Cancellations;
 use App\Lotteries;
 use Carbon\Carbon;
@@ -37,6 +38,7 @@ class SalesResource extends JsonResource
             'codigoQr' => base64_encode($this->ticket->codigoBarra),
             'status' => $this->status, 
             'created_at' => $this->created_at,
+            'pagado' => $this->pagado,
             'premio' => Salesdetails::where('idVenta', $this->id)->sum('premio'),
             'razon' => Cancellations::where('idTicket', $this->idTicket)->value('razon'),
             'fechaCancelacion' => Cancellations::where('idTicket', $this->idTicket)->value('created_at'),
@@ -46,7 +48,10 @@ class SalesResource extends JsonResource
                                 return $id->idLoteria;
                             }) 
                         )->get(),
-            'jugadas' => Salesdetails::where('idVenta', $this->id)->get(),
+            'jugadas' => collect(Salesdetails::where('idVenta', $this->id)->get())->map(function($d){
+                $sorteo = Draws::whereId($d['idSorteo'])->first()->descripcion;
+                return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
+            }),
             'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A')
         ];
     }

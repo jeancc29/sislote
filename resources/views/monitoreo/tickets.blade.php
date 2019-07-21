@@ -54,7 +54,7 @@
 <!-- TODAS LAS LOTERIAS -->
 <div class="row justify-content-center">
   <div class="col-md-12">
-      <div class="card ">
+      <div class="card " style="min-height: 1000px;">
         <div class="card-header card-header-info card-header-text">
           <div class="card-text">
             <h4 class="card-title">Monitoreo de tickets</h4>
@@ -84,11 +84,11 @@
                                 <!-- <div  class="col-9"> -->
                                   <select 
                                   id="multiselectDias"
-                                      ng-model="datos.buscar.dias"
-                                      ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
+                                  ng-model="datos.selectedBanca"
+                                      ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
                                       class="selectpicker w-100" 
                                       data-style="select-with-transition" 
-                                      multiple title="Seleccionar bancas"
+                                       title="Seleccionar dias"
                                       data-size="7" aria-setsize="2">
                                   </select>
                               <!-- </div> -->
@@ -107,11 +107,11 @@
                                 <!-- <div  class="col-9"> -->
                                   <select 
                                   id="multiselectDias"
-                                      ng-model="datos.buscar.dias"
-                                      ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
+                                  ng-model="datos.selectedLoteria"
+                                      ng-options="o.descripcion for o in datos.optionsLoterias track by o.id"
                                       class="selectpicker w-100" 
                                       data-style="select-with-transition" 
-                                      multiple title="Seleccionar bancas"
+                                       title="Seleccionar loteria"
                                       data-size="7" aria-setsize="2">
                                   </select>
                               <!-- </div> -->
@@ -120,7 +120,7 @@
 
                           <div class="col-3 text-center">
                             <div class="input-group">
-                            <label  for="jugada" class="bmd-label-floating font-weight-bold" style="color: black;">Sorteo</label>
+                            <label  for="jugada" class="bmd-label-floating font-weight-bold" style="color: black;">Loteria</label>
                               <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Dias</label>                               -->
                                 <style>
                                   #multiselectDias{
@@ -128,23 +128,26 @@
                                   }
                                 </style>
                                 <!-- <div  class="col-9"> -->
-                                  <select 
+                                <select 
                                   id="multiselectDias"
-                                      ng-model="datos.buscar.dias"
-                                      ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
-                                      class="selectpicker w-100" 
-                                      data-style="select-with-transition" 
-                                      multiple title="Seleccionar bancas"
-                                      data-size="7" aria-setsize="2">
+                                  ng-model="datos.selectedSorteo"
+                                      ng-options="o.descripcion for o in datos.optionsSorteos"
+                                          ng-change="cbxBancasChange(o)"
+                                          class="selectpicker w-100" 
+                                          id="entidad1"
+                                          data-style="select-with-transition" 
+                                          title="Select sorteo">
                                   </select>
                               <!-- </div> -->
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
+                         
+
                           <div class="col-sm-3 mt-4">
                             <div id="fechaBusqueda" class="form-group">
                             <label for="fechaBusqueda" class="bmd-label-floating font-weight-bold" style="color: black;">Numero</label>
-                            <input ng-model="datos.monitoreo.numero" id="fechaBusqueda" type="text" class="form-control" required>
+                            <input ng-model="datos.jugada" id="fechaBusqueda" type="text" class="form-control" required>
                             </div>
                         </div>
 
@@ -155,7 +158,7 @@
                     </div>
 
                     <div class="col-12">
-                      <div class="row justify-content-center">
+                      <div class="row justify-content-first">
                           <div class="btn-group" role="group" aria-label="Basic example">
                               <button ng-click="buscarpor_ticket_estado(5)" type="button" class="btn btn-info">Todos <span class="bg-white rounded text-primary p-1">@{{datos.monitoreo.total_todos}}</span></button>
                               <button ng-click="buscarpor_ticket_estado(2)" type="button" class="btn btn-info">Ganadores <span class="bg-white rounded text-primary p-1">@{{datos.monitoreo.total_ganadores }}</span></button>
@@ -180,7 +183,7 @@
                     </div>
 
                     <div class="col-6 t">
-                    <table class="table table-sm">
+                    <table class="table table-sm" ng-init="mostrarVentanaTicket = false">
                         <thead>
                             <tr>
                             <th scope="col" class="text-center" style="font-size: 12px;">Numero</th>
@@ -201,7 +204,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="c in datos.monitoreo.ventas | filter:datos.monitoreo.datosBusqueda">
+                            <tr ng-click="seleccionarTicket(c)"  ng-repeat="c in datos.monitoreo.ventas | filter:datos.monitoreo.datosBusqueda">
                                 <td scope="col" class="text-center" style="font-size: 14px">@{{c.codigo}}-@{{toSecuencia(c.idTicket)}}</td>
                                 <td scope="col" class="text-center">@{{toFecha(c.created_at.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
@@ -211,7 +214,7 @@
                                 <td scope="col" class="text-center">@{{c.razon}}</td>
                                 <td scope="col" class="text-center">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <td scope="col" class="text-center">@{{estado(c.status)}}</td>
-                                <td scope="col" class="text-center">@{{Marcar pagado}}</td>
+                                <td scope="col" class="text-center">@{{(c.pagado == 1) ? 'si' : 'no'}}</td>
                                 <!-- <td scope="col" class="text-center">Marcar pago</td> -->
                                 <td scope="col" class="text-center">
                                     <a ng-click="imprimirTicket(c)" href="javascript:void(0)" class="btn btn-outline-primary px-1 py-1"><i class="material-icons">print</i></a>
@@ -228,6 +231,114 @@
       </div>
     </div>
   </div>
+
+  <style>
+  .panel.panel-chat
+        {
+            position: fixed;
+            bottom:0;
+            right:0;
+            max-width: 470px;
+            width: 500px;
+            box-shadow: none;
+            -webkit-box-shadow: none;
+            z-index: 99999;
+            
+        }
+
+        #mytable >tbody>tr>td{
+  height:20px;
+  padding:0px;
+  border-top: 0px;
+}
+
+.bg-rosa{
+  background: #FD9EBC;
+}
+    </style>
+
+    <div class="panel panel-chat " ng-show="mostrarVentanaTicket">
+        <div class="row">
+            <div class="col-12">
+                <div style="cursor:pointer" class="bg-success w-25 p-2 text-white text-center font-weight-bold" ng-click="mostrarVentanaTicket = !mostrarVentanaTicket">
+                    Cerrar
+                </div>
+            </div>
+            <div class="col-12">
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 350px; max-height: 350px; width: 100%; background: #dddddd; overflow-y: auto;"> <!-- min-height: 455px; max-height: 455px; -->
+                <div class="card-header card-header-info card-header-icon">
+                
+                  <!-- <h4 class="card-title">Pick4</h4> -->
+                </div>
+                <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
+                <div class="table-responsive">
+                  <h4 class="card-title text-center">Pick4</h4>
+
+                  <div ng-repeat="l in datos.selectedTicket.loterias">
+                  <!-- <div class='loterias col-xs-12 text-center mx-3' style='border-top-style: dashed; border-bottom-style: dashed; font-weight: lighter'> -->
+                    <h5 style=' padding: 8px; width: 75%; margin: auto; '  class='text-center font-weight-bold py-1 mt-2 mb-0'>@{{l.descripcion}}</h5>
+                  <!-- </div> -->
+
+                    <table id="mytable" class="table table-sm">
+                    <thead>
+                        <tr>
+                        <th class="font-weight-bold" style="font-size: 12px">tipo sorteo</th>
+                        <th class="font-weight-bold" style="font-size: 12px">jugada</th>
+                        <th class="text-center font-weight-bold" style="font-size: 12px">monto</th>
+                        <th class="text-center font-weight-bold" style="font-size: 12px">premio</th>
+                        <th class="text-center font-weight-bold" style="font-size: 12px">pagado</th>
+                        <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
+                        </tr>
+                    </thead>
+                    <tbody class="">
+                        <tr class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in datos.selectedTicket.jugadas ">
+                        <td class="" style="font-size: 12px;">@{{c.sorteo}}</td>
+                        <td class="" style="font-size: 12px;">
+                            @{{agregar_guion(c.jugada, c.sorteo)}}
+                            <small ng-if="c.sorteo == 'Pick 3 Box' || c.sorteo == 'Pick 4 Box'" class="text-danger font-weight-bold">B</small>
+                            <small ng-if="c.sorteo == 'Pick 3 Straight' || c.sorteo == 'Pick 4 Straight'" class="text-primary font-weight-bold">S</small>
+                        </td>
+                        <td class="text-center" style="font-size: 12px;">
+                            @{{c.monto}}
+                        </td>
+                        <td class="text-center" style="font-size: 12px;">
+                            @{{c.premio}}
+                        </td>
+                        <td class="text-center" style="font-size: 12px;">
+                            -
+                        </td>
+                        
+                        <!-- <td class="td-actions text-center col-1">
+                            <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                <i class="material-icons">close</i>
+                            </button>
+                            </td> -->
+                        </tr>
+                        
+                    </tbody>
+                    </table>
+                    <hr class="mb-0">
+
+                    </div> <!-- END DIV NG-REPEAT LOTERIAS -->
+                    
+                    <!-- <div class="float-right">
+                            <div style="font-size: 16px;" class="font-weight-bold">
+                                Total
+                                <small class="">&euro;0</small>
+                            </div>   
+                    </div> -->
+                </div>
+                    <div class="float-right">
+                            <div style="font-size: 16px;" class="font-weight-bold">
+                                Total
+                                <small class="">@{{datos.total_pick4 | currency}}</small>
+                            </div>   
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
 
 
 
