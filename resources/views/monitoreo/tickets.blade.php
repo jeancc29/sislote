@@ -183,7 +183,7 @@
                     </div>
 
                     <div class="col-6 t">
-                    <table class="table table-sm" ng-init="mostrarVentanaTicket = false">
+                    <table class="table table-sm table-striped" ng-init="mostrarVentanaTicket = false">
                         <thead>
                             <tr>
                             <th scope="col" class="text-center" style="font-size: 12px;">Numero</th>
@@ -198,26 +198,34 @@
                             <th scope="col" class="text-center" style="font-size: 12px;">Marcar pago</th>
                             <!-- <th scope="col" class="text-center" style="font-size: 12px;">Marcar pago</th> -->
                             <th scope="col" class="text-center" style="font-size: 12px;">Imprimir</th>
+                            <th scope="col" class="text-center" style="font-size: 12px;">Cancelar / Eliminar</th>
 
                             <!--<th scope="col" class="text-center">Cancelar/Eliminar</th> -->
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-click="seleccionarTicket(c)"  ng-repeat="c in datos.monitoreo.ventas | filter:datos.monitoreo.datosBusqueda">
-                                <td scope="col" class="text-center" style="font-size: 14px">@{{c.codigo}}-@{{toSecuencia(c.idTicket)}}</td>
-                                <td scope="col" class="text-center">@{{toFecha(c.created_at.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
-                                <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
-                                <td scope="col" class="text-center">@{{c.usuario}}</td>
-                                <td scope="col" class="text-center">@{{c.subTotal}}</td>
-                                <td scope="col" class="text-center">@{{c.premio}}</td>
-                                <td scope="col" class="text-center">@{{c.razon}}</td>
-                                <td scope="col" class="text-center">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
-                                <td scope="col" class="text-center">@{{estado(c.status)}}</td>
-                                <td scope="col" class="text-center">@{{(c.pagado == 1) ? 'si' : 'no'}}</td>
-                                <!-- <td scope="col" class="text-center">Marcar pago</td> -->
-                                <td scope="col" class="text-center">
+                            <tr   ng-repeat="c in datos.monitoreo.ventas | filter:datos.monitoreo.datosBusqueda">
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.codigo}}-@{{toSecuencia(c.idTicket)}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.created_at.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
+                                <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{Cerrado}}</td> -->
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuario}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.subTotal}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.premio}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuarioCancelacion.usuario}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{estado(c.status)}}</td>
+                                <td scope="col" class="text-center" style="font-size: 11px">
+                                  <a ng-if="c.pagado != 1 && c.premio > 0" style="cursor: pointer;" ng-click="pagar(c)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-primary " style="font-size: 18px!important;">payment</i></a>
+                                  <a ng-if="c.pagado == 1 && c.premio > 0" style="cursor: pointer;" class="d-inline   abrir-wizard-editar"><i class="material-icons text-success " style="font-size: 18px!important;">done_outline</i></a>
+                                </td>
+                                <!-- <td scope="col" class="text-center" style="font-size: 11px">Marcar pago</td> -->
+                                <td scope="col" class="text-center" style="font-size: 11px">
                                     <a ng-click="imprimirTicket(c)" href="javascript:void(0)" class="btn btn-outline-primary px-1 py-1"><i class="material-icons">print</i></a>
+                                </td>
+                                <td>
+                                  <a style="cursor: pointer;" ng-click="cancelar(c)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-danger " style="font-size: 18px!important;">cancel</i></a>
+                                  <a style="cursor: pointer;" ng-click="eliminar(c)" class="d-inline   "><i class="material-icons text-danger" style="font-size: 18px!important;">delete_forever</i></a>
                                 </td>
                             </tr>
                             
@@ -282,9 +290,9 @@
                     <table id="mytable" class="table table-sm">
                     <thead>
                         <tr>
-                        <th class="font-weight-bold" style="font-size: 12px">tipo sorteo</th>
-                        <th class="font-weight-bold" style="font-size: 12px">jugada</th>
-                        <th class="text-center font-weight-bold" style="font-size: 12px">monto</th>
+                        <th class="text-center font-weight-bold" style="font-size: 12px">tipo sorteo</th>
+                        <th class="text-center font-weight-bold" style="font-size: 12px">jugada</th>
+                        <th class="text-center font-weight-bold " style="font-size: 12px">monto</th>
                         <th class="text-center font-weight-bold" style="font-size: 12px">premio</th>
                         <th class="text-center font-weight-bold" style="font-size: 12px">pagado</th>
                         <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
@@ -292,11 +300,11 @@
                     </thead>
                     <tbody class="">
                         <tr class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in datos.selectedTicket.jugadas ">
-                        <td class="" style="font-size: 12px;">@{{c.sorteo}}</td>
-                        <td class="" style="font-size: 12px;">
+                        <td class="text-center" style="font-size: 12px;">@{{c.sorteo}}</td>
+                        <td class="text-center" style="font-size: 12px;">
                             @{{agregar_guion(c.jugada, c.sorteo)}}
-                            <small ng-if="c.sorteo == 'Pick 3 Box' || c.sorteo == 'Pick 4 Box'" class="text-danger font-weight-bold">B</small>
-                            <small ng-if="c.sorteo == 'Pick 3 Straight' || c.sorteo == 'Pick 4 Straight'" class="text-primary font-weight-bold">S</small>
+                            <!-- <small ng-if="c.sorteo == 'Pick 3 Box' || c.sorteo == 'Pick 4 Box'" class="text-danger font-weight-bold">B</small>
+                            <small ng-if="c.sorteo == 'Pick 3 Straight' || c.sorteo == 'Pick 4 Straight'" class="text-primary font-weight-bold">S</small> -->
                         </td>
                         <td class="text-center" style="font-size: 12px;">
                             @{{c.monto}}
@@ -342,6 +350,70 @@
 
 
 
+
+    <div id="modal-cancelar-eliminar" class="modal fade modal-cancelar-eliminar" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                 <div class="modal-header">
+                    <h3 class="modal-title" id="exampleModalLabel">Razon</h3>
+                    <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                    </div> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                    <!-- <form>
+                        <div class="form-group mb-2">
+                        <input type="text" class="form-control b-none" id="recipient-name" placeholder="Nombre completo">
+                        </div>
+                        <div class="form-group my-2">
+                        <input type="email" name="" value="" placeholder="Correo electronico" class="form-control">
+                        </div>
+                        <div class="form-group my-2">
+                        <input type="password" name="" value="" placeholder="Password..." class="form-control">
+                        </div>
+                        <input type="submit" name="guardar" value="Guardar" class="btn btn-primary btn-block p-2">
+                    </form> -->
+
+                    <div class="row">
+                        <!-- <div ng-show="es_movil == false" class="col-sm-3">
+                            <div id="fechaBusqueda" class="form-group">
+                            <label for="fechaBusqueda" class="bmd-label-floating">Codigo</label>
+                            <input ng-model="datos.cancelar.codigoBarra" id="fechaBusqueda" type="text" class="form-control" required>
+                            </div>
+                        </div> -->
+                        <div class="col-sm-8">
+                            <div id="fechaBusqueda" class="form-group">
+                            <label for="fechaBusqueda" class="bmd-label-floating">Razon</label>
+                            <input ng-model="datos.cancelar.razon" id="fechaBusqueda" type="text" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-3">
+                            <input ng-click="cancelar()" type="submit" class="btn btn-primary" value="Buscar">   
+                        </div>
+                    </div>
+
+
+
+                    
+
+                    <div class="container">
+
+                        <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                        </div> -->
+                    </div>
+
+                </div> <!-- END MODAL-BODY -->
+                
+            </div> <!-- END MODAL-CONTENT-->
+        </div>
+    </div>
 
 
 

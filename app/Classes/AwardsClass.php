@@ -184,6 +184,28 @@ class AwardsClass{
         return $guardadoCorrectamente;
     }
 
+    public function eliminarPremio(){
+        $eliminadoCorrectamente = true;
+        try{
+            $fechaActual = getdate();
+            $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+            
+            $numeroGanador = Awards::where('idLoteria', $this->loteria['id'])
+            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
+
+            //Si es diferente de nulo entonces existe, asi que debo eliminar
+            if($numeroGanador != null){
+                Awards::where('idLoteria', $this->loteria['id'])
+                ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->delete();
+            }
+        }catch (Exception $e) {
+            $eliminadoCorrectamente = false;
+        }
+
+        return $eliminadoCorrectamente;
+    }
+
     public function getJugadasDeHoy($idLoteria){
         $fechaActual = getdate();
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
@@ -192,13 +214,28 @@ class AwardsClass{
         $idVentas = Sales::select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
-        ->where('salesdetails.idLoteria', $idLoteria)->where('sales.status', '!=', 0)->get();
+        ->where('salesdetails.idLoteria', $idLoteria)->whereNotIn('sales.status', [0,5])->get();
 
         $jugadas = Salesdetails::whereIn('idVenta', $idVentas)
                 ->orderBy('jugada', 'asc')
                 ->get();
 
         return $jugadas;
+    }
+
+    public function existenTicketsMarcadoComoPagado($idLoteria){
+        $fechaActual = getdate();
+        $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+
+        $cantidadTicksMarcadoComoPagado = Sales::select('sales.id')
+        ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+        ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+        ->where(['salesdetails.idLoteria' => $idLoteria, 'sales.pagado' => 1])->whereNotIn('sales.status', [0,5])->count();
+
+    
+
+        return ($cantidadTicksMarcadoComoPagado > 0) ? true : false;
     }
 
     public function directoBuscarPremio($idVenta, $idLoteria, $jugada, $monto){

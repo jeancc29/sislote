@@ -328,15 +328,13 @@
 
                     </form> 
                    
-                    <style>
+                    <!-- <style>
                       .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
                         background-color: #f5f2f2;
                       }
-                      /* .table-striped{
-                        background: #cccaca!important;
-                      } */
+                      
                     
-                    </style>
+                    </style> -->
                     <div class="col-12">
                          <!-- INICIO TABLA-->
                         <table 

@@ -24,6 +24,7 @@ var myApp = angular
         "idLoteria" : null,
         "idSorteo" : null,
         "jugada" : null,
+        'fecha' : new Date(),
         
         'optionsBancas' : [],
         'selectedBancas' : {},
@@ -223,6 +224,8 @@ var myApp = angular
             $scope.datos.idUsuario = idUsuarioGlobal;
             console.log('buscar: ', $scope.datos);
 
+            $scope.datos.fecha = $scope.datos.monitoreo.fecha;
+
           $http.post(rutaGlobal+"/api/monitoreo/tickets", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
              .then(function(response){
                 console.log('monitoreo ',response);
@@ -324,7 +327,7 @@ var myApp = angular
             
 
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
-            $scope.datos.cancelar.idBanca = $scope.datos.selectedBancas.id;
+            $scope.datos.cancelar.idBanca = idBancaGlobal;
             $scope.datos.cancelar.razon = "Cancelado desde monitoreo ticket";
             $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
@@ -340,6 +343,48 @@ var myApp = angular
                     return;
                 }else if(response.data.errores == 0){
                     $scope.datos.cancelar.codigoBarra = null;
+                    $scope.buscar();
+                    $scope.inicializarDatos(response);
+                    alert(response.data.mensaje);
+                }
+
+            });
+        }
+
+        $scope.eliminar = function(ticket){
+
+            if(ticket.codigoBarra == null || ticket.codigoBarra == undefined)
+            {
+                alert('El codigo del ticket no debe estar vacio');
+                return;
+            }
+
+            if(Number(ticket.codigoBarra) != ticket.codigoBarra)
+            {
+                alert('El codigo del ticket debe ser numerico');
+                return;
+            }
+
+            
+
+            $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
+            $scope.datos.cancelar.idBanca = idBancaGlobal;
+            $scope.datos.cancelar.razon = "Cancelado desde monitoreo ticket";
+            $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
+           // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
+
+            $http.post(rutaGlobal+"/api/principal/eliminar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
+             .then(function(response){
+                console.log(response.data);
+
+                if(response.data.errores == 1){
+                    $scope.datos.cancelar.codigoBarra = null;
+                    $scope.datos.cancelar.razon = null;
+                    alert(response.data.mensaje);
+                    return;
+                }else if(response.data.errores == 0){
+                    $scope.datos.cancelar.codigoBarra = null;
+                    $scope.buscar();
                     $scope.inicializarDatos(response);
                     alert(response.data.mensaje);
                 }
@@ -375,6 +420,7 @@ var myApp = angular
                     alert(response.data.mensaje);
                     return;
                 }else if(response.data.errores == 0){
+                    $scope.buscar();
                     $scope.datos.pagar.codigoBarra = null;
                     alert(response.data.mensaje);
                 }
@@ -389,12 +435,12 @@ var myApp = angular
                 return '-';
         }
 
-        // $scope.toSecuencia = function(idTicket){
-        //     var str = "" + idTicket;
-        //     var pad = "000000000";
-        //     var ans = pad.substring(0, pad.length - str.length) + str;
-        //     return ans;
-        // }
+        $scope.toSecuencia = function(idTicket){
+            var str = "" + idTicket;
+            var pad = "000000000";
+            var ans = pad.substring(0, pad.length - str.length) + str;
+            return ans;
+        }
 
         $scope.estado = function(status){
             if(status == 1)

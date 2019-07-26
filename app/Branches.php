@@ -151,7 +151,7 @@ class Branches extends Model
         
        $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->where('idBanca', $this->id)
-            ->where('status', '!=', 0)->sum('total');
+            ->whereNotIn('status', [0,5])->sum('total');
 
         $ventas += $monto_a_vender;
 

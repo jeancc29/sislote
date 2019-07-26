@@ -9,6 +9,7 @@ use App\Stock;
 use App\Blocksplays;
 use App\Blockslotteries;
 use App\Draws;
+use App\Awards;
 
 use Log;
 use Twilio\Rest\Client;
@@ -212,6 +213,24 @@ class Helper{
        return $idSorteo;
     }
 
+
+    static function agregarGuion($jugada, $idSorteo){
+        $sorteo = Draws::whereId($idSorteo)->first();
+        if($sorteo == null)
+            return $jugada;
+        
+        if($sorteo->descripcion == 'Pick 3 Straight' || $sorteo->descripcion == 'Pick 4 Straight')
+            $jugada .= 'S';
+        else if($sorteo->descripcion == 'Pick 3 Box' || $sorteo->descripcion == 'Pick 4 Box')
+            $jugada .= 'B';
+        else if($sorteo->descripcion == 'Pale' || $sorteo->descripcion == 'Super pale')
+            $jugada = substr($jugada, 0, 2) . '-' . substr($jugada, 2, 2);
+        else if($sorteo->descripcion == 'Tripleta')
+            $jugada = substr($jugada, 0, 2) . '-' . substr($jugada, 2, 2) . '-' . substr($jugada, 4, 2);
+
+        return $jugada;
+    }
+
     static function quitarUltimoCaracter($cadena, $idSorteo){
         $sorteo = Draws::whereId($idSorteo)->first();
         if($sorteo == null){
@@ -397,6 +416,17 @@ class Helper{
         }
 
         return $c;
+    }
+
+    static function loteriaTienePremiosRegistradosHoy($idLoteria){
+            $fechaActual = getdate();
+            $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+            
+            $premios = Awards::where('idLoteria', $idLoteria)
+            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
+
+            return ($premios != null) ? true : false;
     }
 
 

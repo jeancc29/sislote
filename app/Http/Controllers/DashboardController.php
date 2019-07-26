@@ -80,9 +80,9 @@ class DashboardController extends Controller
         ];
 
         //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
-        $ventasGrafica = Sales::select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total'))
+        $ventasGrafica = Sales::select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios'))
             ->whereBetween('created_at', array($fecha6DiasAtras, $fechaActual))
-            ->where('status', '!=', 0)
+            ->whereNotIn('status', [0,5])
             ->groupBy('date')
             //->orderBy('created_at', 'asc')
             ->get();
@@ -91,10 +91,11 @@ class DashboardController extends Controller
         $ventasGrafica = collect($ventasGrafica)->map(function($d) use($daysSpanish){
             $fecha = new Carbon($d['date']);
             $dia = $daysSpanish[$fecha->dayOfWeek] . ' ' . $fecha->day;
-            return ["total" => $d['subTotal'], "neto" => $d['total'], "dia" => $dia];
+            return ["total" => $d['subTotal'], "neto" => $d['total'] - $d['premios'], "dia" => $dia];
         });
 
-        
+        // var_dump($ventasGrafica);
+        // return ;
 
         //VENTAS Y PREMIOS AGRUPADOS POR LOTERIA
         $fechaInicial = Carbon::now();
@@ -104,8 +105,8 @@ class DashboardController extends Controller
             selectRaw('
                 id, 
                 descripcion, 
-                (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.created_at between ? and ?) as ventas,
-                (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.created_at between ? and ?) as premios
+                (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status not in(0,5) and sd.idLoteria = lotteries.id and s.created_at between ? and ?) as ventas,
+                (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status not in(0,5) and sd.idLoteria = lotteries.id and s.created_at between ? and ?) as premios
                 ', [$fechaInicial, $fechaFinal, //Parametros para ventas
                     $fechaInicial, $fechaFinal //Parametros para premios
                     ])
@@ -115,7 +116,7 @@ class DashboardController extends Controller
         //Jugadas con mayores montos jugados en loterías disponibles
         $fecha = getdate();
         $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->where('status', '!=', 0)->get();
+            ->whereNotIn('status', [0,5])->get();
 
         $idVentas = collect($ventas)->map(function($id){
             return $id->id;
@@ -168,7 +169,7 @@ class DashboardController extends Controller
         ];
 
         $ventasGrafica = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->where('status', '!=', 0)
+            ->whereNotIn('status', [0,5])
             ->groupBy('created_at')
             ->orderBy('created_at', 'asc')
             ->get();

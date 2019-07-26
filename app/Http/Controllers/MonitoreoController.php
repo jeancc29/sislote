@@ -81,7 +81,7 @@ class MonitoreoController extends Controller
 
             $idVentas = Sales::select('id')
                 ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-                ->where('status', '!=', 0)
+                ->whereNotIn('status', [0,5])
                 ->whereIn('idBanca', $idBancas)
                 ->get();
     
@@ -196,7 +196,7 @@ class MonitoreoController extends Controller
                     ->count();
     
                     $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                    ->where('status', '!=', '0')
+                    ->whereNotIn('status', [0,5])
                     ->where('idBanca', $datos['idBanca'])
                     ->sum('subTotal');
     
@@ -205,7 +205,7 @@ class MonitoreoController extends Controller
                     //AQUI TERMINAN LAS COMISIONES
     
                     $descuentos = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                    ->where('status', '!=', 0)
+                    ->whereNotIn('status', [0,5])
                     ->where('idBanca', $datos['idBanca'])
                     ->sum('descuentoMonto');
     
@@ -240,7 +240,7 @@ class MonitoreoController extends Controller
                     $loterias = collect($loterias)->map(function($d) use($datos, $fechaInicial, $fechaFinal){
                         $datosComisiones = Commissions::where(['idBanca' => $datos['idBanca'], 'idLoteria' => $d['id']])->first();
                         $comisionesMonto = 0;
-                        $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->where('status', '!=', 0)->get();
+                        $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->whereNotIn('status', [0,5])->get();
                         $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
                             return $id->id;
                         });
@@ -311,7 +311,7 @@ class MonitoreoController extends Controller
     
             $comisionesMonto = 0;
             $datosComisiones = Commissions::where('idBanca', $datos['idBanca'])->get();
-            $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->where('status', '!=', 0)->get();
+            $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->whereNotIn('status', [0,5])->get();
             $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
                 return $id->id;
             });
@@ -516,8 +516,8 @@ class MonitoreoController extends Controller
             'monitoreo' => SalesResource::collection($monitoreo),
             'loterias' => Lotteries::whereStatus(1)->get(),
             'caracteristicasGenerales' =>  Generals::all(),
-            'total_ventas' => Sales::sum('subTotal'),
-            'total_jugadas' => Salesdetails::count('jugada'),
+            'total_ventas' => Sales::whereIn('id', $idVentas)->sum('subTotal'),
+            'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
             'errores' => 0
         ], 201);
     }

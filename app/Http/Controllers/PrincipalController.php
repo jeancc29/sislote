@@ -72,10 +72,10 @@ class PrincipalController extends Controller
    
         if($idBanca == 0){
             $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->where('status', '!=', 0)->get();
+            ->whereNotIn('status', [0,5])->get();
         }else{
             $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->where('status', '!=', 0)
+            ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
         }
@@ -119,10 +119,10 @@ class PrincipalController extends Controller
    
         if($idBanca == 0){
             $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->where('status', '!=', 0)->get();
+            ->whereNotIn('status', [0,5])->get();
         }else{
             $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->where('status', '!=', 0)
+            ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
         }
@@ -245,7 +245,7 @@ class PrincipalController extends Controller
         $jugadas = null;
     
         $idTicket = Tickets::where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
-        $idVenta = Sales::where('idTicket', $idTicket)->where('status', '!=', 0)->value('id');
+        $idVenta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0,5])->value('id');
         
         if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
             if($idVenta != null){
@@ -255,7 +255,12 @@ class PrincipalController extends Controller
                 });
     
                 $loterias = Lotteries::whereIn('id', $idLoterias)->whereStatus(1)->get();
-                $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
+                // $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
+                
+                $jugadas = collect(Salesdetails::where('idVenta', $idVenta)->get())->map(function($d){
+                    $sorteo = Draws::whereId($d['idSorteo'])->first()->descripcion;
+                    return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
+                });
             }else{
                 $errores = 1;
                 $mensaje = "El ticket no existe";
@@ -365,12 +370,12 @@ class PrincipalController extends Controller
         ])['datos'];
     
         $usuario = Users::whereId($datos['idUsuario'])->first();
-        if(!$usuario->tienePermiso("Eliminar ticket")){
-            return Response::json([
-                'errores' => 1,
-                'mensaje' => 'No tiene permisos para realizar esta accion'
-            ], 201);
-        }
+        // if(!$usuario->tienePermiso("Eliminar ticket")){
+        //     return Response::json([
+        //         'errores' => 1,
+        //         'mensaje' => 'No tiene permisos para realizar esta accion'
+        //     ], 201);
+        // }
     
        //return $datos;
         $fecha = getdate();
@@ -386,7 +391,7 @@ class PrincipalController extends Controller
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
             $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
-            $venta = Sales::where('idTicket', $idTicket)->where('status', '!=', 2)->wherePagado(0)->get()->first();
+            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0, 5])->get()->first();
     
             
             
@@ -425,8 +430,16 @@ class PrincipalController extends Controller
                // return ($minutoActual - $minutoTicketJugado) . " - " .$banca[' minutosCancelarTicket'];
     
                 if(($minutoActual - $minutoTicketJugado['minutes']) < $banca['minutosCancelarTicket'] || $usuario->tienePermiso("Cancelar tickets en cualquier momento")){
+                    $venta['pagado'] = 0;
                     $venta['status'] = 0;
                     $venta->save();
+
+                    $ventasDetalles = Salesdetails::where('idVenta', $venta['id'])->get();
+                    foreach($ventasDetalles as $v){
+                        $v['premio'] = 0;
+                        $v['status'] = 0;
+                        $v->save();
+                    }
     
                     Cancellations::create([
                         'idTicket' => $venta['idTicket'],
@@ -444,7 +457,7 @@ class PrincipalController extends Controller
     
             }else{
                 $errores = 1;
-                $mensaje = "El ticket no existe o ya han los 7 minutos de plazo para cancelar";
+                $mensaje = "El ticket no existe o ya ha sido cancelado";
             }
         }else{
                 $errores = 1;
@@ -453,7 +466,7 @@ class PrincipalController extends Controller
 
         $fecha = getdate();
         $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-                ->where('status', '!=', 0)->get();
+                ->whereNotIn('status', [0,5])->get();
     
         $idVentas = collect($ventas)->map(function($id){
             return $id->id;
@@ -464,9 +477,6 @@ class PrincipalController extends Controller
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'resta' => ($minutoActual - $minutoTicketJugado['minutes']),
-            'minutoActual' => $minutoActual,
-            'minutoTicketJugado' => $minutoTicketJugado,
 
             'loterias' => Lotteries::whereStatus(1)->get(),
             'caracteristicasGenerales' =>  Generals::all(),
@@ -474,6 +484,89 @@ class PrincipalController extends Controller
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
             'ventas' => SalesResource::collection($ventas),
             'bancas' => Branches::whereStatus(1)->get()
+        ], 201);
+    }
+
+
+
+    public function eliminar()
+    {
+        $datos = request()->validate([
+            'datos.codigoBarra' => 'required',
+            'datos.razon' => 'required',
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => 'required'
+        ])['datos'];
+    
+        $usuario = Users::whereId($datos['idUsuario'])->first();
+        if(!$usuario->tienePermiso("Eliminar ticket")){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'No tiene permisos para realizar esta accion'
+            ], 201);
+        }
+    
+       //return $datos;
+        $fecha = getdate();
+    
+        $errores = 0;
+        $mensaje = '';
+        $loterias = null;
+        $jugadas = null;
+    
+        
+    
+    
+        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+            //Obtenemos el ticket
+            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [5])->wherePagado(0)->get()->first();
+    
+            
+            
+            if($venta != null){
+                $banca = Branches::whereId($datos['idBanca'])->first();
+            
+    
+               
+               // return ($minutoActual - $minutoTicketJugado) . " - " .$banca[' minutosCancelarTicket'];
+    
+                    $venta['status'] = 5;
+                    $venta['pagado'] = 0;
+                    $venta->save();
+
+                    $ventasDetalles = Salesdetails::where('idVenta', $venta['id'])->get();
+                    foreach($ventasDetalles as $v){
+                        $v['premio'] = 0;
+                        $v['status'] = 0;
+                        $v->save();
+                    }
+    
+                    Cancellations::create([
+                        'idTicket' => $venta['idTicket'],
+                        'idUsuario' => $datos['idUsuario'],
+                        'razon' => 'Esta eliminado'
+                    ]);
+    
+                    $mensaje = "El ticket se ha eliminado correctamente";
+               
+                
+    
+            }else{
+                $errores = 1;
+                $mensaje = "El ticket no existe para eliminar";
+            }
+        }else{
+                $errores = 1;
+                $mensaje = "El numero de ticket no es correcto";
+        }
+
+       
+    
+    
+        return Response::json([
+            'errores' => $errores,
+            'mensaje' => $mensaje
         ], 201);
     }
 
@@ -618,12 +711,23 @@ class PrincipalController extends Controller
         /***************** Validamos la existencia de la jugada ***********************/
         //foreach($datos['loterias'] as $l){
             foreach($datos['jugadas'] as $d){
+
+               
                 
                 $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                 //Confirmamos de que la loteria no tenga premios registrados en el dia de hoy
+               //si es asi entonces no puede realizar la jugada y en caso de querer hacer jugadas
+               //enonces debe borrar los premios de dicha loteria
+               if(Helper::loteriaTienePremiosRegistradosHoy($d['idLoteria']) == true){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensaje' => 'Error: La loteria ' . $loteria->descripcion . ' ya tiene numeros ganadores registrados'
+                    ], 201);
+                }
 
                $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
                 
-           
+               
 
             $banca = Branches::whereId($datos['idBanca'])->first();
             $sorteo = Draws::whereId($idSorteo)->first();

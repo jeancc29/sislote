@@ -112,7 +112,7 @@ class TicketPrintClass{
                         // if($this->contadorJugadas > 3 && $contadorJugadasLoteria == 1){
                         //     $this->openColXs6();
                         // }
-                        if($this->contadorJugadas > 2 && $yaAbrioSegundaTabla == false && $contadorJugadasLoteria > round($this->contadorJugadas / 2)){
+                        if($this->contadorJugadas >= 2 && $yaAbrioSegundaTabla == false && $contadorJugadasLoteria > round($this->contadorJugadas / 2)){
                                 $this->closeTableBody();
                                 $this->closeTable();
                             $this->closeCol();
@@ -131,7 +131,8 @@ class TicketPrintClass{
                             // $this->openTable();
                             //     $this->setTableHead();
                             //     $this->openTableBody();
-                                    $this->setJugada($d['jugada'], $d['monto']);
+                                    $jugada = Helper::agregarGuion($d['jugada'], $d['idSorteo']);
+                                    $this->setJugada($jugada, $d['monto']);
                         //         $this->closeTableBody();
                         //     $this->closeTable();
                         // $this->closeCol();
@@ -146,7 +147,7 @@ class TicketPrintClass{
                     $this->closeTable();
                 $this->closeCol();
 
-                if($this->contadorJugadas < 3){
+                if($this->contadorJugadas < 2){
                         $this->openColXs6();
                                 $this->openTable();
                                 $this->setTableHead();
@@ -184,10 +185,10 @@ class TicketPrintClass{
         // $data = base64_encode($img);
 
         /*************** RUTA PC DEBUG **************************/
-        // $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
-        // $file = fopen($output_file, "wb");
-        // fwrite($file, $this->html);
-        // fclose($file);
+        $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
+        $file = fopen($output_file, "wb");
+        fwrite($file, $this->html);
+        fclose($file);
 
         // ob_start();
         // $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --zoom 2.125 --width 314 ";
@@ -245,6 +246,11 @@ class TicketPrintClass{
           .loterias{
             margin: 0 auto;
             width: 90%;
+            clear: both;
+          }
+
+          .loterias > h3{
+            text-align: center;
           }
 
           .contenedor-tabla{

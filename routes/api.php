@@ -63,6 +63,7 @@ Route::post('/principal/pruebahttp', 'PrincipalController@pruebahttp');
 Route::post('/principal/pagar', 'PrincipalController@pagar');
 Route::post('/principal/duplicar', 'PrincipalController@duplicar');
 Route::post('/principal/cancelar', 'PrincipalController@cancelar');
+Route::post('/principal/eliminar', 'PrincipalController@eliminar');
 
 Route::post('/imagen/guardar', 'PrincipalController@imagen');
 Route::post('/principal/sms', 'PrincipalController@sms');

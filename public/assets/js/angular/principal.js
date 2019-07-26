@@ -595,10 +595,10 @@ var myApp = angular
             //$scope.calcularTotal();
         }
 
-        $scope.jugada_eliminar = function(jugada){
-            if($scope.datos.jugadas.find(x => x.jugada == jugada) != undefined){
+        $scope.jugada_eliminar = function(jugada, idLoteria){
+            if($scope.datos.jugadas.find(x => x.jugada == jugada && x.idLoteria == idLoteria) != undefined){
     
-                let idx = $scope.datos.jugadas.findIndex(x => x.jugada == jugada);
+                let idx = $scope.datos.jugadas.findIndex(x => x.jugada == jugada && x.idLoteria == idLoteria);
                 $scope.datos.jugadas.splice(idx,1);
                 $scope.calcularTotal();
             }
@@ -800,6 +800,7 @@ var myApp = angular
                         }
                     else{
                         alert(response.data.mensaje);
+                        return;
                     }
                    
                 })

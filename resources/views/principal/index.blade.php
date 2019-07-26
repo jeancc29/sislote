@@ -485,8 +485,8 @@
                         <td style="font-size:12px" class="col-3 text-center col-sm-5">@{{c.abreviatura}}</td>
                         <td style="font-size:12px" class="col-3 text-center">@{{agregar_guion(c.jugada)}}</td>
                         <td style="font-size:12px" class="text-center col-3">@{{c.monto}}</td>
-                        <td style="font-size:12px; cursor: pointer;" class="text-center col-3" ng-click="jugada_eliminar(c.jugada)">
-                            <!-- <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link text-center btn-danger">
+                        <td style="font-size:12px; cursor: pointer;" class="text-center col-3" ng-click="jugada_eliminar(c.jugada, c.idLoteria)">
+                            <!-- <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link text-center btn-danger">
                                 <i class="material-icons text-center">close</i>
                             </button> -->
                             <i class="material-icons text-center b-0 p-0" style="margin:0px!important;padding:0px!important;font-size: 15px;">close</i>
@@ -592,7 +592,7 @@
                         <td class="col-4">@{{c.jugada}}</td>
                         <td class="text-right col-4">
                             @{{c.monto}}
-                            <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                            <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
                                     <i class="material-icons">close</i>
                             </button>
                         </td>
@@ -659,7 +659,7 @@
                             <td class="col-4">@{{agregar_guion(c.jugada)}}</td>
                             <td class="text-right col-4">
                                 @{{c.monto}}
-                                <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                                <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
                                         <i class="material-icons">close</i>
                                 </button>
                             </td>
@@ -719,7 +719,7 @@
                         </td>
                         <td class="text-right col-4">
                             @{{c.monto}}
-                            <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                            <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
                                     <i class="material-icons">close</i>
                             </button>
                         </td>
@@ -790,7 +790,7 @@
                         </td>
                         <td class="text-right col-4">
                             @{{c.monto}}
-                            <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                            <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
                                     <i class="material-icons">close</i>
                             </button>
                         </td>
@@ -856,7 +856,7 @@
                         <td style="font-size:12px" class="col-2">@{{agregar_guion(c.jugada)}}</td>
                         <td style="font-size:12px" class="text-right col-4">@{{c.monto}}</td>
                         <td style="font-size:12px" class="td-actions text-center col-1">
-                            <button ng-click="jugada_eliminar(c.jugada)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                            <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
                                 <i class="material-icons">close</i>
                             </button>
                             </td>

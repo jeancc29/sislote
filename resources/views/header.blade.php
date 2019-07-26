@@ -65,6 +65,7 @@ if($controlador != "login"){
     window.idUsuario = "<?php echo session('idUsuario') ?>";
     window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
+    window.idBancaGlobal = "<?php echo session('idBanca') ?>";
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
     window.loteriasGlobal = <?php if(isset($loterias)) echo $loterias; else echo 'null'; ?>;
     window.sorteosGlobal = <?php if(isset($sorteos)) echo $sorteos; else echo 'null'; ?>;
@@ -186,6 +187,10 @@ if($controlador != "login"){
     <?php endif; ?>
 
 <style>
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+                        /* background-color: #f5f2f2; */
+                        background-color: #eae9e9;
+                      }
  /********************* MEDIA QUERY QUE MANEJA MENU DESPLEGABLE ******************/
  
    @media (max-width:<?php if($controlador == 'principal') echo '1391px'; else echo '991px';?>) {

@@ -37,8 +37,8 @@ class LotteriesResource extends JsonResource
                 ->where('fechaDesde', '<=', getdate()['year'].'-'.getdate()['mon'].'-'.getdate()['mday'] . ' 00:00:00')
                 ->where('fechaHasta', '>=', getdate()['year'].'-'.getdate()['mon'].'-'.getdate()['mday'] . ' 23:50:00')
                 ->get(),
-            // 'ventas' => Salesdetails::join('sales', 'salesdetails.idVenta', 'sales.id')->where('sales.status', '!=', 0)->where('salesdetails.idLoteria', $this->id)->sum('salesdetails.monto'),
-            // 'premios' => Salesdetails::join('sales', 'salesdetails.idVenta', 'sales.id')->where('sales.status', '!=', 0)->where('salesdetails.idLoteria', $this->id)->sum('salesdetails.premio')
+            // 'ventas' => Salesdetails::join('sales', 'salesdetails.idVenta', 'sales.id')->whereNotIn('status', [0,5])->where('salesdetails.idLoteria', $this->id)->sum('salesdetails.monto'),
+            // 'premios' => Salesdetails::join('sales', 'salesdetails.idVenta', 'sales.id')->whereNotIn('status', [0,5])->where('salesdetails.idLoteria', $this->id)->sum('salesdetails.premio')
         ];
     }
 }

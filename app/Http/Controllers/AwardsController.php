@@ -281,6 +281,7 @@ class AwardsController extends Controller
     
     
             $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('status', [0,5])
             ->get();
     
             foreach($ventas as $v){
@@ -347,12 +348,15 @@ class AwardsController extends Controller
 
         $awardsClass = new AwardsClass($datos['idLoteria']);
         $awardsClass->idUsuario = $datos['idUsuario'];
-        $awardsClass->primera = "";
-        $awardsClass->segunda = "";
-        $awardsClass->tercera = "";
-        $awardsClass->numerosGanadores = "";
-        if($awardsClass->insertarPremio() == false){
-            return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
+        // $awardsClass->primera = "";
+        // $awardsClass->segunda = "";
+        // $awardsClass->tercera = "";
+        // $awardsClass->numerosGanadores = "";
+        if($awardsClass->existenTicketsMarcadoComoPagado($datos['idLoteria']) == true){
+            return Response::json(['errores' => 1,'mensaje' => 'Error: existen tickets marcados como pagados para esta loteria'], 201);
+        }
+        if($awardsClass->eliminarPremio() == false){
+            return Response::json(['errores' => 1,'mensaje' => 'Error al eliminar numeros ganadores'], 201);
         }
 
             foreach($awardsClass->getJugadasDeHoy($datos['idLoteria']) as $j){
@@ -360,8 +364,13 @@ class AwardsController extends Controller
                 $j['status'] = 0;
                 $j->save();
             }
+
+
+            //Aqui buscaremos todos los tickets creados en el dia de hoy y vamos a 
+            //asignarles el estado pendiente a los tickets en los cuales sus loterias aun no han salido
     
             $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('status', [0,5])
             ->get();
     
             foreach($ventas as $v){
@@ -370,7 +379,7 @@ class AwardsController extends Controller
                 $cantidad_premios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
                 
                 //Si la cantidad de jugadas realizadas es la que misma que la cantidad que jugadas que se 
-                //han marcado como que ya salieron los premios entonces la venta debe cambiar de status pendiente a ganadores o perdedores
+                //han marcado como que ya salieron los premios, entonces la venta debe cambiar de status pendiente a ganadores o perdedores
                 if($todas_las_jugadas_realizadas == $todas_las_jugadas_que_ya_salieron)
                 {
                     if($cantidad_premios > 0)
@@ -388,6 +397,7 @@ class AwardsController extends Controller
                     $v->save();
                 }else{
                     $v['premios'] = 0;
+                    $v['pagado'] = 0;
                     $v['status'] = 1;
                     $v->save();
                 }
