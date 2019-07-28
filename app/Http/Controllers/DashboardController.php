@@ -138,7 +138,14 @@ class DashboardController extends Controller
         $bancasConVentas = Branches::whereIn('id', $idBancas)->count();
         $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->count();
 
-        return view('dashboard.index', compact('controlador', 'ventasGrafica', 'loterias', 'sorteos', 'bancasConVentas', 'bancasSinVentas'));
+        $totalVentasLoterias = 0;
+        $totalPremiosLoterias = 0;
+        foreach($loterias as $l){
+            $totalVentasLoterias += $l['ventas'];
+            $totalPremiosLoterias += $l['premios'];
+        }
+
+        return view('dashboard.index', compact('controlador', 'ventasGrafica', 'loterias', 'sorteos', 'bancasConVentas', 'bancasSinVentas', 'totalVentasLoterias', 'totalPremiosLoterias'));
         
     }
 

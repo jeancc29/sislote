@@ -150,8 +150,8 @@
                         </div><!-- END ROW CONTENEDOR TABLA -->
                         <div class="row mt-2">
                           <h4 class="font-weight-bold col-5  text-center" style="font-size: 18px;">Total</h4>
-                          <h4 class="font-weight-bold col-4 text-center" style="font-size: 18px;">200</h4>
-                          <h4 class="font-weight-bold col-3 text-center" style="font-size: 18px;">200</h4>
+                          <h4 class="font-weight-bold col-4 text-center" style="font-size: 18px;">{{($totalVentasLoterias) ? $totalVentasLoterias : 0}}</h4>
+                          <h4 class="font-weight-bold col-3 text-center" style="font-size: 18px;">{{($totalPremiosLoterias) ? $totalPremiosLoterias : 0}}</h4>
                         </div>
                          <!-- <h4 class="text-right">Total: @{{datos.total_palet | currency}}</h4> -->
                     </div> <!-- COL-3 -->

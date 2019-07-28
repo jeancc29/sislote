@@ -9,8 +9,8 @@ if($controlador != "login"){
 ?>
 
 <!DOCTYPE html>
-<html lang="en" ng-app='myModule'>
-    <head>
+<html lang="en" ng-app='myModule' ng-controller='myController'>
+<head>
 
 
 
@@ -118,7 +118,8 @@ if($controlador != "login"){
 
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
-
+<!-- <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
+<script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script> -->
     <?php if($controlador == "principal"):?>
         <script src="{{asset('assets/js/angular/principal.js')}}" ></script>
     <?php endif; ?>
@@ -186,11 +187,65 @@ if($controlador != "login"){
         <script src="{{asset('assets/js/angular/monitoreo.tickets.js')}}" ></script>
     <?php endif; ?>
 
+    <script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script>
+
 <style>
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
                         /* background-color: #f5f2f2; */
                         background-color: #eae9e9;
                       }
+
+
+                    
+.panel.panel-chat
+{
+    position: fixed;
+    bottom:0;
+    right:0;
+    max-width: 470px;
+    width: 500px;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    z-index: 99999;
+    
+}
+
+#mytable >tbody>tr>td{
+    height:20px;
+    padding:0px;
+    border-top: 0px;
+}
+
+.bg-rosa{
+  background: #FD9EBC;
+}
+
+
+.panelPremios.panel-premios
+{
+    position: fixed;
+    top:0;
+    right:0;
+    /* max-width: 570px; */
+    /* width: 500px; */
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    z-index: 99999;
+    
+}
+
+.max-width-570{
+    max-width: 592px;
+}
+
+.dnone{
+    display: none;
+}
+
+.dblock{
+    display: block;
+}
+    
  /********************* MEDIA QUERY QUE MANEJA MENU DESPLEGABLE ******************/
  
    @media (max-width:<?php if($controlador == 'principal') echo '1391px'; else echo '991px';?>) {
@@ -880,7 +935,7 @@ if($controlador != "login"){
 
 </head>
 <body 
-    ng-controller='myController' ng-init="ROOT_PATH = '/'" ng-init="load('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')"
+     ng-init="ROOT_PATH = '/'" ng-init="load('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')"
     class="<?php if($controlador == 'login') echo 'off-canvas-sidebar' ?>" 
     
     on-shift-tab="venta_guardar($event,'email')">
@@ -896,6 +951,175 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
 ?>
 <!--  wrapper-full-page -->
+@if($controlador != 'login')
+<div ng-controller='controllerPremiosModal'>
+
+<div ng-show="mostrarModalPremios == true" class="row panelPremios panel-premios max-width-570" ng-init="loadPremiosModal('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')">
+      <div class="col-12" ng-init>
+                    <div class="card card-stats px-0 py-0 mb-0" style="border: 5px solid; border-color: #e2e2e2;">
+                      <div class="card-header card-header-success card-header-icon">
+                        <div class="card-icon">
+                          <i class="material-icons">store</i>
+                        </div>
+                        <!-- <p class="card-category">Bancas con ventas</p> -->
+                        <h3 class="card-title" style="cursor: pointer;" ng-click="hola()"><i class="material-icons">close</i></h3>
+                        <h3 class="card-title">Resultados</h3>
+                      </div>
+                      <div class="card-body ">
+                      <div class="row ">
+                        <div class="col-12">
+                          <div class="row">
+                            <div class="col-4 mt-1">
+                              <div class="form-group">
+                                  <select 
+                                      ng-model="datosPremiosModal.selectedLoteriaPremiosModal"
+                                      ng-change="cbxLoteriasPremiosModalChanged()"
+                                      ng-options="o.descripcion for o in datosPremiosModal.optionsLoteriasPremiosModal"
+                                      class="selectpicker w-100" 
+                                      data-style="select-with-transition" 
+                                      title="Select loteria">
+                                </select>
+                              </div>
+                            </div>
+                            <div class="col-2 col-sm-1" ng-show="existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
+                                || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
+                                || existeSorteoPremiosModal('Tripleta', datosPremiosModal.selectedLoteriaPremiosModal)
+                                || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal)">
+                              <div class="input-group form-control-lg">
+                                <div id="primeraPremiosModal" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">1era</label>
+                                  <input
+                                      ng-disabled="existeSorteoPremiosModal('Pick 3 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 3 Straight', datosPremiosModal.selectedLoteriaPremiosModal)" 
+                                      maxLength="2" 
+                                      select-all-on-click ng-keyup="changeFocus($event, 'datosPremiosModal-segunda', 2, datosPremiosModal.primera)" 
+                                      ng-model="datosPremiosModal.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+                            <div class="col-2 col-sm-1" 
+                              ng-show="
+                                existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
+                                || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
+                                || existeSorteoPremiosModal('Tripleta', datosPremiosModal.selectedLoteriaPremiosModal)
+                                || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal)">
+                              <div class="input-group form-control-lg">
+                                <div id="segundaPremiosModal" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">2da</label>
+                                  <input 
+                                          ng-disabled="existeSorteoPremiosModal('Pick 4 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 4 Straight', datosPremiosModal.selectedLoteriaPremiosModal)"
+                                          select-all-on-click 
+                                          maxLength="2"
+                                          id="datosPremiosModal-segunda" 
+                                          ng-keyup="changeFocus($event, 'datosPremiosModal-tercera', 2, datosPremiosModal.segunda)" 
+                                          ng-model="datosPremiosModal.segunda" 
+                                          autocomplete="off" 
+                                          type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+                            <div class="col-2 col-sm-1" ng-show="existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
+                                || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
+                                || existeSorteoPremiosModal('Tripleta', datosPremiosModal.selectedLoteriaPremiosModal)">
+                              <div class="input-group form-control-lg">
+                                <div id="terceraPremiosModal" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">3era</label>
+                                  <input 
+                                  ng-disabled="existeSorteoPremiosModal('Pick 4 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 4 Straight', datosPremiosModal.selectedLoteriaPremiosModal)"
+                                  select-all-on-click id="datosPremiosModal-tercera" ng-keyup="changeFocus($event, 'datosPremiosModal-pick3', 2, datosPremiosModal.tercera)" ng-model="datosPremiosModal.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
+                            <div class="col-2 col-md-2" ng-show="existeSorteoPremiosModal('Pick 3 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 3 Straight', datosPremiosModal.selectedLoteriaPremiosModal)">
+                              <div class="input-group form-control-lg">
+                                <div id="pick3PremiosModal" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Pick3</label>
+                                  <input 
+                                      maxLength="3" 
+                                      select-all-on-click id="datosPremiosModal-pick3" 
+                                      ng-keyup="changeFocus($event, 'datosPremiosModal-pick4', 3, datosPremiosModal.pick3, 'datosPick3')" 
+                                      ng-model="datosPremiosModal.pick3" 
+                                      autocomplete="off" type="text"  class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
+                            <div class="col-2 col-md-2" ng-show="existeSorteoPremiosModal('Pick 4 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 4 Straight', datosPremiosModal.selectedLoteriaPremiosModal)">
+                              <div class="input-group form-control-lg">
+                                <div id="pick4PremiosModal" class="form-group">
+                                  <label for="exampleInput1" class="bmd-label-floating">Pick4</label>
+                                  <input 
+                                    maxLength="4" 
+                                    select-all-on-click 
+                                    ng-keyup="changeFocus($event, 'no', 4, datosPremiosModal.pick4, 'datosPick4')" 
+                                    id="datosPremiosModal-pick4" 
+                                    ng-model="datosPremiosModal.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                </div>
+                              </div>
+                            </div> <!-- END COL-2 -->
+
+                            <div class="col-1 text-center mt-3 " ng-click="actualizar(true)" style="cursor: pointer;">
+                              <i class="material-icons text-white p-2 bg-success rounded mr-1">save</i>
+                            </div>
+                           </div> <!-- END ROW -->
+                        </div> <!-- END COL-23 -->
+                    </div> <!-- END ROW -->
+                      </div> <!-- END CARD-BODY -->
+                      <div class="card-footer">
+                        <div class="stats">
+                          <i class="material-icons">date_range</i> Hoy
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                 
+      </div>
+
+      <style>
+          /* .fixed-plugin2 {
+    position: fixed;
+    top: 115px;
+    right: 0;
+    width: 64px;
+    background: rgba(0, 0, 0, .3);
+    z-index: 1031;
+    border-radius: 8px 0 0 8px;
+    text-align: center;
+}
+          .fixed-plugin2 .fa-cog {
+            color: #FFF;
+            padding: 10px;
+            border-radius: 0 0 6px 6px;
+            width: auto;
+        }
+        .fa-2x {
+            font-size: 2em;
+        }
+
+        .fa {
+            display: inline-block;
+            font: normal normal normal 14px/1 FontAwesome;
+            font-size: inherit;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        } */
+      </style>
+      <div class="fixed-plugin" >
+        <div class="dropdown show-dropdown" >
+            <a href="#" ng-click="hola()">
+            <i class="fa fa-cog fa-2x" > </i>
+            </a>
+            
+        </div>
+    </div>
+    
+</div>
+@endif
+
+
+
+
 
 <div style="width: 100%;" class="wrapper">
           <!-- ********************* MEDIA QUERY QUE MANEJA MENU DESPLEGABLE ******************/ -->
@@ -965,9 +1189,16 @@ if(session('idUsuario') == null && $controlador != 'login'){
         <ul class="nav">
 
             <li class="nav-item ">
-                <a class="nav-link" href="{{route('principal')}}">
+                <a class="nav-link" href="{{route('dashboard')}}">
                     <i class="material-icons">dashboard</i>
-                    <p> Principal </p>
+                    <p> Dashboard </p>
+                </a>
+            </li>
+
+            <li class="nav-item ">
+                <a class="nav-link" href="{{route('principal')}}">
+                    <i class="material-icons">attach_money</i>
+                    <p> Vender </p>
                 </a>
             </li>
             
@@ -999,7 +1230,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('bancas')}}">
-                    <i class="material-icons">format_list_numbered</i>
+                    <i class="material-icons">store</i>
                     <p> Bancas 
                        
                     </p>
@@ -1008,14 +1239,14 @@ if(session('idUsuario') == null && $controlador != 'login'){
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('premios')}}">
                     <i class="material-icons">format_list_numbered</i>
-                    <p> Premios 
+                    <p> Resultados 
                        
                     </p>
                 </a>
             </li>
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('horarios')}}">
-                    <i class="material-icons">format_list_numbered</i>
+                    <i class="material-icons">av_timer</i>
                     <p> Horarios loterias 
                        
                     </p>
@@ -1040,10 +1271,36 @@ if(session('idUsuario') == null && $controlador != 'login'){
                         </li>
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('usuarios.sesiones')}}">
-                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-mini"> S </span>
                               <span class="sidebar-normal"> Sesiones de usuarios </span>
                             </a>
                         </li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#monitoreoToggle">
+                    <i class="material-icons">image</i>
+                    <p> Monitoreo 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="monitoreoToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('monitoreo.tickets')}}">
+                              <span class="sidebar-mini"> T </span>
+                              <span class="sidebar-normal"> Tickets </span>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item ">
+                            <a class="nav-link" href="{{route('usuarios.sesiones')}}">
+                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-normal"> Sesiones de usuarios </span>
+                            </a>
+                        </li> -->
                     </ul>
                 </div>
             </li>
@@ -1060,13 +1317,13 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     <ul class="nav">
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('transacciones')}}">
-                              <span class="sidebar-mini"> E </span>
+                              <span class="sidebar-mini"> T </span>
                               <span class="sidebar-normal"> Transacciones </span>
                             </a>
                         </li>
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('transacciones.grupo')}}">
-                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-mini"> G </span>
                               <span class="sidebar-normal"> Grupo transacciones </span>
                             </a>
                         </li>

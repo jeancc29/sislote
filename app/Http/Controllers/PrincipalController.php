@@ -52,6 +52,13 @@ class PrincipalController extends Controller
         $controlador = Route::getCurrentRoute()->getName();
         $usuario = Users::whereId(session('idUsuario'))->first();
         if(!strpos(Request::url(), '/api/')){
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Vender tickets") == true){
+                return redirect()->route('principal');
+            }
             return view('principal.index', compact('controlador', 'usuario'));
         }
 
@@ -520,7 +527,7 @@ class PrincipalController extends Controller
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
             $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
-            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [5])->wherePagado(0)->get()->first();
+            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [5])->get()->first();
     
             
             
@@ -545,7 +552,7 @@ class PrincipalController extends Controller
                     Cancellations::create([
                         'idTicket' => $venta['idTicket'],
                         'idUsuario' => $datos['idUsuario'],
-                        'razon' => 'Esta eliminado'
+                        'razon' => $datos['razon']
                     ]);
     
                     $mensaje = "El ticket se ha eliminado correctamente";

@@ -310,7 +310,7 @@ var myApp = angular
 
 
 
-        $scope.cancelar = function(ticket){
+        $scope.cancelar = function(ticket, agregarRazon = true){
 
             if(ticket.codigoBarra == null || ticket.codigoBarra == undefined)
             {
@@ -328,8 +328,10 @@ var myApp = angular
 
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = idBancaGlobal;
-            $scope.datos.cancelar.razon = "Cancelado desde monitoreo ticket";
-            $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
+            if(agregarRazon == true){
+                $scope.datos.cancelar.razon = ".";
+                $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
+            }
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
 
             $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
@@ -343,6 +345,7 @@ var myApp = angular
                     return;
                 }else if(response.data.errores == 0){
                     $scope.datos.cancelar.codigoBarra = null;
+                    $scope.datos.cancelar.razon = null;
                     $scope.buscar();
                     $scope.inicializarDatos(response);
                     alert(response.data.mensaje);
@@ -351,7 +354,7 @@ var myApp = angular
             });
         }
 
-        $scope.eliminar = function(ticket){
+        $scope.eliminar = function(ticket, agregarRazon = true){
 
             if(ticket.codigoBarra == null || ticket.codigoBarra == undefined)
             {
@@ -369,8 +372,13 @@ var myApp = angular
 
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = idBancaGlobal;
-            $scope.datos.cancelar.razon = "Cancelado desde monitoreo ticket";
-            $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
+            if(agregarRazon == true){
+                $scope.datos.cancelar.razon = ".";
+                $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
+            }
+
+
+            
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
 
             $http.post(rutaGlobal+"/api/principal/eliminar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
@@ -384,6 +392,7 @@ var myApp = angular
                     return;
                 }else if(response.data.errores == 0){
                     $scope.datos.cancelar.codigoBarra = null;
+                    $scope.datos.cancelar.razon = null;
                     $scope.buscar();
                     $scope.inicializarDatos(response);
                     alert(response.data.mensaje);
@@ -433,6 +442,38 @@ var myApp = angular
                 return new Date(fecha);
             else
                 return '-';
+        }
+
+        $scope.abrirModalRazon = function(ticket, esCancelar){
+            $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
+
+            $scope.esCancelar = esCancelar;
+            $('#inputCodigoBarra').addClass('is-filled');
+            $('#modal-cancelar-eliminar').modal('show');
+        }
+
+        $scope.cancelarEliminarDesdeModalRazon = function(){
+
+            console.log('cancelarEliminarDesdeModalRazon:', $scope.datos.cancelar.razon);
+            
+            if($scope.esCancelar == true){
+                if($scope.empty($scope.datos.cancelar.razon, "string") == true){
+                    alert('Debe espeficicar una razon');
+                    return;
+                }
+    
+                $('#modal-cancelar-eliminar').modal('hide');
+               $scope.cancelar($scope.datos.cancelar, false);
+            }
+            else if($scope.esCancelar == false){
+                if($scope.empty($scope.datos.cancelar.razon, "string") == true){
+                    alert('Debe espeficicar una razon');
+                    return;
+                }
+    
+                $('#modal-cancelar-eliminar').modal('hide');
+                $scope.eliminar($scope.datos.cancelar, false);
+            }
         }
 
         $scope.toSecuencia = function(idTicket){
