@@ -199,7 +199,7 @@ class MonitoreoController extends Controller
                     $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
                     ->whereNotIn('status', [0,5])
                     ->where('idBanca', $datos['idBanca'])
-                    ->sum('subTotal');
+                    ->sum('total');
     
                     //AQUI COMIENSA LAS COMISIONES
     
@@ -524,7 +524,7 @@ class MonitoreoController extends Controller
             'monitoreo' => SalesResource::collection($monitoreo),
             'loterias' => Lotteries::whereStatus(1)->get(),
             'caracteristicasGenerales' =>  Generals::all(),
-            'total_ventas' => Sales::whereIn('id', $idVentas)->sum('subTotal'),
+            'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
             'errores' => 0
         ], 201);

@@ -48,6 +48,7 @@ myApp
     },
 
     'monto_a_pagar': 0,
+    'monto_jugado': 0,
     'total_jugadas': 0,
     'total_directo': 0,
     'total_pale': 0,
@@ -653,7 +654,7 @@ myApp
              $scope.datos.total_pick4 = total_pick4;
              $scope.datos.total_palet_tripleta =  total_palet_tripleta;
              $scope.datos.total_jugadas =  Object.keys($scope.datos.jugadas).length;
-             $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_a_pagar) / parseFloat($scope.datos.selectedBancas.deCada)) * parseFloat($scope.datos.selectedBancas.descontar)  : 0;
+             $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_jugado) / parseFloat($scope.datos.selectedBancas.deCada)) * parseFloat($scope.datos.selectedBancas.descontar)  : 0;
              $scope.datos.monto_a_pagar = monto_a_pagar + $scope.datos.descuentoMonto;
 
              //Calcular total jugdasReporte
@@ -787,13 +788,13 @@ myApp
                     return;
                 }
 
-                $scope.datos.total = $scope.datos.monto_a_pagar;
+                $scope.datos.total = $scope.datos.monto_jugado;
                 $scope.datos.idBanca = $scope.datos.selectedBancas.id;
 
             
                 
                 
-                $scope.datos.subTotal = Number($scope.datos.monto_a_pagar) - Number($scope.datos.descuentoMonto);
+                $scope.datos.subTotal = 0;
                 $http.post(rutaGlobal+"/api/principal/guardar",{'datos':$scope.datos, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 

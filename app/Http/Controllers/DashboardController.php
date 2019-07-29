@@ -80,7 +80,7 @@ class DashboardController extends Controller
         ];
 
         //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
-        $ventasGrafica = Sales::select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios'))
+        $ventasGrafica = Sales::select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios, sum(descuentoMonto)  as descuentoMonto'))
             ->whereBetween('created_at', array($fecha6DiasAtras, $fechaActual))
             ->whereNotIn('status', [0,5])
             ->groupBy('date')
@@ -91,7 +91,7 @@ class DashboardController extends Controller
         $ventasGrafica = collect($ventasGrafica)->map(function($d) use($daysSpanish){
             $fecha = new Carbon($d['date']);
             $dia = $daysSpanish[$fecha->dayOfWeek] . ' ' . $fecha->day;
-            return ["total" => $d['subTotal'], "neto" => $d['total'] - $d['premios'], "dia" => $dia];
+            return ["total" => $d['total'], "neto" => $d['total'] - $d['premios'], "dia" => $dia];
         });
 
         // var_dump($ventasGrafica);

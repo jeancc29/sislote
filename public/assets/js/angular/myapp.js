@@ -1,2 +1,2 @@
-// window.myApp = angular
-//     .module("myModule", [])
+window.myApp = angular
+    .module("myModule", [])

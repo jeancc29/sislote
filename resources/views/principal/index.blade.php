@@ -196,12 +196,18 @@
                 <div class="row justify-content-md-center" >
                     <div class="col-4 col-md-3">
                         <h4 class="font-weight-bold">
-                        Monto: <span class="bg-info p-1 text-white rounded">@{{datos.monto_a_pagar | currency}}</span>
+                        Monto: <span class="bg-info p-1 text-white rounded">@{{datos.monto_jugado | currency}}</span>
                         </h4>
                     </div>
                     <div class="col-4 col-md-3">
                         <h4 class="font-weight-bold">
                         Descuento: <span class="bg-info p-1 text-white rounded">@{{datos.descuentoMonto | currency}}</span>
+                        </h4>
+                    </div>
+
+                    <div class="col-4 col-md-3">
+                        <h4 class="font-weight-bold">
+                        Monto: <span class="bg-info p-1 text-white rounded">@{{datos.monto_a_pagar | currency}}</span>
                         </h4>
                     </div>
                     
@@ -1054,7 +1060,7 @@
                                 <td scope="col" class="text-center">@{{toFecha(c.created_at.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
                                 <td scope="col" class="text-center">@{{c.usuario}}</td>
-                                <td scope="col" class="text-center">@{{c.subTotal}}</td>
+                                <td scope="col" class="text-center">@{{c.total}}</td>
                                 <td scope="col" class="text-center">@{{c.premio}}</td>
                                 <td scope="col" class="text-center">@{{c.razon}}</td>
                                 <td scope="col" class="text-center">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>

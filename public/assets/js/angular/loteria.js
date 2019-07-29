@@ -1,5 +1,4 @@
-var myApp = angular
-    .module("myModule", [])
+myApp
     .controller("myController", function($scope, $http){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];

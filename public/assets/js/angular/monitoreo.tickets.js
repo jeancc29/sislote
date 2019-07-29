@@ -1,5 +1,4 @@
-var myApp = angular
-    .module("myModule", [])
+myApp
     .controller("myController", function($scope, $http, $timeout, $window, $document){
         $scope.busqueda = "";
         var ruta = '';
