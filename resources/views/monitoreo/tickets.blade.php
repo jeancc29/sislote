@@ -267,7 +267,21 @@
                 </div>
                 <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="table-responsive">
-                  <h4 class="card-title text-center">Pick4</h4>
+                  <h4 class="card-title text-center">Ticket:@{{datos.selectedTicket.codigo}}-@{{toSecuencia(datos.selectedTicket.idTicket)}}</h4>
+                  <div class="row justify-content-end">
+                    <div class="col-12 text-center">
+                      <h3>Leyenda</h3>
+                    </div>
+                    <div class="col-3 bg-info text-center">
+                      ganador
+                    </div>
+                    <div class="col-3 bg-rosa text-center">
+                      perdedor
+                    </div>
+                    <div class="col-3 text-center">
+                      pendiente
+                    </div>
+                  </div>
 
                   <div ng-repeat="l in datos.selectedTicket.loterias">
                   <!-- <div class='loterias col-xs-12 text-center mx-3' style='border-top-style: dashed; border-bottom-style: dashed; font-weight: lighter'> -->

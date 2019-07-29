@@ -1,6 +1,7 @@
-var myApp = angular
-    .module("myModule", [])
-    .controller("myController", function($scope, $http, $timeout, $window, $document){
+// var myApp = angular
+//     .module("myModule", [])
+myApp
+    .controller("myController", function($scope, helperService, $http, $timeout, $window, $document){
         $scope.busqueda = "";
         var ruta = '';
         $scope.txtActive = 0;
@@ -110,7 +111,9 @@ var myApp = angular
     }
         $scope.inicializarDatos = function(response = null){
 
-            
+            // console.log('helper: ', helperService.empty($scope.datos.selectedBancas, 'string'));
+            // console.log('helper: ', helperService.empty($scope.datos.selectedBancas));
+            // console.log('helper1: ', $scope.datos.selectedBancas);
            
             
             $scope.datos.idVenta = 0;
@@ -132,13 +135,18 @@ var myApp = angular
             $scope.datos.jugadasReporte.jugadas = [];
             $scope.datos.jugadasReporte.optionsLoterias = [];
             $scope.datos.jugadasReporte.selectedLoteria = {};
+
             
             if(response != null){
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
-                if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
-                    idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
-                $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
+
+
+                
+                // if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
+                //     idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
+                // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
+                $scope.datos.selectedBancas = helperService.retornarObjectoPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca);                
                 $scope.datos.idBanca = response.data.idBanca;
 
 
@@ -163,19 +171,20 @@ var myApp = angular
             $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
 
-                console.log(response)
+                // console.log(response)
 
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
                 if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
                     idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
-                $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
+                // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
+                $scope.datos.selectedBancas = helperService.retornarObjectoPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca);
                 $scope.datos.idBanca = response.data.idBanca;
 
                 $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
                 $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
                  $scope.datos.optionsLoterias =response.data.loterias;
-                 console.log('select: ',$scope.datos.selectedVentas);
+                //  console.log('select: ',$scope.datos.selectedVentas);
                 //  console.log($scope.datos.optionsLoterias);
                 $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
                 $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
@@ -208,14 +217,14 @@ var myApp = angular
         $scope.load = function(codigo_usuario, ROOT_PATH, idBanca = 1){
             
             ruta = ROOT_PATH;
-            console.log('ROOT_PATH: ', ruta);
+            // console.log('ROOT_PATH: ', ruta);
             $scope.inicializarDatos();
 
           $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
           $scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
 
           var a = new Hola("Jean", "Contreras");
-          console.log('clase: ', ruta);
+        //   console.log('clase: ', ruta);
         }
 
         function eliminarUltimoCaracter(d){
@@ -239,7 +248,7 @@ var myApp = angular
 
       
         $scope.tecladoClick = function(d){
-            console.log(d);
+            // console.log(d);
 
             if(d.toLowerCase() === 'enter'){
                 if($scope.txtActive == 1){
@@ -352,7 +361,7 @@ var myApp = angular
                    
                     $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                       .then(function(response){
-                            console.log(response);
+                            // console.log(response);
                          $scope.datos.montoExistente = response.data.monto;
                           $('#inputMonto').focus();
                           return;
@@ -451,7 +460,7 @@ var myApp = angular
                                         //$scope.monto = 0;
                                     }
                                     else{
-                                       // console.log('insertar, foreach: ', array[indice]);
+                                    //    console.log('insertar, foreach: ', array[indice]);
                                         $scope.datos.jugadas.push({'jugada':$scope.datos.jugada, 'monto':$scope.datos.monto, 
                                                                     'tam': $scope.datos.jugada.length, 'idLoteria': array[indice].id,
                                                                     'descripcion':array[indice].descripcion, 'abreviatura' : array[indice].abreviatura});
@@ -611,7 +620,7 @@ var myApp = angular
         }
 
         $scope.calcularTotal = function(){
-            var monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, total_pick3 = 0, total_pick4 = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_monto_total = 0;
+            var monto_jugado = 0, monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, total_pick3 = 0, total_pick4 = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_monto_total = 0;
              $scope.datos.jugadas.forEach(function(valor, indice, array){
 
                 if(array[indice].tam == 2) total_directo += parseFloat(array[indice].monto);
@@ -622,6 +631,7 @@ var myApp = angular
                 if(array[indice].tam == 4 || array[indice].tam == 6) total_palet_tripleta += parseFloat(array[indice].monto);
 
                 monto_a_pagar +=  parseFloat(array[indice].monto);
+                monto_jugado +=  parseFloat(array[indice].monto);
              });
 
 
@@ -633,7 +643,9 @@ var myApp = angular
             //  $scope.datos.total_jugadas = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * Object.keys($scope.datos.jugadas).length : Object.keys($scope.datos.jugadas).length;
             //  $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_a_pagar) / parseFloat($scope.datos.caracteristicasGenerales[0].cantidadAplicar)) * parseFloat($scope.datos.caracteristicasGenerales[0].descuentoValor) : 0;
              
-             $scope.datos.monto_a_pagar =  monto_a_pagar;
+             
+            //  $scope.datos.monto_a_pagar =  monto_a_pagar;
+             $scope.datos.monto_jugado =  monto_jugado;
              $scope.datos.total_directo =  total_directo;
              $scope.datos.total_pale =  total_pale;
              $scope.datos.total_tripleta = total_tripleta;
@@ -642,7 +654,7 @@ var myApp = angular
              $scope.datos.total_palet_tripleta =  total_palet_tripleta;
              $scope.datos.total_jugadas =  Object.keys($scope.datos.jugadas).length;
              $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_a_pagar) / parseFloat($scope.datos.selectedBancas.deCada)) * parseFloat($scope.datos.selectedBancas.descontar)  : 0;
-             
+             $scope.datos.monto_a_pagar = monto_a_pagar + $scope.datos.descuentoMonto;
 
              //Calcular total jugdasReporte
              $scope.datos.jugadasReporte.jugadas.forEach(function(valor, indice, array){
@@ -662,7 +674,7 @@ var myApp = angular
         }
 
         $scope.inputJugadaKeyup = function(evento){
-            //console.log('inputJugadaKeyup: ', evento.key);
+            // console.log('inputJugadaKeyup: ', evento.key);
             if($scope.datos.jugada != undefined){
                 if(evento.key == '+'){
                     if($scope.datos.jugada.length != 4 && $scope.datos.jugada.length != 5){
@@ -681,7 +693,7 @@ var myApp = angular
             
             
             if(($scope.datos.jugada != null && evento.keyCode == 13) || ($scope.datos.jugada != null && evento.key == '+') || ($scope.datos.jugada != null && evento.key == '-')){
-                console.log('inputJugadaKeyup: ', $scope.datos.jugada.length);
+                // console.log('inputJugadaKeyup: ', $scope.datos.jugada.length);
                 $scope.monto_disponible();
             }
         }
@@ -691,7 +703,7 @@ var myApp = angular
         //     //     if($scope.datos.jugada.length == 3)
         //     // }
         //     if($scope.datos.jugada != undefined)
-        //         console.log('inputJugadaKeypress: ', $scope.datos.jugada.length);
+                // console.log('inputJugadaKeypress: ', $scope.datos.jugada.length);
         //     //if($scope.datos.jugada != null && evento.keyCode == 13) $scope.monto_disponible();
         // }
 
@@ -785,11 +797,11 @@ var myApp = angular
                 $http.post(rutaGlobal+"/api/principal/guardar",{'datos':$scope.datos, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 
-                    console.log('Principal.js venta_guardar : ', response.data);
+                    // console.log('Principal.js venta_guardar : ', response.data);
  
                     if(response.data.errores == 0)
                         {
-                            //console.log(response);
+                            // console.log(response);
                           alert(response.data.mensaje);
                           $scope.inicializarDatos();
                           $scope.imprimirTicket(response.data.venta, (e == 1) ? true : false);
@@ -827,11 +839,11 @@ var myApp = angular
 
             //     $scope.datos.total = $scope.datos.monto_a_pagar;
                 
-            //     console.log('venta guardar: ',$scope.datos );
+                // console.log('venta guardar: ',$scope.datos );
 
             //     $http.post($scope.ROOT_PATH +"clases/consultaajax.php",{'datos':$scope.datos, 'action':'sp_ventas_actualiza'})
             //     .then(function(response){
-            //         console.log(response);
+                    // console.log(response);
             //         if(response.data[0].errores == 0)
             //             {
             //               alert(response.data[0].mensaje);
@@ -868,7 +880,7 @@ var myApp = angular
 
         $scope.imprimirTicket = function(ticket, es_movil){
             // window.print();
-            console.log('imprimirTicekt: ', ticket);
+            // console.log('imprimirTicekt: ', ticket);
             $window.sessionStorage.removeItem('ticket');
             $window.sessionStorage.setItem('ticket', JSON.stringify(ticket));
             // console.log(ruta);
@@ -880,7 +892,7 @@ var myApp = angular
             else
                 $('#iframeOcultoMovil').attr('src',ruta);
 
-            console.log('iframe: ', $('#iframeOculto'));
+            // console.log('iframe: ', $('#iframeOculto'));
 
 
             var json = [];
@@ -902,17 +914,19 @@ var myApp = angular
 
         $scope.buscar = function(){
 
-            console.log('monitoreo before addClass',$scope.datos.monitoreo);
+            // console.log('monitoreo before addClass',$scope.datos.monitoreo);
             $('#fechaBusqueda').addClass('is-filled');
             
-            console.log('monitoreo after addClass',$scope.datos.monitoreo);
+            // console.log('monitoreo after addClass',$scope.datos.monitoreo);
             
             $scope.datos.monitoreo.idUsuario = $scope.datos.idUsuario;
             $scope.datos.monitoreo.layout = 'Principal';
-          
+            $scope.datos.monitoreo.idBanca = $scope.datos.selectedBancas.id;
+            
+
           $http.post(rutaGlobal+"/api/reportes/monitoreo", {'action':'sp_ventas_buscar', 'datos': $scope.datos.monitoreo})
              .then(function(response){
-                console.log('monitoreo ',response);
+                // console.log('monitoreo ',response);
                 if(response.data.errores == 0){
                     $scope.datos.monitoreo.ventas = response.data.monitoreo;
 
@@ -957,9 +971,9 @@ var myApp = angular
 
             fecha_actual_horaCierre = new Date(ano, mes, dia, hh, min, ss);
 
-            //console.log('validarHora: ', loteria, new Date(fecha_actual_horaCierre), ' hora: ', new Date(), ' comparacion: ', (new Date(fecha_actual_horaCierre) >= new Date()));
+            // console.log('validarHora: ', loteria, new Date(fecha_actual_horaCierre), ' hora: ', new Date(), ' comparacion: ', (new Date(fecha_actual_horaCierre) >= new Date()));
 
-            //console.log('Validar hora: ',new Date() >= fecha_actual_horaCierre, ' fechaCierre: ', fecha_actual_horaCierre, ' fechaActual: ', new Date());
+            // console.log('Validar hora: ',new Date() >= fecha_actual_horaCierre, ' fechaCierre: ', fecha_actual_horaCierre, ' fechaActual: ', new Date());
             return (new Date() >= fecha_actual_horaCierre);
         }
 
@@ -1167,7 +1181,7 @@ var myApp = angular
           $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': $scope.datos.ventasReporte})
              .then(function(response){
 
-                console.log('ventasReporte_buscar: ', response);
+                // console.log('ventasReporte_buscar: ', response);
 
                 if(response.data.errores == 0){
                     $scope.datos.ventasReporte.loterias =response.data.loterias;
@@ -1192,7 +1206,7 @@ var myApp = angular
                 //$scope.datos.ventasReporte.ventas.balance = jsonVentas.balance;
 
 
-console.log('ventasReporte_buscar2: ', $scope.datos.ventasReporte.ventas.balanceHastaLaFecha);
+// console.log('ventasReporte_buscar2: ', $scope.datos.ventasReporte.ventas.balanceHastaLaFecha);
 
        
                 // $scope.datos.ventasReporte.loterias =JSON.parse(response.data[0].loterias);
@@ -1232,7 +1246,7 @@ console.log('ventasReporte_buscar2: ', $scope.datos.ventasReporte.ventas.balance
             }
             else{
                     $scope.es_movil = false;
-                    console.log('else escondar');
+                    // console.log('else escondar');
             }
         }
 
@@ -1262,7 +1276,7 @@ console.log('ventasReporte_buscar2: ', $scope.datos.ventasReporte.ventas.balance
 
             $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
              .then(function(response){
-                console.log(response.data);
+                // console.log(response.data);
 
                 if(response.data.errores == 1){
                     $scope.datos.cancelar.codigoBarra = null;
@@ -1337,7 +1351,7 @@ console.log('ventasReporte_buscar2: ', $scope.datos.ventasReporte.ventas.balance
             //     return
             // }
 
-            console.log('print function llamada desde ticket: ');
+            // console.log('print function llamada desde ticket: ');
             return;
             
 
@@ -1348,7 +1362,7 @@ console.log('ventasReporte_buscar2: ', $scope.datos.ventasReporte.ventas.balance
             $scope.datos.enviarSMS.idUsuario = idUsuario;
             $http.post(rutaGlobal+"/api/principal/sms", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.enviarSMS})
              .then(function(response){
-                console.log(response.data);
+                // console.log(response.data);
             });
 
         }

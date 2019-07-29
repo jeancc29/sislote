@@ -118,8 +118,9 @@ if($controlador != "login"){
 
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
-<!-- <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
-<script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script> -->
+<script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
+<script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script>
+<script src="{{asset('assets/js/angular/servicios/helper.js')}}" ></script>
     <?php if($controlador == "principal"):?>
         <script src="{{asset('assets/js/angular/principal.js')}}" ></script>
     <?php endif; ?>
@@ -187,7 +188,7 @@ if($controlador != "login"){
         <script src="{{asset('assets/js/angular/monitoreo.tickets.js')}}" ></script>
     <?php endif; ?>
 
-    <script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script>
+    <!-- <script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script> -->
 
 <style>
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
@@ -244,6 +245,11 @@ if($controlador != "login"){
 
 .dblock{
     display: block;
+}
+
+.btn-group {
+  display: flex;
+  overflow: scroll;
 }
     
  /********************* MEDIA QUERY QUE MANEJA MENU DESPLEGABLE ******************/
@@ -1244,6 +1250,16 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
+
+            <li class="nav-item ">
+                <a class="nav-link" href="{{route('entidades')}}">
+                    <i class="material-icons">format_list_numbered</i>
+                    <p> Entidades 
+                       
+                    </p>
+                </a>
+            </li>
+
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('horarios')}}">
                     <i class="material-icons">av_timer</i>

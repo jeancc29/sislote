@@ -311,7 +311,7 @@ class LotteriesController extends Controller
         $datos = request()->validate([
             'datos.id' => 'required',
             'datos.descripcion' => 'required',
-            'datos.abreviatura' => 'required|min:1|max:4',
+            'datos.abreviatura' => 'required',
             'datos.status' => 'required'
         ])['datos'];
 

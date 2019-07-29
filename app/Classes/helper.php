@@ -10,6 +10,7 @@ use App\Blocksplays;
 use App\Blockslotteries;
 use App\Draws;
 use App\Awards;
+use App\Sales;
 
 use Log;
 use Twilio\Rest\Client;
@@ -427,6 +428,42 @@ class Helper{
             ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
 
             return ($premios != null) ? true : false;
+    }
+
+
+    static function ventasDelDia($idBanca){
+        $fecha = getdate();
+   
+        if($idBanca == 0){
+            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('status', [0,5])->get();
+        }else{
+            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('status', [0,5])
+            ->where('idBanca', $idBanca)
+            ->get();
+        }
+    
+        $idVentas = collect($ventas)->map(function($id){
+            return $id->id;
+        });
+
+        return Sales::whereIn('id', $idVentas)->sum('total');
+    }
+
+    static function ticketsDelDia($idBanca){
+        $fecha = getdate();
+   
+     
+        $tickets = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        ->whereNotIn('status', [0,5])
+        ->where('idBanca', $idBanca)
+        ->count();
+    
+    
+        
+
+        return $tickets;
     }
 
 

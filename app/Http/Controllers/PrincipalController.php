@@ -146,7 +146,7 @@ class PrincipalController extends Controller
             'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
             'ventas' => SalesResource::collection($ventas),
-            'bancas' => Branches::whereStatus(1)->get(),
+            'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
             'idUsuario' => $datos['idUsuario'],
             'idBanca' => $idBanca
         ], 201);

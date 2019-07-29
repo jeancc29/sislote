@@ -291,7 +291,7 @@ demo = {
                 refreshAnimation($wizard, index);
 
                 
-                console.log('abrir-wizard-nuevo: ', $wizard.width());
+                // console.log('abrir-wizard-nuevo: ', $wizard.width());
 
                 $('.moving-tab').css({
                     'transition': 'transform 0s'
@@ -300,14 +300,14 @@ demo = {
         });
 
         $(document).on('click', '.abrir-wizard-editar', function(){
-            console.log('abrir-wizard-editar: ');
+            // console.log('abrir-wizard-editar: ');
             $('.card-wizard').each(function() {
                 $wizard = $(this);
 
                 index = $wizard.bootstrapWizard('currentIndex');
                 refreshAnimation($wizard, index);
 
-                console.log('abrir-wizard-editar: ', $wizard.width());
+                // console.log('abrir-wizard-editar: ', $wizard.width());
 
                 $('.moving-tab').css({
                     'transition': 'transform 0s'
@@ -323,7 +323,7 @@ demo = {
             /********* Modificado por mi *********/
             //Obtener el li menu
             var liMenu = document.getElementById( "nav-pills-menu" );
-            console.log('demojs, limenu: ', liMenu);
+            // console.log('demojs, limenu: ', liMenu);
             //Verificamos si existe
             if(liMenu != undefined){
                 //Obtenemos el index del liMenu

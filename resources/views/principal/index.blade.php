@@ -19,14 +19,35 @@
               </button>
             </div> -->
           
-                
+            @if($usuario->tienePermiso("Jugar como cualquier banca"))
+              <div  class="col-5 m-0 p-0">
+                    <!-- o.descripcion disable when validarHora(o.horaCierre, o.descripcion) for o in datos.optionsLoterias track by o.id -->
+                            <select 
+                            id="multiselect2"
+                                ng-model="datos.selectedBancas"
+                                ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
+                                class="selectpicker w-100" 
+                                data-style="select-with-transition" 
+                                title="Seleccionar loteria"
+                                data-size="7" aria-setsize="2">
+                            </select>
+                    </div>
+                @endif
 
-                <a href="#" class="navbar-brand font-weight-bold">
+            <a href="#" class="navbar-brand font-weight-bold">
+                Ventas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.selectedBancas.ventasDelDia | currency}}</span>
+            </a>
+
+            <a href="#" class="navbar-brand font-weight-bold">
+                Tickets del dia: <span class="bg-info p-2 text-white rounded">@{{datos.selectedBancas.ticketsDelDia}}</span>
+            </a>
+
+                <!-- <a href="#" class="navbar-brand font-weight-bold">
                    Ventas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.estadisticas_ventas.total | currency}}</span>
                 </a>
                 <a href="#" class="navbar-brand font-weight-bold">
                    Jugadas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.estadisticas_ventas.total_jugadas | number:2}}</span>
-                </a>
+                </a> -->
                 <a href="#" class="navbar-brand font-weight-bold">
                    Fecha: <span class="bg-secondary p-2 text-white rounded">@{{datos.fecha}}</span>
                 </a>
@@ -180,14 +201,16 @@
                     </div>
                     <div class="col-4 col-md-3">
                         <h4 class="font-weight-bold">
-                        Jugadas: <span class="bg-info p-1 text-white rounded">@{{datos.total_jugadas | currency}}</span>
-                        </h4>
-                    </div>
-                    <div class="col-4 col-md-3">
-                        <h4 class="font-weight-bold">
                         Descuento: <span class="bg-info p-1 text-white rounded">@{{datos.descuentoMonto | currency}}</span>
                         </h4>
                     </div>
+                    
+                    <div class="col-4 col-md-3">
+                        <h4 class="font-weight-bold">
+                        Jugadas: <span class="bg-info p-1 text-white rounded">@{{datos.total_jugadas | currency}}</span>
+                        </h4>
+                    </div>
+                   
                 </div>
 
             </div>

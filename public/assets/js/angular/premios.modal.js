@@ -5,7 +5,7 @@ function retornarAngularModulo(){
     try{
         return angular.module("myModule");
     }catch(e){
-        console.log(e);
+        // console.log(e);
         return angular.module("myModule", [])
     }
 }
@@ -17,7 +17,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
 
         $scope.hola = function(){
-            console.log("hola: ", $scope.mostrarModalPremios);
+            // console.log("hola: ", $scope.mostrarModalPremios);
             if($scope.mostrarModalPremios == true)
                 $scope.mostrarModalPremios = false;
             else
@@ -56,7 +56,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
 
             $http.get(rutaGlobal+"/api/premios", {'action':'sp_datosgenerales_obtener_todos'})
              .then(function(response){
-                console.log('Loteria ajav: ', response.data);
+                // console.log('Loteria ajav: ', response.data);
 
              
 
@@ -97,7 +97,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
         $scope.loadPremiosModal = function(idUsuario, idBanca = 0){
             $scope.datosPremiosModal.idUsuario = idUsuario;
             $scope.datosPremiosModal.idBanca = idBanca;
-            console.log('idUsuario', $scope.datosPremiosModal.idUsuario);
+            //console.log('idUsuario', $scope.datosPremiosModal.idUsuario);
             $scope.inicializarDatosPremiosModal(0, 0);
         }
 
@@ -106,7 +106,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
 
         $scope.actualizar = function(vistaSencilla = false){
             
-            console.log($scope.datosPremiosModal.loterias);
+           // console.log($scope.datosPremiosModal.loterias);
             var errores = false, mensaje = "";
             
 
@@ -225,7 +225,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
 
            
    
-            console.log('actualizar: ', $scope.datos);
+            // console.log('actualizar: ', $scope.datos);
 
             if(vistaSencilla == true){
                 $scope.datosPremiosModal.layout = 'vistaSencilla';
@@ -238,7 +238,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
           
           $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': $scope.datosPremiosModal})
              .then(function(response){
-                console.log(response);
+                // console.log(response);
                 if(response.data.errores == 0){
                     $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo);
                     alert(response.data.mensaje);
@@ -267,7 +267,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
             $scope.datosPremiosModal.idLoteria = id;
             $http.post(rutaGlobal+"/api/premios/erase", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
              .then(function(response){
-                console.log(response);
+                // console.log(response);
                 if(response.data.errores == 0){
                     $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo);
                     alert("Se ha borrado correctamente");
@@ -343,7 +343,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
            $scope.datosPremiosModal.pick3 =  $scope.datosPremiosModal.selectedLoteriaPremiosModal.pick3;
            $scope.datosPremiosModal.pick4 =  $scope.datosPremiosModal.selectedLoteriaPremiosModal.pick4;
            $scope.datosPremiosModal.existeSorteoPremiosModal = $scope.existeSorteoPremiosModal('Super pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal);
-           console.log("Changed sorteo", $scope.datosPremiosModal.selectedLoteriaPremiosModal);
+        //    console.log("Changed sorteo", $scope.datosPremiosModal.selectedLoteriaPremiosModal);
 
            if($scope.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.primera, "number") == false)
                 $('#primeraPremiosModal').addClass('is-filled');
@@ -442,7 +442,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
                     
 
                     if(element == 'ngRepeatPick4'){
-                        console.log('changeFocus length: ', string == '');
+                        // console.log('changeFocus length: ', string == '');
                         if(string == undefined || string == '' || string == null){
                             
                             $scope.datosPremiosModal.loterias[index].segunda = undefined;
@@ -549,7 +549,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
         }
 
         $scope.empty = function(valor, tipo){
-            console.log('empty:', valor);
+            // console.log('empty:', valor);
             if(tipo === 'number'){
                 if(Number(valor) == undefined || valor == '' || valor == null || Number(valor) <= 0)
                     return true;

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 use App\Http\Resources\AutomaticexpensesResource;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Classes\Helper;
 
 class BranchesResource extends JsonResource
 {
@@ -41,6 +42,8 @@ class BranchesResource extends JsonResource
             'pagosCombinaciones' => $this->pagosCombinaciones,
             'comisiones' => $this->comisiones,
             'gastos' => AutomaticexpensesResource::collection($this->gastos),
+            'ventasDelDia' => Helper::ventasDelDia($this->id),
+            'ticketsDelDia' => Helper::ticketsDelDia($this->id)
         ];
     }
 }
