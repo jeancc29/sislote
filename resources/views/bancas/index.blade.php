@@ -613,7 +613,7 @@
                   <!-- track by $index -->
                     <label class="btn btn-outline-info" 
                       ng-repeat="l in datos.ckbLoterias track by l.id"
-                      ng-if="l.existe"
+                      ng-if="l.existe || l.descripcion == 'COPIAR A TODAS'"
                       ng-init="rbxLoteriasComisionesChanged(l, $first)"
                       ng-class="{'active': $first}"
                       ng-click="rbxLoteriasComisionesChanged(l)">
@@ -745,6 +745,9 @@
                       </div> <!-- END COL-6 -->
                    </div> <!-- END ROW -->
 
+                   <div ng-show="datos.ckbLoterias[datos.indexLoteriaComisiones].descripcion == 'COPIAR A TODAS'" class="row justify-content-center w-100">
+                        <input ng-click="copiarATodasComisiones()" type="button" class="btn btn-success " name="guardar" value="Copiar valores no vacios a todas las loterias">
+                      </div>
                   </div> <!-- END COL 12 PRINCIPAL -->
                  
                 </div>
@@ -770,7 +773,7 @@
                       ng-repeat="l in datos.ckbLoterias track by l.id"
                       ng-init="rbxLoteriasPagosCombinacionesChanged(l, $first)"
                       ng-class="{'active': $first}"
-                      ng-if="l.existe"
+                      ng-if="l.existe || l.descripcion == 'COPIAR A TODAS'"
                       ng-click="rbxLoteriasPagosCombinacionesChanged(l)">
                       <input  type="radio" name="options" id="option@{{$index + 1}}" autocomplete="off" checked> @{{l.descripcion}}
                     </label>
@@ -1048,6 +1051,10 @@
                         </div> <!-- END ROW COL-LG-4 -->
                       </div> <!-- END COL-LG-4 -->
 
+                      
+                      <div ng-show="datos.ckbLoterias[datos.indexLoteriaPagosCombinaciones].descripcion == 'COPIAR A TODAS'" class="row justify-content-center w-100">
+                        <input ng-click="copiarATodasPremios()" type="button" class="btn btn-success " name="guardar" value="Copiar valores no vacios a todas las loterias">
+                      </div>
                    </div> <!-- END ROW -->
 
 
@@ -1075,7 +1082,8 @@
                     <div class="col-sm-12 checkbox-radios">
 
                       
-                      <div ng-repeat="d in datos.ckbLoterias" class="form-check form-check-inline">
+  
+                      <div ng-if="d.descripcion != 'COPIAR A TODAS'" ng-repeat="d in datos.ckbLoterias" class="form-check form-check-inline">
                         <label class="form-check-label">
                           <!-- ng-change="ckbLoterias_changed(ckbDias, d)" -->
                           <input ng-model="d.existe"  class="form-check-input" type="checkbox" value=""> @{{d.descripcion}}
@@ -1133,7 +1141,7 @@
                                 
                                 
                                 <td>
-                                  <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                                  <a style="cursor: pointer" data-toggle="modal" data-target=".modal-gasto"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
                                   <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
                                 </td>
                             </tr>

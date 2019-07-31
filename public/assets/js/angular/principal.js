@@ -110,6 +110,11 @@ myApp
         'enviarSMS' : {}
         
     }
+
+    $scope.bancasChanged = function(klk){
+        // console.log('bancasChanged:', $scope.datos.optionsBancas);
+        $scope.datos.selectedBancas = $scope.datos.optionsBancas.find(x => x.id == klk.id);
+    }
         $scope.inicializarDatos = function(response = null){
 
             // console.log('helper: ', helperService.empty($scope.datos.selectedBancas, 'string'));
@@ -125,7 +130,7 @@ myApp
             $scope.datos.loterias = [];
             
             $scope.datos.jugadas = [];
-            $scope.datos.optionsLoterias = [];
+            
 
             $scope.datos.jugada = null;
             $scope.datos.monto_a_pagar = 0;
@@ -133,12 +138,10 @@ myApp
             $scope.datos.total_directo = 0;
             $scope.datos.total_palet_tripleta = 0;
 
-            $scope.datos.jugadasReporte.jugadas = [];
-            $scope.datos.jugadasReporte.optionsLoterias = [];
-            $scope.datos.jugadasReporte.selectedLoteria = {};
-
+            
             
             if(response != null){
+                //console.log('principal:',response.data.bancas)
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
 
@@ -147,18 +150,19 @@ myApp
                 // if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
                 //     idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
                 // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
-                $scope.datos.selectedBancas = helperService.retornarObjectoPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca);                
+                $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas)];                
                 $scope.datos.idBanca = response.data.idBanca;
 
+                
 
-                $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
-                $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
-                $scope.datos.optionsLoterias =response.data.loterias;
-                $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
-                $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
+                // $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
+                // $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
+                // $scope.datos.optionsLoterias =response.data.loterias;
+                // $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
+                // $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
 
-                $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
-                $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
+                // $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
+                // $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
                 
                 
                 $timeout(function() {
@@ -168,8 +172,13 @@ myApp
 
                   return;
             }
-
-            $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
+            else{
+                //Limpiamos algunos campos
+                $scope.datos.jugadasReporte.jugadas = [];
+                $scope.datos.jugadasReporte.optionsLoterias = [];
+                $scope.datos.jugadasReporte.selectedLoteria = {};
+                $scope.datos.optionsLoterias = [];
+                $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
 
                 // console.log(response)
@@ -179,7 +188,7 @@ myApp
                 if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
                     idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
                 // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
-                $scope.datos.selectedBancas = helperService.retornarObjectoPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca);
+                $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
                 $scope.datos.idBanca = response.data.idBanca;
 
                 $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
@@ -211,6 +220,8 @@ myApp
                     //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
                   })
             });
+            }
+            
        
         }
         
@@ -655,7 +666,7 @@ myApp
              $scope.datos.total_palet_tripleta =  total_palet_tripleta;
              $scope.datos.total_jugadas =  Object.keys($scope.datos.jugadas).length;
              $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_jugado) / parseFloat($scope.datos.selectedBancas.deCada)) * parseFloat($scope.datos.selectedBancas.descontar)  : 0;
-             $scope.datos.monto_a_pagar = monto_a_pagar + $scope.datos.descuentoMonto;
+             $scope.datos.monto_a_pagar = Number(monto_a_pagar) - Number($scope.datos.descuentoMonto);
 
              //Calcular total jugdasReporte
              $scope.datos.jugadasReporte.jugadas.forEach(function(valor, indice, array){
@@ -804,9 +815,9 @@ myApp
                         {
                             // console.log(response);
                           alert(response.data.mensaje);
-                          $scope.inicializarDatos();
-                          $scope.imprimirTicket(response.data.venta, (e == 1) ? true : false);
-                          $scope.datos.enviarSMS.codigoBarra = response.data.venta.codigoBarra;
+                          $scope.inicializarDatos(response);
+                        //   $scope.imprimirTicket(response.data.venta, (e == 1) ? true : false);
+                        //   $scope.datos.enviarSMS.codigoBarra = response.data.venta.codigoBarra;
                         //   $scope.print();
                           //$scope.abrirVentanaSms();
                           

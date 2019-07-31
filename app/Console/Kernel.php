@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\AutomaticExpenses::class
+        Commands\AutomaticExpenses::class,
+        Commands\Transactionsdraws::class,
     ];
 
     /**
@@ -25,6 +26,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('transacciones:gastos')
+                 ->everyMinute();
+        $schedule->command('transacciones:sorteos')
                  ->everyMinute();
         $schedule->command('prueba:a')
                  ->everyMinute();

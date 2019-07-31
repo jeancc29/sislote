@@ -56,6 +56,11 @@ class DashboardController extends Controller
         $controlador = Route::getCurrentRoute()->getName(); 
         // $route = Route();
         //echo $controlador;
+
+        if(!Helper::existe_sesion()){
+            return redirect()->route('login');
+        }
+        
         
         
         // if(!strpos(Request::url(), '/api/')){

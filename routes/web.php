@@ -34,6 +34,7 @@ Route::get('/bancas', 'BranchesController@index')->name('bancas');
 Route::get('/usuarios', 'UsersController@index')->name('usuarios');
 Route::get('/usuarios/sesiones', 'UserssesionsController@index')->name('usuarios.sesiones');
 Route::get('/horarios', 'HorariosController@index')->name('horarios');
+Route::get('/', 'DashboardController@index')->name('dashboard');
 Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 Route::get('/bloqueos', 'BlockslotteriesController@index')->name('bloqueos');
 

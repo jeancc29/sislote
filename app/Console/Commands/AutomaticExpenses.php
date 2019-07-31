@@ -63,10 +63,10 @@ class AutomaticExpenses extends Command
         $todayWday = getdate()['wday'];
         $ultimoDiaMes = new Carbon("last day of this month");
         $primerDiaMes = new Carbon("first day of this month");
-        $horaParaRealizarGasto = 11;
+        $horaParaRealizarGasto = 23;
         
 
-        $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 09:00:00";
+        $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";
         $fechaHasta = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 23:59:00";
         $usuario = Users::whereNombres("Sistema")->first();
         $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Consumo automatico de banca")->first();
@@ -76,8 +76,8 @@ class AutomaticExpenses extends Command
 
         
 
-        $saldo = (new Helper)->_sendSms("+18294266800", "Hola jean como estas");
-        $this->info($saldo);
+        // $saldo = (new Helper)->_sendSms("+18294266800", "Hola jean como estas");
+        $this->info($fecha->hour);
         return;
        
         if($usuario == null || $tipo == null)
@@ -96,7 +96,7 @@ class AutomaticExpenses extends Command
                 //Verificamos si el gasto es diario
                 if(strtolower($g->frecuencia->descripcion) == "diario"){
                     //$this->info('klk: '.$fecha->hour);
-                    //Verificamos que la hora de la fecha actual sean las 12AM, osea las 24 que es igual a la hora cero 0
+                    //Verificamos que la hora de la fecha actual sean las 11PM, osea las 24 que es igual a la hora cero 0
                     if($fecha->hour == $horaParaRealizarGasto){
                        //Verificamos que no haya transacciones realizadas en la fecha actual para la banca y el gasto especificado
                        $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
@@ -125,7 +125,7 @@ class AutomaticExpenses extends Command
                     }
                         
                 }
-                //Verificamos si el gasto es diario
+                //Verificamos si el gasto es semanal
                 if(strtolower($g->frecuencia->descripcion) == "semanal"){
                     $gastoWday = Days::whereId($g->idDia)->first()->wday;
                     $this->info('Semanal wday: '.$gastoWday . " - " . $todayWday);

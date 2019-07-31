@@ -403,11 +403,13 @@ class TicketPrintClass{
 
     function setTotal(){
         $this->html .="<div class='row contenedor-total' style='margin-bottom: 2px;'>";
+        $total = (int)$this->venta->total;
         if((int)$this->venta->descuentoMonto > 0){
-            $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>subTotal:". (float)$this->venta->total - (float)$this->venta->descuentoMonto ."</h3>";
+            $total -= (int)$this->venta->descuentoMonto;
+            $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>subTotal:".  $this->venta->total ."</h3>";
             $this->html .= "<h3 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->venta->descuentoMonto ."</h3>";
         }
-        $this->html .= "<h2 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'><strong>- Total:". $this->venta->total ." -</strong></h2>";
+        $this->html .= "<h2 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'><strong>- Total:". $total ." -</strong></h2>";
 
         $this->html .="</div>";
     }

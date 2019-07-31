@@ -18,6 +18,10 @@ if($controlador != "login"){
 <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
 <link rel="icon" type="image/png" href="../assets/img/favicon.png">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta http-equiv="Expires" content="0">
+  <meta http-equiv="Last-Modified" content="0">
+  <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+  <meta http-equiv="Pragma" content="no-cache">
 
 <title>
 
@@ -69,6 +73,7 @@ if($controlador != "login"){
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
     window.loteriasGlobal = <?php if(isset($loterias)) echo $loterias; else echo 'null'; ?>;
     window.sorteosGlobal = <?php if(isset($sorteos)) echo $sorteos; else echo 'null'; ?>;
+    window.loteriasPremiosModelGlobal = <?php if(isset($loteriasPremiosModal)) echo $loteriasPremiosModal; else echo 'null'; ?>;
 
     console.log('header:', bancasGlobal);
    
@@ -119,76 +124,76 @@ if($controlador != "login"){
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
-<script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script>
-<script src="{{asset('assets/js/angular/servicios/helper.js')}}" ></script>
+<script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script>
+<script src="{{asset('assets/js/angular/servicios/helper.js'). '?'.rand(1,50)}}" ></script>
     <?php if($controlador == "principal"):?>
-        <script src="{{asset('assets/js/angular/principal.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/principal.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "principal.pruebahttp" ):?>
-        <script src="{{asset('assets/js/angular/pruebahttp.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/pruebahttp.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "bancas"):?>
-        <script src="{{asset('assets/js/angular/bancas.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/bancas.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "home" || $controlador == ""):?>
-        <script src="{{asset('assets/js/home.js')}}" ></script>
+        <script src="{{asset('assets/js/home.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "usuarios"):?>
-        <script src="{{asset('assets/js/angular/usuarios.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/usuarios.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "usuarios.sesiones" ):?>
-        <script src="{{asset('assets/js/angular/sesiones.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/sesiones.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "loterias"):?>
-        <script src="{{asset('assets/js/angular/loteria.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/loteria.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "loterias.bloqueos" ):?>
-        <script src="{{asset('assets/js/angular/bloqueos.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/bloqueos.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
 
     <?php if($controlador == "premios"):?>
-        <script src="{{asset('assets/js/angular/premios.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/premios.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "reportes.jugadas"):?>
-        <script src="{{asset('assets/js/angular/reportes.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/reportes.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "usuarios"):?>
-        <script src="{{asset('assets/js/angular/usuarios.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/usuarios.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "horarios"):?>
-        <script src="{{asset('assets/js/angular/horarios.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/horarios.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "dashboard"):?>
-        <script src="{{asset('assets/js/angular/dashboard.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/dashboard.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "bloqueos"):?>
-        <script src="{{asset('assets/js/angular/bloqueos2.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/bloqueos2.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "entidades"):?>
-        <script src="{{asset('assets/js/angular/entidades.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/entidades.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "transacciones" || $controlador == "transacciones"):?>
-        <script src="{{asset('assets/js/angular/transacciones.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/transacciones.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "transacciones.grupo"):?>
-        <script src="{{asset('assets/js/angular/transacciones-grupo.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/transacciones-grupo.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
     <?php if($controlador == "monitoreo.tickets" ):?>
-        <script src="{{asset('assets/js/angular/monitoreo.tickets.js')}}" ></script>
+        <script src="{{asset('assets/js/angular/monitoreo.tickets.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
-    <!-- <script src="{{asset('assets/js/angular/premios.modal.js')}}" ></script> -->
+    <!-- <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script> -->
 
 <style>
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
@@ -960,7 +965,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
 @if($controlador != 'login')
 <div ng-controller='controllerPremiosModal'>
 
-<div ng-show="mostrarModalPremios == true" class="row panelPremios panel-premios max-width-570" ng-init="loadPremiosModal('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')">
+<div ng-class="{'dblock': (mostrarModalPremios == true), 'dnone': (mostrarModalPremios == false)}" class="dnone row panelPremios panel-premios max-width-570" ng-init="loadPremiosModal('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')">
       <div class="col-12" ng-init>
                     <div class="card card-stats px-0 py-0 mb-0" style="border: 5px solid; border-color: #e2e2e2;">
                       <div class="card-header card-header-success card-header-icon">
@@ -977,27 +982,43 @@ if(session('idUsuario') == null && $controlador != 'login'){
                           <div class="row">
                             <div class="col-4 mt-1">
                               <div class="form-group">
-                                  <select 
+                              <select 
+                                ng-model="datosPremiosModal.selectedLoteriaPremiosModal"
+                                ng-change="cbxLoteriasPremiosModalChanged()"
+                                      ng-options="o.descripcion for o in datosPremiosModal.optionsLoteriasPremiosModal"
+                                class="selectpicker col-12 mx-0 px-0" 
+                                data-style="select-with-transition" 
+                                title="Select loteria">
+                                <!-- <option value="Afghanistan"> Afghanistan </option>
+                                <option value="Albania"> Albania </option>
+                                <option value="Algeria"> Algeria </option>
+                                <option value="American Samoa"> American Samoa </option>
+                                <option value="Andorra"> Andorra </option>
+                                <option value="Angola"> Angola </option>
+                                <option value="Anguilla"> Anguilla </option>
+                                <option value="Antarctica"> Antarctica </option> -->
+                              </select>
+                                  <!-- <select 
                                       ng-model="datosPremiosModal.selectedLoteriaPremiosModal"
                                       ng-change="cbxLoteriasPremiosModalChanged()"
                                       ng-options="o.descripcion for o in datosPremiosModal.optionsLoteriasPremiosModal"
                                       class="selectpicker w-100" 
                                       data-style="select-with-transition" 
                                       title="Select loteria">
-                                </select>
+                                </select> -->
                               </div>
                             </div>
                             <div class="col-2 col-sm-1" ng-show="existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Tripleta', datosPremiosModal.selectedLoteriaPremiosModal)
-                                || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal)">
+                                || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) || datosPremiosModal.selectedLoteriaPremiosModal == null">
                               <div class="input-group form-control-lg">
                                 <div id="primeraPremiosModal" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">1era</label>
                                   <input
                                       ng-disabled="existeSorteoPremiosModal('Pick 3 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 3 Straight', datosPremiosModal.selectedLoteriaPremiosModal)" 
                                       maxLength="2" 
-                                      select-all-on-click ng-keyup="changeFocus($event, 'datosPremiosModal-segunda', 2, datosPremiosModal.primera)" 
+                                      select-all-on-click ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-segunda', 2, datosPremiosModal.primera)" 
                                       ng-model="datosPremiosModal.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
@@ -1007,7 +1028,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                 existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Tripleta', datosPremiosModal.selectedLoteriaPremiosModal)
-                                || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal)">
+                                || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) || datosPremiosModal.selectedLoteriaPremiosModal == null">
                               <div class="input-group form-control-lg">
                                 <div id="segundaPremiosModal" class="form-group">
                                   <label for="exampleInput1" class="bmd-label-floating">2da</label>
@@ -1016,7 +1037,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                           select-all-on-click 
                                           maxLength="2"
                                           id="datosPremiosModal-segunda" 
-                                          ng-keyup="changeFocus($event, 'datosPremiosModal-tercera', 2, datosPremiosModal.segunda)" 
+                                          ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-tercera', 2, datosPremiosModal.segunda)" 
                                           ng-model="datosPremiosModal.segunda" 
                                           autocomplete="off" 
                                           type="text" class="form-control" id="exampleInput1" name="monto">
@@ -1031,7 +1052,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
                                   <input 
                                   ng-disabled="existeSorteoPremiosModal('Pick 4 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 4 Straight', datosPremiosModal.selectedLoteriaPremiosModal)"
-                                  select-all-on-click id="datosPremiosModal-tercera" ng-keyup="changeFocus($event, 'datosPremiosModal-pick3', 2, datosPremiosModal.tercera)" ng-model="datosPremiosModal.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  select-all-on-click id="datosPremiosModal-tercera" ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-pick3', 2, datosPremiosModal.tercera)" ng-model="datosPremiosModal.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
@@ -1043,7 +1064,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                   <input 
                                       maxLength="3" 
                                       select-all-on-click id="datosPremiosModal-pick3" 
-                                      ng-keyup="changeFocus($event, 'datosPremiosModal-pick4', 3, datosPremiosModal.pick3, 'datosPick3')" 
+                                      ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-pick4', 3, datosPremiosModal.pick3, 'datosPick3')" 
                                       ng-model="datosPremiosModal.pick3" 
                                       autocomplete="off" type="text"  class="form-control" id="exampleInput1" name="monto">
                                 </div>
@@ -1057,14 +1078,14 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                   <input 
                                     maxLength="4" 
                                     select-all-on-click 
-                                    ng-keyup="changeFocus($event, 'no', 4, datosPremiosModal.pick4, 'datosPick4')" 
+                                    ng-keyup="changeFocusPremiosModal($event, 'no', 4, datosPremiosModal.pick4, 'datosPick4')" 
                                     id="datosPremiosModal-pick4" 
                                     ng-model="datosPremiosModal.pick4" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
 
-                            <div class="col-1 text-center mt-3 " ng-click="actualizar(true)" style="cursor: pointer;">
+                            <div class="col-1 text-center mt-3 " ng-click="actualizarPremiosModal(true)" style="cursor: pointer;">
                               <i class="material-icons text-white p-2 bg-success rounded mr-1">save</i>
                             </div>
                            </div> <!-- END ROW -->

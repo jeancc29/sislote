@@ -48,6 +48,11 @@ class AwardsController extends Controller
     public function index()
     {
         $controlador = Route::getCurrentRoute()->getName(); 
+        $datos = request()->validate([
+            'layout' => ''
+        ]);
+
+        
         if(!strpos(Request::url(), '/api/')){
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
@@ -56,6 +61,9 @@ class AwardsController extends Controller
             if(!$u->tienePermiso("Manejar transacciones") == true){
                 return redirect()->route('principal');
             }
+
+            
+
             return view('premios.index', compact('controlador'));
         }
 
@@ -72,38 +80,84 @@ class AwardsController extends Controller
         $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
 
-
         $loterias = Lotteries::whereStatus(1)->has('sorteos')->get();
+        // == "vistaPremiosModal"
+        if(isset($datos['layout'])){
+            
 
-        $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
-            $primera = null;
-            $segunda = null;
-            $tercera = null;
-            $pick3 = null;
-            $pick4 = null;
-            $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
-                            ->where('idLoteria', $l['id'])
-                            ->first();
+            // if($datos['layout'] != "vistaPremiosModal")
+                
+            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+                $primera = null;
+                $segunda = null;
+                $tercera = null;
+                $pick3 = null;
+                $pick4 = null;
+                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                                ->where('idLoteria', $l['id'])
+                                ->first();
+    
+                if($premios != null){
+                    $primera = $premios->primera;
+                    $segunda = $premios->segunda;
+                    $tercera = $premios->tercera;
+                    $pick3 = $premios->pick3;
+                    $pick4 = $premios->pick4;
+                }
+                return [
+                        'id' => $l['id'],
+                        'descripcion' => $l['descripcion'],
+                        'abreviatura' => $l['abreviatura'],
+                        'primera' => $primera,
+                        'segunda' => $segunda,
+                        'tercera' => $tercera,
+                        'pick3' => $pick3,
+                        'pick4' => $pick4,
+                        'sorteos' => $l->sorteos
+                    ];
+            });
+    
+            // $loterias = collect($datos['loterias']);
+            list($loterias, $no) = $loterias->partition(function($l){
+                return Helper::loteriaTienePremiosRegistradosHoy($l['id']) != true;
+            });
+        }else{
+            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+                $primera = null;
+                $segunda = null;
+                $tercera = null;
+                $pick3 = null;
+                $pick4 = null;
+                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                                ->where('idLoteria', $l['id'])
+                                ->first();
+    
+                if($premios != null){
+                    $primera = $premios->primera;
+                    $segunda = $premios->segunda;
+                    $tercera = $premios->tercera;
+                    $pick3 = $premios->pick3;
+                    $pick4 = $premios->pick4;
+                }
+                return [
+                        'id' => $l['id'],
+                        'descripcion' => $l['descripcion'],
+                        'abreviatura' => $l['abreviatura'],
+                        'primera' => $primera,
+                        'segunda' => $segunda,
+                        'tercera' => $tercera,
+                        'pick3' => $pick3,
+                        'pick4' => $pick4,
+                        'sorteos' => $l->sorteos
+                    ];
+            });
+        }
 
-            if($premios != null){
-                $primera = $premios->primera;
-                $segunda = $premios->segunda;
-                $tercera = $premios->tercera;
-                $pick3 = $premios->pick3;
-                $pick4 = $premios->pick4;
-            }
-            return [
-                    'id' => $l['id'],
-                    'descripcion' => $l['descripcion'],
-                    'abreviatura' => $l['abreviatura'],
-                    'primera' => $primera,
-                    'segunda' => $segunda,
-                    'tercera' => $tercera,
-                    'pick3' => $pick3,
-                    'pick4' => $pick4,
-                    'sorteos' => $l->sorteos
-                ];
-        });
+        //La funcion partition retorna los objetos que cumplan la condicion pero esta tambien retornara su mismo index, en algunos
+        //casos no se retorno el index cero porque el elemento en esta posicion no ha sido incluido, entonces lo que hace la funcion values()
+        //es empezar la collection desde su indice cero
+        $loterias = $loterias->values();
+
 
         return Response::json([
             'loterias' => $loterias
@@ -140,7 +194,7 @@ class AwardsController extends Controller
 
         $fecha = getdate();
 
-        if($datos['layout'] == "vistaSencilla"){
+        if($datos['layout'] == "vistaSencilla" || $datos['layout'] == "vistaPremiosModal"){
 
             $fechaRequest = new Carbon($datos['fecha']);
             $fechaActual = Carbon::now();
@@ -311,7 +365,9 @@ class AwardsController extends Controller
                 }
             }
     
-    
+
+            
+
     
         return Response::json([
             'errores' => 0,

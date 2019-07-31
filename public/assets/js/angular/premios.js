@@ -64,12 +64,14 @@ myApp
             
 
                
-            },
-            function(response) {
-                // Handle error here
-                //console.log('Error jean: ', response);
-                alert("Error");
-            });
+            }
+            // ,
+            // function(response) {
+            //     // Handle error here
+            //     //console.log('Error jean: ', response);
+            //     alert("Error");
+            // }
+            );
        
         }
         

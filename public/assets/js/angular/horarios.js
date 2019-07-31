@@ -382,7 +382,7 @@ myApp
                     //$('#multiselect').selectpicker('val', []);
                     $('#multiselect').selectpicker("refresh");
                     $('.selectpicker').selectpicker("refresh");
-                    $('.selectpicker').selectpicker('val', [])
+                    // $('.selectpicker').selectpicker('val', [])
                   })
                
                 

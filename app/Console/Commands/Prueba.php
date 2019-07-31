@@ -83,17 +83,19 @@ class Prueba extends Command
             $c = "malo";
         }
 
+        $this->info("Awardsclasss: " . Helper::comisionesPorBanca(1));
+        $this->info("Awardsclasss: " . Helper::comisionesPorLoteria( 1, '2019-07-31 00:00:00', '2019-07-31 23:00:00'));
         // $this->info("Awardsclasss: " . $a->combinacionesNula());
     //    $this->info("Awardsclasss: " . Helper::contarNumerosIdenticos("1211"));
-    $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, true));
-    $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '131', 1, false));
-    $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, false));
+    // $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, true));
+    // $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '131', 1, false));
+    // $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, false));
 
-       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1234', 1, true));
-       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1222', 1, false));
-       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1221', 1, false));
-       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '2324', 1, false));
-       $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '4231', 1, false));
+    //    $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1234', 1, true));
+    //    $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1222', 1, false));
+    //    $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '1221', 1, false));
+    //    $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '2324', 1, false));
+    //    $this->info("Awardsclasss: " . $a->pick4BuscarPremio(1, 1, '4231', 1, false));
     //    $this->info("Awardsclasss: " . $a->pick3BuscarPremio(1, 1, '122', 1, false));
     // $this->info("Awardsclasss: " . $c); 
 

@@ -81,6 +81,11 @@ class TypesSeeder extends Seeder
             'status' => 1,
             'renglon' => 'transaccion'
         ]);
+        t::create([
+            'descripcion' => 'Sorteo',
+            'status' => 1,
+            'renglon' => 'transaccion'
+        ]);
 
     }
 }

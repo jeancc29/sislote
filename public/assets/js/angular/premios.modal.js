@@ -11,11 +11,12 @@ function retornarAngularModulo(){
 }
 
 var myApp = retornarAngularModulo();
-myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
+myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
 
+        $scope.indexLoteriaPremiosModal = 0;
         $scope.hola = function(){
             // console.log("hola: ", $scope.mostrarModalPremios);
             if($scope.mostrarModalPremios == true)
@@ -53,10 +54,10 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
 
         $scope.inicializarDatosPremiosModal = function(idLoteria, idSorteo){
             
-
-            $http.get(rutaGlobal+"/api/premios", {'action':'sp_datosgenerales_obtener_todos'})
+     
+            $http.get(rutaGlobal+"/api/premios?layout=vistaPremiosModal", {'action':'sp_datosgenerales_obtener_todos'})
              .then(function(response){
-                // console.log('Loteria ajav: ', response.data);
+                console.log('Loteria ajav: ', response.data);
 
              
 
@@ -71,6 +72,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
                 if(idLoteria > 0)
                     idx = $scope.datosPremiosModal.optionsLoteriasPremiosModal.findIndex(x => x.id == idLoteria);
                  $scope.datosPremiosModal.selectedLoteriaPremiosModal = $scope.datosPremiosModal.optionsLoteriasPremiosModal[idx];
+                //  console.log('premiosModal selectedLoteria:',$scope.datosPremiosModal.selectedLoteriaPremiosModal);
                  $scope.cbxLoteriasPremiosModalChanged();
     
 
@@ -104,7 +106,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
       
         
 
-        $scope.actualizar = function(vistaSencilla = false){
+        $scope.actualizarPremiosModal = function(vistaSencilla = false){
             
            // console.log($scope.datosPremiosModal.loterias);
             var errores = false, mensaje = "";
@@ -120,25 +122,25 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
                     $scope.existeSorteoPremiosModal('Directo', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true 
                     || $scope.existeSorteoPremiosModal('Pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true
                     || $scope.existeSorteoPremiosModal('Tripleta', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if($scope.empty($scope.datosPremiosModal.primera, 'number') == true || $scope.empty($scope.datosPremiosModal.segunda, 'number') == true || $scope.empty($scope.datosPremiosModal.tercera, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.primera, 'number') == true || helperService.empty($scope.datosPremiosModal.segunda, 'number') == true || helperService.empty($scope.datosPremiosModal.tercera, 'number') == true){
                         alert("Hay campos vacios otros: ");
                         return;
                     }
                 }
                 else if($scope.existeSorteoPremiosModal('Super pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if($scope.empty($scope.datosPremiosModal.primera, 'number') == true || $scope.empty($scope.datosPremiosModal.segunda, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.primera, 'number') == true || helperService.empty($scope.datosPremiosModal.segunda, 'number') == true){
                         alert("Hay campos vacios super pale");
                         return;
                     }
                 }
                 else if($scope.existeSorteoPremiosModal('Pick 3 Straight', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true || $scope.existeSorteoPremiosModal('Pick 3 Box', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if($scope.empty($scope.datosPremiosModal.pick3, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.pick3, 'number') == true){
                         alert("Hay campos vacios pick3");
                         return;
                     }
                 }
                 else if($scope.existeSorteoPremiosModal('Pick 4 Straight', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true || $scope.existeSorteoPremiosModal('Pick 4 Box', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if($scope.empty($scope.datosPremiosModal.pick4, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.pick4, 'number') == true){
                         alert("Hay campos vacios pick4");
                         return;
                     }
@@ -161,26 +163,26 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
                         $scope.existeSorteoPremiosModal('Directo', array[indice]) == true 
                         || $scope.existeSorteoPremiosModal('Pale', array[indice]) == true
                         || $scope.existeSorteoPremiosModal('Tripleta', array[indice]) == true){
-                        if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true || $scope.empty(array[indice].tercera, 'number') == true){
+                        if(helperService.empty(array[indice].primera, 'number') == true || helperService.empty(array[indice].segunda, 'number') == true || helperService.empty(array[indice].tercera, 'number') == true){
                             alert("Hay campos vacios otros");
                             errores = true;
                         }
                     }
                     if($scope.existeSorteoPremiosModal('Super pale', array[indice]) == true){
-                        if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true){
+                        if(helperService.empty(array[indice].primera, 'number') == true || helperService.empty(array[indice].segunda, 'number') == true){
                             alert("Hay campos vacios super pale");
                             errores = true;
                         }
                     }
                     if($scope.existeSorteoPremiosModal('Pick 3 Straight', array[indice]) == true || $scope.existeSorteoPremiosModal('Pick 3 Box', array[indice]) == true){
-                        if($scope.empty(array[indice].pick3, 'number') == true){
+                        if(helperService.empty(array[indice].pick3, 'number') == true){
                             alert("Hay campos vacios pick3");
                             errores = true;
                         }
                     }
                     if($scope.existeSorteoPremiosModal('Pick 4 Straight', array[indice]) == true || $scope.existeSorteoPremiosModal('Pick 4 Box', array[indice]) == true){
-                        console.log('existe pick4 hola: ', $scope.existeSorteoPremiosModal('Pick 4 Box', array[indice]));
-                        if($scope.empty(array[indice].pick4, 'number') == true){
+                        // console.log('existe pick4 hola: ', $scope.existeSorteoPremiosModal('Pick 4 Box', array[indice]));
+                        if(helperService.empty(array[indice].pick4, 'number') == true){
                             alert("Hay campos vacios pick4");
                             errores = true;
                         }
@@ -188,7 +190,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
                   
     
                     // //Verificamos que todos los datos no esten vacios y que el sorteo 'Super pale' no exista
-                    // if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == false && $scope.existeSorteoPremiosModal('Super pale', array[indice]) == false){
+                    // if(helperService.empty(array[indice].primera, 'number') == false && helperService.empty(array[indice].segunda, 'number') == false && helperService.empty(array[indice].tercera, 'number') == false && $scope.existeSorteoPremiosModal('Super pale', array[indice]) == false){
                     //     if(array[indice].primera.length != 2){
                     //         alert('El valor del campo 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
                     //         errores = true;
@@ -203,7 +205,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
                     //     }
                     // }
                     // //Verificamos que todos los datos no esten vacios, excepto la tripleta y que el sorteo 'Super pale' si exista
-                    // else if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == true && $scope.existeSorteoPremiosModal('Super pale', array[indice]) == true){
+                    // else if(helperService.empty(array[indice].primera, 'number') == false && helperService.empty(array[indice].segunda, 'number') == false && helperService.empty(array[indice].tercera, 'number') == true && $scope.existeSorteoPremiosModal('Super pale', array[indice]) == true){
                     //     if(array[indice].primera.length != 2){
                     //         alert('El valor del campo 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
                     //         errores = true;
@@ -228,6 +230,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
             // console.log('actualizar: ', $scope.datos);
 
             if(vistaSencilla == true){
+
                 $scope.datosPremiosModal.layout = 'vistaSencilla';
             }else{
                 $scope.datosPremiosModal.layout = 'vistaNormal';
@@ -240,7 +243,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
              .then(function(response){
                 // console.log(response);
                 if(response.data.errores == 0){
-                    $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo);
+                    $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo, response);
                     alert(response.data.mensaje);
                 }else if(response.data.errores == 1){
                     $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo);
@@ -258,85 +261,16 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
 
         }
 
-        $scope.borrar = function(id){
-
-            if($scope.datosPremiosModal.optionsLoteriasPremiosModal.find(x => x.id == id) == undefined){
-                return;
-            }
-
-            $scope.datosPremiosModal.idLoteria = id;
-            $http.post(rutaGlobal+"/api/premios/erase", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
-             .then(function(response){
-                // console.log(response);
-                if(response.data.errores == 0){
-                    $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo);
-                    alert("Se ha borrado correctamente");
-                }else if(response.data.errores == 1){
-                    alert(response.data.mensaje);
-                }
-
-            },
-            function(response) {
-                // Handle error here
-                //console.log('Error jean: ', response);
-                alert("Error");
-            });
-        }
-
-        $scope.buscar = function(){
-
-            console.log('buscar: ', $scope.datos);
-            
-          
-          $http.post($scope.ROOT_PATH +"clases/consultaajax.php", {'action':'sp_premios_buscar', 'datos': $scope.datos})
-             .then(function(response){
-                console.log(response.data[0]);
-                $scope.datosPremiosModal.premios = response.data;
-
-                // if(response.data[0].errores == 0){
-                //     $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo);
-                //     alert("Se ha guardado correctamente");
-                // }
-            },
-            function(response) {
-                // Handle error here
-                //console.log('Error jean: ', response);
-                alert("Error");
-            });
-
-        }
-
-
-        $scope.eliminar = function(d){
-            $http.post($scope.ROOT_PATH +"clases/consultaajax.php", {'action':'sp_premios_elimina', 'datos': d})
-             .then(function(response){
-                console.log(response.data[0][0]);
-                var json = JSON.parse(response.data[0][0]);
-                console.log(json);
-                if(response.data[0].errores == 0)
-                {
-                    $scope.inicializarDatosPremiosModal(0);
-                    alert(response.data[0].mensaje);
-                }
-                
-            },
-            function(response) {
-                // Handle error here
-                //console.log('Error jean: ', response);
-                alert("Error");
-            });
-        }
-
-
-
-
-       
-
-
+    
+    
 
        
 
         $scope.cbxLoteriasPremiosModalChanged = function(){
+            if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal, 'object') == true)
+                return;
+
+            
            $scope.datosPremiosModal.primera =  $scope.datosPremiosModal.selectedLoteriaPremiosModal.primera;
            $scope.datosPremiosModal.segunda =  $scope.datosPremiosModal.selectedLoteriaPremiosModal.segunda;
            $scope.datosPremiosModal.tercera =  $scope.datosPremiosModal.selectedLoteriaPremiosModal.tercera;
@@ -345,19 +279,19 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
            $scope.datosPremiosModal.existeSorteoPremiosModal = $scope.existeSorteoPremiosModal('Super pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal);
         //    console.log("Changed sorteo", $scope.datosPremiosModal.selectedLoteriaPremiosModal);
 
-           if($scope.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.primera, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.primera, "number") == false)
                 $('#primeraPremiosModal').addClass('is-filled');
-           if($scope.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.segunda, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.segunda, "number") == false)
                 $('#segundaPremiosModal').addClass('is-filled');
-           if($scope.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.tercera, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.tercera, "number") == false)
                 $('#terceraPremiosModal').addClass('is-filled');
-           if($scope.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick3, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick3, "number") == false)
                 $('#pick3PremiosModal').addClass('is-filled');
-           if($scope.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick4, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick4, "number") == false)
                 $('#pick4PremiosModal').addClass('is-filled');
         }
 
-        $scope.changeFocus = function(event, elementIdToSetFocus,  lengthOfStringToChangeFocus, string, element = undefined, index = -1){
+        $scope.changeFocusPremiosModal = function(event, elementIdToSetFocus,  lengthOfStringToChangeFocus, string, element = undefined, index = -1){
             if(string != undefined){
 
                 if(element != undefined && index == -1){
@@ -481,92 +415,21 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout){
             }
         }
 
-        $scope.editarPremio = function(id){
-            if($scope.datosPremiosModal.optionsLoteriasPremiosModal.find(x => x.id == id) != undefined){
-                $scope.datosPremiosModal.selectedLoteriaPremiosModal = $scope.datosPremiosModal.optionsLoteriasPremiosModal.find(x => x.id == id);
-                $scope.cbxLoteriasPremiosModalChanged();
-                $timeout(function() {
-                    $('.selectpicker').selectpicker("refresh");
-                  })
-            }
-        }
-
-        $scope.cbxLoteriasPremiosModalChanged2 = function(){
-          
-            if($scope.datosPremiosModal.bloqueoJugada.selectedLoteriaPremiosModal.bloqueosJugadas != undefined){
-
-                $scope.datosPremiosModal.bloqueoJugada.bloqueosJugadas = JSON.parse($scope.datosPremiosModal.bloqueoJugada.selectedLoteriaPremiosModal.bloqueosJugadas);
-
-                
-
-                // a.forEach(function(valor, indice, array){
-
-                //     if($scope.datosPremiosModal.ckbDias.find(x => x.idDia == array[indice].idDia) != undefined){
-                //         let idx = $scope.datosPremiosModal.ckbDias.findIndex(x => x.idDia == parseInt(array[indice].idDia));
-                //         $scope.datosPremiosModal.ckbDias[idx].existe = true;
-                //     }
-
-                //  });
-            }
-            else
-                $scope.datosPremiosModal.bloqueoJugada.bloqueosJugadas = [];
+       
 
 
-                
-        }
-
-
-        $scope.agregar_guion = function(cadena, sorteo = undefined){
-            console.log('agregar_guion:', sorteo);
-            if(cadena.length == 4 && sorteo == 'Pale'){
-                cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3];
-            }
-            if(cadena.length == 6){
-                cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3] + '-' + cadena[4] + cadena[5];
-            }
-           return cadena;
-        }
-
-
-        $scope.p = function(){
-            console.log("p: ", Object.keys($scope.datosPremiosModal.premios).length);
-
-            return Object.keys($scope.datosPremiosModal.premios).length;
-            // if(last){
-
-            //     (function($){
-            //         $.fn.hasScrollBar = function(){
-            //           return this.get(0).scrollHeight > this.height();
-            //         }
-            //       })(jQuery);
-    
-    
-            //     //console.log('hasScrollBar function: ', $('#table_body').hasScrollBar());
-
-            // }
-
-            
-        }
-
-        $scope.empty = function(valor, tipo){
-            // console.log('empty:', valor);
-            if(tipo === 'number'){
-                if(Number(valor) == undefined || valor == '' || valor == null || Number(valor) <= 0)
-                    return true;
-            }
-
-            return false;
-        }
 
 
         $scope.existeSorteoPremiosModal = function(sorteo, loteria){
             //console.log('existeSorteoPremiosModal: ', $scope.datosPremiosModal.comisiones.selectedLoteriaPremiosModal);
             var existe = false;
 
+            // console.log('existeSorteoPremiosModal:', loteria);
             
             
-            
-            if(loteria.sorteos == undefined)
+            if(helperService.empty(loteria, 'object') == true )
+            return false;
+            if(helperService.empty(loteria.sorteos, 'object') == true )
             return false;
 
         

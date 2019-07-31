@@ -899,6 +899,7 @@ class PrincipalController extends Controller
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
+            'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
             'venta' => ($sale != null) ? new SalesResource($sale) : null,
             'img' => $img
         ], 201);

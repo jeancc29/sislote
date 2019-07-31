@@ -42,4 +42,22 @@ myApp.service('helperService', function(){
 
         return objectoRetornar;
     }
+
+    this.retornarIndexPorId = function(objeto, arregloDeObjetos, idPorDefectoSiObjetoNulo = undefined){
+        var indexRetornar = 0;
+        if(this.empty(objeto) == false){
+            if(this.empty(arregloDeObjetos) == false){
+                indexRetornar = arregloDeObjetos.findIndex(x => x.id == objeto.id);
+            }
+        }
+        else if(this.empty(arregloDeObjetos) == false){
+            if(idPorDefectoSiObjetoNulo != undefined){
+                indexRetornar = arregloDeObjetos.findIndex(x => x.id == idPorDefectoSiObjetoNulo);
+            }
+            else
+                indexRetornar = 0;
+        }
+
+        return indexRetornar;
+    }
 });

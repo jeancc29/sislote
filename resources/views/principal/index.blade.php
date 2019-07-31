@@ -24,6 +24,7 @@
                     <!-- o.descripcion disable when validarHora(o.horaCierre, o.descripcion) for o in datos.optionsLoterias track by o.id -->
                             <select 
                             id="multiselect2"
+                            ng-change="bancasChanged(datos.selectedBancas)"
                                 ng-model="datos.selectedBancas"
                                 ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
                                 class="selectpicker w-100" 
@@ -207,7 +208,7 @@
 
                     <div class="col-4 col-md-3">
                         <h4 class="font-weight-bold">
-                        Monto: <span class="bg-info p-1 text-white rounded">@{{datos.monto_a_pagar | currency}}</span>
+                        Total a pagar: <span class="bg-info p-1 text-white rounded">@{{datos.monto_a_pagar | currency}}</span>
                         </h4>
                     </div>
                     
