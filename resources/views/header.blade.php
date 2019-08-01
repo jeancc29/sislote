@@ -193,6 +193,13 @@ if($controlador != "login"){
         <script src="{{asset('assets/js/angular/monitoreo.tickets.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
+    <?php if($controlador == "reportes.historico" ):?>
+        <script src="{{asset('assets/js/angular/reporte.historico.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
+    <?php if($controlador == "reportes.ventasporfecha" ):?>
+        <script src="{{asset('assets/js/angular/reporte.ventasporfecha.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
+
     <!-- <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script> -->
 
 <style>
@@ -255,6 +262,21 @@ if($controlador != "login"){
 .btn-group {
   display: flex;
   overflow: scroll;
+}
+
+.bg-bien{
+    background: #add8e6!important;
+}
+.text-bien{
+    color: #262290;
+}
+
+.bg-mal{
+    background: #ffcccc!important;
+}
+
+.text-mal{
+    color: #ff577b;
 }
     
  /********************* MEDIA QUERY QUE MANEJA MENU DESPLEGABLE ******************/
@@ -1228,6 +1250,40 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     <p> Vender </p>
                 </a>
             </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#reportesToggle">
+                    <i class="material-icons">insert_chart_outlined</i>
+                    <p> Ventas 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="reportesToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('reportes.historico')}}">
+                              <span class="sidebar-mini"> H </span>
+                              <span class="sidebar-normal"> Historico </span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('reportes.ventasporfecha')}}">
+                              <span class="sidebar-mini"> V </span>
+                              <span class="sidebar-normal"> Ventas por fecha </span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item ">
+                            <a class="nav-link" href="">
+                              <span class="sidebar-mini"> J </span>
+                              <span class="sidebar-normal"> Jugadas </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
             
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
@@ -1368,31 +1424,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 </div>
             </li>
 
-            <li class="nav-item active">
-                <a class="nav-link" data-toggle="collapse" href="#reportesToggle">
-                    <i class="material-icons">image</i>
-                    <p> Reportes 
-                       <b class="caret"></b>
-                    </p>
-                </a>
-
-                <div class="collapse" id="reportesToggle">
-                    <ul class="nav">
-                        <li class="nav-item ">
-                            <a class="nav-link" href="">
-                              <span class="sidebar-mini"> V </span>
-                              <span class="sidebar-normal"> Ventas </span>
-                            </a>
-                        </li>
-                        <li class="nav-item ">
-                            <a class="nav-link" href="">
-                              <span class="sidebar-mini"> J </span>
-                              <span class="sidebar-normal"> Jugadas </span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+            
 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('cerrarSesion')}}?cerrar=si">

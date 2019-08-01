@@ -40,6 +40,8 @@ Route::get('/bloqueos', 'BlockslotteriesController@index')->name('bloqueos');
 
 
 Route::get('/reportes/jugadas', 'ReportesController@jugadas')->name('reportes.jugadas');
+Route::get('/reportes/historico', 'ReportesController@historico')->name('reportes.historico');
+Route::get('/reportes/ventasporfecha', 'ReportesController@ventasporfecha')->name('reportes.ventasporfecha');
 
 Route::get('/entidades', 'EntityController@index')->name('entidades');
 Route::get('/transacciones/grupo', 'TransactionsController@grupo')->name('transacciones.grupo');

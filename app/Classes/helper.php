@@ -19,44 +19,77 @@ use Twilio\Rest\Client;
 use Twilio\Exceptions\TwilioException;
 
 class Helper{
-    public function saldo($id, $es_banca = true){
-        $datos = Array("id" => $id, "es_banca" => $es_banca);
+    static function saldo($id, $entidad = 1){
+        $datos = Array("id" => $id, "entidad" => $entidad);
 
         $saldo_inicial = 0;
 
-        if($datos["es_banca"] == 1){
+        if($datos["entidad"] == 1){
             $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
             $debito = transactions::where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
                     'status' => 1
-                ])->sum('debito');
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->sum('debito');
             $credito =  transactions::where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
                     'status' => 1
-                ])->sum('credito');
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->sum('credito');
             $saldo_inicial = $debito - $credito;
-        }else{
+        }else if($datos["entidad"] == 2){
             $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
             $debito = transactions::where(
                 [
                     'idEntidad2'=> $datos["id"],
                     'idTipoEntidad2' => $idTipoEntidad2->id,  
                     'status' => 1
-                ])->sum('debito');
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->sum('debito');
             $credito = transactions::where(
                 [
                     'idEntidad2'=> $datos["id"],
                     'idTipoEntidad2' => $idTipoEntidad2->id,  
                     'status' => 1
-                ])->sum('credito');
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->sum('credito');
             $saldo_inicial = $credito - $debito;
         }
+        else if($datos["entidad"] == 3){
+            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad1' => $idTipoEntidad1->id, 
+                    'status' => 1,
+                    'idTipo' => $tipo->id
+                ])
+                ->where('idTipo', '=', $tipo->id)
+                ->sum('debito');
+            $credito = transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad1' => $idTipoEntidad1->id, 
+                    'status' => 1,
+                    'idTipo' => $tipo->id
+                ])
+                ->where('idTipo', '=', $tipo->id)
+                ->sum('credito');
+                $saldo_inicial = $debito - $credito;
+        }
 
-       return $saldo_inicial;
+       return round($saldo_inicial, 2);
     }
 
     public function _sendSms($to, $codigoBarra, $sms = true)
@@ -433,14 +466,26 @@ class Helper{
     }
 
 
-    static function ventasDelDia($idBanca){
+    static function ventasPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
+        if($fechaInicial != null && $fechaFinal != null){
+            $fecha = getdate(strtotime($fechaInicial));
+            $fechaF = getdate(strtotime($fechaFinal));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+            
+
+            
         if($idBanca == 0){
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])->get();
         }else{
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
@@ -450,17 +495,29 @@ class Helper{
             return $id->id;
         });
 
-        return Sales::whereIn('id', $idVentas)->sum('total');
+        return round(Sales::whereIn('id', $idVentas)->sum('total'), 2);
     }
 
-    static function descuentosDelDia($idBanca){
+    static function descuentosPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
+        if($fechaInicial != null && $fechaFinal != null){
+            $fecha = getdate(strtotime($fechaInicial));
+            $fechaF = getdate(strtotime($fechaFinal));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+            
+
+            
         if($idBanca == 0){
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])->get();
         }else{
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
@@ -470,17 +527,29 @@ class Helper{
             return $id->id;
         });
 
-        return Sales::whereIn('id', $idVentas)->sum('descuentoMonto');
+        return round(Sales::whereIn('id', $idVentas)->sum('descuentoMonto'), 2);
     }
 
-    static function premiosDelDia($idBanca){
+    static function premiosPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
+        if($fechaInicial != null && $fechaFinal != null){
+            $fecha = getdate(strtotime($fechaInicial));
+            $fechaF = getdate(strtotime($fechaFinal));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+            
+
+            
         if($idBanca == 0){
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])->get();
         }else{
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
@@ -490,16 +559,49 @@ class Helper{
             return $id->id;
         });
 
-        return Sales::whereIn('id', $idVentas)->sum('premios');
+        return round(Sales::whereIn('id', $idVentas)->sum('premios'), 2);
     }
 
-    static function ticketsDelDia($idBanca){
+    static function ticketsPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
+        if($fechaInicial != null && $fechaFinal != null){
+            $fecha = getdate(strtotime($fechaInicial));
+            $fechaF = getdate(strtotime($fechaFinal));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
      
-        $tickets = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        $tickets = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
         ->whereNotIn('status', [0,5])
         ->where('idBanca', $idBanca)
+        ->count();
+    
+    
+        
+
+        return $tickets;
+    }
+
+    static function ticketsPendientesPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+        $fecha = getdate();
+   
+        if($fechaInicial != null && $fechaFinal != null){
+            $fecha = getdate(strtotime($fechaInicial));
+            $fechaF = getdate(strtotime($fechaFinal));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+     
+        $tickets = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        ->whereNotIn('status', [0,5])
+        ->where(['idBanca' => $idBanca, 'status' => 1])
         ->count();
     
     

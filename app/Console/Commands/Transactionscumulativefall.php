@@ -15,14 +15,14 @@ use App\Classes\Helper;
 use App\Http\Resources\AutomaticexpensesResource;
 use App\Http\Resources\BranchesResource;
 
-class Transactionsdraws extends Command
+class Transactionscumulativefall extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'transacciones:sorteos';
+    protected $signature = 'transacciones:caidaAcumulada';
 
     /**
      * The console command description.
@@ -60,7 +60,7 @@ class Transactionsdraws extends Command
         $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";
         $fechaHasta = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 23:59:00";
         $usuario = Users::whereNombres("Sistema")->first();
-        $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Sorteo")->first();
+        $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
         $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
         $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
         $entidad = Entity::whereNombre("Sistema")->first();
@@ -70,10 +70,10 @@ class Transactionsdraws extends Command
         // $saldo = (new Helper)->_sendSms("+18294266800", "Hola jean como estas");
         // $this->info($prueba->hour);
         // return;
-
+       
         if($fecha->hour != 23)
         return;
-       
+
         if($usuario == null || $tipo == null)
             return;
             
@@ -96,18 +96,41 @@ class Transactionsdraws extends Command
                 //  $this->info('des:prem:comi '.$descuentosDelDia.';'.$premiosDelDia.';'.$comisionesDelDia);
                 //  return $b;
                 $saldoFinalEntidad1 = 0;
-                $saldo = (new Helper)->saldo($b['id'], 1);
+                $saldo = (new Helper)->saldo($b['id'], 3);
                 $totalNeto = $ventasDelDia - ($descuentosDelDia + $premiosDelDia + $comisionesDelDia);
 
                 if($totalNeto >= 0){
                     $debito = $totalNeto;
-                    $saldoFinalEntidad1 = $saldo + $debito;
                     $credito = 0;
+                    //Si el saldo actual de la caida acumulada es menor que cero entonces eso quiere decir  que hay una caida acumulada
+                    //asi que se debe recuperar la caida
+                    if($saldo < 0){
+                        $saldoFinalEntidad1 = $saldo + $debito;
+                        //Si el saldoFinalEntidad1 es mayor que cero eso quiere decir que ya no hay caida acumulada y como la caida acumulada no pasa de cero
+                        //entonces la igualamos a cero
+                        if($saldoFinalEntidad1 > 0){
+                            $debito = abs($saldo);
+                            $saldoFinalEntidad1 = 0;
+                        }
+                    }else{
+                        $debito = 0;
+                        $saldoFinalEntidad1 = 0;
+                    }
+                    
+                    
+                    $this->info('Dentro debi if: '.$saldoFinalEntidad1 . ':' . $debito);
+                    
                 }else{
-                    $credito = abs($totalNeto); //Esta funcion abs "valor absoluto" convierte numeros negativos a positivos
-                    $saldoFinalEntidad1 = $saldo - $credito;
+                    $credito = \abs($totalNeto); //Esta funcion abs "valor absoluto" convierte numeros negativos a positivos
                     $debito = 0;
+                    
+                    $saldoFinalEntidad1 = $saldo - $credito;
+                    $credito = \abs($credito);
+
+                    $this->info('Dentro else: '.$saldoFinalEntidad1 . ':' . $credito);
                 }
+
+               
 
                 $t = transactions::create([
                     'idUsuario' => $usuario->id,
@@ -125,9 +148,7 @@ class Transactionsdraws extends Command
                     'entidad2_saldo_final' => 0,
                     'nota' => "Proceso diario automático de ventas"
                 ]);
-                $this->info('See hizo la transaccion diaria: '.$b['id']);
-
-                
+                $this->info('See hizo la transaccion diaria: '.$saldoFinalEntidad1 . ':' . $totalNeto);
                 
                
         }

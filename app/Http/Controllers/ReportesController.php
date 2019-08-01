@@ -112,6 +112,174 @@ class ReportesController extends Controller
     }
 
 
+
+    public function historico()
+    {
+        $controlador = Route::getCurrentRoute()->getName();
+        
+        if(!strpos(Request::url(), '/api/')){
+            // return "<h1>Dentro reporte jugadas: $controlador </h1>";
+            $fecha = getdate();
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+            $bancas = Branches::whereStatus(1)->get();
+            $bancas = collect($bancas)->map(function($d){
+                $ventas = Helper::ventasPorBanca($d['id']);
+                $descuentos = Helper::descuentosPorBanca($d['id']);
+                $premios = Helper::premiosPorBanca($d['id']);
+                $comisiones = Helper::comisionesPorBanca($d['id']);
+                $tickets = Helper::ticketsPorBanca($d['id']);
+                $ticketsPendientes = Helper::ticketsPendientesPorBanca($d['id']);
+                $totalNeto = $ventas - ($descuentos + $premios + $comisiones);
+                $balance = Helper::saldo($d['id'], 1);
+                $caidaAcumulada = Helper::saldo($d['id'], 3);
+
+                return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
+                    'descuentos' => $descuentos, 
+                    'premios' => $premios, 
+                    'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                    'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
+            });
+
+           return view('reportes.historico', compact('controlador', 'bancas'));
+        }
+
+        
+        $datos = request()->validate([
+            'datos.idUsuario' => 'required',
+            'datos.fechaDesde' => '',
+            'datos.fechaHasta' => ''
+        ])['datos'];
+    
+        $fecha = getdate();
+  
+        if($datos['fechaDesde'] != null && $datos['fechaHasta']){
+            $fecha = getdate(strtotime($datos['fechaDesde']));
+            $fechaF = getdate(strtotime($datos['fechaHasta']));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+    
+    
+        
+    
+        $bancas = Branches::whereStatus(1)->get();
+        $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal){
+            $ventas = Helper::ventasPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $descuentos = Helper::descuentosPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $premios = Helper::premiosPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $comisiones = Helper::comisionesPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $tickets = Helper::ticketsPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $ticketsPendientes = Helper::ticketsPendientesPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $totalNeto = $ventas - ($descuentos + $premios + $comisiones);
+            $balance = Helper::saldo($d['id'], 1);
+            $caidaAcumulada = Helper::saldo($d['id'], 3);
+
+            return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
+                'descuentos' => $descuentos, 
+                'premios' => $premios, 
+                'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
+        });
+        
+      
+        
+    
+        return Response::json([
+            'bancas' => $bancas,
+            'fechaInicial' => $fechaInicial,
+            'fechaFinal' => $fechaFinal,
+            'a' => $datos['fechaDesde']
+        ], 201);
+    }
+
+
+    public function ventasporfecha()
+    {
+        $controlador = Route::getCurrentRoute()->getName();
+        
+        if(!strpos(Request::url(), '/api/')){
+            // return "<h1>Dentro reporte jugadas: $controlador </h1>";
+            $fecha = getdate();
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+            $bancas = Branches::whereStatus(1)->get();
+            $bancas = collect($bancas)->map(function($d){
+                $ventas = Helper::ventasPorBanca($d['id']);
+                $descuentos = Helper::descuentosPorBanca($d['id']);
+                $premios = Helper::premiosPorBanca($d['id']);
+                $comisiones = Helper::comisionesPorBanca($d['id']);
+                $tickets = Helper::ticketsPorBanca($d['id']);
+                $ticketsPendientes = Helper::ticketsPendientesPorBanca($d['id']);
+                $totalNeto = $ventas - ($descuentos + $premios + $comisiones);
+                $balance = Helper::saldo($d['id'], 1);
+                $caidaAcumulada = Helper::saldo($d['id'], 3);
+
+                return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
+                    'descuentos' => $descuentos, 
+                    'premios' => $premios, 
+                    'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                    'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
+            });
+
+           return view('reportes.ventasporfecha', compact('controlador', 'bancas'));
+        }
+
+        
+        $datos = request()->validate([
+            'datos.idUsuario' => 'required',
+            'datos.fechaDesde' => '',
+            'datos.fechaHasta' => ''
+        ])['datos'];
+    
+        $fecha = getdate();
+  
+        if($datos['fechaDesde'] != null && $datos['fechaHasta']){
+            $fecha = getdate(strtotime($datos['fechaDesde']));
+            $fechaF = getdate(strtotime($datos['fechaHasta']));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+    
+    
+        
+    
+        $bancas = Branches::whereStatus(1)->get();
+        $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal){
+            $ventas = Helper::ventasPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $descuentos = Helper::descuentosPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $premios = Helper::premiosPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $comisiones = Helper::comisionesPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $tickets = Helper::ticketsPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $ticketsPendientes = Helper::ticketsPendientesPorBanca($d['id'], $fechaInicial, $fechaFinal);
+            $totalNeto = $ventas - ($descuentos + $premios + $comisiones);
+            $balance = Helper::saldo($d['id'], 1);
+            $caidaAcumulada = Helper::saldo($d['id'], 3);
+
+            return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
+                'descuentos' => $descuentos, 
+                'premios' => $premios, 
+                'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
+        });
+        
+      
+        
+    
+        return Response::json([
+            'bancas' => $bancas,
+            'fechaInicial' => $fechaInicial,
+            'fechaFinal' => $fechaFinal,
+            'a' => $datos['fechaDesde']
+        ], 201);
+    }
+
     public function ventas()
     {
         $datos = request()->validate([
@@ -360,7 +528,7 @@ class ReportesController extends Controller
                 }
             }
 
-            $balanceHastaLaFecha = (new Helper)->saldo($datos['idBanca'], true);
+            $balanceHastaLaFecha = (new Helper)->saldo($datos['idBanca'], 1);
             $comisiones = 0;
             $neto = $ventas -  ($premios + $descuentos + $comisionesMonto);
 

@@ -29,6 +29,8 @@ class Kernel extends ConsoleKernel
                  ->everyMinute();
         $schedule->command('transacciones:sorteos')
                  ->everyMinute();
+        $schedule->command('transacciones:caidaAcumulada')
+                 ->everyMinute();
         $schedule->command('prueba:a')
                  ->everyMinute();
                 //  ->hourly();

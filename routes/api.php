@@ -100,6 +100,8 @@ Route::post('/bloqueos/loterias/buscar', 'BlockslotteriesController@buscar');
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/ventas/', 'ReportesController@ventas');
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
+Route::post('/reportes/historico/', 'ReportesController@historico');
+Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
 
 
 Route::get('/entidades', 'EntityController@index');

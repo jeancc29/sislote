@@ -42,11 +42,11 @@ class BranchesResource extends JsonResource
             'pagosCombinaciones' => $this->pagosCombinaciones,
             'comisiones' => $this->comisiones,
             'gastos' => AutomaticexpensesResource::collection($this->gastos),
-            'ventasDelDia' => Helper::ventasDelDia($this->id),
-            'descuentosDelDia' => Helper::descuentosDelDia($this->id),
-            'premiosDelDia' => Helper::premiosDelDia($this->id),
+            'ventasDelDia' => Helper::ventasPorBanca($this->id),
+            'descuentosDelDia' => Helper::descuentosPorBanca($this->id),
+            'premiosDelDia' => Helper::premiosPorBanca($this->id),
             'comisionesDelDia' => Helper::comisionesPorBanca($this->id),
-            'ticketsDelDia' => Helper::ticketsDelDia($this->id)
+            'ticketsDelDia' => Helper::ticketsPorBanca($this->id)
         ];
     }
 }

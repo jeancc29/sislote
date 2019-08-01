@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -202,8 +202,8 @@ myApp
 
                     console.log("entro: ");
                     
-                    $scope.datos.entidad1_saldo_final = $scope.datos.entidad1_saldo_inicial + Math.abs($scope.datos.debito);
-                    $scope.datos.entidad2_saldo_final = $scope.datos.entidad2_saldo_inicial - Math.abs($scope.datos.debito);
+                    $scope.datos.entidad1_saldo_final = helperService.redondear($scope.datos.entidad1_saldo_inicial + Math.abs($scope.datos.debito));
+                    $scope.datos.entidad2_saldo_final = helperService.redondear($scope.datos.entidad2_saldo_inicial - Math.abs($scope.datos.debito));
                 }else{
                     $scope.datos.debito = 0;
                     $scope.datos.entidad1_saldo_final = 0;
@@ -211,8 +211,8 @@ myApp
                 }
             }else{
                 if(!$scope.empty($scope.datos.credito, 'number')){
-                    $scope.datos.entidad1_saldo_final = $scope.datos.entidad1_saldo_inicial - Math.abs($scope.datos.credito);
-                    $scope.datos.entidad2_saldo_final = $scope.datos.entidad2_saldo_inicial + Math.abs($scope.datos.credito);
+                    $scope.datos.entidad1_saldo_final = helperService.redondear($scope.datos.entidad1_saldo_inicial - Math.abs($scope.datos.credito));
+                    $scope.datos.entidad2_saldo_final = helperService.redondear($scope.datos.entidad2_saldo_inicial + Math.abs($scope.datos.credito));
                 }else if($scope.datos.credito == 0){
                     $scope.datos.credito = 0;
                     $scope.datos.entidad1_saldo_final = 0;
@@ -272,6 +272,8 @@ myApp
             limpiar();
             
         }
+
+
 
         $scope.removeTransaction = function(index){
             

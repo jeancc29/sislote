@@ -60,4 +60,21 @@ myApp.service('helperService', function(){
 
         return indexRetornar;
     }
+
+    this.redondear = function(numero, decimales = 2, usarComa = false){
+        var opciones = {
+            maximumFractionDigits: decimales,
+            useGrouping: false
+        };
+
+        try{
+            numero = Intl.NumberFormat(usarComa, opciones).format(numero);
+            numero = parseFloat(numero);
+        }catch(e){
+            console.log(e);
+            numero = 0;
+        }
+
+        return numero;
+    }
 });

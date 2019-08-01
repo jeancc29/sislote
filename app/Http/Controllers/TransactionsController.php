@@ -122,37 +122,42 @@ class TransactionsController extends Controller
 
         $saldo_inicial = 0;
 
-        if($datos["es_banca"] == 1){
-            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-            $debito = transactions::where(
-                [
-                    'idEntidad1'=> $datos["id"], 
-                    'idTipoEntidad1' => $idTipoEntidad1->id, 
-                    'status' => 1
-                ])->sum('debito');
-            $credito =  transactions::where(
-                [
-                    'idEntidad1'=> $datos["id"], 
-                    'idTipoEntidad1' => $idTipoEntidad1->id, 
-                    'status' => 1
-                ])->sum('credito');
-            $saldo_inicial = $debito - $credito;
-        }else{
-            $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
-            $debito = transactions::where(
-                [
-                    'idEntidad2'=> $datos["id"],
-                    'idTipoEntidad2' => $idTipoEntidad2->id,  
-                    'status' => 1
-                ])->sum('debito');
-            $credito = transactions::where(
-                [
-                    'idEntidad2'=> $datos["id"],
-                    'idTipoEntidad2' => $idTipoEntidad2->id,  
-                    'status' => 1
-                ])->sum('credito');
-            $saldo_inicial = $credito - $debito;
-        }
+        // if($datos["es_banca"] == 1){
+        //     $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+        //     $debito = transactions::where(
+        //         [
+        //             'idEntidad1'=> $datos["id"], 
+        //             'idTipoEntidad1' => $idTipoEntidad1->id, 
+        //             'status' => 1
+        //         ])->sum('debito');
+        //     $credito =  transactions::where(
+        //         [
+        //             'idEntidad1'=> $datos["id"], 
+        //             'idTipoEntidad1' => $idTipoEntidad1->id, 
+        //             'status' => 1
+        //         ])->sum('credito');
+        //     $saldo_inicial = $debito - $credito;
+        // }else{
+        //     $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+        //     $debito = transactions::where(
+        //         [
+        //             'idEntidad2'=> $datos["id"],
+        //             'idTipoEntidad2' => $idTipoEntidad2->id,  
+        //             'status' => 1
+        //         ])->sum('debito');
+        //     $credito = transactions::where(
+        //         [
+        //             'idEntidad2'=> $datos["id"],
+        //             'idTipoEntidad2' => $idTipoEntidad2->id,  
+        //             'status' => 1
+        //         ])->sum('credito');
+        //     $saldo_inicial = $credito - $debito;
+        // }
+
+        if($datos["es_banca"] == 1)
+            $saldo_inicial = Helper::saldo($datos["id"], 1);
+        else
+            $saldo_inicial = Helper::saldo($datos["id"], 2);
 
         return Response::json([
             'saldo_inicial' => $saldo_inicial,

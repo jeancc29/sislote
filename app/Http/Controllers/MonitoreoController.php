@@ -362,7 +362,7 @@ class MonitoreoController extends Controller
                 }
             }
 
-            $balanceHastaLaFecha = (new Helper)->saldo($datos['idBanca'], true);
+            $balanceHastaLaFecha = (new Helper)->saldo($datos['idBanca'], 1);
             $comisiones = 0;
             $neto = $ventas -  ($premios + $descuentos + $comisionesMonto);
 

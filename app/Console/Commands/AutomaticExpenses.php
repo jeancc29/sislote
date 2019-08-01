@@ -77,8 +77,8 @@ class AutomaticExpenses extends Command
         
 
         // $saldo = (new Helper)->_sendSms("+18294266800", "Hola jean como estas");
-        $this->info($fecha->hour);
-        return;
+        // $this->info($fecha->hour);
+        // return;
        
         if($usuario == null || $tipo == null)
             return;
@@ -104,7 +104,7 @@ class AutomaticExpenses extends Command
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], true);
+                            $saldo = (new Helper)->saldo($b['id'], 1);
                             $t = transactions::create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
@@ -141,7 +141,7 @@ class AutomaticExpenses extends Command
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], true);
+                            $saldo = (new Helper)->saldo($b['id'], 1);
                             $t = transactions::create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
@@ -175,7 +175,7 @@ class AutomaticExpenses extends Command
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], true);
+                            $saldo = (new Helper)->saldo($b['id'], 1);
                             $t = transactions::create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
@@ -209,7 +209,7 @@ class AutomaticExpenses extends Command
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], true);
+                            $saldo = (new Helper)->saldo($b['id'], 1);
                             $t = transactions::create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
@@ -243,7 +243,7 @@ class AutomaticExpenses extends Command
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], true);
+                            $saldo = (new Helper)->saldo($b['id'], 1);
                             $t = transactions::create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
