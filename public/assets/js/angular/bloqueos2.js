@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -211,8 +211,8 @@ myApp
                 "fechaHasta" : new Date(),
             },
             'buscar' : {
-                "dias" : null,
-                "bancas" : null,
+                "dias" : [],
+                "bancas" : [],
                 "fechaDesde" : new Date(),
                 "fechaHasta" : new Date(),
             },
@@ -716,6 +716,14 @@ myApp
 
 
         $scope.buscar = function(){
+            if(helperService.empty($scope.datos.buscar.dias, 'object') == true){
+                alert("Debe seleccionar los dias");
+                return;
+            }
+            if(helperService.empty($scope.datos.buscar.bancas, 'object') == true){
+                alert("Debe seleccionar las bancas");
+                return;
+            }
             $scope.datos.buscar.idUsuario = idUsuario;
             $http.post(rutaGlobal+"/api/bloqueos/loterias/buscar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.buscar})
              .then(function(response){

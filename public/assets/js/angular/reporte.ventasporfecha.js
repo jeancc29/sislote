@@ -18,8 +18,9 @@ myApp
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
         $scope.datos =  {
-            "descripcionBanca" : null,
+            "fechaFiltro" : null,
             "accionBusqueda" : "todos",
+            "bancas" : null,
             "idVenta":0,
         "idBanca" : null,
         "idLoteria" : null,
@@ -70,10 +71,11 @@ myApp
             
            //console.log('bancasGlobal', bancasGlobal);
             
-            $scope.datos.bancas = bancasGlobal;
-            $scope.datos.optionsBancas = bancasGlobal;
+            $scope.datos.objetoBancas = bancasGlobal;
+            $scope.datos.optionsBancas = helperService.copiarObjecto(bancasGlobal);
             $scope.datos.optionsSorteos = sorteosGlobal;
             
+            $scope.datos.ventas = vGlobal;
 
             $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
 
@@ -206,14 +208,26 @@ myApp
             $scope.datos.layout = 'Principal';
 
 
-            
+            if(Object.keys($scope.datos.selectedBancas).length > 0){
+                $scope.datos.bancas = null;
+                $scope.datos.selectedBancas.forEach(function(valor, indice, array){
+
+                    if(array[indice].descripcion != "N/A"){
+                        if($scope.datos.bancas == null){
+                            $scope.datos.bancas = [];
+                        }
+                        $scope.datos.bancas.push(array[indice]);
+                    }
+    
+                });
+            }
 
           $http.post(rutaGlobal+"/api/reportes/ventasporfecha", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
              .then(function(response){
                 console.log('monitoreo ',response);
                 // if(response.data.errores == 0){
 
-                    $scope.datos.bancas = response.data.bancas;
+                    $scope.datos.ventas = response.data.ventas;
                     
                 // }else{
                 //     alert(response.data.mensaje);
@@ -225,7 +239,7 @@ myApp
         }
 
         $scope.totalesParaFiltros = function(){
-            $scope.datos.bancas.forEach(function(valor, indice, array){
+            $scope.datos.objetoBancas.forEach(function(valor, indice, array){
 
                 $scope.datos.total_todos ++;
                 if(array[indice].ventas > 0) $scope.datos.total_con_ventas ++;
@@ -268,30 +282,50 @@ myApp
             
             return function(item){
                 console.log('greaterThan:');
-                if(helperService.empty($scope.datos.descripcionBanca, 'string') == true){
-                    if($scope.datos.accionBusqueda == "con premios")
-                    return item['premios'] > 0;
-                    else if($scope.datos.accionBusqueda == "con ventas")
-                        return item['ventas'] > 0;
-                    else if($scope.datos.accionBusqueda == "con tickets pendientes")
-                        return item['ticketsPendientes'] > 0;
-                    else
+                if(helperService.empty($scope.datos.fechaFiltro, 'string') == true){
                         return true;
                 }else{
-                    if($scope.datos.accionBusqueda == "con premios")
-                        return item['premios'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
-                    else if($scope.datos.accionBusqueda == "con ventas" )
-                        return item['ventas'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
-                    else if($scope.datos.accionBusqueda == "con tickets pendientes")
-                        return item['ticketsPendientes'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
-                    else
-                        return item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        return item['fecha'].indexOf($scope.datos.fechaFiltro.toUpperCase()) != -1;
                 }
                 
             }
         }
 
 
+        $scope.seleccionarTodasLasBancas = function(){
+            $scope.datos.selectedBancas = [];
+            if($('#labelSeleccionarTodas').hasClass('active2')){
+                $('#labelSeleccionarTodas').removeClass('active2');
+                $timeout(function() {
+                    $('#multiselect').selectpicker('val', [])
+                  });
+            }
+            else{
+                $('#labelSeleccionarTodas').addClass('active2');
+                var arregloIdBancas = [];
+                $scope.datos.bancas = [];
+                
+                $scope.datos.optionsBancas.forEach(function(valor, indice, array){
+
+                    if(array[indice].descripcion != "N/A"){
+                        $scope.datos.bancas.push(array[indice]);
+                        arregloIdBancas.push(array[indice].id);
+                    }
+                    
+                  
+                });
+
+
+                console.log("seleccionarToas: ", arregloIdBancas);
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    ////Aqui se seleccionan las loterias
+                    // $('#multiselect').selectpicker('val', arregloIdBancas);
+                    // $('#multiselect').selectpicker("refresh");
+                    $('#multiselect').selectpicker('val', arregloIdBancas)
+                  })
+            }
+        }
 
 
 

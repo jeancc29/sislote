@@ -21,6 +21,7 @@ class CreateSalesdetailsTable extends Migration
             $table->string('jugada', 6);
             $table->decimal('monto', 20, 2);
             $table->decimal('premio', 20, 2);
+            $table->decimal('comision', 20, 2);
             $table->integer('status')->default(0);
             $table->timestamps();
 

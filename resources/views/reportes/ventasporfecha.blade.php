@@ -57,7 +57,7 @@
       <div class="card " style="min-height: 1000px;">
         <div class="card-header card-header-info card-header-text">
           <div class="card-text">
-            <h4 class="card-title">Monitoreo de tickets</h4>
+            <h4 class="card-title">Ventas por fecha</h4>
           </div>
         </div>
         <div class="card-body ">
@@ -91,18 +91,54 @@
                                 </style>
                                 <!-- <div  class="col-9"> -->
                                   <select 
-                                  id="multiselectDias"
-                                  ng-model="datos.selectedBanca"
+                                  ng-model="datos.selectedBancas"
                                       ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
                                       class="selectpicker w-100" 
                                       data-style="select-with-transition" 
                                        title="Seleccionar dias"
                                        multiple
+                                       id="multiselect"
                                       data-size="7" aria-setsize="2">
                                   </select>
                               <!-- </div> -->
                             </div> <!-- END INPUT GROUP -->
                           </div>
+
+                          <div class="col-2 text-center mt-4">
+                          <style>
+                                  .btn-outline-info.active2{
+                                    background-color: #00bcd4!important;
+                                    color: #fff!important;
+                                  }
+
+                                  .btn-group-toggle > .btn,
+                                    .btn-group-toggle2 > .btn-group > .btn {
+                                    margin-bottom: 0;
+                                    }
+
+                                    .btn-group-toggle2 > .btn input[type="radio"],
+                                    .btn-group-toggle2 > .btn input[type="checkbox"],
+                                    .btn-group-toggle2 > .btn-group > .btn input[type="radio"],
+                                    .btn-group-toggle2 > .btn-group > .btn input[type="checkbox"] {
+                                    position: absolute;
+                                    clip: rect(0, 0, 0, 0);
+                                    pointer-events: none;
+                                    }
+
+                                </style>
+                                <div class="btn-group btn-group-sm  btn-group-not">
+                                    <button 
+                                    ng-click="seleccionarTodasLasBancas()" id="labelSeleccionarTodas"
+                                    id="btnLoteria@{{$index}}"
+                                    type="button" 
+                                    class="btn btn-outline-info">Seleccionar todas</button>
+                                    <!-- <button type="button" class="btn btn-outline-info">6</button>
+                                    <button type="button" class="btn btn-outline-info">7</button> -->
+                                </div>
+
+                                      <!-- ng-init="rbxLoteriasChanged(l, $first)" -->
+                               
+                              </div><!-- END COL-12 -->
 
 
                       
@@ -114,24 +150,14 @@
                         </div> <!-- END ROW -->
                     </div>
 
-                    <div class="col-12">
-                      <div class="row justify-content-first">
-                          <div class="btn-group" role="group" aria-label="Basic example">
-                              <button ng-class="{'active': (datos.accionBusqueda == 'todos')}" ng-click="cambiarAccionBusqueda('todos')" type="button" class="btn btn-info">Todos</button>
-                              <button ng-class="{'active': (datos.accionBusqueda == 'con ventas')}" ng-click="cambiarAccionBusqueda('con ventas')" type="button" class="btn btn-info">Con ventas</button>
-                              <button ng-class="{'active': (datos.accionBusqueda == 'con premios')}" ng-click="cambiarAccionBusqueda('con premios')" type="button" class="btn btn-info">Con premios</button>
-                              <button ng-class="{'active': (datos.accionBusqueda == 'con tickets pendientes')}" ng-click="cambiarAccionBusqueda('con tickets pendientes')" type="button" class="btn btn-info">Con tickets pendientes</button>
-
-                          </div>
-                      </div>
-                    </div>
+           
 
                     <div class="col-12">
                        <div class="row">
                        <div class="col-sm-3">
                             <div class="form-group">
                             <label for="numeroTicketBusqueda" class="bmd-label-floating">Filtrar</label>
-                            <input ng-keyup="inputDescripcionBancaKeyUp()" ng-model="datos.descripcionBanca" id="numeroTicketBusqueda" type="text" class="form-control" required>
+                            <input ng-keyup="inputDescripcionBancaKeyUp()" ng-model="datos.fechaFiltro" id="numeroTicketBusqueda" type="text" class="form-control">
                             </div>
                         </div>
                        </div>
@@ -142,36 +168,28 @@
                     <table class="table table-sm table-striped" ng-init="mostrarVentanaTicket = false">
                         <thead>
                             <tr>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Banca</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Codigo</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Fecha</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Ventas</th>
                             <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Cerrado</th> -->
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Tickets</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Venta</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Premios</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Comisiones</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Descuentos</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Premios</th>
+                            
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Neto</th>
-                            <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Caida</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Final</th> -->
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Caida acumulada</th>
+                            
 
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr   ng-repeat="c in datos.bancas | filter:greaterThan(datos.accionBusqueda)">
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descripcion}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.codigo}}</td>
-                                <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.tickets}}</td>
+                            <tr   ng-repeat="c in datos.ventas | filter:greaterThan(datos.accionBusqueda)">
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.fecha}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.ventas}}</td>
+                                <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.premios}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.comisiones}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descuentos}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.premios}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balance}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.caidaAcumulada >= 0), 'bg-mal text-mal': (c.caidaAcumulada < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.caidaAcumulada}}</td>
                             </tr>
                             
                         </tbody>

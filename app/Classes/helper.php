@@ -721,6 +721,121 @@ class Helper{
         return round($comisionesMonto, 2);
     }
 
+
+    static function cambiarComisionesATickets($idBanca, $fechaInicial = null, $fechaFinal = null){
+        if($fechaInicial == null && $fechaFinal == null){
+            $fecha = getdate();
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+
+        
+        $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
+        $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
+            return $id->id;
+        });
+            $datosComisiones = Commissions::where('idBanca', $idBanca)->get();
+            
+            foreach($datosComisiones as $d){
+                $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                if($loteria == null)
+                    continue;
+
+                
+
+                if($d['directo'] >= 0){
+                    $sorteo = Draws::whereDescripcion('Directo')->first();
+                    if($sorteo != null){
+
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['directo'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                      
+                    }
+                }
+
+                if($d['pale'] >= 0){
+                    $sorteo = Draws::whereDescripcion('Pale')->first();
+                    if($sorteo != null && $loteria->sorteoExiste($sorteo->id) == true){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['pale'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+                if($d['tripleta'] > 0){
+                    $sorteo = Draws::whereDescripcion('Tripleta')->first();
+                    if($sorteo != null){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['tripleta'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+                if($d['superPale'] >= 0){
+                    $sorteo = Draws::whereDescripcion('Super pale')->first();
+                    if($sorteo != null){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['superPale'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+                if($d['pick3Straight'] >= 0){
+                    $sorteo = Draws::whereDescripcion('Pick 3 Straight')->first();
+                    if($sorteo != null){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['pick3Straight'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+                if($d['pick3Box'] > 0){
+                    $sorteo = Draws::whereDescripcion('Pick 3 Box')->first();
+                    if($sorteo != null){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['pick3Box'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+                if($d['pick4Straight'] >= 0){
+                    $sorteo = Draws::whereDescripcion('Pick 4 Straight')->first();
+                    if($sorteo != null){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['pick4Straight'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+                if($d['pick4Box'] > 0){
+                    $sorteo = Draws::whereDescripcion('Pick 4 Box')->first();
+                    if($sorteo != null){
+                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        foreach($Salesdetails as $s){
+                            $s['comision'] = ($d['pick4Box'] / 100) * $s['monto'];
+                            $s->save();
+                        }
+                    }
+                }
+
+            }
+    }
+
     static function comisionesPorLoteria($idBanca, $fechaInicial = null, $fechaFinal = null){
       
         if($fechaInicial == null and $fechaFinal == null){
@@ -856,6 +971,61 @@ class Helper{
                         return ['id' => $d->id, 'descripcion' => $d->descripcion, 'comisiones' => round($comisionesMonto, 2), 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
                     });
             return $loterias;
+    }
+
+
+
+    static function comision($idBanca, $idLoteria, $idSorteo, $monto){
+      
+        $comision = 0;
+       
+        $datosComisiones = Commissions::where(['idBanca' => $idBanca, 'idLoteria' => $idLoteria])->first();
+        $sorteo = Draws::whereId($idSorteo)->first();
+        if($sorteo == null)
+            return 0;
+
+        if($sorteo->descripcion == "Directo"){
+            if($datosComisiones['directo'] > 0){
+                $comision = ($datosComisiones['directo'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Pale"){
+            if($datosComisiones['pale'] > 0){
+                $comision = ($datosComisiones['pale'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Tripleta"){
+            if($datosComisiones['tripleta'] > 0){
+                $comision = ($datosComisiones['tripleta'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Super pale"){
+            if($datosComisiones['superPale'] > 0){
+                $comision = ($datosComisiones['superPale'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Pick 3 Straight"){
+            if($datosComisiones['pick3Straight'] > 0){
+                $comision = ($datosComisiones['pick3Straight'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Pick 3 Box"){
+            if($datosComisiones['pick3Box'] > 0){
+                $comision = ($datosComisiones['pick3Box'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Pick 4 Straight"){
+            if($datosComisiones['pick4Straight'] > 0){
+                $comision = ($datosComisiones['pick4Straight'] / 100) * $monto;
+            }
+        }
+        else if($sorteo->descripcion == "Pick 4 Box"){
+            if($datosComisiones['pick4Box'] > 0){
+                $comision = ($datosComisiones['pick4Box'] / 100) * $monto;
+            }
+        }
+        
+        return $comision;
     }
 
 }

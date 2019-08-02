@@ -1333,7 +1333,7 @@
         <div class="card-body ">
           <div class="row justify-content-end">
             <!-- .abrir-wizard la uso en el archivo demo.js para obtener los datos reales del wizard al momento de quitarle el display none -->
-            <a ng-click="editar(true, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva loteria</a>
+            <a ng-click="editar(1, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva loteria</a>
           </div>
           <table class="table table-sm">
             <thead>
@@ -1350,8 +1350,9 @@
                 <td>@{{l.descripcion}}</td>
                 <td>@{{l.codigo}}</td>
                 <td>
-                  <a style="cursor: pointer" ng-click="editar(false, l)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
-                  <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
+                  <a style="cursor: pointer" ng-click="editar(2, l)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                  <a style="cursor: pointer" ng-click="editar(3, l)" class="ion-edit d-inline bg-success py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">file_copy</i></a>
+                  <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline   bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
                 </td>
               </tr>
              

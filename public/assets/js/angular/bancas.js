@@ -297,7 +297,10 @@ myApp
                     array[indice].pagosCombinaciones.pick412Way = null;
                     array[indice].pagosCombinaciones.pick424Way = null;
 
-                    array[indice].existe = true;
+                    if(array[indice].id == 0)
+                        array[indice].existe = false;
+                    else
+                        array[indice].existe = true;
 
                     // $scope.datos.loterias.push(array[indice]);
                     // $scope.datos.ckbLoterias.push(array[indice]);
@@ -392,7 +395,7 @@ myApp
             $scope.datos.ckbLoterias = $scope.datos.ckbLoteriasGuardar;
             $scope.datos.gastos = [];
 
-            if(esNuevo){
+            if(esNuevo == 1){
                 $scope.inicializarDatos(true);
                 $scope.datos.gastos = [];
 
@@ -423,7 +426,7 @@ myApp
                  $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0]);
                  $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0]);
             }
-            else{
+            else if(esNuevo == 2){
                 //$scope.inicializarDatos();
                 //$scope.datos.mostrarFormEditar = true;
 
@@ -431,6 +434,190 @@ myApp
 
 
                 $scope.datos.id = d.id;
+                $scope.datos.descripcion = d.descripcion;
+                $scope.datos.codigo = d.codigo;
+                $scope.datos.ip = d.ip;
+                $scope.datos.dueno = d.dueno;
+                $scope.datos.localidad = d.localidad;
+                $scope.datos.porcentajeCaida = d.porcentajeCaida;
+                $scope.datos.balanceDesactivacion = d.balanceDesactivacion;
+                $scope.datos.limiteVenta = d.limiteVenta;
+                $scope.datos.descontar = d.descontar;
+                $scope.datos.deCada = d.deCada;
+                $scope.datos.minutosCancelarTicket = d.minutosCancelarTicket;
+                $scope.datos.piepagina1 = d.piepagina1;
+                $scope.datos.piepagina2 = d.piepagina2;
+                $scope.datos.piepagina3 = d.piepagina3;
+                $scope.datos.piepagina4 = d.piepagina4;
+                $scope.datos.estado = (d.status == 1) ? true : false;
+
+                
+                
+                $scope.datos.lunes.apertura = d.dias[0].pivot.horaApertura;
+                $scope.datos.lunes.cierre = d.dias[0].pivot.horaCierre;
+                $scope.datos.martes.apertura = d.dias[1].pivot.horaApertura;
+                $scope.datos.martes.cierre = d.dias[1].pivot.horaCierre;
+                $scope.datos.miercoles.apertura = d.dias[2].pivot.horaApertura;
+                $scope.datos.miercoles.cierre = d.dias[2].pivot.horaCierre;
+                $scope.datos.jueves.apertura = d.dias[3].pivot.horaApertura;
+                $scope.datos.jueves.cierre = d.dias[3].pivot.horaCierre;
+                $scope.datos.viernes.apertura = d.dias[4].pivot.horaApertura;
+                $scope.datos.viernes.cierre = d.dias[4].pivot.horaCierre;
+                $scope.datos.sabado.apertura = d.dias[5].pivot.horaApertura;
+                $scope.datos.sabado.cierre = d.dias[5].pivot.horaCierre;
+                $scope.datos.domingo.apertura = d.dias[6].pivot.horaApertura;
+                $scope.datos.domingo.cierre = d.dias[6].pivot.horaCierre;
+                
+
+                $scope.datos.ckbLoterias.forEach(function(valor, indice, array){
+
+                    array[indice].existe = false;
+
+                 });
+
+
+                 $scope.datos.loteriasSeleccionadas = [];
+                 $scope.datos.comisiones.loterias = $scope.datos.loteriasSeleccionadas;
+                 $scope.datos.pagosCombinaciones.loterias = $scope.datos.loteriasSeleccionadas;
+                 if(d.loterias != undefined){
+
+                    console.log('editar bancas, loterias: ', d.loterias);
+                    
+
+                    d.loterias.forEach(function(valor, indice, array){
+
+                        if($scope.datos.ckbLoterias.find(x => x.id == array[indice].id) != undefined){
+                            let idx = $scope.datos.ckbLoterias.findIndex(x => x.id == parseInt(array[indice].id));
+                            $scope.datos.ckbLoterias[idx].existe = true;
+                            $scope.datos.loteriasSeleccionadas.push($scope.datos.ckbLoterias[idx]);
+                        }else{
+                            $scope.datos.ckbLoterias[idx].existe = false;
+                        }
+
+                     });
+                }
+
+                // $scope.datos.loteriasSeleccionadas.forEach(function(valor, indice, array){
+                //     if($scope.datos.comisiones.loterias.find(x => x.id == array[indice].idLoteria) == undefined){
+                //         $scope.datos.comisiones.loterias.push(array[indice]);
+                //     }
+                //     if($scope.datos.pagosCombinaciones.loterias.find(x => x.id == array[indice].idLoteria) == undefined){
+                //         $scope.datos.pagosCombinaciones.loterias.push(array[indice]);
+                //     }
+                // });
+
+                $scope.datos.comisiones.loterias = [];
+                d.comisiones.forEach(function(valor, indice, array){
+                    if($scope.datos.ckbLoterias.find(x => x.id == array[indice].idLoteria) != undefined){
+                        let idx = $scope.datos.ckbLoterias.findIndex(x => x.id == parseInt(array[indice].idLoteria));
+                        if($scope.datos.ckbLoterias[idx].existe && $scope.datos.ckbLoterias[idx].descripcion != "COPIAR A TODAS"){
+                            console.log('comision existe');
+                            $scope.datos.ckbLoterias[idx].comisiones.directo = array[indice].directo;
+                            $scope.datos.ckbLoterias[idx].comisiones.pale = array[indice].pale;
+                            $scope.datos.ckbLoterias[idx].comisiones.tripleta = array[indice].tripleta;
+                            $scope.datos.ckbLoterias[idx].comisiones.superPale = array[indice].superPale;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Straight = array[indice].pick3Straight;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Box = array[indice].pick3Box;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Straight = array[indice].pick4Straight;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Box = array[indice].pick4Box;
+
+                            $scope.datos.comisiones.loterias.push($scope.datos.ckbLoterias[idx]);
+                        }else{
+                            console.log('comision noo existe');
+                            $scope.datos.ckbLoterias[idx].comisiones.directo = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.pale = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.tripleta = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.superPale = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Straight = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick3Box = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Straight = null;
+                            $scope.datos.ckbLoterias[idx].comisiones.pick4Box = null;
+                        }
+                    }
+
+                });
+                $scope.datos.comisiones.selectedLoteria = $scope.datos.comisiones.loterias[0];
+
+                $scope.datos.pagosCombinaciones.loterias = [];
+                d.pagosCombinaciones.forEach(function(valor, indice, array){
+
+                    if($scope.datos.ckbLoterias.find(x => x.id == array[indice].idLoteria) != undefined){
+                        let idx = $scope.datos.ckbLoterias.findIndex(x => x.id == parseInt(array[indice].idLoteria));
+                        if($scope.datos.ckbLoterias[idx].existe && $scope.datos.ckbLoterias[idx].descripcion != "COPIAR A TODAS"){
+                            console.log('pagosCombinaciones existe');
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primera = array[indice].primera;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.segunda = array[indice].segunda;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.tercera = array[indice].tercera;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primeraSegunda = array[indice].primeraSegunda;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primeraTercera = array[indice].primeraTercera;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.segundaTercera = array[indice].segundaTercera;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.tresNumeros = array[indice].tresNumeros;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.dosNumeros = array[indice].dosNumeros;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primerPago = array[indice].primerPago;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick3TodosEnSecuencia = array[indice].pick3TodosEnSecuencia;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick33Way = array[indice].pick33Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick36Way = array[indice].pick36Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick4TodosEnSecuencia = array[indice].pick4TodosEnSecuencia;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick44Way = array[indice].pick44Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick46Way = array[indice].pick46Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick412Way = array[indice].pick412Way;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick424Way = array[indice].pick424Way;
+
+                            $scope.datos.pagosCombinaciones.loterias.push($scope.datos.ckbLoterias[idx]);
+                        }else{
+                            console.log('pagosCombinaciones noo existe');
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primera = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.segunda = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.tercera = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primeraSegunda = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primeraTercera = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.segundaTercera = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.tresNumeros = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.dosNumeros = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.primerPago = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick3TodosEnSecuencia = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick33Way = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick36Way = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick4TodosEnSecuencia = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick44Way = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick46Way = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick412Way = null;
+                            $scope.datos.ckbLoterias[idx].pagosCombinaciones.pick424Way = null;
+                        }
+                    }
+
+                });
+                $scope.datos.pagosCombinaciones.selectedLoteria = $scope.datos.pagosCombinaciones.loterias[0];
+
+                //console.log('comisiones: ', $scope.datos.comisiones.loterias, ' pagos: ', $scope.datos.pagosCombinaciones.loterias);
+
+                idx = $scope.datos.optionsUsuarios.findIndex(x => x.id == d.idUsuario);
+                $scope.datos.selectedUsuario = $scope.datos.optionsUsuarios[idx];
+
+
+
+                $scope.datos.gastos = d.gastos;
+
+                //console.log('editar, idx: ', idx, ' usuario: ', $scope.datos.selectedUsuario);
+                // $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0], false);
+                // $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0], false);
+                $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0]);
+                $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0]);
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    $('.selectpicker').selectpicker("refresh");
+                  });
+            }
+
+            else if(esNuevo == 3){
+                //$scope.inicializarDatos();
+                //$scope.datos.mostrarFormEditar = true;
+
+                $('.form-group').addClass('is-filled');
+
+
+                //Como estoy clonando el id tiene que ser igual a null
+                $scope.datos.id = 0;
                 $scope.datos.descripcion = d.descripcion;
                 $scope.datos.codigo = d.codigo;
                 $scope.datos.ip = d.ip;
@@ -804,12 +991,12 @@ myApp
                 }
                 
             }
-            ,
-            function(response) {
-                // Handle error here
-                console.log('Error jean: ', response);
-                alert("Error");
-            }
+            // ,
+            // function(response) {
+            //     // Handle error here
+            //     console.log('Error jean: ', response);
+            //     alert("Error");
+            // }
             );
         
 

@@ -81,8 +81,8 @@ class BlockslotteriesController extends Controller
 
         $dias = Days::whereIn('id', $idDias)->get();
         //COLLECT DIAS
-        $dias = collect($dias)->map(function($d){
-            $bancas = BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', [1,2])->get());
+        $dias = collect($dias)->map(function($d) use($idBancas){
+            $bancas = BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', $idBancas)->get());
             //COLLECT BANCAS
             $bancas = collect($bancas)->map(function($b) use($d){
                 //COLLECT LOTERIAS

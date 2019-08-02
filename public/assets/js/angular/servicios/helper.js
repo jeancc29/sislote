@@ -77,4 +77,9 @@ myApp.service('helperService', function(){
 
         return numero;
     }
+
+    this.copiarObjecto = function(objeto){
+        //JSON.parse(JSON.stringify(objeto)) esto retorna una copia exacta de un objeto
+        return JSON.parse(JSON.stringify(objeto));
+    }
 });

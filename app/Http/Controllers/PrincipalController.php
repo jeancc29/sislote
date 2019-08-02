@@ -876,7 +876,8 @@ class PrincipalController extends Controller
              'jugada' => $d['jugada'],
              'monto' => $d['monto'],
              'premio' => 0,
-             'monto' => $d['monto']
+             'monto' => $d['monto'],
+             'comision' => Helper::comision($datos['idBanca'], $d['idLoteria'], $idSorteo, $d['monto'])
          ]);
 
          

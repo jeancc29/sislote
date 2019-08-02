@@ -73,6 +73,7 @@ if($controlador != "login"){
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
     window.loteriasGlobal = <?php if(isset($loterias)) echo $loterias; else echo 'null'; ?>;
     window.sorteosGlobal = <?php if(isset($sorteos)) echo $sorteos; else echo 'null'; ?>;
+    window.vGlobal = <?php if(isset($ventas)) echo $ventas; else echo 'null'; ?>;
     window.loteriasPremiosModelGlobal = <?php if(isset($loteriasPremiosModal)) echo $loteriasPremiosModal; else echo 'null'; ?>;
 
     console.log('header:', bancasGlobal);
@@ -259,7 +260,7 @@ if($controlador != "login"){
     display: block;
 }
 
-.btn-group {
+div:not(.btn-group-not).btn-group {
   display: flex;
   overflow: scroll;
 }
@@ -1275,12 +1276,12 @@ if(session('idUsuario') == null && $controlador != 'login'){
                             </a>
                         </li>
 
-                        <li class="nav-item ">
+                        <!-- <li class="nav-item ">
                             <a class="nav-link" href="">
                               <span class="sidebar-mini"> J </span>
                               <span class="sidebar-normal"> Jugadas </span>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
             </li>

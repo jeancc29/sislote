@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Salesdetails extends Model
 {
     protected $fillable = [
-        'idLoteria', 'idSorteo', 'premio', 'monto', 'jugada', 'status', 'idVenta',
+        'idLoteria', 'idSorteo', 'premio', 'monto', 'jugada', 'status', 'idVenta', 'comision'
     ];
 
     public static function loterias()
