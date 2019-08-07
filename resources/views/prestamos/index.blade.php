@@ -89,6 +89,7 @@
                 <form novalidate>
 
                   <div class="col-12 col-sm-10">
+                  <div class="row">
                     <div class="input-group form-control-lg">
                       <div class="input-group-prepend">
                         <span class="input-group-text">
@@ -100,6 +101,42 @@
                         <input ng-model="datos.descripcion" class="form-control" id="descripcion" name="descripcion">
                       </div>
                     </div>
+
+                    <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Prestar a entidad</label>                              
+
+                                <div  class=" col-sm-8 col-10">
+                                <select 
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
+                                    ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                    <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
+
+                                <div  class=" col-sm-8 col-10">
+                                <select 
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
+                                    ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
                     <!-- <div class="input-group form-control-lg">
                       <div class="input-group-prepend">
                         <span class="input-group-text">
@@ -113,53 +150,57 @@
                     </div> -->
 
 
-                    <div class="row">
-                      
-                      <div class="col-7">
-                        <div class="input-group form-control-lg">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">
-                            <i class="material-icons">record_voice_over</i>
-                          </span>
-                        </div>
-                        <div class="form-group">
-                          <label for="abreviatura" class="bmd-label-floating">Abreviatura</label>
-                          <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
-                        </div>
-                      </div>
-
-                          <!-- <div class="input-group form-control-lg">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text">
-                              <i class="material-icons">av_timer</i>
-                            </span>
-                          </div>
-                          <div class="form-group">
-                            <label for="exampleInput1" class="bmd-label-floating">Hora de cierre</label>
-                            <input ng-model="datos.horaCierre" id="horaCierre" type="text" class="form-control timepicker" value="10/05/2016" required>
-                          </div>
-                        </div> -->
-
-                      </div>
-
-                      <div class="col-3">
-                        <div class="input-group form-control-lg">
-                            <div class="form-group">
-                              <div class="form-check">
-                                <label class="form-check-label">
-                                  <input ng-model="datos.status" class="form-check-input" type="checkbox" value="" checked> Activa
-                                  <span class="form-check-sign">
-                                    <span class="check"></span>
-                                  </span>
-                                </label>
-                              </div>
+                        <div class="col-12">
+                        
+                            <div class="row">
+                            
+                            <div class="col-7">
+                                <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="material-icons">record_voice_over</i>
+                                </span>
+                                </div>
+                                <div class="form-group">
+                                <label for="abreviatura" class="bmd-label-floating">Abreviatura</label>
+                                <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
                             </div>
-                          </div>
-                      </div>
+
+                                <!-- <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                    <i class="material-icons">av_timer</i>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInput1" class="bmd-label-floating">Hora de cierre</label>
+                                    <input ng-model="datos.horaCierre" id="horaCierre" type="text" class="form-control timepicker" value="10/05/2016" required>
+                                </div>
+                                </div> -->
+
+                            </div>
+
+                            <div class="col-3">
+                                <div class="input-group form-control-lg">
+                                    <div class="form-group">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                        <input ng-model="datos.status" class="form-check-input" type="checkbox" value="" checked> Activa
+                                        <span class="form-check-sign">
+                                            <span class="check"></span>
+                                        </span>
+                                        </label>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            </div>
+
+                        </div>
 
                     </div>
-
-
                   </div>
                   <!-- END DIV FORMULARIO -->
 

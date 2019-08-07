@@ -1285,6 +1285,69 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </ul>
                 </div>
             </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#monitoreoToggle">
+                    <i class="material-icons">image</i>
+                    <p> Monitoreo 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="monitoreoToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('monitoreo.tickets')}}">
+                              <span class="sidebar-mini"> T </span>
+                              <span class="sidebar-normal"> Tickets </span>
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item ">
+                            <a class="nav-link" href="{{route('usuarios.sesiones')}}">
+                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-normal"> Sesiones de usuarios </span>
+                            </a>
+                        </li> -->
+                    </ul>
+                </div>
+            </li>
+
+            
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#transaccionesToggle">
+                    <i class="material-icons">image</i>
+                    <p> Transacciones 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="transaccionesToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('transacciones')}}">
+                              <span class="sidebar-mini"> T </span>
+                              <span class="sidebar-normal"> Transacciones </span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('transacciones.grupo')}}">
+                              <span class="sidebar-mini"> G </span>
+                              <span class="sidebar-normal"> Grupo transacciones </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="nav-item ">
+                <a class="nav-link" href="{{route('entidades')}}">
+                    <i class="material-icons">format_list_numbered</i>
+                    <p> Entidades 
+                       
+                    </p>
+                </a>
+            </li>
+
             
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
@@ -1329,14 +1392,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 </a>
             </li>
 
-            <li class="nav-item ">
-                <a class="nav-link" href="{{route('entidades')}}">
-                    <i class="material-icons">format_list_numbered</i>
-                    <p> Entidades 
-                       
-                    </p>
-                </a>
-            </li>
+            
 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('horarios')}}">
@@ -1373,57 +1429,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 </div>
             </li>
 
-            <li class="nav-item active">
-                <a class="nav-link" data-toggle="collapse" href="#monitoreoToggle">
-                    <i class="material-icons">image</i>
-                    <p> Monitoreo 
-                       <b class="caret"></b>
-                    </p>
-                </a>
-
-                <div class="collapse" id="monitoreoToggle">
-                    <ul class="nav">
-                        <li class="nav-item ">
-                            <a class="nav-link" href="{{route('monitoreo.tickets')}}">
-                              <span class="sidebar-mini"> T </span>
-                              <span class="sidebar-normal"> Tickets </span>
-                            </a>
-                        </li>
-                        <!-- <li class="nav-item ">
-                            <a class="nav-link" href="{{route('usuarios.sesiones')}}">
-                              <span class="sidebar-mini"> B </span>
-                              <span class="sidebar-normal"> Sesiones de usuarios </span>
-                            </a>
-                        </li> -->
-                    </ul>
-                </div>
-            </li>
-
-            <li class="nav-item active">
-                <a class="nav-link" data-toggle="collapse" href="#transaccionesToggle">
-                    <i class="material-icons">image</i>
-                    <p> Transacciones 
-                       <b class="caret"></b>
-                    </p>
-                </a>
-
-                <div class="collapse" id="transaccionesToggle">
-                    <ul class="nav">
-                        <li class="nav-item ">
-                            <a class="nav-link" href="{{route('transacciones')}}">
-                              <span class="sidebar-mini"> T </span>
-                              <span class="sidebar-normal"> Transacciones </span>
-                            </a>
-                        </li>
-                        <li class="nav-item ">
-                            <a class="nav-link" href="{{route('transacciones.grupo')}}">
-                              <span class="sidebar-mini"> G </span>
-                              <span class="sidebar-normal"> Grupo transacciones </span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+            
 
             
 

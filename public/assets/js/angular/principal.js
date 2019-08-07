@@ -814,7 +814,7 @@ myApp
                     if(response.data.errores == 0)
                         {
                             // console.log(response);
-                          alert(response.data.mensaje);
+                          //alert(response.data.mensaje);
                           $scope.inicializarDatos(response);
                         //   $scope.imprimirTicket(response.data.venta, (e == 1) ? true : false);
                         //   $scope.datos.enviarSMS.codigoBarra = response.data.venta.codigoBarra;

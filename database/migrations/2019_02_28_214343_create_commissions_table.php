@@ -20,14 +20,14 @@ class CreateCommissionsTable extends Migration
             //$table->unsignedInteger('idSorteo');
             //$table->decimal('monto', 20, 2);
 
-            $table->decimal('directo', 10, 2)->default(0);
-            $table->decimal('pale', 10, 2)->default(0);
-            $table->decimal('tripleta', 10, 2)->default(0);
-            $table->decimal('superPale', 10, 2)->default(0);
-            $table->decimal('pick3Straight', 10, 2)->default(0);
-            $table->decimal('pick3Box', 10, 2)->default(0);
-            $table->decimal('pick4Straight', 10, 2)->default(0);
-            $table->decimal('pick4Box', 10, 2)->default(0);
+            $table->decimal('directo', 10, 2)->nullable()->default(0);
+            $table->decimal('pale', 10, 2)->nullable()->default(0);
+            $table->decimal('tripleta', 10, 2)->nullable()->default(0);
+            $table->decimal('superPale', 10, 2)->nullable()->default(0);
+            $table->decimal('pick3Straight', 10, 2)->nullable()->default(0);
+            $table->decimal('pick3Box', 10, 2)->nullable()->default(0);
+            $table->decimal('pick4Straight', 10, 2)->nullable()->default(0);
+            $table->decimal('pick4Box', 10, 2)->nullable()->default(0);
 
            
 

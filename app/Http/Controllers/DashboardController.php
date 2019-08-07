@@ -140,8 +140,8 @@ class DashboardController extends Controller
             return $id['idBanca'];
         });
 
-        $bancasConVentas = Branches::whereIn('id', $idBancas)->count();
-        $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->count();
+        $bancasConVentas = Branches::whereIn('id', $idBancas)->whereStatus(1)->count();
+        $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->whereStatus(1)->count();
 
         $totalVentasLoterias = 0;
         $totalPremiosLoterias = 0;

@@ -290,6 +290,31 @@ myApp
 
         }
         
+        $scope.loteriasSeleccionadasCount = function(){
+            var contador = 0;
+            $scope.datos.loterias.forEach(function(valor, indice, array){
+                if(array[indice].seleccionado == true){
+                    contador++;
+                }
+            });
+
+            return contador;
+        }
+
+        $scope.superPaleEstaSeleccionado = function(){
+            
+            var seleccionado = false;
+            if(Object.keys($scope.datos.sorteos).length > 0){
+                $scope.datos.sorteos.forEach(function(valor, indice, array){
+                    if(array[indice].descripcion == "Super pale"){
+                        seleccionado = true;
+                    }
+                });
+            }
+
+            console.log("superPaleEstaSeleccionado:", seleccionado);
+            return seleccionado;
+        }
 
         $scope.actualizar = function(){
          
@@ -309,6 +334,15 @@ myApp
                 alert("Debe seleccionar los sorteos perteneciente a esta loteria");
                 return;
             }
+            
+            console.log('actualizar count:', $scope.loteriasSeleccionadasCount());
+            if($scope.superPaleEstaSeleccionado()){
+                if($scope.loteriasSeleccionadasCount() != 2){
+                    alert("Debe seleccionar las dos loterias pertenecientes al supe pale");
+                return;
+                }
+            }
+            
 
             /************* DIAS ********************/
             // if(Object.keys($scope.datos.dias).length == 0){
@@ -481,8 +515,11 @@ myApp
 
 
         $scope.ckbSorteos_changed = function(check, d){
-            console.log('ckbSorteos_changed: ', d);
+            
             if(d.existe){
+                if(d.descripcion == "Super pale"){
+                   $scope.seleccionarONoTodosLosSorteos(false, "Super pale");
+                }
                 $scope.datos.sorteos.push(d);
             }
             else{
@@ -493,8 +530,39 @@ myApp
                 }
             }
             
+            console.log('ckbSorteos_changed: ', $scope.datos.sorteos);
         }
 
+        $scope.seleccionarONoTodosLosSorteos = function(seleccionar, excepto = null){
+            //la variable excepto es una variable que va a contener el nombre o descripcion de un sorteo que se quiera o no seleccionar
+            if(seleccionar == true){
+                $scope.datos.sorteos = [];
+                $scope.datos.ckbSorteos.forEach(function(valor, indice, array){
+                    // array[indice].existe = true;
+                    // $scope.datos.sorteos.push(array[indice]);
+                    if(excepto != null){
+                        if(array[indice].descripcion != excepto){
+                            array[indice].existe = true;
+                            $scope.datos.sorteos.push(array[indice]);
+                        }
+                    }else{
+                        array[indice].existe = true;
+                        $scope.datos.sorteos.push(array[indice]);
+                    }
+                });
+            }else{
+                $scope.datos.sorteos = [];
+                $scope.datos.ckbSorteos.forEach(function(valor, indice, array){
+                    if(excepto != null){
+                        if(array[indice].descripcion != excepto){
+                            array[indice].existe = false;
+                        }
+                    }else{
+                        array[indice].existe = false;
+                    }
+                });
+            }
+        }
 
 
         $scope.hora_convertir = function(_24){
@@ -531,6 +599,7 @@ myApp
                 }
             }
         }
+
 
 
         $scope.rbxLoteriasChanged = function(d, idx){
