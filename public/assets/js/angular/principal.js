@@ -370,6 +370,7 @@ myApp
 
                     $scope.datos.idLoteria = $scope.datos.loterias[0].id;
                     $scope.datos.idBanca = $scope.datos.selectedBancas.id;
+                    $('#inputMonto').focus();
                    
                     $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                       .then(function(response){
