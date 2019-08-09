@@ -13,6 +13,9 @@ use App\Awards;
 use App\Sales;
 use App\Salesdetails;
 use App\Commissions;
+use App\Settings;
+use App\Coins;
+
 
 use Log;
 use Twilio\Rest\Client;
@@ -1026,6 +1029,59 @@ class Helper{
         }
         
         return $comision;
+    }
+
+
+    static function decimalesDelMontoJugadoSonValidos($monto, $loteria, $sorteo){
+        $monto = strval($monto);
+
+        $montoValido = false;
+        //Validamos de que el monto sea decimal para ello verificamos si existe un punto en el monto
+        if(gettype(strpos($monto, '.')) == "integer"){
+            //Validamos de que la moneda seleccionada permita decimales
+            $settings = Settings::find(1);
+            $moneda = Coins::whereId($settings->idMoneda)->first();
+            if($moneda->permiteDecimales != true)
+                return false;
+
+            if($loteria != null){
+                if($loteria->descripcion == "New York AM" || $loteria->descripcion == "New York PM" 
+                    && ($sorteo->descripcion == "Pick 3 Box" || $sorteo->descripcion == "Pick 3 Straight" || $sorteo->descripcion == "Pick 4 Straight" || $sorteo->descripcion == "Pick 4 Box") ){
+                    if($monto == "0.50"){
+                        $montoValido = true;
+                    }
+                }
+            }
+            
+        }else{
+            $montoValido = true;
+        }
+        
+        return $montoValido;
+    }
+
+    static function loteriasOrdenadasPorHoraCierre(){
+        $loterias = Lotteries::whereStatus(1)->get();
+        $loterias = collect($loterias);
+        $idDia = Days::whereWday(getdate()['wday'])->first()->id;
+        list($loterias, $no) = $loterias->partition(function($l){
+            $loteria = Lotteries::whereId($l['id'])->first();
+            return $loteria->cerrada() != true;
+        });
+
+        $idLoteriasAbiertas = collect($loterias)->map(function($l){
+            return $l['id'];
+        });
+
+         $loterias = 
+            Lotteries::
+            join('day_lottery', 'day_lottery.idLoteria', '=', 'lotteries.id')
+            ->whereIn('lotteries.id', $idLoteriasAbiertas)
+            ->where('day_lottery.idDia', $idDia)
+            ->orderBy('day_lottery.horaCierre', 'asc')
+            ->get();
+
+        return $loterias;
     }
 
 }

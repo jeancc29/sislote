@@ -949,7 +949,7 @@
                       </div> <!-- END COL-LG-4 -->
 
                       
-                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Box', false)">
                         <div class="row">
                             <div class="col-12 text-center">
                             <h4 class="font-weight-bold m-0">Pick 3 Box</h4>
@@ -978,7 +978,7 @@
                         </div> <!-- END ROW COL-LG-4 -->
                       </div> <!-- END COL-LG-4 -->
 
-                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 4 Straight', false)">
                         <div class="row">
                             <div class="col-12 text-center">
                             <h4 class="font-weight-bold m-0">Pick 4 Straight</h4>
@@ -1000,10 +1000,10 @@
                       </div> <!-- END COL-LG-4 -->
 
 
-                      <div class="col-lg-4" ng-if="existeSorteo('Pick 3 Straight', false)">
+                      <div class="col-lg-4" ng-if="existeSorteo('Pick 4 Box', false)">
                         <div class="row">
                             <div class="col-12 text-center">
-                            <h4 class="font-weight-bold m-0">Pick 3 Box</h4>
+                            <h4 class="font-weight-bold m-0">Pick 4 Box</h4>
                             </div>
                             <div class="col-12">
                               <div class="row ">
@@ -1335,7 +1335,7 @@
             <!-- .abrir-wizard la uso en el archivo demo.js para obtener los datos reales del wizard al momento de quitarle el display none -->
             <a ng-click="editar(1, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva loteria</a>
           </div>
-          <table class="table table-sm">
+          <table class="table table-sm table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>

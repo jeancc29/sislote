@@ -96,7 +96,7 @@ class DashboardController extends Controller
         $ventasGrafica = collect($ventasGrafica)->map(function($d) use($daysSpanish){
             $fecha = new Carbon($d['date']);
             $dia = $daysSpanish[$fecha->dayOfWeek] . ' ' . $fecha->day;
-            return ["total" => $d['total'], "neto" => $d['total'] - $d['premios'], "dia" => $dia];
+            return ["total" => $d['total'], "neto" => $d['total'] - ($d['premios'] + $d['descuentoMonto']), "dia" => $dia];
         });
 
         // var_dump($ventasGrafica);

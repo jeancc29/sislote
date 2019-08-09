@@ -94,7 +94,7 @@ class PrincipalController extends Controller
     
     
         return Response::json([
-            'loterias' => Lotteries::whereStatus(1)->get(),
+            'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
             'caracteristicasGenerales' =>  Generals::all(),
             'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
@@ -141,7 +141,7 @@ class PrincipalController extends Controller
     
     
         return Response::json([
-            'loterias' => Lotteries::whereStatus(1)->get(),
+            'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
             'caracteristicasGenerales' =>  Generals::all(),
             'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
@@ -732,12 +732,20 @@ class PrincipalController extends Controller
                     ], 201);
                 }
 
-               $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
                 
+
+               $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
+               $sorteo = Draws::whereId($idSorteo)->first();
+               if(Helper::decimalesDelMontoJugadoSonValidos($d['monto'], $loteria, $sorteo) == false){
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'Error: El monto de la jugada ' . $d['jugada'] . ' es incorrecto'
+                ], 201);
+            }
                
 
             $banca = Branches::whereId($datos['idBanca'])->first();
-            $sorteo = Draws::whereId($idSorteo)->first();
+            
                 if(!$banca->loteriaExisteYTienePagoCombinaciones($d['idLoteria'], $idSorteo)){
                     return Response::json([
                         'errores' => 1,
@@ -901,6 +909,7 @@ class PrincipalController extends Controller
             'errores' => $errores,
             'mensaje' => $mensaje,
             'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
+            'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
             'venta' => ($sale != null) ? new SalesResource($sale) : null,
             'img' => $img
         ], 201);

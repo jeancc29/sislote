@@ -155,7 +155,7 @@
                         </div>
                     </div>
                     
-                    <table class="table table-sm">
+                    <table class="table table-sm table-striped">
                         <thead>
                             <tr>
                             <th scope="col" class="text-center" style="font-size: 12px;">Tipo</th>

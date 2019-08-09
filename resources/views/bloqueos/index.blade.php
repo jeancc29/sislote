@@ -209,7 +209,7 @@
                               </div>
                               <div class="card-body">
                                 <div class="col-12">
-                                  <table class="table table-sm">
+                                  <table class="table table-sm table-striped">
                                         <thead>
                                             <tr>
                                             <th scope="col" class="text-center">ID</th>

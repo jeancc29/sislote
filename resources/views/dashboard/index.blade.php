@@ -357,13 +357,192 @@
   // stacked: true,
   barSize: 30,
   resize: true,
+  fillOpacity: 0.1,
+  hideHover: true,
+  behaveLikeLine: true,
+
+  pointFillColors: ['#ffffff'],
+  pointStrokeColors: ['black'],
+  lineColors: ['red', 'blue'],
+
   barColors: function (row, series, type) {
-    console.log('row: ', series);
-    if(series.key == "neto")
+    console.log('row: ', row.y);
+    if(series.key == "neto" && row.y > 0)
         return "#75b281";
-    return "#c2c2d6";
+    if(series.key == "neto" && row.y < 0)
+      return "#dc2365";
+    else
+      return "#c2c2d6";
     }
 });
+
+// var data = 
+//     // [
+//     //   { y: 'asdfgfddfgdfgdfgdfgdfggdf', a: 50, b: 90},
+//     //   { y: '2015dfdfgfdgdfgfdggdfgdfg', a: 65,  b: 75},
+//     //   { y: '2016dfdfgdfgdfgfdggdfgdfg', a: 50,  b: 50},
+//     //   { y: '201dfgdfgdfgdfgdfgdfgdfgdfg7', a: 75,  b: 60},
+//     //   { y: '2018', a: 80,  b: 65},
+//     //   { y: '2019', a: 90,  b: 70},
+//     //   { y: '20dfgdfgdfgdfgdfgdfg20', a: 100, b: 75},
+//     //   { y: '2021', a: 115, b: 75},
+//     //   { y: '2022', a: 120, b: 85},
+//     //   { y: '2023', a: 145, b: 85},
+//     //   { y: '2024', a: 160, b: 95}
+//     // ]
+//     <?php echo $ventasGrafica ?>
+//     ,
+//     formatY = function (neto) {
+//       console.log("y: ", '$'+neto);
+//             return '$'+neto;
+//         },
+//     formatX = function (x) {
+//       console.log("x: ", x);
+//             return x.src.dia;
+//         },
+    
+//     config = {
+//       data: data,
+//       xkey: 'dia',
+//       ykeys: ['neto', 'total'],
+//       labels: ['total', 'neto'],
+//       fillOpacity: 0.6,
+//       hideHover: 'auto',
+//       stacked: true,
+//       resize: true,
+//       pointFillColors:['#ffffff'],
+//       pointStrokeColors: ['black'],
+//       barColors:['blue','green','orange'],
+//       yLabelFormat:formatY,
+//       xLabelFormat: formatX,
+//       barSize: 30,
+//       // hoverCallback: function (index, options, content, row) {
+//       //   return 'custom 1';
+//       // }
+//       barColors: function (row, series, type) {
+//         // console.log('row: ', series);
+//         if(series.key == "neto" && row.y > 0)
+//             return "#75b281";
+//         if(series.key == "neto" && row.y < 0)
+//           return "#dd9999";
+//         else
+//           return "#c2c2d6";
+//       }
+//   };
+
+
+
+// var data = [
+//       { y: 'asdfgfddfgdfgdfgdfgdfggdf', a: 50, b: 90},
+//       { y: '2015dfdfgfdgdfgfdggdfgdfg', a: 65,  b: 75},
+//       { y: '2016dfdfgdfgdfgfdggdfgdfg', a: 50,  b: 50},
+//       { y: '201dfgdfgdfgdfgdfgdfgdfgdfg7', a: 75,  b: 60},
+//       { y: '2018', a: 80,  b: 65},
+//       { y: '2019', a: 90,  b: 70},
+     
+//     ],
+//     formatY = function (y) {
+//             return '$'+y;
+//         },
+//     formatX = function (x) {
+//             return x.src.y;
+//         },
+    
+//     config = {
+//       data: data,
+//       xkey: 'y',
+//       ykeys: ['a', 'b' ],
+//       labels: ['Total Income', 'Total Outcome'],
+//       fillOpacity: 0.6,
+//       hideHover: 'auto',
+//       stacked: true,
+//       resize: true,
+//       pointFillColors:['#ffffff'],
+//       pointStrokeColors: ['black'],
+//       barColors:['blue','green','orange'],
+//       yLabelFormat:formatY,
+//       xLabelFormat: formatX,
+      
+//   };
+    
+
+    
+// config.element = 'myfirstchart';
+// new Morris.Bar(config);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// var data = 
+//     [
+//       { y: 'asdfgfddfgdfgdfgdfgdfggdf', a: 50, b: 90},
+//       { y: '2015dfdfgfdgdfgfdggdfgdfg', a: 65,  b: 75},
+//       { y: '2016dfdfgdfgdfgfdggdfgdfg', a: 50,  b: 50},
+//       { y: '201dfgdfgdfgdfgdfgdfgdfgdfg7', a: 75,  b: 60},
+//       { y: '2018', a: 80,  b: 65},
+//       { y: '2019', a: 90,  b: 70},
+//       { y: '20dfgdfgdfgdfgdfgdfg20', a: 100, b: 75},
+//       { y: '2021', a: 115, b: 75},
+//       { y: '2022', a: 120, b: 85},
+//       { y: '2023', a: 145, b: 85},
+//       { y: '2024', a: 160, b: 95}
+//     ]
+//     ,
+//     formatY = function (y) {
+//       console.log("y: ", '$'+y);
+//             return '$'+y;
+//         },
+//     formatX = function (x) {
+//       console.log("x: ", x);
+//             return x.src.y;
+//         },
+    
+//     config = {
+//       data: data,
+//       xkey: 'y',
+//       ykeys: ['a', 'b'],
+//       labels: ['Total Income', 'Total Outcome'],
+//       fillOpacity: 0.6,
+//       hideHover: 'auto',
+//       stacked: true,
+//       resize: true,
+//       pointFillColors:['#ffffff'],
+//       pointStrokeColors: ['black'],
+//       barColors:['blue','green','orange'],
+//       yLabelFormat:formatY,
+//       xLabelFormat: formatX,
+//       // hoverCallback: function (index, options, content, row) {
+//       //   return 'custom 1';
+//       // }
+//       barColors: function (row, series, type) {
+//         // console.log('row: ', series);
+//         if(series.key == "neto" && row.y > 0)
+//             return "#75b281";
+//         if(series.key == "neto" && row.y < 0)
+//           return "#dd9999";
+//         else
+//           return "#c2c2d6";
+//       }
+//   };
     </script>
 
 

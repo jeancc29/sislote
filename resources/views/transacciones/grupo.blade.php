@@ -87,7 +87,7 @@
                                 </div>
                             </div>
                     </div> <!-- END ROW FECHAS -->
-                <table class="table table-sm">
+                <table class="table table-sm table-striped">
                         <thead>
                             <tr>
                             <th scope="col" class="text-center">Numero</th>
@@ -316,7 +316,7 @@
                     </div> <!-- END ROW CAMPOS -->
                    
 
-                    <table class="table table-sm">
+                    <table class="table table-sm table-striped">
                         <thead class="thead-dark">
                             <tr>
                             <th scope="col" class="text-center" style="font-size: 12px;">Tipo</th>
@@ -415,7 +415,7 @@
                    
                    
 
-                    <table class="table table-sm">
+                    <table class="table table-sm table-striped">
                         <thead class="thead-dark">
                             <tr>
                             <th scope="col" class="text-center" style="font-size: 12px;">Tipo</th>

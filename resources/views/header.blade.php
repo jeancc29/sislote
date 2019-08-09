@@ -279,6 +279,11 @@ div:not(.btn-group-not).btn-group {
 .text-mal{
     color: #ff577b;
 }
+
+
+.morris-hover{
+    
+}
     
  /********************* MEDIA QUERY QUE MANEJA MENU DESPLEGABLE ******************/
  

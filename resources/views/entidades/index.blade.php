@@ -218,7 +218,7 @@
             <!-- .abrir-wizard la uso en el archivo demo.js para obtener los datos reales del wizard al momento de quitarle el display none -->
             <a ng-click="editar(true, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva loteria</a>
           </div>
-          <table class="table table-sm">
+          <table class="table table-sm table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>

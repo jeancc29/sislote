@@ -36,12 +36,15 @@ myApp
                     //La variable hora va a contener el solamente la hora sin minutos ni segundos
                     var hora = parseInt(a[0]);
                     //Aqui se convierte la hora normal en el formato 24 horas
-                    phora = hora + 12;
+                    if(hora == 12)
+                        phora = hora;
+                    else
+                        phora = hora + 12;
                     //Aqui se concatena la hora en formato 24 con los minutos
                     phora = phora.toString() + ":" + a[1];
                     //console.log('actualizar: convertido: ', phora); 
                 }
-                else{
+                else if(phora.indexOf("AM") != -1){
                      //Aqui se le quitara el AM a la hora
                      var a = phora.replace(" AM", "");
                     //  phora = a;
