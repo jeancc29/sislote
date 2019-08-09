@@ -83,7 +83,7 @@ class Lotteries extends Model
                 $cerrado = true;
             else if((int)$hora[0] == (int)$fecha['hours']){
                 //Validamos si los minutos actuales son mayores que los minutos horaCierre  
-                if((int)$fecha['minutes'] > (int)$hora[1])
+                if((int)$fecha['minutes'] >= (int)$hora[1])
                     $cerrado = true;
             }
         }else{

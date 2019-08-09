@@ -374,7 +374,7 @@ myApp
                    
                     $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                       .then(function(response){
-                            // console.log(response);
+                            console.log(response);
                          $scope.datos.montoExistente = response.data.monto;
                           $('#inputMonto').focus();
                           return;

@@ -1081,6 +1081,10 @@ class Helper{
             ->orderBy('day_lottery.horaCierre', 'asc')
             ->get();
 
+            $loterias = collect($loterias)->map(function($l){
+                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura']];
+            });
+
         return $loterias;
     }
 

@@ -961,6 +961,7 @@ class PrincipalController extends Controller
     //         $idSorteo = 3;
     //    }
 
+  
         $idSorteo = (new Helper)->determinarSorteo($datos['jugada'], $loteria->id);
     
        $bloqueo = Stock::where([   
