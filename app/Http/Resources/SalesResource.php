@@ -10,6 +10,7 @@ use App\Cancellations;
 use App\Lotteries;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt; 
+use App\Classes\TicketPrintClass;
 
 class SalesResource extends JsonResource
 {
@@ -54,7 +55,8 @@ class SalesResource extends JsonResource
                 $sorteo = Draws::whereId($d['idSorteo'])->first()->descripcion;
                 return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
             }),
-            'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A')
+            'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A'),
+            'img' =>  (new TicketPrintClass($this->id))->generate()
         ];
     }
 }
