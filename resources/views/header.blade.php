@@ -249,7 +249,7 @@ if($controlador != "login"){
 }
 
 .max-width-570{
-    max-width: 592px;
+    max-width: 692px;
 }
 
 .dnone{
@@ -1042,12 +1042,12 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                 || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) || datosPremiosModal.selectedLoteriaPremiosModal == null">
                               <div class="input-group form-control-lg">
                                 <div id="primeraPremiosModal" class="form-group">
-                                  <label for="exampleInput1" class="bmd-label-floating">1era</label>
+                                  <label for="primera" class="bmd-label-floating">1era</label>
                                   <input
                                       ng-disabled="existeSorteoPremiosModal('Pick 3 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 3 Straight', datosPremiosModal.selectedLoteriaPremiosModal)" 
                                       maxLength="2" 
                                       select-all-on-click ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-segunda', 2, datosPremiosModal.primera)" 
-                                      ng-model="datosPremiosModal.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                      ng-model="datosPremiosModal.primera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="primera">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
