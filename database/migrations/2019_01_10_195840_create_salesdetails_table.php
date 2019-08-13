@@ -22,7 +22,8 @@ class CreateSalesdetailsTable extends Migration
             $table->decimal('monto', 20, 2);
             $table->decimal('premio', 20, 2);
             $table->decimal('comision', 20, 2);
-            $table->integer('status')->default(0);
+            $table->integer('status')->default(0); //status == 2 eso quiere decir que se ha pagado esa jugada
+            $table->integer('pagado')->default(0);
             $table->timestamps();
 
             $table->foreign('idLoteria')->references('id')->on('lotteries');

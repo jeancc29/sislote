@@ -216,8 +216,8 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{estado(c.status)}}</td>
                                 <td scope="col" class="text-center" style="font-size: 11px">
-                                  <a ng-if="c.pagado != 1 && c.premio > 0" style="cursor: pointer;" ng-click="pagar(c)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-primary " style="font-size: 18px!important;">payment</i></a>
-                                  <a ng-if="c.pagado == 1 && c.premio > 0" style="cursor: pointer;" class="d-inline   abrir-wizard-editar"><i class="material-icons text-success " style="font-size: 18px!important;">done_outline</i></a>
+                                  <a ng-if="c.pagado != 1 && c.premio > 0 && c.montoAPagar > 0" style="cursor: pointer;" ng-click="pagar(c)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-primary " style="font-size: 18px!important;">payment</i></a>
+                                  <a ng-if="c.pagado == 1" style="cursor: pointer;" class="d-inline   abrir-wizard-editar"><i class="material-icons text-success " style="font-size: 18px!important;">done_outline</i></a>
                                 </td>
                                 <!-- <td scope="col" class="text-center" style="font-size: 11px">Marcar pago</td> -->
                                 <td scope="col" class="text-center" style="font-size: 11px">
@@ -225,12 +225,12 @@
                                 </td>
                                 <td>
                                   
-                                <div ng-if="c.pagado == 0">
+                                <div ng-if="c.montoPagado == 0">
                                   <a ng-if="c.status != 0" style="cursor: pointer;" ng-click="cancelar(c)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-danger " style="font-size: 18px!important;">cancel</i></a>
                                   <a ng-if="c.status == 0" style="cursor: pointer;"  class="d-inline   abrir-wizard-editar"><i class="material-icons text-success " style="font-size: 18px!important;">done_outline</i></a>
                                   <a style="cursor: pointer;" ng-click="eliminar(c)" class="d-inline   "><i class="material-icons text-danger" style="font-size: 18px!important;">delete_forever</i></a>
                                 </div>
-                                  <div ng-if="c.pagado == 1">
+                                  <div ng-if="c.montoPagado > 1">
                                     <a ng-if="c.status != 0" style="cursor: pointer;" ng-click="abrirModalRazon(c, true)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-danger " style="font-size: 18px!important;">cancel</i></a>
                                     <a ng-if="c.status == 0" style="cursor: pointer;" class="d-inline   abrir-wizard-editar"><i class="material-icons text-success " style="font-size: 18px!important;">done_outline</i></a>                                    
                                     <a  style="cursor: pointer;" ng-click="abrirModalRazon(c, false)" class="d-inline   "><i class="material-icons text-danger" style="font-size: 18px!important;">delete_forever</i></a> 
@@ -267,8 +267,28 @@
                 </div>
                 <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="table-responsive">
-                  <h4 class="card-title text-center">Ticket:@{{datos.selectedTicket.codigo}}-@{{toSecuencia(datos.selectedTicket.idTicket)}}</h4>
-                  <div class="row justify-content-end">
+                  <h4 class="card-title text-center font-weight-bold">Ticket:@{{datos.selectedTicket.codigo}}-@{{toSecuencia(datos.selectedTicket.idTicket)}}</h4>
+                  <div class="row justify-content-center">
+                    <div class="col-12 text-center">
+                        <h4 class="">
+                        Monto: <span class="bg-info p-1  rounded">@{{datos.selectedTicket.total | currency}}</span>
+                        </h4>
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <h4 class="">
+                        Pendiente de pago: <span class=" p-1  rounded" ng-class="{'bg-rosa ': (datos.selectedTicket.premio > 0), 'bg-info': (datos.selectedTicket.premio == 0)}">@{{datos.selectedTicket.montoAPagar | currency}}</span>
+                        </h4>
+                    </div>
+                    
+                    <div class="col-12 text-center">
+                        <h4 class="">
+                        Premio total: <span class="bg-info p-1  rounded">@{{datos.selectedTicket.premio | currency}}</span>
+                        </h4>
+                    </div>
+                  </div>
+
+                  <div class="row justify-content-center">
                     <div class="col-12 text-center">
                       <h3>Leyenda</h3>
                     </div>
@@ -282,6 +302,8 @@
                       pendiente
                     </div>
                   </div>
+
+                  
 
                   <div ng-repeat="l in datos.selectedTicket.loterias">
                   <!-- <div class='loterias col-xs-12 text-center mx-3' style='border-top-style: dashed; border-bottom-style: dashed; font-weight: lighter'> -->
@@ -300,7 +322,7 @@
                         </tr>
                     </thead>
                     <tbody class="">
-                        <tr class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in datos.selectedTicket.jugadas ">
+                        <tr ng-if="l.id == c.idLoteria" class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in datos.selectedTicket.jugadas ">
                         <td class="text-center" style="font-size: 12px;">@{{c.sorteo}}</td>
                         <td class="text-center" style="font-size: 12px;">
                             @{{agregar_guion(c.jugada, c.sorteo)}}
@@ -314,7 +336,8 @@
                             @{{c.premio}}
                         </td>
                         <td class="text-center" style="font-size: 12px;">
-                            -
+                        @{{(c.pagado == 1) ? 'si' : 'no'}}
+                          <a ng-show="c.pagado == 1" style="cursor: pointer;" ng-click="eliminar(c)" class="d-inline   " data-toggle="tooltip" data-placement="top" title="Pagado por @{{c.pagadoPor}} el @{{toFecha(c.fechaPagado.date) | date:'dd/MM/yyyy hh:mm a'}}"><i class="material-icons" style="font-size: 18px!important;">info</i></a>
                         </td>
                         
                         <!-- <td class="td-actions text-center col-1">

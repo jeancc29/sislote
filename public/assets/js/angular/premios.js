@@ -89,7 +89,7 @@ myApp
         $scope.actualizar = function(vistaSencilla = false){
             
             console.log($scope.datos.loterias);
-            var errores = false, mensaje = "";
+            var errores = false, erroresVistaCompleta = false, mensaje = "";
             
 
             if(vistaSencilla == true){
@@ -144,27 +144,34 @@ myApp
                         || $scope.existeSorteo('Pale', array[indice]) == true
                         || $scope.existeSorteo('Tripleta', array[indice]) == true){
                         if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true || $scope.empty(array[indice].tercera, 'number') == true){
-                            alert("Hay campos vacios otros");
-                            errores = true;
+                            // alert("Hay campos vacios otros");
+                            array[indice].primera = null;
+                            array[indice].segunda = null;
+                            array[indice].tercera = null;
+                            erroresVistaCompleta = true;
                         }
                     }
                     if($scope.existeSorteo('Super pale', array[indice]) == true){
                         if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true){
-                            alert("Hay campos vacios super pale");
-                            errores = true;
+                            // alert("Hay campos vacios super pale");
+                            array[indice].primera = null;
+                            array[indice].segunda = null;
+                            erroresVistaCompleta = true;
                         }
                     }
                     if($scope.existeSorteo('Pick 3 Straight', array[indice]) == true || $scope.existeSorteo('Pick 3 Box', array[indice]) == true){
                         if($scope.empty(array[indice].pick3, 'number') == true){
-                            alert("Hay campos vacios pick3");
-                            errores = true;
+                            // alert("Hay campos vacios pick3");
+                            array[indice].pick3 = null;
+                            erroerroresVistaCompletares = true;
                         }
                     }
                     if($scope.existeSorteo('Pick 4 Straight', array[indice]) == true || $scope.existeSorteo('Pick 4 Box', array[indice]) == true){
                         console.log('existe pick4 hola: ', $scope.existeSorteo('Pick 4 Box', array[indice]));
                         if($scope.empty(array[indice].pick4, 'number') == true){
-                            alert("Hay campos vacios pick4");
-                            errores = true;
+                            // alert("Hay campos vacios pick4");
+                            array[indice].pick4 = null;
+                            erroresVistaCompleta = true;
                         }
                     }
                   
@@ -204,6 +211,9 @@ myApp
              if(errores){
                  return;
              }
+            //  if(erroresVistaCompleta){
+            //      return;
+            //  }
 
            
    
@@ -219,7 +229,7 @@ myApp
           
           $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
              .then(function(response){
-                console.log(response);
+                console.log('premios:', response);
                 if(response.data.errores == 0){
                     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
                     alert(response.data.mensaje);

@@ -236,7 +236,7 @@
                                       ng-model="datos.selectedLoteria"
                                       ng-change="cbxLoteriasChanged()"
                                       ng-options="o.descripcion for o in datos.optionsLoterias"
-                                      class="selectpicker w-100" 
+                                      class="selectpicker col-12" 
                                       data-style="select-with-transition" 
                                       title="Select loteria">
                                 </select>

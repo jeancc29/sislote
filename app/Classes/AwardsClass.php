@@ -216,7 +216,7 @@ class AwardsClass{
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
         ->where('salesdetails.idLoteria', $idLoteria)->whereNotIn('sales.status', [0,5])->get();
 
-        $jugadas = Salesdetails::whereIn('idVenta', $idVentas)
+        $jugadas = Salesdetails::whereIn('idVenta', $idVentas)->where('idLoteria', $idLoteria)
                 ->orderBy('jugada', 'asc')
                 ->get();
 
@@ -231,7 +231,7 @@ class AwardsClass{
         $cantidadTicksMarcadoComoPagado = Sales::select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
-        ->where(['salesdetails.idLoteria' => $idLoteria, 'sales.pagado' => 1])->whereNotIn('sales.status', [0,5])->count();
+        ->where(['salesdetails.idLoteria' => $idLoteria, 'salesdetails.pagado' => 1])->whereNotIn('sales.status', [0,5])->count();
 
     
 

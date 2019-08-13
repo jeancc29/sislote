@@ -15,6 +15,8 @@ use App\Salesdetails;
 use App\Commissions;
 use App\Settings;
 use App\Coins;
+use App\Logs;
+use App\Branches;
 
 
 use Log;
@@ -1087,5 +1089,74 @@ class Helper{
 
         return $loterias;
     }
+
+
+    //Debemos verificar si todas las jugadas han sido pagadas
+    static function verificarTicketHaSidoPagado($idVenta){
+        $jugadasQueAunEstanPendiente = Salesdetails::where('idVenta', $idVenta)->whereStatus(0)->count();
+        if($jugadasQueAunEstanPendiente > 0){
+            return false;
+        }
+        $jugadas = Salesdetails::where('idVenta', $idTicket)->get();
+
+        $montoPremios = 0;
+        $montoPagado = 0;
+        foreach($jugadas as $j){
+            $montoPremios += $j['premio'];
+            if($j['pagado'] == true){
+                $montoPagado += $j['premio'];
+            }
+            
+        }
+
+        return ($montoPremio > $montoPagado) ? false : true;
+    }
+
+
+    static function pagar($idVenta, $idUsuario, $idBanca = null){
+        
+        $jugadas = Salesdetails::where(['idVenta' => $idVenta, 'pagado' => 0])->where('premio', '>', 0)->get();
+
+        $montoPremios = 0;
+        $montoPagado = 0;
+        if($jugadas != null && count($jugadas) > 0){
+            foreach($jugadas as $j){
+                $j['pagado'] = 1;
+                $j->save();
+                
+                Logs::create([
+                    'idBanca' => Helper::getIdBanca($idUsuario, $idBanca),
+                    'idUsuario' => $idUsuario,
+                    'tabla' => 'salesdetails',
+                    'idRegistroTablaAccion' => $j['id'],
+                    'accion' => 'update',
+                    'campo' => 'pagado',
+                    'valor_viejo' => '0',
+                    'valor_nuevo' => '1'
+                ]);
+            }
+        }else{
+            return false;
+        }
+        
+
+        return $jugadas;
+    }
+
+
+    public static function getIdBanca($idUsuario, $idBanca = null){
+        if($idBanca != null){
+            $idBanca = Branches::where(['id' => $idBanca, 'status' => 1])->first();
+            if($idBanca != null)
+                $idBanca = $idBanca->id;
+        }else{
+            $idBanca = Branches::where(['idUsuario' => $idUsuario, 'status' => 1])->first();
+            if($idBanca != null)
+                $idBanca = $idBanca->id;
+        }
+
+        return $idBanca;
+    }
+   
 
 }

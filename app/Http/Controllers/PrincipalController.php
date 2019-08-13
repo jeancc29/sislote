@@ -336,23 +336,109 @@ class PrincipalController extends Controller
         $mensaje = '';
         $loterias = null;
         $jugadas = null;
+        $venta = null;
+        
+    
+    
+        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $venta = Sales::where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
+    
+            if($venta != null){
+                // $venta['pagado'] = 1;
+                // $venta->save();
+    
+                if(Helper::pagar($venta->id, $datos['idUsuario']))
+                    $mensaje = "El ticket se ha pagado correctamente";
+                else{
+                    $errores = 1;
+                    $mensaje = "El ticket no existe, no esta premiado o ya ha sido pagado";
+                }
+    
+            }else{
+                $errores = 1;
+                $mensaje = "El ticket no existe, no esta premiado o ya ha sido pagado";
+            }
+        }else{
+                $errores = 1;
+                $mensaje = "El numero de ticket no es correcto";
+        }
+    
+    
+        return Response::json([
+            'errores' => $errores,
+            'mensaje' => $mensaje,
+            'venta' => ($venta != null) ? new SalesResource($venta) : null,
+        ], 201);
+    }
+
+
+    public function buscarTicketAPagar()
+    {
+        $datos = request()->validate([
+            'datos.codigoBarra' => '',
+            'datos.codigoQr' => '',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+    
+        $usuario = Users::whereId($datos['idUsuario'])->first();
+        if(!$usuario->tienePermiso("Marcar ticket como pagado")){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'No tiene permisos para realizar esta accion'
+            ], 201);
+        }
+
+        if(isset($datos['codigoBarra'])){
+            if(!(new Helper)->isNumber($datos['codigoBarra'])){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+            if(strlen($datos['codigoBarra']) != 10){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+        }
+        else if(isset($datos['codigoQr']) && !isset($datos['codigoBarra'])){
+            $datos['codigoBarra'] = Crypt::decryptString($datos['codigoQr']);
+        }else{
+            return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
+        }
+    
+        $fecha = getdate();
+    
+        $errores = 0;
+        $mensaje = '';
+        $loterias = null;
+        $jugadas = null;
     
         
     
     
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
-            $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->wherePagado(0)->wherePagado(0)->get()->first();
-    
+            //->wherePagado(0)
+            $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
+            
             if($venta != null){
-                $venta['pagado'] = 1;
-                $venta->save();
-    
-                $mensaje = "El ticket se ha pagado correctamente";
+                
+                if(Helper::verificarTicketHaSidoPagado($venta->id)){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensaje' => 'El ticket ya ha sido pagado'
+                    ], 201);
+                }else{
+                    return Response::json([
+                        'errores' => 0,
+                        'mensaje' => '',
+                        'venta' =>  new SalesResource($sale)
+                    ], 201);
+                }
     
             }else{
-                $errores = 1;
-                $mensaje = "El ticket no existe, no esta premiado o ya ha sido pagado";
+                
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'El ticket no existe, no esta premiado'
+                ], 201);
             }
         }else{
                 $errores = 1;
@@ -634,6 +720,7 @@ class PrincipalController extends Controller
         $datos = request()->validate([
             'datos.idUsuario' => 'required',
             'datos.idBanca' => 'required',
+            'datos.idVenta' => 'required',
             'datos.descuentoMonto' => 'required',
             'datos.hayDescuento' => 'required',
             'datos.total' => 'required',
@@ -642,6 +729,19 @@ class PrincipalController extends Controller
             'datos.loterias' => 'required',
             'datos.jugadas' => 'required',
         ])['datos'];
+
+
+        $sale = Sales::whereId($datos['idVenta'])->whereNotIn('status', [0, 5])->first();
+        if($sale != null){
+            return Response::json([
+                'errores' => $errores,
+                'mensaje' => $mensaje,
+                'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
+                'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
+                'venta' => ($sale != null) ? new SalesResource($sale) : null,
+                'img' => $img
+            ], 201);
+        }
 
    
     

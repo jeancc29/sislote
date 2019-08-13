@@ -181,7 +181,7 @@ myApp
                 $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
 
-                // console.log(response)
+                console.log(response)
 
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;

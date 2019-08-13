@@ -15,9 +15,11 @@ class CreateLogsTable extends Migration
     {
         Schema::create('logs', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('idBanca')->nullable();
             $table->unsignedInteger('idUsuario');
-            $table->string('accion');
             $table->string('tabla');
+            $table->unsignedInteger('idRegistroTablaAccion'); //Este sera el id afectado de la tabla en la cual se ha realizado la accion
+            $table->string('accion');
             $table->string('campo');//Campo que se modifico
             $table->string('valor_viejo');
             $table->string('valor_nuevo');
