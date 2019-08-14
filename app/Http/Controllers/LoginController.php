@@ -70,6 +70,11 @@ class LoginController extends Controller
         
 
         $u = Users::where(['usuario' => $data['usuario']])->get()->first();
+        if($u == null){
+            return redirect('login')->withErrors([
+                'acceso' => 'Usuario no existe'
+            ]);
+        }
         $idBanca = Branches::where('idUsuario', $u->id)->first();
         if($idBanca != null){
             $idBanca = $idBanca->id;

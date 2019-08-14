@@ -15,6 +15,9 @@ class CreateIdventatemporalsTable extends Migration
     {
         Schema::create('idventatemporals', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('idBanca');
+            $table->bigInteger('idVenta'); //este sera el idVenta temporal
+            $table->string('idVentaHash');
             $table->timestamps();
         });
     }

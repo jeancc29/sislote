@@ -17,6 +17,10 @@ use App\Settings;
 use App\Coins;
 use App\Logs;
 use App\Branches;
+use App\Idventatemporal;
+use App\Users;
+use App\Tickets;
+use Illuminate\Support\Facades\Hash;
 
 
 use Log;
@@ -1150,13 +1154,91 @@ class Helper{
             if($idBanca != null)
                 $idBanca = $idBanca->id;
         }else{
+            
             $idBanca = Branches::where(['idUsuario' => $idUsuario, 'status' => 1])->first();
             if($idBanca != null)
                 $idBanca = $idBanca->id;
+            else{
+                $u = Users::whereId($idUsuario)->first();
+                //Si el usuario no tiene banca entonces verificamos si tiene permiso para jugar como cualquier banca para retornar el id de la primera banca activa
+                if($u->tienePermiso("Jugar como cualquier banca") == true){
+                    $idBanca = Branches::where(['status' => 1])->first();
+                    if($idBanca != null){
+                        $idBanca = $idBanca->id;
+                    }
+                }
+                
+            }
         }
 
         return $idBanca;
     }
+
+
+    //Esta funcion apartara el siguiente idVenta
+    public static function createIdVentaTemporal($idBanca){
+        $siguienteIdVenta = Sales::max('id');
+        if($siguienteIdVenta == null)
+            $siguienteIdVenta = 0;
+        $siguienteIdVenta++;
+
+        //Hasing laravel https://laravel.com/docs/5.8/hashing
+        $id = Idventatemporal::where(['idVenta' => $siguienteIdVenta])->first();
+        if($id != null){
+            if($id->idBanca == $idBanca)
+                return $id->idVentaHash;
+            else{
+                $siguienteIdVenta = Idventatemporal::max('id');
+                if($siguienteIdVenta == null)
+                    $siguienteIdVenta = 0;
+                $siguienteIdVenta++;
+            }
+        }
+
+        $siguienteIdVentaHash = Hash::make($siguienteIdVenta);
+        $id = Idventatemporal::create([
+            'idBanca' => $idBanca,
+            'idVenta' => $siguienteIdVenta,
+            'idVentaHash' => $siguienteIdVentaHash
+        ]);
+
+        return $id->idVentaHash;
+    }
+
+
+    public static function getIdVentaTemporal($idVentaHash){
+        $id = Idventatemporal::where('IdVentaHash', $idVentaHash)->first();
+        if($id != null){
+            return $id->idVenta;
+        }
+
+        return 0;
+    }
+
+    public static function borrarVentaErronea($venta){
+        if($venta != null){
+            $idTicket = $venta->idTicket;
+            Salesdetails::where('idVenta', $venta->id)->delete();
+            $venta->delete();
+            Tickets::whereId($idTicket)->delete();
+        }
+    }
    
+
+    public static function getVentasDeHoy($idBanca){
+        $fecha = getdate();
+   
+        if($idBanca == 0){
+            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('status', [0,5])->get();
+        }else{
+            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('status', [0,5])
+            ->where('idBanca', $idBanca)
+            ->get();
+        }
+
+        return $ventas;
+    }
 
 }

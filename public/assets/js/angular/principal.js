@@ -143,6 +143,7 @@ myApp
             if(response != null){
                 //console.log('principal:',response.data.bancas)
                 $scope.datos.optionsBancas = response.data.bancas;
+                $scope.datos.idVenta = response.data.idVenta;
                 let idx = 0;
 
 
@@ -181,8 +182,14 @@ myApp
                 $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
 
-                console.log(response)
 
+                if(response.data.errores == 1){
+                    alert('Error: ' + response.data.mensaje);
+                    return;
+                }
+                
+console.log(response)
+                $scope.datos.idVenta = response.data.idVenta;
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
                 if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
@@ -810,7 +817,7 @@ myApp
                 $http.post(rutaGlobal+"/api/principal/guardar",{'datos':$scope.datos, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 
-                    // console.log('Principal.js venta_guardar : ', response.data);
+                    console.log('Principal.js venta_guardar : ', response.data);
  
                     if(response.data.errores == 0)
                         {

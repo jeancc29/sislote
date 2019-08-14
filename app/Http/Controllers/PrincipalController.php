@@ -117,9 +117,17 @@ class PrincipalController extends Controller
         ])['datos'];
 
         if(isset($datos['idUsuario'])){
-            $idBanca = Branches::where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first();
-            if($idBanca != null)
-                $idBanca = $idBanca->id;
+            $idBanca = Helper::getIdBanca($datos['idUsuario']);
+            // $idBanca = Branches::where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first();
+            // if($idBanca != null)
+            //     $idBanca = $idBanca->id;
+        }
+
+        if($idBanca == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'No hay bancas registradas'
+            ], 201);
         }
        
         $fecha = getdate();
@@ -141,6 +149,7 @@ class PrincipalController extends Controller
     
     
         return Response::json([
+            'idVenta' => Helper::createIdVentaTemporal($idBanca),
             'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
             'caracteristicasGenerales' =>  Generals::all(),
             'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
@@ -730,20 +739,34 @@ class PrincipalController extends Controller
             'datos.jugadas' => 'required',
         ])['datos'];
 
-
-        $sale = Sales::whereId($datos['idVenta'])->whereNotIn('status', [0, 5])->first();
-        if($sale != null){
+        $datos['idVenta'] = Helper::getIdVentaTemporal($datos['idVenta']);
+        if($datos['idVenta'] == 0){
             return Response::json([
-                'errores' => $errores,
-                'mensaje' => $mensaje,
-                'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
-                'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
-                'venta' => ($sale != null) ? new SalesResource($sale) : null,
-                'img' => $img
+                'errores' => 1,
+                'mensaje' => 'Error de seguridad: Idventa incorrecto'
             ], 201);
         }
 
+        $sale = Sales::where(['id' => $datos['idVenta'], 'idBanca' => $datos['idBanca']])->whereNotIn('status', [0, 5])->first();
+        if($sale != null){
+            //En caso de que la venta ya exista eso quiere decir que 
+            //la venta se guardo pero hubo un error antes de terminar de guardar todo por lo tanto es mejor borrarla y volver a crearla
+            Helper::borrarVentaErronea($sale);
+            // $img = new TicketPrintClass($sale->id);
+            // $img = $img->generate();
+            // return Response::json([
+            //     'idVenta' => Helper::createIdVentaTemporal($datos['idBanca']),
+            //     'errores' => 0,
+            //     'mensaje' => 'Se ha guardado Correctamente',
+            //     'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
+            //     'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
+            //     'venta' => ($sale != null) ? new SalesResource($sale) : null,
+            //     'img' => $img
+            // ], 201);
+        }
+
    
+        
     
         $fecha = getdate();
         $idSorteo = 0;
@@ -904,6 +927,7 @@ class PrincipalController extends Controller
         /***************** Insertar la venta y obtener el idVenta ***********************/
         
        $sale = Sales::create([
+           'id' => $datos['idVenta'],
            'idUsuario' => $datos['idUsuario'],
            'idBanca' => $datos['idBanca'],
            'total' => $datos['total'],
@@ -912,6 +936,9 @@ class PrincipalController extends Controller
            'hayDescuento' => $datos['hayDescuento'],
            'idTicket' => $idTicket
        ]);
+
+       //Hago esto porque al momento de guardar me retorna el id 0 entonces no es correcto
+       $sale = Sales::whereId($datos['idVenta'])->first();
     
     
        /***************** Insertar el datelle ventas ***********************/
@@ -1001,17 +1028,20 @@ class PrincipalController extends Controller
         $img = null;
         if($sale != null){
             // $img = new TicketClass($sale->id);\
+            
             $img = new TicketPrintClass($sale->id);
             $img = $img->generate();
         }
     
         return Response::json([
+            'idVenta' => Helper::createIdVentaTemporal($datos['idBanca']),
             'errores' => $errores,
             'mensaje' => $mensaje,
             'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
             'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
             'venta' => ($sale != null) ? new SalesResource($sale) : null,
-            'img' => $img
+            'img' => $img,
+            'ventas' => SalesResource::collection(Helper::getVentasDeHoy($datos['idBanca'])),
         ], 201);
     }
 

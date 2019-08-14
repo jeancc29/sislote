@@ -15,7 +15,7 @@ class CreateSalesTable extends Migration
     public function up()
     {
         Schema::create('sales', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->bigInteger('id');
             $table->unsignedInteger('idUsuario');
             $table->unsignedInteger('idBanca');
             $table->decimal('total', 20, 2);
@@ -27,6 +27,7 @@ class CreateSalesTable extends Migration
             $table->unsignedBigInteger('idTicket');
             $table->integer('status')->default(1);
             
+            $table->primary('id');
             $table->timestamps();
         });
     }

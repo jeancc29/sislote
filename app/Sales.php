@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Sales extends Model
 {
     protected $fillable = [
-        'idUsuario', 'idBanca', 'total', 'descuentoMonto', 'descuentoPorcentaje', 'hayDescuento', 'subTotal', 'idLoteria', 'idTicket'
+        'id', 'idUsuario', 'idBanca', 'total', 'descuentoMonto', 'descuentoPorcentaje', 'hayDescuento', 'subTotal', 'idLoteria', 'idTicket'
     ];
 
 
