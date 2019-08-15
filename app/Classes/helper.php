@@ -1113,7 +1113,7 @@ class Helper{
             
         }
 
-        return ($montoPremio > $montoPagado) ? false : true;
+        return ($montoPremios > $montoPagado) ? false : true;
     }
 
 
