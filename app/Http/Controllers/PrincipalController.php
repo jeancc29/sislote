@@ -439,7 +439,7 @@ class PrincipalController extends Controller
                     return Response::json([
                         'errores' => 0,
                         'mensaje' => '',
-                        'venta' =>  new SalesResource($sale)
+                        'venta' =>  new SalesResource($venta)
                     ], 201);
                 }
     
