@@ -426,7 +426,8 @@ class PrincipalController extends Controller
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
-            $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
+            // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
+            $venta = Sales::where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
             
             if($venta != null){
                 
