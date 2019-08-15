@@ -1119,7 +1119,14 @@ class Helper{
 
     static function pagar($idVenta, $idUsuario, $idBanca = null){
         
+        $venta = Sales::whereId($idVenta)->whereNotIn('status', [0,5])->first();
+        if($venta == null){
+            return false;
+        }
         $jugadas = Salesdetails::where(['idVenta' => $idVenta, 'pagado' => 0])->where('premio', '>', 0)->get();
+        $jugadasQueAunEstanPendiente = Salesdetails::where('idVenta', $idVenta)->whereStatus(0)->count();
+        $seMarcaronJugadasComoPagadas = false;
+        $idTicket = $venta->idTicket;
 
         $montoPremios = 0;
         $montoPagado = 0;
@@ -1127,6 +1134,7 @@ class Helper{
             foreach($jugadas as $j){
                 $j['pagado'] = 1;
                 $j->save();
+                $seMarcaronJugadasComoPagadas = true;
                 
                 Logs::create([
                     'idBanca' => Helper::getIdBanca($idUsuario, $idBanca),
@@ -1138,6 +1146,29 @@ class Helper{
                     'valor_viejo' => '0',
                     'valor_nuevo' => '1'
                 ]);
+            }
+
+            if($jugadasQueAunEstanPendiente > 0){
+                if($seMarcaronJugadasComoPagadas){
+                     //Generamos y guardamos codigo de barra
+                     $codigoBarraCorrecto = false;
+                    while($codigoBarraCorrecto != true){
+                        // $codigoBarra = $faker->isbn10;
+                        $codigoBarra = rand(1111111111, getrandmax());
+                        //return 'codiog: ' . $codigoBarra . ' faker: ' . $faker->isbn10;
+                        //Verificamos de que el codigo de barra no exista
+                        if(Tickets::where('codigoBarra', $codigoBarra)->get()->first() == null){
+                            if(is_numeric($codigoBarra)){
+                                $ticket = Tickets::whereId($idTicket)->first();
+                                $ticket['codigoBarraAntiguo'] = $ticket['codigoBarra'];
+                                $ticket['codigoBarra'] = $codigoBarra;
+                                $ticket->save();
+                                $codigoBarraCorrecto = true;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }else{
             return false;
