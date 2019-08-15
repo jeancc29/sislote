@@ -55,50 +55,59 @@ class AwardsClass{
     }
 
     public function datosValidos(){
-        $sorteo = Draws::whereId($this->loteria['id'])->first();
+        $sorteos = $this->loteria->sorteos;
+
+        $validos = true;
+
+        foreach($sorteos as $sorteo):
+
         if($sorteo == null)
             return false;
 
         if($sorteo['descripcion'] == "Directo" || $sorteo['descripcion'] == "Pale" || $sorteo['descripcion'] == "Tripleta" || $sorteo['descripcion'] == "Super pale"){
             if(!Helper::isNumber($this->primera)){
-                return false;
+                $validos = false;
             }
             else if(strlen($this->primera) != 2){
-                return false;
+                $validos = false;
             }
             if(!Helper::isNumber($this->segunda)){
-                return false;
+                $validos = false;
             }
             else if(strlen($this->segunda) != 2){
-                return false;
+                $validos = false;
             }
             if($sorteo['descripcion'] != "Super pale"){
                 if(!Helper::isNumber($this->tercera)){
-                    return false;
+                    $validos = false;
                 }
                 else if(strlen($this->tercera) != 2){
-                    return false;
+                    $validos = false;
                 }
             } 
         }
-        if($sorteo['descripcion'] == "Pick 3 Straight" || $sorteo['descripcion'] == "Pick 3 Box"){
+        else if($sorteo['descripcion'] == "Pick 3 Straight" || $sorteo['descripcion'] == "Pick 3 Box"){
+            return $sorteo;
             if(!Helper::isNumber($this->pick3)){
-                return false;
+                $validos = false;
             }
             else if(strlen($this->pick3) != 3){
-                return false;
+                $validos = false;
             }
         }
-        if($sorteo['descripcion'] == "Pick 4 Straight" || $sorteo['descripcion'] == "Pick 4 Box"){
+        else if($sorteo['descripcion'] == "Pick 4 Straight" || $sorteo['descripcion'] == "Pick 4 Box"){
+            return $sorteo;
             if(!Helper::isNumber($this->pick4)){
-                return false;
+                $validos = false;
             }
             else if(strlen($this->pick4) != 4){
-                return false;
+                $validos = false;
             }
         }
 
-        return true;
+    endforeach;
+
+        return $validos;
     }
 
     public function combinacionesNula(){

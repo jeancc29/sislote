@@ -64,12 +64,24 @@ class Prueba extends Command
         $monto = (new Helper)->montodisponible("55", 1, 1);
 
         //$h = new TicketClass(17);
-        $a = new AwardsClass(2);
-        $a->primera = 25;
-        $a->segunda = 02;
-        $a->tercera = 23;
-        $a->pick3 = 111;
-        $a->pick4 = 1234;
+        $a = new AwardsClass(7);
+        $a->primera = "25";
+        $a->segunda = "02";
+        $a->tercera = "23";
+        // $a->pick3 = 111;
+        // $a->pick4 = 1234;
+
+        $this->info("Awardsclasss: " . $a->datosValidos());
+
+
+        // $awardsClass = new AwardsClass($l['id']);
+        // $awardsClass->idUsuario = $datos['idUsuario'];
+        // $awardsClass->primera = $l['primera'];
+        // $awardsClass->segunda = $l['segunda'];
+        // $awardsClass->tercera = $l['tercera'];
+        // $awardsClass->pick3 = $l['pick3'];
+        // $awardsClass->pick4 = $l['pick4'];
+        // $awardsClass->numerosGanadores = $l['primera'] . $l['segunda'] . $l['tercera'];
 
         //$a->pick3BuscarPremio(1, 1, '122', 1, false);
 
@@ -83,8 +95,10 @@ class Prueba extends Command
             $c = "malo";
         }
 
-        $this->info("Awardsclasss: " . Helper::comisionesPorBanca(1));
-        $this->info("Awardsclasss: " . Helper::comisionesPorLoteria( 1, '2019-07-31 00:00:00', '2019-07-31 23:00:00'));
+
+
+        // $this->info("Awardsclasss: " . Helper::comisionesPorBanca(1));
+        // $this->info("Awardsclasss: " . Helper::comisionesPorLoteria( 1, '2019-07-31 00:00:00', '2019-07-31 23:00:00'));
         // $this->info("Awardsclasss: " . $a->combinacionesNula());
     //    $this->info("Awardsclasss: " . Helper::contarNumerosIdenticos("1211"));
     // $this->info("Awardsclasss pick3: " . $a->pick3BuscarPremio(1, 1, '123', 1, true));

@@ -334,7 +334,7 @@ class PrincipalController extends Controller
             }
         }
         else if(isset($datos['codigoQr']) && !isset($datos['codigoBarra'])){
-            $datos['codigoBarra'] = Crypt::decryptString($datos['codigoQr']);
+            $datos['codigoBarra'] = base64_decode($datos['codigoQr']);
         }else{
             return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
         }
@@ -357,8 +357,9 @@ class PrincipalController extends Controller
                 // $venta['pagado'] = 1;
                 // $venta->save();
     
-                if(Helper::pagar($venta->id, $datos['idUsuario']))
+                if(Helper::pagar($venta->id, $datos['idUsuario'])){
                     $mensaje = "El ticket se ha pagado correctamente";
+                }
                 else{
                     $errores = 1;
                     $mensaje = "El ticket no existe, no esta premiado o ya ha sido pagado";
@@ -407,7 +408,7 @@ class PrincipalController extends Controller
             }
         }
         else if(isset($datos['codigoQr']) && !isset($datos['codigoBarra'])){
-            $datos['codigoBarra'] = Crypt::decryptString($datos['codigoQr']);
+            $datos['codigoBarra'] = base64_decode($datos['codigoQr']);
         }else{
             return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
         }

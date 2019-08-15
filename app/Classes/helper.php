@@ -1101,7 +1101,7 @@ class Helper{
         if($jugadasQueAunEstanPendiente > 0){
             return false;
         }
-        $jugadas = Salesdetails::where('idVenta', $idTicket)->get();
+        $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
 
         $montoPremios = 0;
         $montoPagado = 0;
