@@ -666,6 +666,66 @@ class ReportesController extends Controller
         ], 201);
     }
 
+    public function ticketsPendientesDePago()
+    {
+        $datos = request()->validate([
+            'datos.fecha' => 'required',
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => '',
+            'datos.layout' => ''
+        ])['datos'];
+
+        if($datos['idBanca'] == 0){
+            $bancas = Branches::whereStatus(1)->get();
+            $datos['idBanca'] = collect($bancas)->map(function($b){
+                return $b['id'];
+            });
+        }else{
+            $datos['idBanca'] = [$datos['idBanca']];
+        }
+
+        if($datos['fecha'] == "Todas las fechas"){
+            $ticketsPendientesDePago = Sales::
+            select('sales.id')
+            ->join('salesdetails', 'salesdetails.idVenta', 'sales.id')
+            ->whereNotIn('sales.status', [0, 5])
+            ->where(['salesdetails.status' => 1, 'salesdetails.pagado' => 0])
+            ->where('salesdetails.premio', '>', 0)
+            ->groupBy('sales.id')
+            ->whereIn('sales.idBanca', $datos['idBanca'])
+            ->get();
+        }else{
+            $fecha = getdate(strtotime($datos['fecha']));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+           
+
+            $ticketsPendientesDePago = Sales::select('sales.id')
+            ->join('salesdetails', 'salesdetails.idVenta', 'sales.id')
+            ->whereNotIn('sales.status', [0, 5])
+            ->where(['salesdetails.status' => 1, 'salesdetails.pagado' => 0])
+            ->where('salesdetails.premio', '>', 0)
+            ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            ->groupBy('sales.id')
+            ->whereIn('sales.idBanca', $datos['idBanca'])
+            ->get();
+        }
+
+
+
+        $ticketsPendientesDePago = collect($ticketsPendientesDePago)->map(function($t){
+            return $t['id'];
+        });
+
+        $ticketsPendientesDePago = Sales::whereIn('id', $ticketsPendientesDePago)->get();
+        return Response::json([
+            'bancas' => Branches::whereStatus(1)->get(),
+            'ticketsPendientesDePago' => SalesResource::collection($ticketsPendientesDePago)
+        ], 201);
+        
+    }
+
     /**
      * Show the form for creating a new resource.
      *

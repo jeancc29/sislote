@@ -103,6 +103,7 @@ Route::post('/reportes/ventas/', 'ReportesController@ventas');
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
 Route::post('/reportes/historico/', 'ReportesController@historico');
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
+Route::post('/reportes/ticketsPendientesDePago/', 'ReportesController@ticketsPendientesDePago');
 
 
 Route::get('/entidades', 'EntityController@index');
