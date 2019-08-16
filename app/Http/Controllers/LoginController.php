@@ -182,6 +182,14 @@ class LoginController extends Controller
             'idUsuario' => $u->id,
             'esCelular' => true
         ]);
+
+        $administrador = false;
+        
+        $role = Roles::whereId($u->idRole)->first();
+       if($role->descripcion == "Administrador")
+            $administrador = true;
+        else
+            $administrador = false;
       
        return Response::json([
         'errores' => 0,
@@ -189,7 +197,8 @@ class LoginController extends Controller
         'idUsuario' => $u->id,
         'permisos' => $u->permisos,
         'banca' => $banca->descripcion,
-        'idBanca' => $banca->id
+        'idBanca' => $banca->id,
+        'administrador' => $administrador
     ], 201);
     }
 
