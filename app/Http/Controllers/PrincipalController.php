@@ -358,6 +358,7 @@ class PrincipalController extends Controller
                 // $venta->save();
     
                 if(Helper::pagar($venta->id, $datos['idUsuario'])){
+                    $venta = Sales::whereId($venta->id)->first();
                     $mensaje = "El ticket se ha pagado correctamente";
                 }
                 else{
