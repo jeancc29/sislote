@@ -48,3 +48,4 @@ Route::get('/transacciones/grupo', 'TransactionsController@grupo')->name('transa
 Route::get('/transacciones', 'TransactionsController@index')->name('transacciones');
 
 Route::get('/monitoreo/tickets', 'MonitoreoController@tickets')->name('monitoreo.tickets');
+Route::get('/politica', 'PoliticaPrivacidadController@index')->name('politica');
