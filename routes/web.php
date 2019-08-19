@@ -49,3 +49,10 @@ Route::get('/transacciones', 'TransactionsController@index')->name('transaccione
 
 Route::get('/monitoreo/tickets', 'MonitoreoController@tickets')->name('monitoreo.tickets');
 Route::get('/politica', 'PoliticaPrivacidadController@index')->name('politica');
+
+
+Route::get('/balance/bancas', 'BalancesController@index')->name('balance.bancas');
+Route::get('/balance/bancos', 'BalancesController@bancos')->name('balance.bancos');
+Route::get('/test1', 'DaysController@test1')->name('prueba1');
+Route::get('/test2', 'DaysController@test2')->name('prueba2');
+Route::get('/test3', 'DaysController@test3')->name('prueba3');

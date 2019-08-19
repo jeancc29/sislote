@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Days;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 
 class DaysController extends Controller
@@ -13,10 +15,68 @@ class DaysController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    function microtime_float()
+    {
+        list($usec, $sec) = explode(" ", microtime());
+        return ((float)$usec + (float)$sec);
+    }
+
     public function index()
+    {
+        // $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+        //             sum(sales.subTotal) subTotal, 
+        //             sum(sales.total) total, 
+        //             sum(sales.premios) premios, 
+        //             sum(descuentoMonto)  as descuentoMonto,
+        //             sum(salesdetails.comision) as comisiones'))
+        //     ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+        //     ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereNotIn('sales.status', [0,5])
+        //     ->groupBy('fecha')
+        //     //->orderBy('created_at', 'asc')
+        //     ->get();
+    }
+
+    public function test1()
+    {
+        $time_start = $this->microtime_float();
+
+        // Sleep for a while
+        $d = Days::whereId(1);
+    
+       
+        
+        $time_end = $this->microtime_float();
+        $time = $time_end - $time_start;
+
+        return $time;
+    }
+
+    
+    public function test2()
+    {
+        $time_start = $this->microtime_float();
+
+        // Sleep for a while
+        // $d = DB::raw('select * from days where id = 1');
+        $d = DB::table('users')->select('id');
+    
+       
+        echo 
+        
+        $time_end = $this->microtime_float();
+        $time = $time_end - $time_start;
+
+        return $time;
+    }
+
+    
+    public function test3()
     {
         //
     }
+
 
     /**
      * Show the form for creating a new resource.

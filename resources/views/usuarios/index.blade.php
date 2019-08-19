@@ -326,6 +326,34 @@
                           </div>
                         </div> <!-- END ROW -->
 
+                        <div class="row">
+                          <div class="col-12">
+                            <h3 class="">Balances</h3>
+                          </div>
+                          <div ng-repeat="d in datos.ckbPermisos | filter: {idTipo: 8}" class="form-check form-check-inline">
+                            <label class="form-check-label">
+                              <input ng-model="d.existe" ng-change="ckbPermisos_changed(ckbDias, d)" class="form-check-input" type="checkbox" value=""> @{{d.descripcion}}
+                              <span class="form-check-sign">
+                                <span class="check"></span>
+                              </span>
+                            </label>
+                          </div>
+                        </div> <!-- END ROW -->
+
+                        <div class="row">
+                          <div class="col-12">
+                            <h3 class="">Otros</h3>
+                          </div>
+                          <div ng-repeat="d in datos.ckbPermisos | filter: {idTipo: 9}" class="form-check form-check-inline">
+                            <label class="form-check-label">
+                              <input ng-model="d.existe" ng-change="ckbPermisos_changed(ckbDias, d)" class="form-check-input" type="checkbox" value=""> @{{d.descripcion}}
+                              <span class="form-check-sign">
+                                <span class="check"></span>
+                              </span>
+                            </label>
+                          </div>
+                        </div> <!-- END ROW -->
+
                       </div> <!-- END COL-12 -->
                      </div> <!-- END ROW ROLE -->
 

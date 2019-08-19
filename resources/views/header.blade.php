@@ -200,6 +200,13 @@ if($controlador != "login"){
     <?php if($controlador == "reportes.ventasporfecha" ):?>
         <script src="{{asset('assets/js/angular/reporte.ventasporfecha.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
+    <?php if($controlador == "balance.bancas" ):?>
+        <script src="{{asset('assets/js/angular/balances.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
+
+    <?php if($controlador == "balance.bancos" ):?>
+        <script src="{{asset('assets/js/angular/balance.bancos.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
 
     <!-- <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script> -->
 
@@ -1328,7 +1335,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
                 <div class="collapse" id="transaccionesToggle">
                     <ul class="nav">
-                        <li class="nav-item ">
+                        <li class="nav-item">
                             <a class="nav-link" href="{{route('transacciones')}}">
                               <span class="sidebar-mini"> T </span>
                               <span class="sidebar-normal"> Transacciones </span>
@@ -1338,6 +1345,31 @@ if(session('idUsuario') == null && $controlador != 'login'){
                             <a class="nav-link" href="{{route('transacciones.grupo')}}">
                               <span class="sidebar-mini"> G </span>
                               <span class="sidebar-normal"> Grupo transacciones </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" data-toggle="collapse" href="#balanceToggle">
+                    <i class="material-icons">account_balance_wallet</i>
+                    <p> Balance 
+                       <b class="caret"></b>
+                    </p>
+                </a>
+
+                <div class="collapse" id="balanceToggle">
+                    <ul class="nav">
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('balance.bancas')}}">
+                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-normal"> Bancas </span>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{{route('balance.bancos')}}">
+                              <span class="sidebar-mini"> B </span>
+                              <span class="sidebar-normal"> Bancos </span>
                             </a>
                         </li>
                     </ul>

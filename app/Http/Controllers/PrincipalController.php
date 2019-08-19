@@ -780,6 +780,7 @@ class PrincipalController extends Controller
         $codigoBarra = '';
         $sale = null;
         $idDia = Days::whereWday($fecha['wday'])->first()->id;
+        $banca = Branches::whereId($datos['idBanca'])->first();
     
         $usuario = Users::whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso('Vender tickets')){
@@ -799,21 +800,21 @@ class PrincipalController extends Controller
         }
     
     
-        if(!Branches::whereId($datos['idBanca'])->first()->abierta()){
+        if(!$banca->abierta()){
             return Response::json([
                 'errores' => 1,
                 'mensaje' => 'La banca aun no ha abierto'
             ], 201);
         }
     
-        if(Branches::whereId($datos['idBanca'])->first()->cerrada()){
+        if($banca->cerrada()){
             return Response::json([
                 'errores' => 1,
                 'mensaje' => 'La banca ha cerrado'
             ], 201);
         }
 
-        if(Branches::whereId($datos['idBanca'])->first()->limiteVenta($datos['total'])){
+        if($banca->limiteVenta($datos['total'])){
             return Response::json([
                 'errores' => 1,
                 'mensaje' => 'A excedido el limite de ventas de la banca'

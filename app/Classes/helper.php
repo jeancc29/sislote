@@ -101,6 +101,101 @@ class Helper{
        return round($saldo_inicial, 2);
     }
 
+
+
+    static function saldoPorFecha($id, $entidad = 1, $fechaHasta = null){
+        $datos = Array("id" => $id, "entidad" => $entidad);
+        $saldo_inicial = 0;
+        $fecha = getdate();
+   
+        if($fechaHasta != null){
+            $fecha = getdate(strtotime($fechaHasta));
+            $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }else{
+            $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+            
+
+            
+
+
+
+
+
+        if($datos["entidad"] == 1){
+            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad1' => $idTipoEntidad1->id, 
+                    'status' => 1
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->where('created_at', '<', $fechaHasta)
+                ->sum('debito');
+            $credito =  transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad1' => $idTipoEntidad1->id, 
+                    'status' => 1
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->where('created_at', '<', $fechaHasta)
+                ->sum('credito');
+            $saldo_inicial = $debito - $credito;
+        }else if($datos["entidad"] == 2){
+            $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::where(
+                [
+                    'idEntidad2'=> $datos["id"],
+                    'idTipoEntidad2' => $idTipoEntidad2->id,  
+                    'status' => 1
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->where('created_at', '<', $fechaHasta)
+                ->sum('debito');
+            $credito = transactions::where(
+                [
+                    'idEntidad2'=> $datos["id"],
+                    'idTipoEntidad2' => $idTipoEntidad2->id,  
+                    'status' => 1
+                ])
+                ->where('idTipo', '!=', $tipo->id)
+                ->where('created_at', '<', $fechaHasta)
+                ->sum('credito');
+            $saldo_inicial = $credito - $debito;
+        }
+        else if($datos["entidad"] == 3){
+            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad1' => $idTipoEntidad1->id, 
+                    'status' => 1,
+                    'idTipo' => $tipo->id
+                ])
+                ->where('idTipo', '=', $tipo->id)
+                ->where('created_at', '<', $fechaHasta)
+                ->sum('debito');
+            $credito = transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad1' => $idTipoEntidad1->id, 
+                    'status' => 1,
+                    'idTipo' => $tipo->id
+                ])
+                ->where('idTipo', '=', $tipo->id)
+                ->where('created_at', '<', $fechaHasta)
+                ->sum('credito');
+                $saldo_inicial = $debito - $credito;
+        }
+
+       return round($saldo_inicial, 2);
+    }
+
     public function _sendSms($to, $codigoBarra, $sms = true)
     {
         $accountSid = config('twilio.TWILIO_SID');
@@ -1270,6 +1365,10 @@ class Helper{
         }
 
         return $ventas;
+    }
+
+    public static function getJugadasPertenecientesALoteria($idLoteria){
+        
     }
 
 }

@@ -175,5 +175,81 @@ class PermissionSeeder extends Seeder
             'idTipo' => 7
         ]);
 
+
+
+
+
+         //Balances idTipo == 8
+        //20
+        p::create([
+            'descripcion' => 'Ver lista de balances de bancas',
+            'status' => 1,
+            'idTipo' => 8
+        ]);
+
+        p::create([
+            'descripcion' => 'Ver lista de balances de bancos',
+            'status' => 1,
+            'idTipo' => 8
+        ]);
+
+
+        //Otros idTipo == 9
+        //22
+       
+
+        p::create([
+            'descripcion' => 'Manejar resultados',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        p::create([
+            'descripcion' => 'Manejar agentes externos',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        p::create([
+            'descripcion' => 'Manejar entidades contables',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        p::create([
+            'descripcion' => 'Manejar horarios de loterias',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        p::create([
+            'descripcion' => 'Manejar loterias',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        p::create([
+            'descripcion' => 'Manejar reglas',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        p::create([
+            'descripcion' => 'Manejar prestamos',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
+        // p::create([
+        //     'descripcion' => 'Manejar correos',
+        //     'status' => 1,
+        //     'idTipo' => 9
+        // ]);
+         // p::create([
+        //     'descripcion' => 'Cierre programado global de loteria',
+        //     'status' => 1,
+        //     'idTipo' => 9
+        // ]);
+        // p::create([
+        //     'descripcion' => 'Editar caida acumulada',
+        //     'status' => 1,
+        //     'idTipo' => 9
+        // ]);
+
+      
+
     }
 }

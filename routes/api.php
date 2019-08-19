@@ -120,3 +120,5 @@ Route::post('/transacciones/buscarTransaccion', 'TransactionsController@buscarTr
 
 
 Route::post('/monitoreo/tickets', 'MonitoreoController@monitoreo');
+Route::post('/balance/bancas', 'BalancesController@index');
+Route::post('/balance/bancos', 'BalancesController@bancos');
