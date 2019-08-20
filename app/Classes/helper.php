@@ -267,14 +267,14 @@ class Helper{
         $idSorteo = 1;
     }
    else if(strlen($jugada) == 3){
-        $idSorteo = DB::table('draws')::whereDescripcion("Pick 3 Straight")->first();
+        $idSorteo = DB::table('draws')->whereDescripcion("Pick 3 Straight")->first();
         if($idSorteo != null){
             $idSorteo = $idSorteo->id;
         }
    }
    else if(strlen($jugada) == 4){
         if(gettype(strpos($jugada, '+')) == "integer"){
-            $idSorteo = DB::table('draws')::whereDescripcion("Pick 3 Box")->first();
+            $idSorteo = DB::table('draws')->whereDescripcion("Pick 3 Box")->first();
             if($idSorteo != null){
                 $idSorteo = $idSorteo->id;
             }
@@ -291,13 +291,13 @@ class Helper{
    }
     else if(strlen($jugada) == 5){
             if(gettype(strpos($jugada, '+')) == "integer"){
-                $idSorteo = DB::table('draws')::whereDescripcion("Pick 4 Box")->first();
+                $idSorteo = DB::table('draws')->whereDescripcion("Pick 4 Box")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
             }
             else if(gettype(strpos($jugada, '-')) == "integer"){
-                $idSorteo = DB::table('draws')::whereDescripcion("Pick 4 Straight")->first();
+                $idSorteo = DB::table('draws')->whereDescripcion("Pick 4 Straight")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
@@ -516,7 +516,7 @@ class Helper{
 
        $jugada = Helper::quitarUltimoCaracter($jugada, $idSorteo);
     
-       $bloqueo = Stock::where([   
+       $bloqueo = DB::table('stocks')->where([   
            'idLoteria' => $loteria->id, 
            'idBanca' => $idBanca, 
            'jugada' => $jugada,
@@ -526,7 +526,7 @@ class Helper{
        
     //Verificamos que la variable $stock no sea nula
     if($bloqueo == null){
-        $bloqueo = Blocksplays::where(
+        $bloqueo = DB::table('blocksplays')->where(
             [
                 'idBanca' => $idBanca,
                 'idLoteria' => $loteria->id, 
@@ -538,7 +538,7 @@ class Helper{
             ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->value('monto');
     
         if($bloqueo == null){
-            $bloqueo = Blockslotteries::where([
+            $bloqueo = DB::table('blockslotteries')->where([
                 'idBanca' => $idBanca, 
                 'idLoteria' => $loteria->id, 
                 'idDia' => $idDia,
