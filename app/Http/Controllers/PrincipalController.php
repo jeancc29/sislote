@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
 
 
 use Request;
@@ -861,7 +862,7 @@ class PrincipalController extends Controller
 
                 
 
-               $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
+               $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria);
                $sorteo = Draws::whereId($idSorteo)->first();
                if(Helper::decimalesDelMontoJugadoSonValidos($d['monto'], $loteria, $sorteo) == false){
                 return Response::json([
@@ -957,7 +958,7 @@ class PrincipalController extends Controller
 
             $loteria = Lotteries::whereId($d['idLoteria'])->first();
             
-           $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria->id);
+           $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria);
            $d['jugada'] = Helper::quitarUltimoCaracter($d['jugada'], $idSorteo);
     
            $stock = Stock::where(['idLoteria' => $d['idLoteria'],'idBanca' => $datos['idBanca'], 'jugada' => $d['jugada'], 'idSorteo' => $idSorteo])
@@ -1078,9 +1079,10 @@ class PrincipalController extends Controller
         $idSorteo = 0;
         $bloqueo = 0;
     
-        $idDia = Days::whereWday($fecha['wday'])->first()->id;
+        // $idDia = Days::whereWday($fecha['wday'])->first()->id;
     
-        $loteria = Lotteries::whereId($datos['idLoteria'])->first();
+        $loteria = DB::table('lotteries')->whereId($datos['idLoteria'])->first();
+        
     
     //    if(strlen($datos['jugada']) == 2){
     //         $idSorteo = 1;
@@ -1095,16 +1097,17 @@ class PrincipalController extends Controller
     //         $idSorteo = 3;
     //    }
 
-  
-        $idSorteo = (new Helper)->determinarSorteo($datos['jugada'], $loteria->id);
     
-       $bloqueo = Stock::where([   
-           'idLoteria' => $datos['idLoteria'], 
-           'idBanca' => $datos['idBanca'], 
-           'jugada' => $datos['jugada'],
-           'idSorteo' => $idSorteo,
-        ])
-       ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->value('monto');
+  
+        // $idSorteo = (new Helper)->determinarSorteo($datos['jugada'], $loteria);
+    
+    //    $bloqueo = Stock::where([   
+    //        'idLoteria' => $datos['idLoteria'], 
+    //        'idBanca' => $datos['idBanca'], 
+    //        'jugada' => $datos['jugada'],
+    //        'idSorteo' => $idSorteo,
+    //     ])
+    //    ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->value('monto');
        
     //Verificamos que la variable $stock no sea nula
     // if($bloqueo == null){
@@ -1129,7 +1132,7 @@ class PrincipalController extends Controller
     //     }
     // }
 
-    $bloqueo = (new Helper)->montodisponible($datos['jugada'], $datos['idLoteria'], $datos['idBanca']);
+    $bloqueo = (new Helper)->montodisponible($datos['jugada'], $loteria, $datos['idBanca']);
     
        
     

@@ -1,5 +1,6 @@
 <?php
 namespace App\Classes;
+use Illuminate\Support\Facades\DB;
 
 use App\transactions;
 use App\Types;
@@ -257,7 +258,61 @@ class Helper{
         }
     }
 
-    public function determinarSorteo($jugada, $idLoteria){
+    public function determinarSorteo($jugada, $loteria){
+        
+        $idSorteo = 0;
+  
+
+    if(strlen($jugada) == 2){
+        $idSorteo = 1;
+    }
+   else if(strlen($jugada) == 3){
+        $idSorteo = DB::table('draws')::whereDescripcion("Pick 3 Straight")->first();
+        if($idSorteo != null){
+            $idSorteo = $idSorteo->id;
+        }
+   }
+   else if(strlen($jugada) == 4){
+        if(gettype(strpos($jugada, '+')) == "integer"){
+            $idSorteo = DB::table('draws')::whereDescripcion("Pick 3 Box")->first();
+            if($idSorteo != null){
+                $idSorteo = $idSorteo->id;
+            }
+        }
+        $sorteo = DB::table('draws')
+                ->select('draws.id')
+                ->join('draw_lottery', 'draws.id', '=', 'draw_lottery.idSorteo')
+                ->where(['draw_lottery.idLoteria' => $loteria->id, 'draws.descripcion' => 'Super pale'])->first();
+        $drawRelations = DB::table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
+        if($sorteo == null || $drawRelations <= 1)
+            $idSorteo = 2;
+        else if($sorteo != null || $drawRelations >= 2)
+            $idSorteo = 4;
+   }
+    else if(strlen($jugada) == 5){
+            if(gettype(strpos($jugada, '+')) == "integer"){
+                $idSorteo = DB::table('draws')::whereDescripcion("Pick 4 Box")->first();
+                if($idSorteo != null){
+                    $idSorteo = $idSorteo->id;
+                }
+            }
+            else if(gettype(strpos($jugada, '-')) == "integer"){
+                $idSorteo = DB::table('draws')::whereDescripcion("Pick 4 Straight")->first();
+                if($idSorteo != null){
+                    $idSorteo = $idSorteo->id;
+                }
+            }
+    }
+    else if(strlen($jugada) == 6){
+            $idSorteo = 3;
+    }
+
+
+       return $idSorteo;
+    }
+
+
+    public function determinarSorteoViejo($jugada, $idLoteria){
         $loteria = Lotteries::whereId($idLoteria)->first();
         $idSorteo = 0;
   
@@ -372,7 +427,7 @@ class Helper{
     }
 
     static function quitarUltimoCaracter($cadena, $idSorteo){
-        $sorteo = Draws::whereId($idSorteo)->first();
+        $sorteo = DB::table('draws')->whereId($idSorteo)->first();
         if($sorteo == null){
             return $cadena;
         }
@@ -449,7 +504,57 @@ class Helper{
         // return   session('_'."1") . ':' . session('_'."2"). ':' . session('_'."3") . ':'. session('_'."4");
     }
 
-    function montodisponible($jugada, $idLoteria, $idBanca){
+    function montodisponible($jugada, $loteria, $idBanca){ 
+        $fecha = getdate();
+        $idSorteo = 0;
+        $bloqueo = 0;
+    
+        $idDia = DB::table('days')->whereWday($fecha['wday'])->first()->id;
+    
+        
+        $idSorteo = Helper::determinarSorteo($jugada, $loteria);
+
+       $jugada = Helper::quitarUltimoCaracter($jugada, $idSorteo);
+    
+       $bloqueo = Stock::where([   
+           'idLoteria' => $loteria->id, 
+           'idBanca' => $idBanca, 
+           'jugada' => $jugada,
+           'idSorteo' => $idSorteo
+        ])
+       ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->value('monto');
+       
+    //Verificamos que la variable $stock no sea nula
+    if($bloqueo == null){
+        $bloqueo = Blocksplays::where(
+            [
+                'idBanca' => $idBanca,
+                'idLoteria' => $loteria->id, 
+                'jugada' => $jugada,
+                'idSorteo' => $idSorteo,
+                'status' => 1
+            ])
+            ->where('fechaDesde', '<=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00')
+            ->where('fechaHasta', '>=', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00')->value('monto');
+    
+        if($bloqueo == null){
+            $bloqueo = Blockslotteries::where([
+                'idBanca' => $idBanca, 
+                'idLoteria' => $loteria->id, 
+                'idDia' => $idDia,
+                'idSorteo' => $idSorteo
+            ])->value('monto');
+        }
+    }
+    
+       
+    
+       if($bloqueo == null) $bloqueo = 0;
+    
+        return $bloqueo;
+    }
+
+    function montodisponibleViejo($jugada, $idLoteria, $idBanca){ 
         $fecha = getdate();
         $idSorteo = 0;
         $bloqueo = 0;
