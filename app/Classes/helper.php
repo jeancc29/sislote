@@ -1472,8 +1472,69 @@ class Helper{
         return $ventas;
     }
 
-    public static function getJugadasPertenecientesALoteria($idLoteria){
-        
+    public static function getJugadasPertenecientesALoteria($idLoteria, $jugadas){
+        $c = 0;
+        $colleccion = null;
+        foreach($jugadas as $j){
+            if($idLoteria == $j['idLoteria']){
+                 if($c == 0){
+                    $colleccion = collect([
+                        [
+                            'idLoteria' => $idLoteria,
+                            'jugada' => $j['jugada'],
+                            'monto' => $j['monto'], 
+                            'tam' => $j['tam'], 
+                            'monto' => $j['monto']
+                        ]
+                    ]);
+                    return $colleccion;
+                }else{
+                    $colleccion->push([
+                        'idLoteria' => $idLoteria,
+                        'jugada' => $j['jugada'],
+                        'monto' => $j['monto'], 
+                        'tam' => $j['tam'], 
+                        'monto' => $j['monto']
+                    ]);
+                }
+
+                $c++;
+            }
+        }
+
+        return $colleccion;
+    }
+
+    public static function getLoterias($jugadas){
+        $c = 0;
+        $colleccion = null;
+        foreach($jugadas as $j){
+            
+                 if($c == 0){
+                    $colleccion = collect([
+                        ['id' => $j['idLoteria']]
+                    ]);
+                }else{
+                    if(!Helper::existeLoteria($j['idLoteria'], $colleccion))
+                        $colleccion->push([
+                            'id' => $j['idLoteria']
+                        ]);
+                }
+
+                $c++;
+            
+        }
+
+        return $colleccion;
+    }
+    
+    public static function existeLoteria($idLoteria, $collect){
+        foreach($collect as $c){
+            if($c['id'] == $idLoteria)
+                return true;
+        }
+
+        return false;
     }
 
 }

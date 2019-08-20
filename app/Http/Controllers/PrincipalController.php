@@ -743,6 +743,12 @@ class PrincipalController extends Controller
             'datos.jugadas' => 'required',
         ])['datos'];
 
+        // return Response::json([
+        //     'errores' => 1,
+        //     'mensaje' => 'Error de seguridad: Idventa incorrecto',
+        //     'datos' => $datos['jugadas']
+        // ], 201);
+
         $datos['idVenta'] = Helper::getIdVentaTemporal($datos['idVenta']);
         if($datos['idVenta'] == 0){
             return Response::json([
@@ -844,12 +850,15 @@ class PrincipalController extends Controller
     
         
         /***************** Validamos la existencia de la jugada ***********************/
-        //foreach($datos['loterias'] as $l){
-            foreach($datos['jugadas'] as $d){
+        $loterias = Helper::getLoterias($datos['jugadas']);
+        foreach($loterias as $l){
+            $loteria = Lotteries::whereId($l['id'])->first();
+            $jugadas = Helper::getJugadasPertenecientesALoteria($l['id'], $datos['jugadas']);
+            foreach($jugadas as $d){
 
                
                 
-                $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                
                  //Confirmamos de que la loteria no tenga premios registrados en el dia de hoy
                //si es asi entonces no puede realizar la jugada y en caso de querer hacer jugadas
                //enonces debe borrar los premios de dicha loteria
@@ -917,7 +926,7 @@ class PrincipalController extends Controller
                     'jugada' => $d['jugada']])
                     ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
                    
-                if((new Helper)->montodisponible($d['jugada'], $d['idLoteria'], $datos['idBanca']) < $d['monto']){
+                if((new Helper)->montodisponible($d['jugada'], $loteria, $datos['idBanca']) < $d['monto']){
                         $errores = 1;
                         $mensaje = 'No hay existencia suficiente para la jugada ' . $d['jugada'] .' en la loteria ' . $d['descripcion'];
                         break;
@@ -925,7 +934,7 @@ class PrincipalController extends Controller
             
                
             }
-        //}
+        }
     
     if($errores == 0){
     
@@ -949,14 +958,17 @@ class PrincipalController extends Controller
        /***************** Insertar el datelle ventas ***********************/
     
    
-    $coleccionJugadas = collect($datos['jugadas']);
+    // $coleccionJugadas = collect($datos['jugadas']);
         // list($jugadasLoterias, $no) = $coleccionJugadas->partition(function($j) use($l){
         //     return $j['idLoteria'] == $l['id'];
         // });
 
-        foreach($datos['jugadas'] as $d){
+    foreach($loterias as $l){
+        $loteria = Lotteries::whereId($l['id'])->first();
+        $jugadas = Helper::getJugadasPertenecientesALoteria($l['id'], $datos['jugadas']);
+        foreach($jugadas as $d){
 
-            $loteria = Lotteries::whereId($d['idLoteria'])->first();
+            // $loteria = Lotteries::whereId($d['idLoteria'])->first();
             
            $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria);
            $d['jugada'] = Helper::quitarUltimoCaracter($d['jugada'], $idSorteo);
@@ -1023,6 +1035,7 @@ class PrincipalController extends Controller
          
     
         }
+    }
 
         if($errores == 0)
             $mensaje = "Se ha guardado correctamente";
