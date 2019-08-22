@@ -802,6 +802,12 @@ class PrincipalController extends Controller
                 'mensaje' => 'No tiene permisos para realizar esta accion'
             ], 201);
         }
+        if(!$usuario->tienePermiso('Acceso al sistema')){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'No tiene permisos para realizar esta accion'
+            ], 201);
+        }
     
         if(!$usuario->esBancaAsignada($datos['idBanca'])){
             if(!$usuario->tienePermiso('Jugar como cualquier banca')){

@@ -22,7 +22,11 @@ class CreateLoansTable extends Migration
             $table->unsignedInteger('idEntidadFondo');
             $table->decimal('montoPrestado', 20, 2)->default(0);
             $table->decimal('montoCuota', 20, 2)->default(0);
-            $table->decimal('montoCuota', 20, 2)->default(0);
+            $table->decimal('tasaInteres', 20, 2)->default(0);
+            $table->decimal('mora', 20, 2)->default(0);
+            $table->integer('status')->default(1);
+            $table->integer('diasGracia')->default(0);
+            $table->string('detalles')->nullable();
 
             $table->unsignedInteger('idFrecuencia');
             $table->unsignedInteger('idDia')->nullable();
