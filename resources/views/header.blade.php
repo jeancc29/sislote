@@ -208,6 +208,10 @@ if($controlador != "login"){
         <script src="{{asset('assets/js/angular/balance.bancos.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
+    <?php if($controlador == "prestamos" ):?>
+        <script src="{{asset('assets/js/angular/prestamos.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
+
     <!-- <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script> -->
 
 <style>

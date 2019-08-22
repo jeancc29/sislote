@@ -12,7 +12,7 @@ class Transactionsgroups extends Model
 
     public function transacciones()
     {
-        return $this->belongsToMany('App\Transactions', 'transaction_transactionsgroup', 'idGrupo', 'idTransaccion');
+        return $this->belongsToMany('App\transactions', 'transaction_transactionsgroup', 'idGrupo', 'idTransaccion');
     }
 
     public function usuario()

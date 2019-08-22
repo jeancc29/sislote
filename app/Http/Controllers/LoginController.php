@@ -69,7 +69,7 @@ class LoginController extends Controller
 
         
 
-        $u = Users::where(['usuario' => $data['usuario']])->get()->first();
+        $u = Users::where(['usuario' => $data['usuario'], 'status' => 1])->get()->first();
         if($u == null){
             return redirect('login')->withErrors([
                 'acceso' => 'Usuario no existe'
@@ -132,7 +132,7 @@ class LoginController extends Controller
 
         
 
-        $u = Users::where(['usuario' => $datos['usuario']])->get()->first();
+        $u = Users::where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
 
     
         

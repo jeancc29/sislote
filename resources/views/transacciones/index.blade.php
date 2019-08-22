@@ -57,7 +57,7 @@
       <div class="card ">
         <div class="card-header card-header-info card-header-text">
           <div class="card-text">
-            <h4 class="card-title">Lista de grupo de transacciones</h4>
+            <h4 class="card-title">Lista de transacciones</h4>
           </div>
         </div>
         <div class="card-body ">

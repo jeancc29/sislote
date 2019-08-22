@@ -789,7 +789,13 @@ class PrincipalController extends Controller
         $idDia = Days::whereWday($fecha['wday'])->first()->id;
         $banca = Branches::whereId($datos['idBanca'])->first();
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::whereId($datos['idUsuario'])->whereStatus(1)->first();
+        if($usuario == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Usuario no existe'
+            ], 201);
+        }
         if(!$usuario->tienePermiso('Vender tickets')){
             return Response::json([
                 'errores' => 1,

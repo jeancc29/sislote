@@ -3,7 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Loans;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+
+use Request;
+use Illuminate\Support\Facades\Route; 
+use Illuminate\Support\Facades\Response; 
+use Carbon\Carbon;
+use App\Classes\Helper;
+use App\Classes\TicketPrintClass;
+
+
+// use Faker\Generator as Faker;
+use App\Lotteries;
+use App\Generals;
+use App\Sales;
+use App\Salesdetails;
+use App\Blockslotteries;
+use App\Blocksplays;
+use App\Stock;
+use App\Tickets;
+use App\Cancellations;
+use App\Days;
+use App\Payscombinations;
+use App\Awards;
+use App\Draws;
+use App\Branches;
+use App\Users;
+use App\Roles;
+use App\Commissions;
+use App\Permissions;
+
+use App\Http\Resources\LotteriesResource;
+use App\Http\Resources\SalesResource;
+use App\Http\Resources\BranchesResource;
+use App\Http\Resources\RolesResource;
+use App\Http\Resources\UsersResource;
+
+use Illuminate\Support\Facades\Crypt;
 
 class LoansController extends Controller
 {
@@ -14,7 +51,10 @@ class LoansController extends Controller
      */
     public function index()
     {
-        //
+        $controlador = Route::getCurrentRoute()->getName(); 
+        if(!strpos(Request::url(), '/api/')){
+            return view('prestamos.index', compact('controlador'));
+        }
     }
 
     /**

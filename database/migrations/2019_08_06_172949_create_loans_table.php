@@ -20,8 +20,16 @@ class CreateLoansTable extends Migration
             $table->unsignedInteger('idTipoEntidadFondo');
             $table->unsignedInteger('idEntidadPrestamo');
             $table->unsignedInteger('idEntidadFondo');
-            $table->decimal('prestado', 20, 2)->default(0);
-            $table->decimal('cuota', 20, 2)->default(0);
+            $table->decimal('montoPrestado', 20, 2)->default(0);
+            $table->decimal('montoCuota', 20, 2)->default(0);
+            $table->decimal('montoCuota', 20, 2)->default(0);
+
+            $table->unsignedInteger('idFrecuencia');
+            $table->unsignedInteger('idDia')->nullable();
+            
+      
+            $table->foreign('idFrecuencia')->references('id')->on('frecuencies');
+            $table->foreign('idDia')->references('id')->on('days');
             $table->timestamps();
         });
     }

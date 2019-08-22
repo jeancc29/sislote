@@ -417,16 +417,16 @@ class TicketPrintClass{
     function setPieDePagina(){
         $this->html .="<div class='row contenedor-total' style='margin-bottom: 150px;'>";
         if($this->banca->piepagina1 != null){
-            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina1 ."</h4>";
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>". $this->banca->piepagina1 ."</h4>";
         }
         if($this->banca->piepagina2 != null){
-            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina2 ."</h4>";
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>". $this->banca->piepagina2 ."</h4>";
         }
         if($this->banca->piepagina3 != null){
-            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina3 ."</h4>";
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>". $this->banca->piepagina3 ."</h4>";
         }
         if($this->banca->piepagina4 != null){
-            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'> Descuento:". $this->banca->piepagina4 ."</h4>";
+            $this->html .= "<h4 class='text-center my-0' style='margin-top: 0px; margin-bottom:0px;'>". $this->banca->piepagina4 ."</h4>";
         }
         
         $this->html .="</div>";
