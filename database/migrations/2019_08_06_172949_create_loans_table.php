@@ -21,7 +21,8 @@ class CreateLoansTable extends Migration
             $table->unsignedInteger('idEntidadPrestamo');
             $table->unsignedInteger('idEntidadFondo');
             $table->decimal('montoPrestado', 20, 2)->default(0);
-            $table->decimal('montoCuota', 20, 2)->default(0);
+            $table->decimal('montoCuotas', 20, 2)->default(0);
+            $table->decimal('numeroCuotas', 20, 2)->default(0);
             $table->decimal('tasaInteres', 20, 2)->default(0);
             $table->decimal('mora', 20, 2)->default(0);
             $table->integer('status')->default(1);
@@ -29,11 +30,13 @@ class CreateLoansTable extends Migration
             $table->string('detalles')->nullable();
 
             $table->unsignedInteger('idFrecuencia');
-            $table->unsignedInteger('idDia')->nullable();
+            $table->dateTime('fechaInicio'); //Fecha desde la cual se empezara a calcular la fecha de pago
+            // $table->unsignedInteger('idDia')->nullable();
+            
             
       
             $table->foreign('idFrecuencia')->references('id')->on('frecuencies');
-            $table->foreign('idDia')->references('id')->on('days');
+            // $table->foreign('idDia')->references('id')->on('days');
             $table->timestamps();
         });
     }
@@ -45,6 +48,7 @@ class CreateLoansTable extends Migration
      */
     public function down()
     {
+        $table->dropForeign(['idFrecuencia']);
         Schema::dropIfExists('loans');
     }
 }

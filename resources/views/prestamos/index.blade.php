@@ -97,16 +97,16 @@
                     <div class="col-12">
                             <h3>Datos entidades</h3>
                           </div>
-                    <div class="col-12 text-center">
+                    <div class="col-6 text-center">
                             <div class="input-group">
                               
-                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Prestar a entidad</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Prestar a entidad</label>                              
 
-                                <div  class=" col-sm-8 col-10">
+                                <div  class=" col-sm-8 col-9">
                                 <select 
                                     ng-change="cbxTipoBloqueosJugadaChanged()"
-                                    ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
-                                    ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
+                                    ng-model="datos.selectedBanca"
+                                    ng-options="o.descripcion for o in datos.optionsBancas"
                                     class="selectpicker col-12" 
                                     data-style="select-with-transition" 
                                     title="Select tipo regla">
@@ -115,16 +115,16 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
-                    <div class="col-12 text-center">
+                    <div class="col-6 text-center">
                             <div class="input-group">
                               
-                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
 
-                                <div  class=" col-sm-8 col-10">
+                                <div  class=" col-sm-8 col-9">
                                 <select 
                                     ng-change="cbxTipoBloqueosJugadaChanged()"
-                                    ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
-                                    ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
+                                    ng-model="datos.selectedBanco"
+                                    ng-options="o.nombre for o in datos.optionsBancos"
                                     class="selectpicker col-12" 
                                     data-style="select-with-transition" 
                                     title="Select tipo regla">
@@ -141,9 +141,9 @@
                         <h3>Datos prestamo</h3>
                       </div>
 
-                      <div class="col-12  ">
+                      <div class="col-6  ">
                                   <div class="input-group form-control-lg pt-0 mt-0">
-                                    <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Monto prestado</label>                              
+                                    <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Monto prestado</label>                              
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
@@ -154,9 +154,9 @@
 
                               </div>
 
-                              <div class="col-12">
+                              <div class="col-6">
                                   <div class="input-group form-control-lg pt-0 mt-0">
-                                    <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Monto cuota</label>                              
+                                    <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;"># Cuotas</label>                              
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
@@ -165,9 +165,22 @@
                                   </div>
                                 </div>
 
-                                <div class="col-12">
+                              <div class="col-6">
                                   <div class="input-group form-control-lg pt-0 mt-0">
-                                    <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Tasa interes</label>                              
+                                    <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Monto cuota</label>                              
+                                      
+                                      <div class="form-group col-sm-8 col-10">
+                                      <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
+                                      <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      </div>
+                                  </div>
+                                </div>
+
+                                
+
+                                <div class="col-6">
+                                  <div class="input-group form-control-lg pt-0 mt-0">
+                                    <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Tasa interes</label>                              
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
@@ -190,16 +203,16 @@
                     <div class="col-12 ">
                         <h3>Datos frecuencia</h3>
                       </div>
-                          <div class="col-12 text-center">
+                          <div class="text-center col-6" >
                                 <div class="input-group">
                                   
                                   <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Frecuencia</label>                              
 
-                                    <div  class=" col-sm-8 col-10">
+                                    <div  class=" col-sm-9 col-10">
                                     <select 
                                         ng-change="cbxTipoBloqueosJugadaChanged()"
-                                        ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
-                                        ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
+                                        ng-model="datos.selectedFrecuencia"
+                                        ng-options="o.descripcion for o in datos.optionsFrecuencias"
                                         class="selectpicker col-12" 
                                         data-style="select-with-transition" 
                                         title="Select tipo regla">
@@ -208,23 +221,18 @@
                                 </div> <!-- END INPUT GROUP -->
                               </div>
 
-                              <div class="col-12 text-center">
-                                <div class="input-group">
-                                  
-                                  <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Dia</label>                              
+                             
 
-                                    <div  class=" col-sm-8 col-10">
-                                    <select 
-                                        ng-change="cbxTipoBloqueosJugadaChanged()"
-                                        ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
-                                        ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
-                                        class="selectpicker col-12" 
-                                        data-style="select-with-transition" 
-                                        title="Select tipo regla">
-                                  </select>
+                              <div class="col-6">
+                                  <div class="input-group form-control-lg pt-0 mt-0">
+                                    <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Fecha inicio</label>                              
+                                      
+                                      <div class="form-group col-sm-8 col-10">
+                                      <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
+                                      <input ng-model="datos.fechaInicio" type="date" class="form-control" id="abreviatura" name="abreviatura">
+                                      </div>
                                   </div>
-                                </div> <!-- END INPUT GROUP -->
-                              </div>
+                                </div>
 
                     </div>
                   </div>

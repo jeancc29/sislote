@@ -71,8 +71,11 @@ if($controlador != "login"){
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
+    window.bancosGlobal = <?php if(isset($bancos)) echo $bancos; else echo 'null'; ?>;
     window.loteriasGlobal = <?php if(isset($loterias)) echo $loterias; else echo 'null'; ?>;
     window.sorteosGlobal = <?php if(isset($sorteos)) echo $sorteos; else echo 'null'; ?>;
+    window.diasGlobal = <?php if(isset($dias)) echo $dias; else echo 'null'; ?>;
+    window.frecuenciasGlobal = <?php if(isset($frecuencias)) echo $frecuencias; else echo 'null'; ?>;
     window.vGlobal = <?php if(isset($ventas)) echo $ventas; else echo 'null'; ?>;
     window.loteriasPremiosModelGlobal = <?php if(isset($loteriasPremiosModal)) echo $loteriasPremiosModal; else echo 'null'; ?>;
 

@@ -33,6 +33,9 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Types;
+use App\Entity;
+use App\Frecuency;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -53,8 +56,27 @@ class LoansController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
-            return view('prestamos.index', compact('controlador'));
+            $u = Users::where(['id' => session("idUsuario"), 'status' => 1])->first();
+
+            if($u == null){
+                return redirect()->route('login');
+            }
+            if(!$u->tienePermiso("Manejar prestamos") == true){
+                return redirect()->route('principal');
+            }
+        $idTipo = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first()->id;
+
+            $bancas = Branches::whereStatus(1)->get();
+            $bancos = Entity::where(['status' => 1, 'idTipo' => $idTipo])->get();
+            $dias = Days::all();
+            $frecuencias = Frecuency::orderBy('id', 'desc')->get();
+            return view('prestamos.index', compact('controlador', 'bancas', 'bancos', 'frecuencias', 'dias'));
         }
+
+       
+        
+        
+    
     }
 
     /**
@@ -75,7 +97,37 @@ class LoansController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $datos = request()->validate([
+            'idPrestamo' => '',
+            'idUsuario' => 'required',
+            'datos.idEntidadPrestamo' => 'required',
+            'datos.idEntidadFondo' => 'required',
+            'datos.montoPrestado' => 'required',
+            'datos.montoCuotas' => 'required',
+            'datos.numeroCuotas' => 'required',
+            'datos.tasaInteres' => 'required',
+            'datos.status' => 'required',
+            'datos.detalles' => 'required'
+        ])['datos'];
+
+
+        $idTipoBanca = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+        $idTipoBanco = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+
+
+        $prestamo = Loans::where(['id' => $datos['id']])->first();
+        if($prestamo != null){
+            $prestamo->montoPrestado = $datos['montoPrestado'];
+            $prestamo->status = $datos['status'];
+            $prestamo->numeroCuotas = $datos['numeroCuotas'];
+            $prestamo->tasaInteres = $datos['tasaInteres'];
+            $prestamo->detalles = $datos['detalles'];
+        }else{
+            Loans::create([
+
+                ]);
+        }
+        
     }
 
     /**

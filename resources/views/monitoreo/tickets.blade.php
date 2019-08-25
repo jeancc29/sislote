@@ -86,7 +86,7 @@
                                   id="multiselectDias"
                                   ng-model="datos.selectedBanca"
                                       ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
-                                      class="selectpicker w-100" 
+                                      class="selectpicker col-12" 
                                       data-style="select-with-transition" 
                                        title="Seleccionar dias"
                                       data-size="7" aria-setsize="2">
@@ -109,7 +109,7 @@
                                   id="multiselectDias"
                                   ng-model="datos.selectedLoteria"
                                       ng-options="o.descripcion for o in datos.optionsLoterias track by o.id"
-                                      class="selectpicker w-100" 
+                                      class="selectpicker col-12" 
                                       data-style="select-with-transition" 
                                        title="Seleccionar loteria"
                                       data-size="7" aria-setsize="2">
@@ -118,16 +118,16 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
+
+<!-- BLOQUEE LOS SORTEOS PERO AUN SE SIGUEN SELECCIONANDO EL ITEM N/A
                           <div class="col-3 text-center">
                             <div class="input-group">
                             <label  for="jugada" class="bmd-label-floating font-weight-bold" style="color: black;">Loteria</label>
-                              <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Dias</label>                               -->
                                 <style>
                                   #multiselectDias{
                                     font-size: 8px;
                                   }
                                 </style>
-                                <!-- <div  class="col-9"> -->
                                 <select 
                                   id="multiselectDias"
                                   ng-model="datos.selectedSorteo"
@@ -138,9 +138,9 @@
                                           data-style="select-with-transition" 
                                           title="Select sorteo">
                                   </select>
-                              <!-- </div> -->
-                            </div> <!-- END INPUT GROUP -->
-                          </div>
+                              
+                            </div> 
+                          </div> -->
 
                          
 

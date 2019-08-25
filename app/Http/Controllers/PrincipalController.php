@@ -58,7 +58,7 @@ class PrincipalController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Vender tickets") == true){
-                return redirect()->route('principal');
+                return redirect()->route('dashboard');
             }
             return view('principal.index', compact('controlador', 'usuario'));
         }

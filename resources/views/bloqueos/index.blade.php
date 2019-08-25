@@ -120,7 +120,7 @@
                                   id="multiselectDias"
                                       ng-model="datos.buscar.dias"
                                       ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
-                                      class="selectpicker w-100" 
+                                      class="selectpicker col-12" 
                                       data-style="select-with-transition" 
                                       multiple title="Seleccionar bancas"
                                       data-size="7" aria-setsize="2">

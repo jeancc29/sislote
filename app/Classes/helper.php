@@ -1,6 +1,7 @@
 <?php
 namespace App\Classes;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 use App\transactions;
 use App\Types;
@@ -21,6 +22,7 @@ use App\Branches;
 use App\Idventatemporal;
 use App\Users;
 use App\Tickets;
+use App\Frecuency;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -1535,6 +1537,128 @@ class Helper{
         }
 
         return false;
+    }
+
+    public static function amortizar($montoPrestado, $montoCuotas, $numeroCuotas, $tasaInteres, $idFrecuencia, $fechaInicio, $insertarColumnaCero = false){
+        //Aqui utilice el metodo americano con la unica exception de que el interes lo calculo en base al monto de la cuota y no en base al monto del prestamo saldado
+        $frecuencia = Frecuency::whereId($idFrecuencia)->first();
+        $colleccion = null;
+        if($montoCuotas == 0 || $montoCuotas == null){
+            $montoCuotas = $montoPrestado / $numeroCuotas;
+        }
+        else if($montoCuotas > 0 && $numeroCuotas > 0 && ($tasaInteres == 0 || $tasaInteres == null)){
+            $valorPresente = $montoPrestado;
+            $valorFuturo = $montoCuotas * $numeroCuotas;
+            $tasaInteres = ($valorFuturo - $valorPresente) / $valorPresente;
+            $tasaInteres = $tasaInteres * 100;
+        }
+        else if($montoCuotas > 0 && $montoPrestado > 0 && ($numeroCuotas == 0 || $numeroCuotas == null)){
+            $numeroCuotas = $montoPrestado / $montoCuotas;
+            $numeroCuotasEntero = (int)$numeroCuotas;
+            if($numeroCuotas > $numeroCuotasEntero){
+                $numeroCuotas = $numeroCuotasEntero + 1;
+            }
+        }//Endif
+
+        $fechaInicioCarbon = new Carbon($fechaInicio);
+            $montoPrestadoDeducible = $montoPrestado;
+            for($c = 1; $c <= $numeroCuotas; $c++){
+                
+                if($c == 1 && $insertarColumnaCero == true){
+                    $colleccion = collect([
+                        [
+                            'numeroCuota' => 0,
+                            'montoCuota' => 0,
+                            'fecha' => $fechaInicioCarbon->toDateString(),
+                            'montoInteres' => 0,
+                            'amortizacion' => 0,
+                            'saldoPendiente' => $montoPrestadoDeducible
+                        ]
+                    ]);
+                }
+                if($c == 1)
+                    $montoInteres =  $montoCuotas * ($tasaInteres / 100);
+                else
+                    $montoInteres =  $montoCuotas * ($tasaInteres / 100);
+
+                    $montoCuotas = round($montoCuotas, 2);
+                if($montoCuotas > $montoPrestadoDeducible){
+                    $montoCuotas = $montoPrestadoDeducible;
+                    $montoInteres =  $montoCuotas * ($tasaInteres / 100);
+                }
+                else if($montoPrestadoDeducible > $montoCuotas && $c == $numeroCuotas){
+                    //En caso de sea la ultima cuota y el montoPrestadoDeducible sea mayor que el montoCuotas entonces el montoCuotas sera igual al montoPrestadoDeducible
+                    $montoCuotas = $montoPrestadoDeducible;
+                    $montoInteres =  $montoCuotas * ($tasaInteres / 100);
+                }
+
+                    $montoInteres = round($montoInteres, 2);
+                    $montoPrestadoDeducible = $montoPrestadoDeducible - ($montoCuotas);
+                
+                if($frecuencia->descripcion == "Diario"){
+                    $fechaInicioCarbon->addDay();
+                    if($colleccion==null){
+                        $colleccion = collect([
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(), 'montoCuota' => $montoCuotas + $montoInteres, 'montoInteres' => $montoInteres, 'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        ]);
+                    }else{
+                        $colleccion->push(
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(),'montoCuota' => $montoCuotas + $montoInteres,'montoInteres' => $montoInteres,'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        );
+                    }
+                }
+                else if($frecuencia->descripcion == "Semanal"){
+                    $fechaInicioCarbon->addWeek();
+                    if($colleccion==null){
+                        $colleccion = collect([
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(), 'montoCuota' => $montoCuotas + $montoInteres, 'montoInteres' => $montoInteres, 'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        ]);
+                    }else{
+                        $colleccion->push(
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(),'montoCuota' => $montoCuotas + $montoInteres,'montoInteres' => $montoInteres,'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        );
+                    }
+                }
+                else if($frecuencia->descripcion == "Quincenal"){
+                    $fechaInicioCarbon->addDays(15);
+                    if($colleccion==null){
+                        $colleccion = collect([
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(), 'montoCuota' => $montoCuotas + $montoInteres, 'montoInteres' => $montoInteres, 'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        ]);
+                    }else{
+                        $colleccion->push(
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(),'montoCuota' => $montoCuotas + $montoInteres,'montoInteres' => $montoInteres,'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        );
+                    }
+                }
+                else if($frecuencia->descripcion == "Mensual"){
+                    $fechaInicioCarbon->addMonthNoOverflow();
+                    if($colleccion==null){
+                        $colleccion = collect([
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(), 'montoCuota' => $montoCuotas + $montoInteres, 'montoInteres' => $montoInteres, 'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        ]);
+                    }else{
+                        $colleccion->push(
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(),'montoCuota' => $montoCuotas + $montoInteres,'montoInteres' => $montoInteres,'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        );
+                    }
+                }
+                else if($frecuencia->descripcion == "Anual"){
+                    $fechaInicioCarbon->addYear();
+                    if($colleccion==null){
+                        $colleccion = collect([
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(), 'montoCuota' => $montoCuotas + $montoInteres, 'montoInteres' => $montoInteres, 'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        ]);
+                    }else{
+                        $colleccion->push(
+                            ['numeroCuota' => $c, 'fecha' => $fechaInicioCarbon->toDateString(),'montoCuota' => $montoCuotas + $montoInteres,'montoInteres' => $montoInteres,'amortizacion' => $montoCuotas,'saldoPendiente' => $montoPrestadoDeducible]
+                        );
+                    }
+                }
+
+            } //ENdFOR
+
+        return $colleccion;
     }
 
 }

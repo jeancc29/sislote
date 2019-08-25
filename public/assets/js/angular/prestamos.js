@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http){
+    .controller("myController", function($scope, $http, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -27,125 +27,66 @@ myApp
 
             "ckbDias": [],
             "ckbSorteos": [],
-            "mostrarFormEditar" : false
+            "mostrarFormEditar" : false,
+            'selectedBanca' : {},
+            'selectedDia' : {},
+            'selectedBanco' : {},
+            'selectedFrecuencia' : {},
+            'fechaInicio' : new Date()
         }
 
         $scope.inicializarDatos = function(todos){
+            $scope.datos.optionsBancas = bancasGlobal;
+            $scope.datos.optionsDias = diasGlobal;
+            $scope.datos.optionsBancos = bancosGlobal;
+            $scope.datos.optionsFrecuencias = frecuenciasGlobal;
+
+            $scope.datos.selectedBanca = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBanca, $scope.datos.optionsBancas)];
+            $scope.datos.selectedDia = $scope.datos.optionsDias[helperService.retornarIndexPorId($scope.datos.selectedDia, $scope.datos.optionsDias)];
+            $scope.datos.selectedBanco = $scope.datos.optionsBancos[helperService.retornarIndexPorId($scope.datos.selectedBanco, $scope.datos.optionsBancos)];
+            $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId($scope.datos.selectedFrecuencia, $scope.datos.optionsFrecuencias)];
+
+            console.log('bancos:', $scope.datos.optionsBancos);
                
-            $http.get(rutaGlobal+"/api/loterias")
-             .then(function(response){
-                console.log('Loteria ajav: ', response.data.loterias);
+            // $http.get(rutaGlobal+"/api/loterias")
+            //  .then(function(response){
+            //     console.log('Loteria ajav: ', response.data.loterias);
 
-                if(todos){
-                    $scope.datos.id = 0;
-                    $scope.datos.descripcion = null,
-                    $scope.datos.abreviatura = null,
-                    $scope.datos.status = true;
-                   // $scope.datos.dias = [];
-                    $scope.datos.sorteos = [];
-                    $scope.datos.horaCierre = moment().format('YYYY/MM/DD');
-                   // $scope.datos.ckbDias = [];
-                    $scope.datos.ckbSorteos = [];
+            //     if(todos){
+            //         $scope.datos.id = 0;
+            //         $scope.datos.descripcion = null,
+            //         $scope.datos.abreviatura = null,
+            //         $scope.datos.status = true;
+            //        // $scope.datos.dias = [];
+            //         $scope.datos.sorteos = [];
+            //         $scope.datos.horaCierre = moment().format('YYYY/MM/DD');
+            //        // $scope.datos.ckbDias = [];
+            //         $scope.datos.ckbSorteos = [];
 
-                    /************* PAGOS COMBINACIONES ********************/
-                    // $scope.datos.primera = null;
-                    // $scope.datos.segunda = null;
-                    // $scope.datos.tercera = null;
-                    // $scope.datos.primeraSegunda = null;
-                    // $scope.datos.primeraTercera = null;
-                    // $scope.datos.segundaTercera = null;
-                    // $scope.datos.tresNumeros = null;
-                    // $scope.datos.dosNumeros = null;
-                    /************* END PAGOS COMBINACIONES ********************/
 
-                    // $scope.datos =  {
-                    //     "idLoteria":0,
-                    //     "descripcion": null,
-                    //     "abreviatura" : null,
-                    //     "estado":true,
-                    //     "dias": [],
-                    //     "horaCierre": moment().format('YYYY/MM/DD'),
-        
-                    //     "ckbDias": []
-                    // }
-
-                    // var jsonDias = response.data.dias;
-                    // jsonDias.forEach(function(valor, indice, array){
-                    //     $scope.datos.ckbDias.push({'id' :array[indice].id, 'descripcion': array[indice].descripcion, 'existe' : false});
-                    // });
-
-                    var jsonSorteos = response.data.sorteos;
-                    jsonSorteos.forEach(function(valor, indice, array){
-                        $scope.datos.ckbSorteos.push({'id' :array[indice].id, 'descripcion': array[indice].descripcion, 'existe' : false});
-                    });
+            //         var jsonSorteos = response.data.sorteos;
+            //         jsonSorteos.forEach(function(valor, indice, array){
+            //             $scope.datos.ckbSorteos.push({'id' :array[indice].id, 'descripcion': array[indice].descripcion, 'existe' : false});
+            //         });
                     
-                   }
+            //        }
 
-                $scope.datos.loterias= [];
-                var jsonLoterias = response.data.loterias;
-                jsonLoterias.forEach(function(valor, indice, array){
-                    array[indice].seleccionado = false;
-                    $scope.datos.loterias.push(array[indice]);
-                })
-               // $scope.datos.loterias =response.data.loterias;
+            //     $scope.datos.loterias= [];
+            //     var jsonLoterias = response.data.loterias;
+            //     jsonLoterias.forEach(function(valor, indice, array){
+            //         array[indice].seleccionado = false;
+            //         $scope.datos.loterias.push(array[indice]);
+            //     })
+            //    // $scope.datos.loterias =response.data.loterias;
             
                 
-            });
+            // });
        
         }
         
 
         $scope.load = function(codigo_usuario){
-            $scope.inicializarDatos(true);
-            
-
-          //$scope.datos.idUsuario = parseInt(codigo_usuario);
-
-        //   $http.post($scope.ROOT_PATH +"clases/consultaajax.php", {'action':'sp_datosgenerales_obtener_todos'})
-        //      .then(function(response){
-        //         console.log('principal ajav: ', JSON.parse(response.data[0].loterias));
-
-        //         $scope.datos.optionsLoterias =JSON.parse(response.data[0].loterias);
-        //         $scope.datos.caracteristicasGenerales =JSON.parse(response.data[0].caracteristicasGenerales);
-        //         console.log('Dentor load: ',moment().format('D MMM, YYYY'));
-                
-                //$scope.datos.loterias =  $scope.datos.optionsLoterias[0];
-
-            //     $scope.optionsSexo = [{'id':'Masculino', 'name':'Hombre'}, {'id':'Femenino', 'name':'Mujer'}];
-            //  $scope.selectedSexo = $scope.optionsSexo[0];
-
-                //console.log(JSON.parse(response.data[0].tipo_sector));
-
-                  //console.log('tipo usuario id: ',$scope.optionsTipoUsuario.find(x => x.descripcion === 'Cliente')); 
-
-                //   if(angular.isNumber(codigo_usuario) && codigo_usuario != undefined && codigo_usuario > 0 ){
-                //       console.log('codigo_usuario distinto de undefined', $scope.optionsTipoSector);
-
-                //       $http.post("/prestamoGitHub/clases/consultaajax.php", {'action':'personas_obtener_por_id', 'data' : codigo_usuario})
-                //        .then(function(response){
-                           
-                //            if(response.data[0] != undefined){
-                //             $scope.persona.codigo_usuario = response.data[0].codigo_usuario;
-                //             $scope.persona.nombre = response.data[0].nombre;
-                //             $scope.persona.sexo = response.data[0].sexo;
-                //             $scope.persona.identificacion = response.data[0].identificacion;
-                //             $scope.persona.telefono = response.data[0].telefono;
-                //             $scope.persona.direccion = response.data[0].direccion;
-                //             $scope.persona.fecha_nacimiento = new Date(response.data[0].fecha_nacimiento);
-                //             $scope.persona.correo = response.data[0].correo;
-                //             $scope.selectedTipoSector = $scope.optionsTipoSector.find(x => x.tipo_registro === parseInt(response.data[0].tipo_registro_sector));
-                //             $scope.selectedTipoUsuario =$scope.optionsTipoUsuario.find(x => x.tipo_registro ===  parseInt(response.data[0].tipo_registro_usuario));
-                //             $scope.selectedTipoCliente =$scope.optionsTipoCliente.find(x => x.tipo_registro ===   parseInt(response.data[0].tipo_registro_cliente));
-                //            }
-                //       });
-                //    }
-
-            // });
-
-             
-
-
-             
+            $scope.inicializarDatos(true);    
         }
 
 

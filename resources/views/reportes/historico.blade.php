@@ -57,7 +57,7 @@
       <div class="card " style="min-height: 1000px;">
         <div class="card-header card-header-info card-header-text">
           <div class="card-text">
-            <h4 class="card-title">Monitoreo de tickets</h4>
+            <h4 class="card-title">Historico</h4>
           </div>
         </div>
         <div class="card-body ">
