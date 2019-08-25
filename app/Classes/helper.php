@@ -1479,24 +1479,19 @@ class Helper{
         $colleccion = null;
         foreach($jugadas as $j){
             if($idLoteria == $j['idLoteria']){
-                 if($c == 0){
+                 if($colleccion == null){
                     $colleccion = collect([
                         [
                             'idLoteria' => $idLoteria,
                             'jugada' => $j['jugada'],
                             'monto' => $j['monto'], 
-                            'tam' => $j['tam'], 
-                            'monto' => $j['monto']
                         ]
                     ]);
-                    return $colleccion;
                 }else{
                     $colleccion->push([
                         'idLoteria' => $idLoteria,
                         'jugada' => $j['jugada'],
-                        'monto' => $j['monto'], 
-                        'tam' => $j['tam'], 
-                        'monto' => $j['monto']
+                        'monto' => $j['monto'],
                     ]);
                 }
 

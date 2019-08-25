@@ -863,9 +863,16 @@ class PrincipalController extends Controller
         
         /***************** Validamos la existencia de la jugada ***********************/
         $loterias = Helper::getLoterias($datos['jugadas']);
+        // return Response::json([
+        //     'errores' => 1,
+        //     'mensaje' => 'Erro',
+        //     'a' => $datos['jugadas']
+        // ], 201);
+        
         foreach($loterias as $l){
             $loteria = Lotteries::whereId($l['id'])->first();
             $jugadas = Helper::getJugadasPertenecientesALoteria($l['id'], $datos['jugadas']);
+
             foreach($jugadas as $d){
 
                
