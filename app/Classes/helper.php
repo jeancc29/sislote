@@ -1253,8 +1253,7 @@ class Helper{
                 return false;
 
             if($loteria != null){
-                if($loteria->descripcion == "New York AM" || $loteria->descripcion == "New York PM" 
-                    && ($sorteo->descripcion == "Pick 3 Box" || $sorteo->descripcion == "Pick 3 Straight" || $sorteo->descripcion == "Pick 4 Straight" || $sorteo->descripcion == "Pick 4 Box") ){
+                if($sorteo->descripcion == "Pick 3 Box" || $sorteo->descripcion == "Pick 3 Straight" || $sorteo->descripcion == "Pick 4 Straight" || $sorteo->descripcion == "Pick 4 Box"){
                     if($monto == "0.50"){
                         $montoValido = true;
                     }

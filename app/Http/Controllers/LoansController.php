@@ -36,6 +36,7 @@ use App\Permissions;
 use App\Types;
 use App\Entity;
 use App\Frecuency;
+use App\Amortization;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -107,7 +108,9 @@ class LoansController extends Controller
             'datos.numeroCuotas' => 'required',
             'datos.tasaInteres' => 'required',
             'datos.status' => 'required',
-            'datos.detalles' => 'required'
+            'datos.detalles' => 'required',
+            'datos.idFrecuencia' => 'required',
+            'datos.fechaInicio' => 'required',
         ])['datos'];
 
 
@@ -122,12 +125,66 @@ class LoansController extends Controller
             $prestamo->numeroCuotas = $datos['numeroCuotas'];
             $prestamo->tasaInteres = $datos['tasaInteres'];
             $prestamo->detalles = $datos['detalles'];
+            //Cuando se hace la transaccion para emitir los fondos se le restaran el monto pagado al monto del nuevo prestamo
         }else{
-            Loans::create([
+            $prestamo = Loans::create([
+                'idUsuario' => $datos['idUsuario'],
+                'idTipoEntidadPrestamo' => $idTipoBanca->id,
+                'idTipoEntidadFondo' => $idTipoBanco->id,
+                'idEntidadPrestamo' => $datos['idEntidadPrestamo'],
+                'idEntidadFondo'=> $datos['idEntidadFondo'],
+                'montoPrestado'=> $datos['montoPrestado'],
+                'montoCuotas'=> $datos['montoCuotas'],
+                'numeroCuotas'=> $datos['numeroCuotas'],
+                'tasaInteres'=> $datos['tasaInteres'],
+                'status'=> $datos['status'],
+                'detalles' => $datos['detalles'],
+                'idFrecuencia' => $datos['idFrecuencia'],
+                'fechaInicio' => $datos['fechaInicio']
+            ]);
 
+            $amortizacion = Helper::amortizar($prestamo->montoPrestado, $prestamo->montoCuotas, $prestamo->numeroCuotas, $prestamo->tasaInteres, $prestamo->idFrecuencia, false);
+            foreach($amortizacion as $a){
+                Amortization::create([
+                    'idPrestamo' => $prestamo->id,
+                    'numeroCuota' => $a['numeroCuota'],
+                    'montoCuota' => $a['montoCuota'],
+                    'montoInteres' => $a['montoInteres'],
+                    'amortizacion' => $a['amortizacion'],
+                    'fecha' => $a['fecha'],
                 ]);
+            }
+
+            $t = transactions::create([
+                'idUsuario' => $datos['idUsuario'],
+                'idTipo' => $tipo->id,
+                'idTipoEntidad1' => $idTipoEntidad1->id,
+                'idTipoEntidad2' => $idTipoEntidad2->id,
+                'idEntidad1' => $b['id'],
+                'idEntidad2' => $entidad->id,
+                'entidad1_saldo_inicial' => $saldo,
+                'entidad2_saldo_inicial' => 0,
+                'debito' => $debito,
+                'credito' => $credito,
+                'idGasto' => null,
+                'entidad1_saldo_final' => $saldoFinalEntidad1,
+                'entidad2_saldo_final' => 0,
+                'nota' => "Proceso diario automático de ventas"
+            ]);
+
         }
         
+    }
+
+    public function aplazarCuota(Loans $loans)
+    {
+        //Aplazar o perdonar cuota
+        $datos = request()->validate([
+            'idPrestamo' => '',
+            'idUsuario' => 'required'
+        ])['datos'];
+
+
     }
 
     /**
