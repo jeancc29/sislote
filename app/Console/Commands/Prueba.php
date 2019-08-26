@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use App\Draws;
+use App\Lotteries;
 use App\Branches;
 use Carbon\Carbon;
 use App\transactions;
@@ -61,17 +62,20 @@ class Prueba extends Command
 
 
 
-        $monto = (new Helper)->montodisponible("55", 1, 1);
+        // $monto = (new Helper)->montodisponible("55", 1, 1);
 
-        //$h = new TicketClass(17);
-        $a = new AwardsClass(7);
-        $a->primera = "25";
-        $a->segunda = "02";
-        $a->tercera = "23";
+        // //$h = new TicketClass(17);
+        // $a = new AwardsClass(7);
+        // $a->primera = "25";
+        // $a->segunda = "02";
+        // $a->tercera = "23";
         // $a->pick3 = 111;
         // $a->pick4 = 1234;
 
-        $this->info("Awardsclasss: " . $a->datosValidos());
+        $loteria = Lotteries::whereId(3)->first();
+        $sorteo = Draws::whereDescripcion("Pick 3 Box")->first();
+        // $this->info("Awardsclasss: " . Helper::decimalesDelMontoJugadoSonValidos("0.50", $loteria, $sorteo));
+        $this->info("Awardsclasss: " . Helper::determinarSorteo("123+", $loteria));
 
 
         // $awardsClass = new AwardsClass($l['id']);

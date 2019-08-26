@@ -892,6 +892,7 @@ class PrincipalController extends Controller
 
                $idSorteo = (new Helper)->determinarSorteo($d['jugada'], $loteria);
                $sorteo = Draws::whereId($idSorteo)->first();
+              
                if(Helper::decimalesDelMontoJugadoSonValidos($d['monto'], $loteria, $sorteo) == false){
                 return Response::json([
                     'errores' => 1,

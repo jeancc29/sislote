@@ -260,7 +260,7 @@ class Helper{
         }
     }
 
-    public function determinarSorteo($jugada, $loteria){
+    public static function determinarSorteo($jugada, $loteria){
         
         $idSorteo = 0;
   
@@ -281,15 +281,17 @@ class Helper{
                 $idSorteo = $idSorteo->id;
             }
         }
-        $sorteo = DB::table('draws')
+        else{
+            $sorteo = DB::table('draws')
                 ->select('draws.id')
                 ->join('draw_lottery', 'draws.id', '=', 'draw_lottery.idSorteo')
                 ->where(['draw_lottery.idLoteria' => $loteria->id, 'draws.descripcion' => 'Super pale'])->first();
-        $drawRelations = DB::table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
-        if($sorteo == null || $drawRelations <= 1)
-            $idSorteo = 2;
-        else if($sorteo != null || $drawRelations >= 2)
-            $idSorteo = 4;
+            $drawRelations = DB::table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
+            if($sorteo == null || $drawRelations <= 1)
+                $idSorteo = 2;
+            else if($sorteo != null || $drawRelations >= 2)
+                $idSorteo = 4;
+        }
    }
     else if(strlen($jugada) == 5){
             if(gettype(strpos($jugada, '+')) == "integer"){
@@ -1243,6 +1245,7 @@ class Helper{
     static function decimalesDelMontoJugadoSonValidos($monto, $loteria, $sorteo){
         $monto = strval($monto);
 
+        
         $montoValido = false;
         //Validamos de que el monto sea decimal para ello verificamos si existe un punto en el monto
         if(gettype(strpos($monto, '.')) == "integer"){
