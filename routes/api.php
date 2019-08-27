@@ -122,3 +122,6 @@ Route::post('/transacciones/buscarTransaccion', 'TransactionsController@buscarTr
 Route::post('/monitoreo/tickets', 'MonitoreoController@monitoreo');
 Route::post('/balance/bancas', 'BalancesController@index');
 Route::post('/balance/bancos', 'BalancesController@bancos');
+Route::post('/versiones', 'AndroidversionsController@index');
+Route::post('/versiones/guardar', 'AndroidversionsController@store');
+Route::post('/versiones/publicar', 'AndroidversionsController@publicar');

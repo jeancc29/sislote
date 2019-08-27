@@ -215,6 +215,10 @@ if($controlador != "login"){
         <script src="{{asset('assets/js/angular/prestamos.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
 
+    <?php if($controlador == "versiones" ):?>
+        <script src="{{asset('assets/js/angular/versiones.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
+
     <!-- <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script> -->
 
 <style>
@@ -248,6 +252,10 @@ if($controlador != "login"){
   background: #FD9EBC;
 }
 
+
+.bg-success2{
+  background: #bef1c0!important;
+}
 
 .panelPremios.panel-premios
 {
