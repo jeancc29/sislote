@@ -21,6 +21,7 @@ myApp
         $scope.es_cliente = false;
         $scope.datos =  {
             "idVenta":0,
+            "compartido":0,
         "idUsuario": 0,
         "idBanca" : 1,
         "codigoBarra":"barra29",

@@ -493,7 +493,7 @@ class PrincipalController extends Controller
     
         
     
-    
+        
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
             $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
@@ -502,10 +502,17 @@ class PrincipalController extends Controller
             
             
             if($venta != null){
+                if($usuario->roles->descripcion != "Administrador" && $venta->compartido == 1){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
+                    ], 201);
+                }
                 $banca = Branches::whereId($datos['idBanca'])->first();
                 $minutoTicketJugado =  getdate(strtotime($venta['created_at']));
                 $minutoActual = $fecha['minutes'];
     
+                
                 if(!$usuario->tienePermiso("Cancelar tickets en cualquier momento")){
                     if($minutoTicketJugado['year'] != $fecha['year']){
                         return Response::json([
@@ -734,6 +741,7 @@ class PrincipalController extends Controller
             'datos.idUsuario' => 'required',
             'datos.idBanca' => 'required',
             'datos.idVenta' => 'required',
+            'datos.compartido' => 'required',
             'datos.descuentoMonto' => 'required',
             'datos.hayDescuento' => 'required',
             'datos.total' => 'required',
@@ -962,6 +970,7 @@ class PrincipalController extends Controller
         
        $sale = Sales::create([
            'id' => $datos['idVenta'],
+           'compartido' => $datos['compartido'],
            'idUsuario' => $datos['idUsuario'],
            'idBanca' => $datos['idBanca'],
            'total' => $datos['total'],

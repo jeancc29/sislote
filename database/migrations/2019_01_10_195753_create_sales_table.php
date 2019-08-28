@@ -26,6 +26,7 @@ class CreateSalesTable extends Migration
             $table->integer('idLoteria')->nullable();
             $table->unsignedBigInteger('idTicket');
             $table->integer('status')->default(1);
+            $table->integer('compartido')->default(0);
             
             $table->primary('id');
             $table->timestamps();
