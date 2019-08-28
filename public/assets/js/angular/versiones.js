@@ -83,17 +83,10 @@ myApp
             else{
                 $('.form-group').addClass('is-filled');
                 $scope.datos.id = d.id;
-                $scope.datos.nombre = d.nombre;
+                $scope.datos.version = d.version;
+                $scope.datos.enlace = d.enlace;
                 $scope.datos.status = (d.status == 1) ? true : false;
-                var idx = 0;
-                if($scope.datos.optionsTipos.find(x => x.id == d.tipo.id) != undefined)
-                    idx = $scope.datos.optionsTipos.findIndex(x => x.id == d.tipo.id);
-                $scope.datos.selectedTipo = $scope.datos.optionsTipos[idx];
-                $timeout(function() {
-                    // anything you want can go here and will safely be run on the next digest.
-                    $('.selectpicker').selectpicker("refresh");
-                    
-                  })
+                
             }
 
             
