@@ -75,7 +75,11 @@ class Prueba extends Command
         $loteria = Lotteries::whereId(3)->first();
         $sorteo = Draws::whereDescripcion("Pick 3 Box")->first();
         // $this->info("Awardsclasss: " . Helper::decimalesDelMontoJugadoSonValidos("0.50", $loteria, $sorteo));
-        $this->info("Awardsclasss: " . Helper::determinarSorteo("123+", $loteria));
+        // $this->info("Awardsclasss: " . Helper::determinarSorteo("123+", $loteria));
+        $usuario = Users::whereUsuario('jean')->first();
+        $usuario2 = Users::whereUsuario('u2')->first();
+        $this->info("Awardsclasss: " . Helper::loteriasOrdenadasPorHoraCierre($usuario));
+        $this->info("Awardsclasss2: " . Helper::loteriasOrdenadasPorHoraCierre($usuario2));
 
 
         // $awardsClass = new AwardsClass($l['id']);

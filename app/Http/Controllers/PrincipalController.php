@@ -76,6 +76,7 @@ class PrincipalController extends Controller
                 $idBanca = $idBanca->id;
         }
        
+        $usuario = Users::where(['id' => $datos['idUsuario'], 'status' => 1])->first();
         $fecha = getdate();
    
         if($idBanca == 0){
@@ -95,7 +96,7 @@ class PrincipalController extends Controller
     
     
         return Response::json([
-            'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
+            'loterias' =>($usuario != null) ? Helper::loteriasOrdenadasPorHoraCierre($usuario) : [],
             'caracteristicasGenerales' =>  Generals::all(),
             'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
@@ -148,10 +149,11 @@ class PrincipalController extends Controller
         });
     
     
+        $usuario = Users::where(['id' => $datos['idUsuario'], 'status' => 1])->first();
     
         return Response::json([
             'idVenta' => Helper::createIdVentaTemporal($idBanca),
-            'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
+            'loterias' => ($usuario != null) ? Helper::loteriasOrdenadasPorHoraCierre($usuario) : [],
             'caracteristicasGenerales' =>  Generals::all(),
             'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
             'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
@@ -940,10 +942,12 @@ class PrincipalController extends Controller
                 }
             
                 if($loteria->cerrada()){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => 'La loteria' . $loteria->descripcion . ' ha cerrado'
-                    ], 201);
+                    if(!$usuario->tienePermiso('Jugar fuera de horario')){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => 'La loteria' . $loteria->descripcion . ' ha cerrado'
+                        ], 201);
+                    }
                 }
         
     
@@ -1085,7 +1089,7 @@ class PrincipalController extends Controller
             'errores' => $errores,
             'mensaje' => $mensaje,
             'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
-            'loterias' => Helper::loteriasOrdenadasPorHoraCierre(),
+            'loterias' => Helper::loteriasOrdenadasPorHoraCierre($usuario),
             'venta' => ($sale != null) ? new SalesResource($sale) : null,
             'img' => $img,
             'ventas' => SalesResource::collection(Helper::getVentasDeHoy($datos['idBanca'])),

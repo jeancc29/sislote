@@ -14,5 +14,7 @@ class Amortization extends Model
         'montoInteres',
         'amortizacion',
         'montoPagado',
+        'montoPagadoCapital',
+        'montoPagadoInteres',
     ];
 }
