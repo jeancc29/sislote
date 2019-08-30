@@ -86,6 +86,28 @@ class TypesSeeder extends Seeder
             'status' => 1,
             'renglon' => 'transaccion'
         ]);
+        t::create([
+            'descripcion' => 'Cobro prestamo',
+            'status' => 1,
+            'renglon' => 'transaccion'
+        ]);
+        t::create([
+            'descripcion' => 'Desembolso de prestamo',
+            'status' => 1,
+            'renglon' => 'transaccion'
+        ]);
+
+        t::create([
+            'descripcion' => 'Pago cuota',
+            'status' => 1,
+            'renglon' => 'pago'
+        ]);
+
+        t::create([
+            'descripcion' => 'Abono a capital',
+            'status' => 1,
+            'renglon' => 'pago'
+        ]);
 
     }
 }

@@ -90,7 +90,7 @@
                                         ng-model="datos.selectedTipoEntidad"
                                         ng-options="o.descripcion for o in datos.optionsTipoEntidad"
                                         ng-change="cbxTipoEntidadChange(o)"
-                                        class="selectpicker w-100" 
+                                        class="selectpicker col-12" 
                                         id="tipoEntidad"
                                         data-style="select-with-transition" 
                                         title="Select Usuario">
@@ -106,7 +106,7 @@
                                         ng-model="datos.selectedEntidad"
                                         ng-options="o.descripcion for o in datos.optionsEntidades"
                                         ng-change="cbxEntidadesChange(o)"
-                                        class="selectpicker w-100" 
+                                        class="selectpicker col-12" 
                                         id="entidades"
                                         data-style="select-with-transition" 
                                         title="Select Usuario">
@@ -122,7 +122,7 @@
                                         ng-model="datos.selectedTipo"
                                         ng-options="o.descripcion for o in datos.optionsTipos"
                                         ng-change="cbxEntidadesChange(o)"
-                                        class="selectpicker w-100" 
+                                        class="selectpicker col-12" 
                                         id="tipos"
                                         data-style="select-with-transition" 
                                         title="Select Usuario">
@@ -137,7 +137,7 @@
                                 <select 
                                         ng-model="datos.selectedUsuario"
                                         ng-options="o.usuario for o in datos.optionsUsuarios"
-                                        class="selectpicker w-100" 
+                                        class="selectpicker col-12" 
                                         id="usuarios"
                                         data-style="select-with-transition" 
                                         title="Select Usuario">

@@ -31,6 +31,8 @@ class CreateTransactionsTable extends Migration
             $table->string('nota_grupo')->nullable();
             $table->integer('status')->default(1);
             $table->unsignedInteger('idGasto')->nullable(); //Cuando la transaccion sea un gasto automatico  este campo guardara el id del gasto
+            $table->unsignedInteger('idPrestamo')->nullable(); //Cuando la transaccion sea un cobro de prestamo ya sea manual o automatico  este campo guardara el id del prestamo
+            $table->unsignedInteger('idAmortizacion')->nullable(); //Cuando la transaccion sea un cobro de prestamo ya sea manual o automatico  este campo guardara el id de la amortizacion
             $table->timestamps();
         });
     }

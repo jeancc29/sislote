@@ -379,6 +379,9 @@ class BranchesController extends Controller
              Automaticexpenses::where('idBanca', $banca['id'])->whereNotIn('id', $idGastos)->delete();
              foreach($datos['gastos'] as $l){
                 $gasto = Automaticexpenses::where(['idBanca' => $banca['id'], 'id' => $l['id']])->first();
+                
+
+                
                 if($gasto != null){
                     
                     // if($l['fechaInicio'] != $gasto['fechaInicio']){
@@ -394,9 +397,10 @@ class BranchesController extends Controller
                     //     }
                     // }
 
+
                     $gasto['descripcion'] = $l['descripcion'];
                     $gasto['monto'] = $l['monto'];
-                    $gasto['monto'] = $l['frecuencia']['id'];
+                    $gasto['idFrecuencia'] = $l['frecuencia']['id'];
                     if(strtolower($l['frecuencia']['descripcion']) == strtolower("SEMANAL")){
                         $gasto['idDia'] = $l['idDia'];
                     }
@@ -416,6 +420,8 @@ class BranchesController extends Controller
                         // 'fechaInicio' => $l['fechaInicio'],
                     ]);
                 }
+
+               
                 
              }
              
@@ -427,7 +433,8 @@ class BranchesController extends Controller
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
             'banca' => BranchesResource::collection(Branches::whereId($banca->id)->get()),
-            'bancas' => BranchesResource::collection(Branches::whereIn('status', array(0, 1))->get())
+            'bancas' => BranchesResource::collection(Branches::whereIn('status', array(0, 1))->get()),
+            'gastos' => $datos['gastos']
         ], 201);
     }
 

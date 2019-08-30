@@ -21,7 +21,8 @@ class CreateAmortizationsTable extends Migration
             $table->decimal('montoCuota', 20, 2)->default(0);
             $table->decimal('montoInteres', 20, 2)->default(0);
             $table->decimal('amortizacion', 20, 2)->default(0);
-            $table->decimal('montoPagado', 20, 2)->default(0);
+            $table->decimal('montoPagadoCapital', 20, 2)->default(0);
+            $table->decimal('montoPagadoInteres', 20, 2)->default(0);
 
             $table->timestamps();
 

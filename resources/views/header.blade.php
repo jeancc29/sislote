@@ -76,6 +76,7 @@ if($controlador != "login"){
     window.sorteosGlobal = <?php if(isset($sorteos)) echo $sorteos; else echo 'null'; ?>;
     window.diasGlobal = <?php if(isset($dias)) echo $dias; else echo 'null'; ?>;
     window.frecuenciasGlobal = <?php if(isset($frecuencias)) echo $frecuencias; else echo 'null'; ?>;
+    window.prestamosGlobal = <?php if(isset($prestamos)) echo $prestamos; else echo 'null'; ?>;
     window.vGlobal = <?php if(isset($ventas)) echo $ventas; else echo 'null'; ?>;
     window.loteriasPremiosModelGlobal = <?php if(isset($loteriasPremiosModal)) echo $loteriasPremiosModal; else echo 'null'; ?>;
 

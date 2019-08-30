@@ -126,3 +126,5 @@ Route::post('/versiones', 'AndroidversionsController@index');
 Route::post('/versiones/guardar', 'AndroidversionsController@store');
 Route::post('/versiones/publicar', 'AndroidversionsController@publicar');
 Route::post('/versiones/publicada', 'AndroidversionsController@publicada');
+
+Route::post('/prestamos/guardar', 'LoansController@store');

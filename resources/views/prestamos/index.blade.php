@@ -147,7 +147,7 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-model="datos.montoPrestado" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
 
@@ -160,7 +160,7 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-model="datos.numeroCuotas" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
@@ -171,7 +171,7 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-model="datos.montoCuotas" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
@@ -184,12 +184,12 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.abreviatura" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-model="datos.tasaInteres" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
 
-                             
+                                
 
                              
 
@@ -203,7 +203,7 @@
                     <div class="col-12 ">
                         <h3>Datos frecuencia</h3>
                       </div>
-                          <div class="text-center col-6" >
+                          <div class="text-center col-5" >
                                 <div class="input-group">
                                   
                                   <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Frecuencia</label>                              
@@ -223,7 +223,7 @@
 
                              
 
-                              <div class="col-6">
+                              <div class="col-5">
                                   <div class="input-group form-control-lg pt-0 mt-0">
                                     <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Fecha inicio</label>                              
                                       
@@ -232,6 +232,21 @@
                                       <input ng-model="datos.fechaInicio" type="date" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
+                                </div>
+
+                                <div class="col-3 col-sm-2">
+                                  <div class="input-group form-control-lg">
+                                      <div class="form-group">
+                                        <div class="form-check">
+                                          <label class="form-check-label">
+                                            <input ng-model="datos.status" class="form-check-input" type="checkbox" value="" checked> Activo
+                                            <span class="form-check-sign">
+                                              <span class="check"></span>
+                                            </span>
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
                                 </div>
 
                     </div>
@@ -448,18 +463,39 @@
           <table class="table table-sm">
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Loteria</th>
-                <th scope="col">Abreviatura</th>
-                <!-- <th scope="col">Hora cierre</th> -->
-                <th scope="col">Editar</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">#</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Banca</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Total prestado</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Tasa interes</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Total saldado</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Total a pagar</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Creado</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Ultimo pago</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold"># Cuotas pendientes</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Balance pendiente</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Monto cuota</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Frecuencia</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Fecha pago</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Estado</th>
+                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Editar</th>
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="l in datos.loterias">
+              <tr ng-repeat="l in datos.prestamos">
                 <th scope="row">@{{$index + 1}}</th>
-                <td>@{{l.descripcion}}</td>
-                <td>@{{l.abreviatura}}</td>
+                <td>@{{l.banca}}</td>
+                <td>@{{l.montoPrestado}}</td>
+                <td>@{{l.tasaInteres}}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>@{{toFecha(l.created_at) | date:"dd/MM/yyyy"}}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>@{{l.montoCuotas}}</td>
+                <td>@{{l.frecuencia}}</td>
+                <td>-</td>
+                <td>@{{(l.status == 1) ? 'Activo' : 'Desactivado'}}</td>
                 <!-- <td>@{{l.horaCierre}}</td> -->
                 <td>
                   <a style="cursor: pointer" ng-click="editar(false, l)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>

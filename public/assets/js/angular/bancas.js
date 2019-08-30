@@ -984,7 +984,7 @@ myApp
                         $scope.datos.status = ($scope.datos.status == 1) ? true : false;
                         _convertir_apertura_y_cierre(false);
                         $scope.datos.bancas = response.data.bancas;
-                        $scope.editar(false, response.data.banca[0]);
+                        $scope.editar(2, response.data.banca[0]);
                         alert("Se ha guardado correctamente");
                     }
                 }else{
@@ -1363,11 +1363,12 @@ myApp
                 $scope.datos.gastos[$scope.datos.gasto.index].frecuencia = $scope.datos.gasto.frecuencia;
                 if($scope.datos.gasto.frecuencia.descripcion.toLowerCase() == "semanal"){
                     $scope.datos.gastos[$scope.datos.gasto.index].idDia = $scope.datos.selectedDia.id;
-                    alert('Dentro:' + $scope.datos.selectedDia.id);
+                    $('#modal-gasto').modal('toggle');
+                    // alert('Dentro:' + $scope.datos.selectedDia.id);
                 }else{
                     $scope.datos.gastos[$scope.datos.gasto.index].idDia = null;
                 }
-                $('#modal-gasto').modal('hide');
+                
             }else{
                 var idDia = null;
                 if($scope.datos.gasto.frecuencia.descripcion.toLowerCase() == "semanal"){

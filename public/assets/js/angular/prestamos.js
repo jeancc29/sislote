@@ -9,12 +9,18 @@ myApp
         $scope.es_cliente = false;
         $scope.datos =  {
             "id":0,
-            "descripcion": null,
-            "abreviatura" : null,
+            'idUsuario' : 0,
+            "montoPrestado": null,
+            "numeroCuotas" : null,
+            "montoCuotas" : null,
+            "tasaInteres" : null,
+            "idFrecuencia" : null,
+            "idEntidadPrestamo" : null,
+            "idEntidadFondo" : null,
+            "detalles" : null,
+            'fechaInicio' : new Date(),
             "status":true,
-            "dias": [],
-            "sorteos": [],
-            "horaCierre": moment().format('YYYY/MM/DD'),
+            
 
             "primera" : null,
             "segunda" : null,
@@ -25,17 +31,25 @@ myApp
             "tresNumeros" : null,
             "dosNumeros" : null,
 
-            "ckbDias": [],
-            "ckbSorteos": [],
+            "optionsBancas": [],
+            "optionsBancos": [],
+            "optionsFrecuencias": [],
             "mostrarFormEditar" : false,
             'selectedBanca' : {},
             'selectedDia' : {},
             'selectedBanco' : {},
-            'selectedFrecuencia' : {},
-            'fechaInicio' : new Date()
+            'selectedFrecuencia' : {}
+        }
+
+        $scope.toFecha = function(fecha){
+            if(fecha != undefined && fecha != null )
+                return new Date(fecha);
+            else
+                return '-';
         }
 
         $scope.inicializarDatos = function(todos){
+            $scope.datos.prestamos = prestamosGlobal;
             $scope.datos.optionsBancas = bancasGlobal;
             $scope.datos.optionsDias = diasGlobal;
             $scope.datos.optionsBancos = bancosGlobal;
@@ -46,7 +60,7 @@ myApp
             $scope.datos.selectedBanco = $scope.datos.optionsBancos[helperService.retornarIndexPorId($scope.datos.selectedBanco, $scope.datos.optionsBancos)];
             $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId($scope.datos.selectedFrecuencia, $scope.datos.optionsFrecuencias)];
 
-            console.log('bancos:', $scope.datos.optionsBancos);
+            console.log('bancos:', $scope.datos.prestamos);
                
             // $http.get(rutaGlobal+"/api/loterias")
             //  .then(function(response){
@@ -100,20 +114,6 @@ myApp
 
             if(esNuevo){
                 $scope.inicializarDatos(true);
-                
-                //$('.form-group').removeClass('is-filled');
-                
-                // $scope.datos.ckbDias.forEach(function(valor, indice, array){
-
-                //     array[indice].existe = false;
-
-                //  });
-                $scope.datos.ckbSorteos.forEach(function(valor, indice, array){
-
-                    array[indice].existe = false;
-
-                 });
-        
             }
             else{
                 //$scope.inicializarDatos();
@@ -261,136 +261,12 @@ myApp
          
             //$scope.datos.horaCierre = moment($scope.datos.horaCierre, ['HH:mm']).format('HH:mm');
 
-            console.log('primera: ',Number($scope.datos.primera));
-
-            if($scope.datos.descripcion == undefined || $scope.datos.descripcion == ""){
-                alert("El nombre no debe estar vacio");
-                return;
-            }
-            if($scope.datos.abreviatura == undefined || $scope.datos.abreviatura == ""){
-                alert("El abreviatura no debe estar vacio");
-                return;
-            }
-            if(Object.keys($scope.datos.sorteos).length == 0){
-                alert("Debe seleccionar los sorteos perteneciente a esta loteria");
-                return;
-            }
-            
-            console.log('actualizar count:', $scope.loteriasSeleccionadasCount());
-            if($scope.superPaleEstaSeleccionado()){
-                if($scope.loteriasSeleccionadasCount() != 2){
-                    alert("Debe seleccionar las dos loterias pertenecientes al supe pale");
-                return;
-                }
-            }
             
 
-            /************* DIAS ********************/
-            // if(Object.keys($scope.datos.dias).length == 0){
-            //     alert("Debe seleccionar los dias perteneciente a esta loteria");
-            //     return;
-            // }
-            /************* END DIAS ********************/
-
-            /************* PAGOS COMBINACIONES ********************/
-
-            // if(Number($scope.datos.primera) == $scope.datos.primera){
-            //     if(Number($scope.datos.primera) < 0)
-            //     {
-            //         alert("El campo primera debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo primera debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.segunda) == $scope.datos.segunda){
-            //     if(Number($scope.datos.segunda) < 0)
-            //     {
-            //         alert("El campo segunda debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo segunda debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.tercera) == $scope.datos.tercera){
-            //     if(Number($scope.datos.tercera) < 0)
-            //     {
-            //         alert("El campo tercera debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo tercera debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.primeraSegunda) == $scope.datos.primeraSegunda){
-            //     if(Number($scope.datos.primeraSegunda) < 0)
-            //     {
-            //         alert("El campo primeraSegunda debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo primeraSegunda debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.primeraTercera) == $scope.datos.primeraTercera){
-            //     if(Number($scope.datos.primeraTercera) < 0)
-            //     {
-            //         alert("El campo primeraTercera debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo primeraTercera debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.segundaTercera) == $scope.datos.segundaTercera){
-            //     if(Number($scope.datos.segundaTercera) < 0)
-            //     {
-            //         alert("El campo segundaTercera debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo segundaTercera debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.tresNumeros) == $scope.datos.tresNumeros){
-            //     if(Number($scope.datos.tresNumeros) < 0)
-            //     {
-            //         alert("El campo tresNumeros debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo tresNumeros debe ser numerico");
-            //     return;
-            // }
-
-            // if(Number($scope.datos.dosNumeros) == $scope.datos.dosNumeros){
-            //     if(Number($scope.datos.dosNumeros) < 0)
-            //     {
-            //         alert("El campo dosNumeros debe ser mayor que cero");
-            //         return;
-            //     }
-            // }
-            // else{
-            //     alert("El campo dosNumeros debe ser numerico");
-            //     return;
-            // }
-
-
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.idEntidadPrestamo = $scope.datos.selectedBanca.id;
+            $scope.datos.idEntidadFondo = $scope.datos.selectedBanco.id;
+            $scope.datos.idFrecuencia = $scope.datos.selectedFrecuencia.id;
 
             $scope.datos.status = ($scope.datos.status) ? 1 : 0;
             $scope.datos.horaCierre = $('#horaCierre').val();
@@ -398,9 +274,10 @@ myApp
 
 
     //   console.log($scope.datos);
+    //   return;
 
 
-          $http.post(rutaGlobal+"/api/loterias/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+          $http.post(rutaGlobal+"/api/prestamos/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
              .then(function(response){
                  console.log(response.data);
                 if(response.data.errores == 0){
