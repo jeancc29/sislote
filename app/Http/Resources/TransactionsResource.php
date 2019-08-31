@@ -27,6 +27,7 @@ class TransactionsResource extends JsonResource
             'idEntidad2' => $this->idEntidad2,
             'entidad1' => (Types::where(['renglon' => 'entidad', 'id' => $this->idTipoEntidad1])->first()->descripcion == 'Banca') ? Branches::whereId($this->idEntidad1)->first() : Entity::whereId($this->idEntidad1)->first(),
             'entidad2' => (Types::where(['renglon' => 'entidad', 'id' => $this->idTipoEntidad2])->first()->descripcion == 'Banca') ? Branches::whereId($this->idEntidad2)->first() : Entity::whereId($this->idEntidad2)->first(),
+            'tipoEntidad2' => (Types::where(['renglon' => 'entidad', 'id' => $this->idTipoEntidad2])->first()->descripcion == 'Banca') ? "Banca" : "Banco",
             'entidad1_saldo_inicial' => $this->entidad1_saldo_inicial,
             'entidad2_saldo_inicial' => $this->entidad2_saldo_inicial,
             'debito' => $this->debito,

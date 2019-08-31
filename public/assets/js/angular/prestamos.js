@@ -31,14 +31,18 @@ myApp
             "tresNumeros" : null,
             "dosNumeros" : null,
 
+            "optionsTiposEntidadesFondo": [],
             "optionsBancas": [],
-            "optionsBancos": [],
+            "optionsBancasFondos": [],
+            "optionsBancosFondos": [],
             "optionsFrecuencias": [],
             "mostrarFormEditar" : false,
             'selectedBanca' : {},
+            'selectedBancaFondo' : {},
             'selectedDia' : {},
-            'selectedBanco' : {},
-            'selectedFrecuencia' : {}
+            'selectedBancoFondo' : {},
+            'selectedFrecuencia' : {},
+            'selectedTipoEntidadFondo' : {}
         }
 
         $scope.toFecha = function(fecha){
@@ -49,15 +53,19 @@ myApp
         }
 
         $scope.inicializarDatos = function(todos){
+            $scope.datos.optionsTiposEntidadesFondo = tiposEntidadesGlobal;
             $scope.datos.prestamos = prestamosGlobal;
             $scope.datos.optionsBancas = bancasGlobal;
             $scope.datos.optionsDias = diasGlobal;
-            $scope.datos.optionsBancos = bancosGlobal;
+            $scope.datos.optionsBancasFondos = bancasGlobal;
+            $scope.datos.optionsBancosFondos = bancosGlobal;
             $scope.datos.optionsFrecuencias = frecuenciasGlobal;
 
+            $scope.datos.selectedTipoEntidadFondo = $scope.datos.optionsTiposEntidadesFondo[helperService.retornarIndexPorId($scope.datos.selectedTipoEntidadFondo, $scope.datos.optionsTiposEntidadesFondo)];
             $scope.datos.selectedBanca = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBanca, $scope.datos.optionsBancas)];
             $scope.datos.selectedDia = $scope.datos.optionsDias[helperService.retornarIndexPorId($scope.datos.selectedDia, $scope.datos.optionsDias)];
-            $scope.datos.selectedBanco = $scope.datos.optionsBancos[helperService.retornarIndexPorId($scope.datos.selectedBanco, $scope.datos.optionsBancos)];
+            $scope.datos.selectedBancaFondo = $scope.datos.optionsBancasFondos[helperService.retornarIndexPorId($scope.datos.selectedBancaFondo, $scope.datos.optionsBancasFondos)];
+            $scope.datos.selectedBancoFondo = $scope.datos.optionsBancosFondos[helperService.retornarIndexPorId($scope.datos.selectedBancoFondo, $scope.datos.optionsBancosFondos)];
             $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId($scope.datos.selectedFrecuencia, $scope.datos.optionsFrecuencias)];
 
             console.log('bancos:', $scope.datos.prestamos);
@@ -265,8 +273,18 @@ myApp
 
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.idEntidadPrestamo = $scope.datos.selectedBanca.id;
-            $scope.datos.idEntidadFondo = $scope.datos.selectedBanco.id;
             $scope.datos.idFrecuencia = $scope.datos.selectedFrecuencia.id;
+            $scope.datos.idTipoEntidadFondo = $scope.datos.selectedTipoEntidadFondo.id;
+
+
+            if($scope.datos.selectedTipoEntidadFondo.descripcion == 'Banco'){
+                $scope.datos.idEntidadFondo = $scope.datos.selectedBancoFondo.id;
+            }else{
+                $scope.datos.idEntidadFondo = $scope.datos.selectedBancaFondo.id;
+            }
+            
+
+            
 
             $scope.datos.status = ($scope.datos.status) ? 1 : 0;
             $scope.datos.horaCierre = $('#horaCierre').val();

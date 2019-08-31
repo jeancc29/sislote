@@ -97,10 +97,10 @@
                     <div class="col-12">
                             <h3>Datos entidades</h3>
                           </div>
-                    <div class="col-6 text-center">
+                    <div class="col-12 text-center">
                             <div class="input-group">
                               
-                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Prestar a entidad</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold " style="color: black;">Prestar a entidad</label>                              
 
                                 <div  class=" col-sm-8 col-9">
                                 <select 
@@ -115,16 +115,16 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
-                    <div class="col-6 text-center">
+                          <div class="col-6 text-center">
                             <div class="input-group">
                               
-                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Tipo entidad fondo</label>                              
 
                                 <div  class=" col-sm-8 col-9">
                                 <select 
                                     ng-change="cbxTipoBloqueosJugadaChanged()"
-                                    ng-model="datos.selectedBanco"
-                                    ng-options="o.nombre for o in datos.optionsBancos"
+                                    ng-model="datos.selectedTipoEntidadFondo"
+                                    ng-options="o.descripcion for o in datos.optionsTiposEntidadesFondo"
                                     class="selectpicker col-12" 
                                     data-style="select-with-transition" 
                                     title="Select tipo regla">
@@ -132,7 +132,49 @@
                               </div>
                             </div> <!-- END INPUT GROUP -->
                           </div>
+
+                          <div class="col-6 text-center" ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banco'">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
+
+                                <div  class=" col-sm-8 col-9">
+                                <select 
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="datos.selectedBancoFondo"
+                                    ng-options="o.nombre for o in datos.optionsBancosFondos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                          <div class="col-6 text-center" ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banca'">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
+
+                                <div  class=" col-sm-8 col-9">
+                                <select 
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="datos.selectedBancaFondo"
+                                    ng-options="o.descripcion for o in datos.optionsBancasFondos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                    
                     </div>
+
+                    
+                   
+
                   </div>
                   
                   <div class="col-12">

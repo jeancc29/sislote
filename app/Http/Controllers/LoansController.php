@@ -72,6 +72,7 @@ class LoansController extends Controller
             $bancos = Entity::where(['status' => 1, 'idTipo' => $idTipo])->get();
             $dias = Days::all();
             $frecuencias = Frecuency::orderBy('id', 'desc')->get();
+            $tiposEntidades = Types::where(['renglon' => 'entidad'])->whereIn('descripcion', ['Banco', 'Banca'])->get();
             
             $prestamos = DB::table('loans')
                 ->select('loans.id', 'loans.montoPrestado', 'loans.numeroCuotas', 'loans.montoCuotas', 'loans.tasaInteres', 'loans.created_at', 'loans.status', 'branches.descripcion AS banca', 'frecuencies.descripcion AS frecuencia')
@@ -79,7 +80,7 @@ class LoansController extends Controller
                 ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
                 ->where('loans.status', 1)
                 ->get();
-            return view('prestamos.index', compact('controlador', 'bancas', 'bancos', 'frecuencias', 'dias', 'prestamos'));
+            return view('prestamos.index', compact('controlador', 'bancas', 'bancos', 'frecuencias', 'dias', 'prestamos', 'tiposEntidades'));
         }
 
        
@@ -181,11 +182,6 @@ class LoansController extends Controller
                 $idTipoEntidadFondo = $idTipoBanco->id;
 
                 
-                
-            }else{
-                $idTipoEntidadFondo = $idTipoBanca->id;
-
-                //Tambien debo ir al archivo helper y arreglar la funcio saldo y saldoPorFecha
                 $saldo = (new Helper)->saldo($datos['idEntidadPrestamo'], 1);
                 $saldoEntidad2 = (new Helper)->saldo($datos['idEntidadFondo'], 2);
                 $t = transactions::create([
@@ -197,11 +193,33 @@ class LoansController extends Controller
                     'idEntidad2' => $prestamo->idEntidadFondo,
                     'entidad1_saldo_inicial' => $saldo,
                     'entidad2_saldo_inicial' => $saldoEntidad2,
-                    'debito' => 0,
-                    'credito' => $prestamo->montoPrestado,
+                    'debito' => $prestamo->montoPrestado,
+                    'credito' => 0,
                     'idGasto' => null,
-                    'entidad1_saldo_final' => $saldo - $prestamo->montoPrestado,
-                    'entidad2_saldo_final' => 0,
+                    'entidad1_saldo_final' => 0,
+                    'entidad2_saldo_final' => $saldoEntidad2 - $prestamo->montoPrestado,
+                    'nota' => "Desembolso de prestamo"
+                ]);
+            }else{
+                $idTipoEntidadFondo = $idTipoBanca->id;
+
+                //Tambien debo ir al archivo helper y arreglar la funcio saldo y saldoPorFecha
+                $saldo = (new Helper)->saldo($datos['idEntidadPrestamo'], 1);
+                $saldoEntidad2 = (new Helper)->saldo($datos['idEntidadFondo'], 1);
+                $t = transactions::create([
+                    'idUsuario' => $datos['idUsuario'],
+                    'idTipo' => $tipo->id,
+                    'idTipoEntidad1' => $idTipoBanca->id,
+                    'idTipoEntidad2' => $idTipoEntidadFondo,
+                    'idEntidad1' => $prestamo->idEntidadPrestamo,
+                    'idEntidad2' => $prestamo->idEntidadFondo,
+                    'entidad1_saldo_inicial' => $saldo,
+                    'entidad2_saldo_inicial' => $saldoEntidad2,
+                    'debito' => $prestamo->montoPrestado,
+                    'credito' => 0,
+                    'idGasto' => null,
+                    'entidad1_saldo_final' => 0,
+                    'entidad2_saldo_final' => $saldoEntidad2 - $prestamo->montoPrestado,
                     'nota' => "Desembolso de prestamo"
                 ]);
             }

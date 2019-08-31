@@ -63,7 +63,7 @@ class AutomaticExpenses extends Command
         $todayWday = getdate()['wday'];
         $ultimoDiaMes = new Carbon("last day of this month");
         $primerDiaMes = new Carbon("first day of this month");
-        $horaParaRealizarGasto = 23;
+        $horaParaRealizarGasto = 0;
         
 
         $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";

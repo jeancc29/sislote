@@ -55,7 +55,17 @@ class Helper{
                 ])
                 ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
                 ->sum('credito');
-            $saldo_inicial = $debito - $credito;
+            //El debito desembolso es un fondo emitido para un prestamo desde esta entidad, osea, que es un dinero que sale
+            // por lo tanto este se le suma al credito
+            $debitoDesembolso =  transactions::where(
+                    [
+                        'idEntidad1'=> $datos["id"], 
+                        'idTipoEntidad2' => $idTipoEntidad1->id, 
+                        'status' => 1
+                    ])
+                    ->where('idTipo', Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)                
+                    ->sum('debito');
+            $saldo_inicial = $debito - ($credito + $debitoDesembolso);
         }else if($datos["entidad"] == 2){
             $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
             $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
@@ -146,7 +156,17 @@ class Helper{
                 ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
                 ->where('created_at', '<', $fechaHasta)
                 ->sum('credito');
-            $saldo_inicial = $debito - $credito;
+            //El debito desembolso es un fondo emitido para un prestamo desde esta entidad, osea, que es un dinero que sale
+            // por lo tanto este se le suma al credito
+            $debitoDesembolso =  transactions::where(
+                [
+                    'idEntidad1'=> $datos["id"], 
+                    'idTipoEntidad2' => $idTipoEntidad1->id, 
+                    'status' => 1
+                ])
+                ->where('idTipo', Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)                
+                ->sum('debito');
+            $saldo_inicial = $debito - ($credito + $debitoDesembolso);
         }else if($datos["entidad"] == 2){
             $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
             $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
