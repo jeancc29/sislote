@@ -249,7 +249,7 @@ class PrincipalController extends Controller
         $jugadas = null;
 
         $esCodigoBarra = true;
-        if(isset($codigoBarra['codigoBarra'])){
+        if(isset($codigoBarra['codigoBarra']) && !isset($codigoBarra['codigoQr'])){
             if(!(new Helper)->isNumber($codigoBarra['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Numero de ticket incorrecto"], 201);
             }
@@ -262,7 +262,7 @@ class PrincipalController extends Controller
             $codigoBarra['codigoBarra'] = $idTicket;
             $esCodigoBarra = false;
         }
-        else if(isset($codigoBarra['codigoQr']) && !isset($codigoBarra['codigoBarra'])){
+        else if(isset($codigoBarra['codigoQr'])){
             $codigoBarra['codigoBarra'] = base64_decode($codigoBarra['codigoQr']);
         }else{
             return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
