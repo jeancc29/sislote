@@ -243,14 +243,24 @@ class PrincipalController extends Controller
             'datos.codigoQr' => ''
         ])['datos'];
 
-        
+        $errores = 0;
+        $mensaje = '';
+        $loterias = null;
+        $jugadas = null;
+
+        $esCodigoBarra = true;
         if(isset($codigoBarra['codigoBarra'])){
             if(!(new Helper)->isNumber($codigoBarra['codigoBarra'])){
-                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+                return Response::json(['errores' => 1, 'mensaje' => "Numero de ticket incorrecto"], 201);
             }
-            if(strlen($codigoBarra['codigoBarra']) != 10){
-                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            if(strlen($codigoBarra['codigoBarra']) != 9){
+                return Response::json(['errores' => 1, 'mensaje' => "Numero de ticket incorrecto"], 201);
             }
+
+            //Quitamos todos los ceros de la izquierda
+            $idTicket = ltrim($codigoBarra['codigoBarra'], "0");
+            $codigoBarra['codigoBarra'] = $idTicket;
+            $esCodigoBarra = false;
         }
         else if(isset($codigoBarra['codigoQr']) && !isset($codigoBarra['codigoBarra'])){
             $codigoBarra['codigoBarra'] = base64_decode($codigoBarra['codigoQr']);
@@ -258,15 +268,23 @@ class PrincipalController extends Controller
             return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
         }
     
-        $errores = 0;
-        $mensaje = '';
-        $loterias = null;
-        $jugadas = null;
+        
     
-        $idTicket = Tickets::where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
+        if($esCodigoBarra){
+            $idTicket = Tickets::where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
+            if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => "El numero de ticket no es correcto"
+                ], 201);
+            }
+        }else{
+            $idTicket = $codigoBarra['codigoBarra'];
+        }
+        
         $idVenta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0,5])->value('id');
         
-        if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
+        // if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
             if($idVenta != null){
                 $idLoterias = Salesdetails::distinct()->select('idLoteria')->where('idVenta', $idVenta)->get();
                 $idLoterias = collect($idLoterias)->map(function($id){
@@ -284,10 +302,10 @@ class PrincipalController extends Controller
                 $errores = 1;
                 $mensaje = "El ticket no existe";
             }
-        }else{
-                $errores = 1;
-                $mensaje = "El numero de ticket no es correcto";
-        }
+        // }else{
+        //         $errores = 1;
+        //         $mensaje = "El numero de ticket no es correcto";
+        // }
         //$fecha = getdate(strtotime($fecha['fecha']));
     
         

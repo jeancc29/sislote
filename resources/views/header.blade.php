@@ -253,6 +253,9 @@ if($controlador != "login"){
 .bg-rosa{
   background: #FD9EBC;
 }
+.bg-disabled{
+  background: #cdcbce;
+}
 
 
 .bg-success2{

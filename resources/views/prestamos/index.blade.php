@@ -591,7 +591,7 @@
                     </div>
                         <div class="col-6 text-right mt-2">
                               <div class="form-group">
-                                <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">   
+                                <input ng-click="pagar()" type="submit" class="btn btn-primary" value="Guardar">   
                             </div>
                           </div>
                     
@@ -676,7 +676,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="c in datos.selectedPrestamoPagar.amortizacion">
+                            <tr ng-click='seleccionarCuota(c)' ng-class="{'bg-disabled' : c.enable == false}" ng-repeat="c in datos.selectedPrestamoPagar.amortizacion">
                                 <td scope="col" class="text-center" >@{{c.fecha}}</td>
                                 <td scope="col" class="text-center" >@{{c.montoCuota - c.montoInteres}}</td>
                                 <!-- <td scope="col" class="text-center" >@{{Cerrado}}</td> -->
@@ -685,9 +685,9 @@
                                 <td scope="col" class="text-center" >
                                   <div class="form-check">
                                     <label class="form-check-label">
-                                      <input class="form-check-input" type="checkbox" value="">
+                                      <input ng-model="c.seleccionado" class="form-check-input" type="checkbox" value="">
                                       <span class="form-check-sign">
-                                        <span class="check"></span>
+                                        <span  class="check"></span>
                                       </span>
                                     </label>
                                   </div>
@@ -710,7 +710,7 @@
 
                     <div class="col-12 text-right mt-2">
                               <div class="form-group">
-                                <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">   
+                                <input ng-click="pagar()" type="submit" class="btn btn-primary" value="Guardar">   
                             </div>
                           </div>
 

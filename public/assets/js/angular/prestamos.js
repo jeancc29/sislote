@@ -345,10 +345,50 @@ myApp
                 {
                     // $scope.inicializarDatos(true);
                     $('#modal-prestamo').modal('show');
+                    response.data.prestamo.amortizacion.forEach(function(valor, indice, array){
+                        if(indice == 0){
+                        array[indice].enable = true;
+                        }else{
+                            array[indice].enable = false;
+                        }
+                        array[indice].seleccionado = false;
+                        console.log('indice: ', indice);
+                    });
                     $scope.datos.selectedPrestamoPagar = response.data.prestamo;
+
+
                 }
                 
             });
+        }
+
+        $scope.seleccionarCuota = function(cuota){
+            console.log('dentro', cuota);
+            var index = $scope.datos.selectedPrestamoPagar.amortizacion.findIndex(x => x.id == cuota.id);
+            if(cuota.seleccionado == true){
+                $scope.datos.selectedPrestamoPagar.amortizacion[index].seleccionado = false;
+                $scope.datos.selectedPrestamoPagar.amortizacion.forEach(function(valor, indice, array){
+                    // if(indice > index){
+                        $scope.datos.selectedPrestamoPagar.amortizacion[indice].enable = false;
+                        $scope.datos.selectedPrestamoPagar.amortizacion[indice].seleccionado = false;
+                    // }
+                });
+            }else{
+                $scope.datos.selectedPrestamoPagar.amortizacion[index].seleccionado = true;
+                if(helperService.empty($scope.datos.selectedPrestamoPagar.amortizacion[index + 1], 'object') != true){
+                    $scope.datos.selectedPrestamoPagar.amortizacion[index].enable = true;
+                }
+            }
+
+
+
+
+            
+        }
+
+
+        $scope.pagar = function(){
+            console.log('dentro', $scope.datos.selectedPrestamoPagar.amortizacion);
         }
        
 
