@@ -272,7 +272,7 @@ class PrincipalController extends Controller
     
         if($esCodigoBarra){
             $idTicket = Tickets::where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
-            if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
+            if(strlen($codigoBarra['codigoBarra']) != 10 || is_numeric($codigoBarra['codigoBarra']) != true){
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => "El numero de ticket no es correcto"
