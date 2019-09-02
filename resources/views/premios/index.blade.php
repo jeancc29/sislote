@@ -206,9 +206,11 @@
                           <div class="col-3">
                               <div id="divInputFechaDesde" class="form-group">
                                   <label  for="jugada" class="bmd-label-floating">Fecha</label>
-                                  <input ng-model="datos.fecha" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
+                                  <input ng-click="prueba()" ng-model="datos.fecha" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
                               </div>
                           </div>
+
+                          
 
                           
 
@@ -221,6 +223,11 @@
                               </label>
                             </div>
                           </div>
+
+                          <div class="col-3">
+                              <p ng-click="buscarPorFecha()" class="btn btn-success">Buscar</p>
+                          </div>
+
                         </div>
                       </div>
 

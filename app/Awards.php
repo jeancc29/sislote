@@ -8,6 +8,6 @@ class Awards extends Model
 {
     protected $fillable = [
         'idUsuario', 'numeroGanador', 'idLoteria', 'idSorteo', 'primera', 'segunda', 
-        'tercera', 'pick3', 'pick4'
+        'tercera', 'pick3', 'pick4', 'created_at'
     ];
 }

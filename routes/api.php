@@ -88,6 +88,7 @@ Route::post('/horarios/normal/guardar', 'HorariosController@store');
 
 
 Route::get('/premios', 'AwardsController@index');
+Route::post('/premios/buscarPorFecha', 'AwardsController@buscarPorFecha');
 Route::post('/premios/erase', 'AwardsController@erase');
 Route::post('/premios/guardar', 'AwardsController@store');
 
@@ -128,3 +129,4 @@ Route::post('/versiones/publicar', 'AndroidversionsController@publicar');
 Route::post('/versiones/publicada', 'AndroidversionsController@publicada');
 
 Route::post('/prestamos/guardar', 'LoansController@store');
+Route::post('/prestamos/getPrestamo', 'LoansController@getPrestamo');

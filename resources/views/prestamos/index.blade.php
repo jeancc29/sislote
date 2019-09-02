@@ -541,6 +541,8 @@
                 <!-- <td>@{{l.horaCierre}}</td> -->
                 <td>
                   <a style="cursor: pointer" ng-click="editar(false, l)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                  <!-- <a style="cursor: pointer" data-toggle="modal" data-target=".bd-example-modal-lg" class="ion-edit d-inline bg-success py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">payment</i></a> -->
+                  <a style="cursor: pointer" ng-click="getPrestamo(l)" class="ion-edit d-inline bg-success py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">payment</i></a>
                   <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
                 </td>
               </tr>
@@ -568,9 +570,163 @@
         
 
 
+        <style>
+                .modal-lg {
+            max-width: 90% !important;
+            z-index: 90000000000;
+        }
+
+        .modal{
+            z-index: 90000000000;
+        }
+    </style>
+
+        <div id="modal-prestamo" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg mt-1">
+            <div class="modal-content">
+
+                 <div class="modal-header">
+                    <div class="col-sm-6">
+                        <h3 class="modal-title" id="exampleModalLabel">Pagar prestamo</h3>
+                    </div>
+                        <div class="col-6 text-right mt-2">
+                              <div class="form-group">
+                                <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">   
+                            </div>
+                          </div>
+                    
+                    <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                    </div> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+
+                    <div class="modal-body">
 
 
 
+                   <div class="row justify-content-center">
+
+                        
+                      <div class="col-6  ">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Prestado a</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
+                                <input ng-model="datos.selectedPrestamoPagar.banca" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6  ">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Monto prestado</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
+                                <input ng-model="datos.selectedPrestamoPagar.montoPrestado" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6  ">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Frecuencia</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
+                                <input ng-model="datos.selectedPrestamoPagar.frecuencia" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6  ">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Tasa interes</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
+                                <input ng-model="datos.selectedPrestamoPagar.tasaInteres" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                    </div> <!-- END ROW CAMPOS -->
+                   
+
+                    <table class="table table-sm mt-3">
+                        <thead class="">
+                            <tr>
+                            <th scope="col" class="text-center font-weight-bold" >Fecha</th>
+                            <!-- <th scope="col" class="text-center font-weight-bold" >Cerrado</th> -->
+                            <th scope="col" class="text-center font-weight-bold" >Capital</th>
+                            <th scope="col" class="text-center font-weight-bold" >Interes</th>
+                            <th scope="col" class="text-center font-weight-bold" >Cuota</th>
+                            <th scope="col" class="text-center font-weight-bold" >Pagar</th>
+                           
+
+                            <!--<th scope="col" class="text-center">Cancelar/Eliminar</th> -->
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="c in datos.selectedPrestamoPagar.amortizacion">
+                                <td scope="col" class="text-center" >@{{c.fecha}}</td>
+                                <td scope="col" class="text-center" >@{{c.montoCuota - c.montoInteres}}</td>
+                                <!-- <td scope="col" class="text-center" >@{{Cerrado}}</td> -->
+                                <td scope="col" class="text-center" >@{{c.montoInteres}}</td>
+                                <td scope="col" class="text-center" >@{{c.montoCuota}}</td>
+                                <td scope="col" class="text-center" >
+                                  <div class="form-check">
+                                    <label class="form-check-label">
+                                      <input class="form-check-input" type="checkbox" value="">
+                                      <span class="form-check-sign">
+                                        <span class="check"></span>
+                                      </span>
+                                    </label>
+                                  </div>
+                                </td>
+                                <!-- <td scope="col" class="text-center" style="font-size: 12px">Marcar pago</td> -->
+                                <!-- <td scope="col" class="text-center" style="font-size: 12px">
+                                    <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline   bg-danger  text-white rounded"><i class="material-icons">delete_forever</i></a>
+                                </td> -->
+                            </tr>
+                            <tr >
+                                <td colspan="2"></td>
+                                <td class="text-center font-weight-bold">TOTAL:</td>
+                                <td class="text-center font-weight-bold">@{{total(true) | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{total(false) | currency}}</td>
+                                <td colspan="4"></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+
+                    <div class="col-12 text-right mt-2">
+                              <div class="form-group">
+                                <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">   
+                            </div>
+                          </div>
+
+                    <div class="container">
+
+                        <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                        </div> -->
+                    </div>
+
+                </div> <!-- END MODAL-BODY -->
+                
+            </div> <!-- END MODAL-CONTENT-->
+        </div>
+    </div>
+    <!-- MODAL MONITOREO -->
 
 
 

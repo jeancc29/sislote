@@ -5,6 +5,7 @@ use App\Awards;
 use Request;
 use Illuminate\Support\Facades\Route; 
 use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
 
 
 use Faker\Generator as Faker;
@@ -37,6 +38,7 @@ use Illuminate\Support\Facades\Crypt;
 
 
 class AwardsClass{
+    public $fecha;
     public $loteria;
     public $primera;
     public $segunda;
@@ -147,7 +149,7 @@ class AwardsClass{
     }
 
     public function loteriaAbreDiaActual(){
-        $loteriaWday = $this->loteria->dias()->whereWday(getdate()['wday'])->get()->first();
+        $loteriaWday = $this->loteria->dias()->whereWday($this->fecha['wday'])->get()->first();
         if($loteriaWday == null){
             return false;
         }
@@ -158,7 +160,7 @@ class AwardsClass{
     public function insertarPremio(){
         $guardadoCorrectamente = true;
         try{
-            $fechaActual = getdate();
+            $fechaActual = $this->fecha;
             $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
             $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
             
@@ -175,6 +177,8 @@ class AwardsClass{
                     $numeroGanador['pick4'] =  $this->pick4;
                     $numeroGanador->save();
                 }else{
+                    $fechaString = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' ' .$fechaActual['hours'] . ':' . $fechaActual['minutes'];
+                    $fecha = new Carbon($fechaString);
                     Awards::create([
                         'idUsuario' => $this->idUsuario,
                         'idLoteria' => $this->loteria->id,
@@ -183,7 +187,8 @@ class AwardsClass{
                         'segunda' => $this->segunda,
                         'tercera' => $this->tercera,
                         'pick3' => $this->pick3,
-                        'pick4' => $this->pick4
+                        'pick4' => $this->pick4,
+                        'created_at' => $fecha
                     ]);
                 }
         }catch (Exception $e) {
@@ -196,7 +201,7 @@ class AwardsClass{
     public function eliminarPremio(){
         $eliminadoCorrectamente = true;
         try{
-            $fechaActual = getdate();
+            $fechaActual = $this->fecha;
             $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
             $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
             
@@ -215,8 +220,8 @@ class AwardsClass{
         return $eliminadoCorrectamente;
     }
 
-    public function getJugadasDeHoy($idLoteria){
-        $fechaActual = getdate();
+    public function getJugadasDeFechaDada($idLoteria){
+        $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
         $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
 
@@ -233,7 +238,7 @@ class AwardsClass{
     }
 
     public function existenTicketsMarcadoComoPagado($idLoteria){
-        $fechaActual = getdate();
+        $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
         $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
 

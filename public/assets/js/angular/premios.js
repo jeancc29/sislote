@@ -83,6 +83,58 @@ myApp
             $scope.inicializarDatos(0, 0);
         }
 
+
+
+        $scope.prueba = function(){
+            console.log('prueba changed');
+            $('#culo').datetimepicker("show");
+
+            $(".datepicker").datepicker();
+        }
+        $scope.buscarPorFecha = function(idLoteria, idSorteo){
+            
+
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $http.post(rutaGlobal+"/api/premios/buscarPorFecha", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
+             .then(function(response){
+                console.log('Loteria ajav: ', response.data);
+
+             
+
+
+                
+                $scope.datos.optionsLoterias = response.data.loterias;
+                $scope.datos.loterias = response.data.loterias;
+                //$scope.datos.optionsSorteos = response.data.sorteos;
+                
+                
+                let idx = 0;
+                if(idLoteria > 0)
+                    idx = $scope.datos.optionsLoterias.findIndex(x => x.id == idLoteria);
+                 $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[idx];
+                 $scope.cbxLoteriasChanged();
+    
+
+                 $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    //$('#multiselect').selectpicker('val', []);
+                    $('#multiselect').selectpicker("refresh");
+                    $('.selectpicker').selectpicker("refresh");
+                    //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+                  })
+            
+
+               
+            }
+            // ,
+            // function(response) {
+            //     // Handle error here
+            //     //console.log('Error jean: ', response);
+            //     alert("Error");
+            // }
+            );
+       
+        }
       
         
 

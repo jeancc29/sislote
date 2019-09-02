@@ -8,7 +8,7 @@ myApp
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
         $scope.datos =  {
-            "id":0,
+            "idPrestamo":0,
             'idUsuario' : 0,
             "montoPrestado": null,
             "numeroCuotas" : null,
@@ -326,6 +326,26 @@ myApp
                 {
                     $scope.inicializarDatos(true);
                     alert(response.data.mensaje);
+                }
+                
+            });
+        }
+
+
+        $scope.getPrestamo = function(prestamo){
+            $scope.datos.idPrestamo = prestamo.id;
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.selectedPrestamoPagar = null;
+
+            $http.post(rutaGlobal+"/api/prestamos/getPrestamo", {'action':'sp_loterias_elimnar', 'datos': $scope.datos})
+             .then(function(response){
+                console.log(response);
+            
+                if(response.data.errores == 0)
+                {
+                    // $scope.inicializarDatos(true);
+                    $('#modal-prestamo').modal('show');
+                    $scope.datos.selectedPrestamoPagar = response.data.prestamo;
                 }
                 
             });

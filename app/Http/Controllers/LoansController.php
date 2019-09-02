@@ -281,9 +281,9 @@ class LoansController extends Controller
                             //Deducimos el interes pagado
                             if($datos['montoPagado'] > 0){
                                 $interesPagado = 0;
-                                $calculo = $amortizacion->montoInteres - $datos['montoPagado'];
+                                $calculo = round(($amortizacion->montoInteres - $datos['montoPagado']), 2 );
                                 if($calculo < 0){
-                                    $datos['montoPagado'] = abs($interesPagado);
+                                    $datos['montoPagado'] = abs($calculo);
                                     $interesPagado = $amortizacion->montoInteres;
                                 }else{
                                     $interesPagado = $amortizacion->montoInteres - $calculo;
@@ -299,7 +299,7 @@ class LoansController extends Controller
                                 $calculo = $capital - $datos['montoPagado'];
 
                                 if($calculo < 0){
-                                    $datos['montoPagado'] = abs($interesPagado);
+                                    $datos['montoPagado'] = abs($calculo);
                                     $capitalPagado = $capital;
                                 }else{
                                     $capitalPagado = $capital - $calculo;
@@ -311,22 +311,23 @@ class LoansController extends Controller
 
                             $tipo = Types::where(['renglon' => 'transaccion', 'descripcion' => 'Cobro prestamo'])->first();
 
+                            $amortizacion->save();
                             $saldo = (new Helper)->saldo($prestamo->idEntidadPrestamo, 1);
-                            $saldoEntidad2 = (new Helper)->saldo($datos['idEntidadFondo'], 2);
+                            $saldoEntidad2 = (new Helper)->saldo($datos['idBanco'], 2);
                             $t = transactions::create([
                                 'idUsuario' => $datos['idUsuario'],
                                 'idTipo' => $tipo->id,
-                                'idTipoEntidad1' => $prestamo->idEntidadPrestamo,
+                                'idTipoEntidad1' => $prestamo->idTipoEntidadPrestamo,
                                 'idTipoEntidad2' => $idTipoBanco->id,
                                 'idEntidad1' => $prestamo->idEntidadPrestamo,
                                 'idEntidad2' => $datos['idBanco'],
                                 'entidad1_saldo_inicial' => $saldo,
                                 'entidad2_saldo_inicial' => $saldoEntidad2,
-                                'debito' => $prestamo->montoPrestado,
-                                'credito' => 0,
+                                'debito' => 0,
+                                'credito' => $amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres,
                                 'idGasto' => null,
-                                'entidad1_saldo_final' => $prestamo->montoPrestado + $saldo,
-                                'entidad2_saldo_final' => round(($saldoEntidad2 - $prestamo->montoPrestado), 2),
+                                'entidad1_saldo_final' => $saldo - ($amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres),
+                                'entidad2_saldo_final' => $saldoEntidad2 + ($amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres),
                                 'nota' => "Cobro manual de prestamo"
                             ]);
 
@@ -335,77 +336,13 @@ class LoansController extends Controller
                 }
             }
         }
-        $prestamo = Loans::where(['id' => $datos['id']])->first();
-        if($prestamo != null){
-            $prestamo->montoPrestado = $datos['montoPrestado'];
-            $prestamo->status = $datos['status'];
-            $prestamo->numeroCuotas = $datos['numeroCuotas'];
-            $prestamo->tasaInteres = $datos['tasaInteres'];
-            $prestamo->detalles = $datos['detalles'];
-            //Cuando se hace la transaccion para emitir los fondos se le restaran el monto pagado al monto del nuevo prestamo
-        }else{
-            
-
-            // $amortizacion = Helper::amortizar($prestamo->montoPrestado, $prestamo->montoCuotas, $prestamo->numeroCuotas, $prestamo->tasaInteres, $prestamo->idFrecuencia, false);
-            $amortizacion = Helper::amortizar($datos['montoPrestado'], $datos['montoCuotas'], $datos['numeroCuotas'], $datos['tasaInteres'], $datos['idFrecuencia'], false);
-            $datos['montoCuotas'] = $amortizacion[0]['montoCuota'] + $amortizacion[0]['montoInteres'];
-            $datos['numeroCuotas'] = count($amortizacion);
-            $datos['tasaInteres'] = ($amortizacion[0]['tasaInteres'] == null) ? 0 : $amortizacion[0]['tasaInteres'];
-
-            $fechaInicioCarbon = new Carbon($datos['fechaInicio']);
-            $datos['fechaInicio'] = $fechaInicioCarbon->toDateString();
-            $prestamo = Loans::create([
-                'idUsuario' => $datos['idUsuario'],
-                'idTipoEntidadPrestamo' => $idTipoBanca->id,
-                'idTipoEntidadFondo' => $idTipoBanco->id,
-                'idEntidadPrestamo' => $datos['idEntidadPrestamo'],
-                'idEntidadFondo'=> $datos['idEntidadFondo'],
-                'montoPrestado'=> $datos['montoPrestado'],
-                'montoCuotas'=> $datos['montoCuotas'],
-                'numeroCuotas'=> $datos['numeroCuotas'],
-                'tasaInteres'=> $datos['tasaInteres'],
-                'status'=> $datos['status'],
-                'detalles' => $datos['detalles'],
-                'idFrecuencia' => $datos['idFrecuencia'],
-                'fechaInicio' => $datos['fechaInicio']
-            ]);
-
-
-            // $c[0]['a'];
-            foreach($amortizacion as $a){
-                Amortization::create([
-                    'idPrestamo' => $prestamo->id,
-                    'numeroCuota' => $a['numeroCuota'],
-                    'montoCuota' => $a['montoCuota'],
-                    'montoInteres' => $a['montoInteres'],
-                    'amortizacion' => $a['amortizacion'],
-                    'fecha' => $a['fecha'],
-                ]);
-            }
-
-            $tipo = Types::where(['renglon' => 'transaccion', 'descripcion' => 'Desembolso de prestamo'])->first();
-
-            $saldo = (new Helper)->saldo($datos['idEntidadPrestamo'], 1);
-            $saldoEntidad2 = (new Helper)->saldo($datos['idEntidadFondo'], 2);
-            $t = transactions::create([
-                'idUsuario' => $datos['idUsuario'],
-                'idTipo' => $tipo->id,
-                'idTipoEntidad1' => $idTipoBanca->id,
-                'idTipoEntidad2' => $idTipoBanco->id,
-                'idEntidad1' => $prestamo->idEntidadPrestamo,
-                'idEntidad2' => $prestamo->idEntidadFondo,
-                'entidad1_saldo_inicial' => $saldo,
-                'entidad2_saldo_inicial' => $saldoEntidad2,
-                'debito' => $prestamo->montoPrestado,
-                'credito' => 0,
-                'idGasto' => null,
-                'entidad1_saldo_final' => $prestamo->montoPrestado + $saldo,
-                'entidad2_saldo_final' => round(($saldoEntidad2 - $prestamo->montoPrestado), 2),
-                'nota' => "Desembolso de prestamo"
-            ]);
-
-        }
         
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha pagado correctamente',
+            //'colleccon' => $colleccion
+        ], 201);
+
     }
 
     public function aplazarCuota(Loans $loans)
@@ -417,6 +354,52 @@ class LoansController extends Controller
         ])['datos'];
 
 
+    }
+
+    public function getPrestamo(Loans $loans)
+    {
+        //Aplazar o perdonar cuota
+        $datos = request()->validate([
+            'datos.idPrestamo' => 'required',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+
+
+        $prestamo = DB::table('loans')
+        ->select('loans.id', 'loans.montoPrestado', 'loans.numeroCuotas', 'loans.montoCuotas', 'loans.tasaInteres', 'loans.created_at', 'loans.status', 'branches.descripcion AS banca', 'frecuencies.descripcion AS frecuencia')
+        ->join('branches', 'branches.id', '=', 'loans.idEntidadPrestamo')
+        ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
+        ->where('loans.status', 1)
+        ->where('loans.id', $datos['idPrestamo'])
+        ->first();
+        if($prestamo != null){
+            // $prestamo = collect($prestamo)->map(function($p){
+            //     $amortizacion = Amortization::where('idPrestamo', $p->id)->get();
+            //     return ['id' => $p->id, 'montoPrestado' => 
+            //             $p->montoPrestado, 'montoCuotas' => $p->montoCuotas,
+            //             'tasaInteres' => $p->tasaInteres,
+            //             'banca' => $p->banca,
+            //             'frecuencia' => $p->frecuencia,
+            //             'amortizacion' => $amortizacion
+            //     ];
+            // });
+            $prestamo->amortizacion = Amortization::where('idPrestamo', $prestamo->id)->get();
+            return Response::json([
+                'errores' => 0,
+                'mensaje' => '',
+                'prestamo' => $prestamo
+                //'colleccon' => $colleccion
+            ], 201);
+        }
+
+
+        return Response::json([
+            'errores' => 1,
+            'mensaje' => 'El prestamo no existe',
+            'prestamo' => $prestamo
+            //'colleccon' => $colleccion
+        ], 201);
+ 
     }
 
     /**

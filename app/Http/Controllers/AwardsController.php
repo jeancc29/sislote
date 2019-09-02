@@ -164,6 +164,108 @@ class AwardsController extends Controller
         ], 201);
     }
 
+
+
+    public function buscarPorFecha()
+    {
+       
+
+
+        $datos = request()->validate([
+            'datos.fecha' => 'required',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+
+
+        $fecha = getdate(strtotime($datos['fecha']));
+        $fechaDesde = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+
+        $loterias = Lotteries::whereStatus(1)->has('sorteos')->get();
+        // == "vistaPremiosModal"
+        if(isset($datos['layout'])){
+            
+
+            // if($datos['layout'] != "vistaPremiosModal")
+                
+            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+                $primera = null;
+                $segunda = null;
+                $tercera = null;
+                $pick3 = null;
+                $pick4 = null;
+                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                                ->where('idLoteria', $l['id'])
+                                ->first();
+    
+                if($premios != null){
+                    $primera = $premios->primera;
+                    $segunda = $premios->segunda;
+                    $tercera = $premios->tercera;
+                    $pick3 = $premios->pick3;
+                    $pick4 = $premios->pick4;
+                }
+                return [
+                        'id' => $l['id'],
+                        'descripcion' => $l['descripcion'],
+                        'abreviatura' => $l['abreviatura'],
+                        'primera' => $primera,
+                        'segunda' => $segunda,
+                        'tercera' => $tercera,
+                        'pick3' => $pick3,
+                        'pick4' => $pick4,
+                        'sorteos' => $l->sorteos
+                    ];
+            });
+    
+            // $loterias = collect($datos['loterias']);
+            list($loterias, $no) = $loterias->partition(function($l){
+                return Helper::loteriaTienePremiosRegistradosHoy($l['id']) != true;
+            });
+        }else{
+            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+                $primera = null;
+                $segunda = null;
+                $tercera = null;
+                $pick3 = null;
+                $pick4 = null;
+                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                                ->where('idLoteria', $l['id'])
+                                ->first();
+    
+                if($premios != null){
+                    $primera = $premios->primera;
+                    $segunda = $premios->segunda;
+                    $tercera = $premios->tercera;
+                    $pick3 = $premios->pick3;
+                    $pick4 = $premios->pick4;
+                }
+                return [
+                        'id' => $l['id'],
+                        'descripcion' => $l['descripcion'],
+                        'abreviatura' => $l['abreviatura'],
+                        'primera' => $primera,
+                        'segunda' => $segunda,
+                        'tercera' => $tercera,
+                        'pick3' => $pick3,
+                        'pick4' => $pick4,
+                        'sorteos' => $l->sorteos
+                    ];
+            });
+        }
+
+        //La funcion partition retorna los objetos que cumplan la condicion pero esta tambien retornara su mismo index, en algunos
+        //casos no se retorna el index cero porque el elemento en esta posicion no ha sido incluido, entonces lo que hace la funcion values()
+        //es empezar la collection desde su indice cero
+        $loterias = $loterias->values();
+
+
+        return Response::json([
+            'loterias' => $loterias
+        ], 201);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -222,6 +324,7 @@ class AwardsController extends Controller
     
     foreach($datos['loterias'] as $l):
         $awardsClass = new AwardsClass($l['id']);
+        $awardsClass->fecha = $fecha;
         $awardsClass->idUsuario = $datos['idUsuario'];
         $awardsClass->primera = $l['primera'];
         $awardsClass->segunda = $l['segunda'];
@@ -252,7 +355,7 @@ class AwardsController extends Controller
             $c = 0;
             $colleccion = null;
             
-            foreach($awardsClass->getJugadasDeHoy($l['id']) as $j){
+            foreach($awardsClass->getJugadasDeFechaDada($l['id']) as $j){
     
                 $j['premio'] = 0;
                 $contador = 0;
@@ -415,7 +518,7 @@ class AwardsController extends Controller
             return Response::json(['errores' => 1,'mensaje' => 'Error al eliminar numeros ganadores'], 201);
         }
 
-            foreach($awardsClass->getJugadasDeHoy($datos['idLoteria']) as $j){
+            foreach($awardsClass->getJugadasDeFechaDada($datos['idLoteria']) as $j){
                 $j['premio'] = 0;
                 $j['status'] = 0;
                 $j->save();
