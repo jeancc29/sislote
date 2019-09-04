@@ -73,14 +73,29 @@ class LoansController extends Controller
             $dias = Days::all();
             $frecuencias = Frecuency::orderBy('id', 'desc')->get();
             $tiposEntidades = Types::where(['renglon' => 'entidad'])->whereIn('descripcion', ['Banco', 'Banca'])->get();
-            
+            $tiposPagos = Types::where(['renglon' => 'pago'])->whereIn('descripcion', ['Pago cuota', 'Abono a capital'])->get();
+            // $prestamos = DB::table('loans')
+            //     ->select('loans.id', 'loans.montoPrestado', 
+            //         'loans.numeroCuotas', 'loans.montoCuotas', 'loans.tasaInteres', 'loans.created_at', 
+            //         'loans.status', 'branches.descripcion AS banca', 'frecuencies.descripcion AS frecuencia',
+            //         DB::raw('select sum(montoPagadoInteres + montoPagadoCapital) as totalSaldado from amortizations'))
             $prestamos = DB::table('loans')
-                ->select('loans.id', 'loans.montoPrestado', 'loans.numeroCuotas', 'loans.montoCuotas', 'loans.tasaInteres', 'loans.created_at', 'loans.status', 'branches.descripcion AS banca', 'frecuencies.descripcion AS frecuencia')
+            ->selectRaw('loans.id, loans.montoPrestado,
+                    loans.numeroCuotas, 
+                    loans.montoCuotas, 
+                    loans.tasaInteres, 
+                    loans.created_at, 
+                    loans.status, 
+                    branches.descripcion AS banca, 
+                    frecuencies.descripcion AS frecuencia,
+                    (select sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as totalSaldado,
+                    (select loans.montoPrestado - sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as balancePendiente
+                    ')
                 ->join('branches', 'branches.id', '=', 'loans.idEntidadPrestamo')
                 ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
                 ->where('loans.status', 1)
                 ->get();
-            return view('prestamos.index', compact('controlador', 'bancas', 'bancos', 'frecuencias', 'dias', 'prestamos', 'tiposEntidades'));
+            return view('prestamos.index', compact('controlador', 'bancas', 'bancos', 'frecuencias', 'dias', 'prestamos', 'tiposEntidades', 'tiposPagos'));
         }
 
        
@@ -227,6 +242,30 @@ class LoansController extends Controller
             
 
         }
+
+        $prestamos = DB::table('loans')
+        ->selectRaw('loans.id, loans.montoPrestado,
+                loans.numeroCuotas, 
+                loans.montoCuotas, 
+                loans.tasaInteres, 
+                loans.created_at, 
+                loans.status, 
+                branches.descripcion AS banca, 
+                frecuencies.descripcion AS frecuencia,
+                (select sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as totalSaldado,
+                (select loans.montoPrestado - sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as balancePendiente
+                ')
+            ->join('branches', 'branches.id', '=', 'loans.idEntidadPrestamo')
+            ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
+            ->where('loans.status', 1)
+            ->get();
+    
+    return Response::json([
+        'errores' => 0,
+        'mensaje' => 'Se ha guardado correctamente',
+        'prestamos' => $prestamos
+        //'colleccon' => $colleccion
+    ], 201);
         
     }
 
@@ -239,8 +278,14 @@ class LoansController extends Controller
             'datos.idTipoPago' => 'required', 
             'datos.montoPagado' => 'required', 
             'datos.cuotas' => 'required',
-            'datos.idBanco'
+            'datos.idBanco' => 'required'
         ])['datos'];
+
+        $cuotas = collect($datos['cuotas']);
+
+        list($datos['cuotas'], $no) = $cuotas->partition(function($l){
+            return $l['seleccionado'] == true;
+        });
 
 
         $tipoPago = Types::whereId($datos['idTipoPago'])->first();
@@ -276,11 +321,17 @@ class LoansController extends Controller
 
                     //Ahora vamos a crear las transacciones
                     for($c = 0; $c < count($datos['cuotas']); $c++){
+                        $capitalPagado = 0;
+                        $interesPagado = 0;
                         $amortizacion = Amortization::whereId($datos['cuotas'][$c]['id'])->first();
                         if($amortizacion != null){
+                            //Comprobamos de que la cuota no se haya pagado 
+                            if(($amortizacion->montoPagadoInteres + $amortizacion->montoPagadoCapital) >= $amortizacion->montoCuota)
+                                continue;
+
                             //Deducimos el interes pagado
-                            if($datos['montoPagado'] > 0){
-                                $interesPagado = 0;
+                            if($datos['montoPagado'] > 0 && ($amortizacion->montoInteres - $amortizacion->montoPagadoInteres) > 0){
+                                
                                 $calculo = round(($amortizacion->montoInteres - $datos['montoPagado']), 2 );
                                 if($calculo < 0){
                                     $datos['montoPagado'] = abs($calculo);
@@ -289,13 +340,18 @@ class LoansController extends Controller
                                     $interesPagado = $amortizacion->montoInteres - $calculo;
                                     $datos['montoPagado'] = 0;
                                 }
-                                $amortizacion->montoPagadoInteres = $interesPagado;
+
+                                if($amortizacion->montoPagadoInteres == 0)
+                                    $amortizacion->montoPagadoInteres = $interesPagado;
+                                else if($amortizacion->montoPagadoInteres > 0)
+                                    $amortizacion->montoPagadoInteres += $interesPagado;
+                                
                             }
 
                             //Deducimos el capital pagado
-                            if($datos['montoPagado'] > 0){
-                                $capitalPagado = 0;
-                                $capital = ($amortizacion->montoInteres - $amortizacion->montoInteres);
+                            if($datos['montoPagado'] > 0 && ($amortizacion->montoCuota - ($amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres)) > 0){
+                                
+                                $capital = ($amortizacion->montoCuota - $amortizacion->montoInteres);
                                 $calculo = $capital - $datos['montoPagado'];
 
                                 if($calculo < 0){
@@ -305,15 +361,21 @@ class LoansController extends Controller
                                     $capitalPagado = $capital - $calculo;
                                     $datos['montoPagado'] = 0;
                                 }
+                                
+                                if($amortizacion->montoPagadoCapital == 0)
+                                    $amortizacion->montoPagadoCapital = $capitalPagado;
+                                else if($amortizacion->montoPagadoCapital > 0)
+                                    $amortizacion->montoPagadoCapital += $capitalPagado;
 
-                                $amortizacion->montoPagadoCapital = $capitalPagado;
+                                
                             }
 
                             $tipo = Types::where(['renglon' => 'transaccion', 'descripcion' => 'Cobro prestamo'])->first();
 
-                            $amortizacion->save();
+                            
                             $saldo = (new Helper)->saldo($prestamo->idEntidadPrestamo, 1);
                             $saldoEntidad2 = (new Helper)->saldo($datos['idBanco'], 2);
+                            
                             $t = transactions::create([
                                 'idUsuario' => $datos['idUsuario'],
                                 'idTipo' => $tipo->id,
@@ -324,22 +386,42 @@ class LoansController extends Controller
                                 'entidad1_saldo_inicial' => $saldo,
                                 'entidad2_saldo_inicial' => $saldoEntidad2,
                                 'debito' => 0,
-                                'credito' => $amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres,
+                                'credito' => $capitalPagado + $interesPagado,
                                 'idGasto' => null,
-                                'entidad1_saldo_final' => $saldo - ($amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres),
-                                'entidad2_saldo_final' => $saldoEntidad2 + ($amortizacion->montoPagadoCapital + $amortizacion->montoPagadoInteres),
+                                'entidad1_saldo_final' => $saldo - ($capitalPagado + $interesPagado),
+                                'entidad2_saldo_final' => $saldoEntidad2 + ($capitalPagado + $interesPagado),
                                 'nota' => "Cobro manual de prestamo"
                             ]);
+
+                            $amortizacion->save();
 
                         } //Endif amortization != null
                     }// end primer for
                 }
             }
         }
+
+        $prestamos = DB::table('loans')
+            ->selectRaw('loans.id, loans.montoPrestado,
+                    loans.numeroCuotas, 
+                    loans.montoCuotas, 
+                    loans.tasaInteres, 
+                    loans.created_at, 
+                    loans.status, 
+                    branches.descripcion AS banca, 
+                    frecuencies.descripcion AS frecuencia,
+                    (select sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as totalSaldado,
+                    (select loans.montoPrestado - sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as balancePendiente
+                    ')
+                ->join('branches', 'branches.id', '=', 'loans.idEntidadPrestamo')
+                ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
+                ->where('loans.status', 1)
+                ->get();
         
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha pagado correctamente',
+            'prestamos' => $prestamos
             //'colleccon' => $colleccion
         ], 201);
 

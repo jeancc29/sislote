@@ -130,3 +130,4 @@ Route::post('/versiones/publicada', 'AndroidversionsController@publicada');
 
 Route::post('/prestamos/guardar', 'LoansController@store');
 Route::post('/prestamos/getPrestamo', 'LoansController@getPrestamo');
+Route::post('/prestamos/cobrar', 'LoansController@cobrar');

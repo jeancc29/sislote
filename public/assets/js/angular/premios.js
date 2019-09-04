@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -154,25 +154,25 @@ myApp
                     $scope.existeSorteo('Directo', $scope.datos.selectedLoteria) == true 
                     || $scope.existeSorteo('Pale', $scope.datos.selectedLoteria) == true
                     || $scope.existeSorteo('Tripleta', $scope.datos.selectedLoteria) == true){
-                    if($scope.empty($scope.datos.primera, 'number') == true || $scope.empty($scope.datos.segunda, 'number') == true || $scope.empty($scope.datos.tercera, 'number') == true){
+                    if(helperService.empty($scope.datos.primera, 'number', false) == true || helperService.empty($scope.datos.segunda, 'number', false) == true || helperService.empty($scope.datos.tercera, 'number', false) == true){
                         alert("Hay campos vacios otros: ");
                         return;
                     }
                 }
                 else if($scope.existeSorteo('Super pale', $scope.datos.selectedLoteria) == true){
-                    if($scope.empty($scope.datos.primera, 'number') == true || $scope.empty($scope.datos.segunda, 'number') == true){
+                    if(helperService.empty($scope.datos.primera, 'number', false) == true || helperService.empty($scope.datos.segunda, 'number', false) == true){
                         alert("Hay campos vacios super pale");
                         return;
                     }
                 }
                 else if($scope.existeSorteo('Pick 3 Straight', $scope.datos.selectedLoteria) == true || $scope.existeSorteo('Pick 3 Box', $scope.datos.selectedLoteria) == true){
-                    if($scope.empty($scope.datos.pick3, 'number') == true){
+                    if(helperService.empty($scope.datos.pick3, 'number', false) == true){
                         alert("Hay campos vacios pick3");
                         return;
                     }
                 }
                 else if($scope.existeSorteo('Pick 4 Straight', $scope.datos.selectedLoteria) == true || $scope.existeSorteo('Pick 4 Box', $scope.datos.selectedLoteria) == true){
-                    if($scope.empty($scope.datos.pick4, 'number') == true){
+                    if(helperService.empty($scope.datos.pick4, 'number', false) == true){
                         alert("Hay campos vacios pick4");
                         return;
                     }
@@ -195,7 +195,7 @@ myApp
                         $scope.existeSorteo('Directo', array[indice]) == true 
                         || $scope.existeSorteo('Pale', array[indice]) == true
                         || $scope.existeSorteo('Tripleta', array[indice]) == true){
-                        if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true || $scope.empty(array[indice].tercera, 'number') == true){
+                        if(helperService.empty(array[indice].primera, 'number', false) == true || helperService.empty(array[indice].segunda, 'number', false) == true || helperService.empty(array[indice].tercera, 'number', false) == true){
                             // alert("Hay campos vacios otros");
                             array[indice].primera = null;
                             array[indice].segunda = null;
@@ -204,7 +204,7 @@ myApp
                         }
                     }
                     if($scope.existeSorteo('Super pale', array[indice]) == true){
-                        if($scope.empty(array[indice].primera, 'number') == true || $scope.empty(array[indice].segunda, 'number') == true){
+                        if(helperService.empty(array[indice].primera, 'number', false) == true || helperService.empty(array[indice].segunda, 'number', false) == true){
                             // alert("Hay campos vacios super pale");
                             array[indice].primera = null;
                             array[indice].segunda = null;
@@ -212,7 +212,7 @@ myApp
                         }
                     }
                     if($scope.existeSorteo('Pick 3 Straight', array[indice]) == true || $scope.existeSorteo('Pick 3 Box', array[indice]) == true){
-                        if($scope.empty(array[indice].pick3, 'number') == true){
+                        if(helperService.empty(array[indice].pick3, 'number', false) == true){
                             // alert("Hay campos vacios pick3");
                             array[indice].pick3 = null;
                             erroerroresVistaCompletares = true;
@@ -220,7 +220,7 @@ myApp
                     }
                     if($scope.existeSorteo('Pick 4 Straight', array[indice]) == true || $scope.existeSorteo('Pick 4 Box', array[indice]) == true){
                         console.log('existe pick4 hola: ', $scope.existeSorteo('Pick 4 Box', array[indice]));
-                        if($scope.empty(array[indice].pick4, 'number') == true){
+                        if(helperService.empty(array[indice].pick4, 'number', false) == true){
                             // alert("Hay campos vacios pick4");
                             array[indice].pick4 = null;
                             erroresVistaCompleta = true;
@@ -229,7 +229,7 @@ myApp
                   
     
                     // //Verificamos que todos los datos no esten vacios y que el sorteo 'Super pale' no exista
-                    // if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == false && $scope.existeSorteo('Super pale', array[indice]) == false){
+                    // if(helperService.empty(array[indice].primera, 'number') == false && helperService.empty(array[indice].segunda, 'number') == false && helperService.empty(array[indice].tercera, 'number') == false && $scope.existeSorteo('Super pale', array[indice]) == false){
                     //     if(array[indice].primera.length != 2){
                     //         alert('El valor del campo 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
                     //         errores = true;
@@ -244,7 +244,7 @@ myApp
                     //     }
                     // }
                     // //Verificamos que todos los datos no esten vacios, excepto la tripleta y que el sorteo 'Super pale' si exista
-                    // else if($scope.empty(array[indice].primera, 'number') == false && $scope.empty(array[indice].segunda, 'number') == false && $scope.empty(array[indice].tercera, 'number') == true && $scope.existeSorteo('Super pale', array[indice]) == true){
+                    // else if(helperService.empty(array[indice].primera, 'number') == false && helperService.empty(array[indice].segunda, 'number') == false && helperService.empty(array[indice].tercera, 'number') == true && $scope.existeSorteo('Super pale', array[indice]) == true){
                     //     if(array[indice].primera.length != 2){
                     //         alert('El valor del campo 1era de la loteria ', array[indice].descripcion, ' debe ser numerico de dos digitos');
                     //         errores = true;
@@ -388,15 +388,15 @@ myApp
            $scope.datos.existeSorteo = $scope.existeSorteo('Super pale', $scope.datos.selectedLoteria);
            console.log("Changed sorteo", $scope.datos.selectedLoteria);
 
-           if($scope.empty($scope.datos.selectedLoteria.primera, "number") == false)
+           if(helperService.empty($scope.datos.selectedLoteria.primera, "number", false) == false)
                 $('#primeraVentanaSencilla').addClass('is-filled');
-           if($scope.empty($scope.datos.selectedLoteria.segunda, "number") == false)
+           if(helperService.empty($scope.datos.selectedLoteria.segunda, "number", false) == false)
                 $('#segundaVentanaSencilla').addClass('is-filled');
-           if($scope.empty($scope.datos.selectedLoteria.tercera, "number") == false)
+           if(helperService.empty($scope.datos.selectedLoteria.tercera, "number", false) == false)
                 $('#terceraVentanaSencilla').addClass('is-filled');
-           if($scope.empty($scope.datos.selectedLoteria.pick3, "number") == false)
+           if(helperService.empty($scope.datos.selectedLoteria.pick3, "number", false) == false)
                 $('#pick3VentanaSencilla').addClass('is-filled');
-           if($scope.empty($scope.datos.selectedLoteria.pick4, "number") == false)
+           if(helperService.empty($scope.datos.selectedLoteria.pick4, "number", false) == false)
                 $('#pick4VentanaSencilla').addClass('is-filled');
         }
 
@@ -591,15 +591,15 @@ myApp
             
         }
 
-        $scope.empty = function(valor, tipo){
-            console.log('empty:', valor);
-            if(tipo === 'number'){
-                if(Number(valor) == undefined || valor == '' || valor == null || Number(valor) <= 0)
-                    return true;
-            }
+        // helperService.empty = function(valor, tipo){
+        //     console.log('empty:', valor);
+        //     if(tipo === 'number'){
+        //         if(Number(valor) == undefined || valor == '' || valor == null || Number(valor) <= 0)
+        //             return true;
+        //     }
 
-            return false;
-        }
+        //     return false;
+        // }
 
 
         $scope.existeSorteo = function(sorteo, loteria){

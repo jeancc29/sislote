@@ -77,6 +77,7 @@ if($controlador != "login"){
     window.diasGlobal = <?php if(isset($dias)) echo $dias; else echo 'null'; ?>;
     window.frecuenciasGlobal = <?php if(isset($frecuencias)) echo $frecuencias; else echo 'null'; ?>;
     window.prestamosGlobal = <?php if(isset($prestamos)) echo $prestamos; else echo 'null'; ?>;
+    window.tiposPagosGlobal = <?php if(isset($tiposPagos)) echo $tiposPagos; else echo 'null'; ?>;
     window.tiposEntidadesGlobal = <?php if(isset($tiposEntidades)) echo $tiposEntidades; else echo 'null'; ?>;
     window.vGlobal = <?php if(isset($ventas)) echo $ventas; else echo 'null'; ?>;
     window.loteriasPremiosModelGlobal = <?php if(isset($loteriasPremiosModal)) echo $loteriasPremiosModal; else echo 'null'; ?>;

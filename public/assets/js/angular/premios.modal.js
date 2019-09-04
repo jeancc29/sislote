@@ -122,25 +122,25 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
                     $scope.existeSorteoPremiosModal('Directo', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true 
                     || $scope.existeSorteoPremiosModal('Pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true
                     || $scope.existeSorteoPremiosModal('Tripleta', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if(helperService.empty($scope.datosPremiosModal.primera, 'number') == true || helperService.empty($scope.datosPremiosModal.segunda, 'number') == true || helperService.empty($scope.datosPremiosModal.tercera, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.primera, 'number', false) == true || helperService.empty($scope.datosPremiosModal.segunda, 'number', false) == true || helperService.empty($scope.datosPremiosModal.tercera, 'number', false) == true){
                         alert("Hay campos vacios otros: ");
                         return;
                     }
                 }
                 else if($scope.existeSorteoPremiosModal('Super pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if(helperService.empty($scope.datosPremiosModal.primera, 'number') == true || helperService.empty($scope.datosPremiosModal.segunda, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.primera, 'number', false) == true || helperService.empty($scope.datosPremiosModal.segunda, 'number', false) == true){
                         alert("Hay campos vacios super pale");
                         return;
                     }
                 }
                 else if($scope.existeSorteoPremiosModal('Pick 3 Straight', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true || $scope.existeSorteoPremiosModal('Pick 3 Box', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if(helperService.empty($scope.datosPremiosModal.pick3, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.pick3, 'number', false) == true){
                         alert("Hay campos vacios pick3");
                         return;
                     }
                 }
                 else if($scope.existeSorteoPremiosModal('Pick 4 Straight', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true || $scope.existeSorteoPremiosModal('Pick 4 Box', $scope.datosPremiosModal.selectedLoteriaPremiosModal) == true){
-                    if(helperService.empty($scope.datosPremiosModal.pick4, 'number') == true){
+                    if(helperService.empty($scope.datosPremiosModal.pick4, 'number', false) == true){
                         alert("Hay campos vacios pick4");
                         return;
                     }
@@ -163,26 +163,26 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
                         $scope.existeSorteoPremiosModal('Directo', array[indice]) == true 
                         || $scope.existeSorteoPremiosModal('Pale', array[indice]) == true
                         || $scope.existeSorteoPremiosModal('Tripleta', array[indice]) == true){
-                        if(helperService.empty(array[indice].primera, 'number') == true || helperService.empty(array[indice].segunda, 'number') == true || helperService.empty(array[indice].tercera, 'number') == true){
+                        if(helperService.empty(array[indice].primera, 'number', false) == true || helperService.empty(array[indice].segunda, 'number', false) == true || helperService.empty(array[indice].tercera, 'number', false) == true){
                             alert("Hay campos vacios otros");
                             errores = true;
                         }
                     }
                     if($scope.existeSorteoPremiosModal('Super pale', array[indice]) == true){
-                        if(helperService.empty(array[indice].primera, 'number') == true || helperService.empty(array[indice].segunda, 'number') == true){
+                        if(helperService.empty(array[indice].primera, 'number', false) == true || helperService.empty(array[indice].segunda, 'number', false) == true){
                             alert("Hay campos vacios super pale");
                             errores = true;
                         }
                     }
                     if($scope.existeSorteoPremiosModal('Pick 3 Straight', array[indice]) == true || $scope.existeSorteoPremiosModal('Pick 3 Box', array[indice]) == true){
-                        if(helperService.empty(array[indice].pick3, 'number') == true){
+                        if(helperService.empty(array[indice].pick3, 'number', false) == true){
                             alert("Hay campos vacios pick3");
                             errores = true;
                         }
                     }
                     if($scope.existeSorteoPremiosModal('Pick 4 Straight', array[indice]) == true || $scope.existeSorteoPremiosModal('Pick 4 Box', array[indice]) == true){
                         // console.log('existe pick4 hola: ', $scope.existeSorteoPremiosModal('Pick 4 Box', array[indice]));
-                        if(helperService.empty(array[indice].pick4, 'number') == true){
+                        if(helperService.empty(array[indice].pick4, 'number', false) == true){
                             alert("Hay campos vacios pick4");
                             errores = true;
                         }
@@ -279,15 +279,15 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
            $scope.datosPremiosModal.existeSorteoPremiosModal = $scope.existeSorteoPremiosModal('Super pale', $scope.datosPremiosModal.selectedLoteriaPremiosModal);
         //    console.log("Changed sorteo", $scope.datosPremiosModal.selectedLoteriaPremiosModal);
 
-           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.primera, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.primera, "number", false) == false)
                 $('#primeraPremiosModal').addClass('is-filled');
-           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.segunda, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.segunda, "number", false) == false)
                 $('#segundaPremiosModal').addClass('is-filled');
-           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.tercera, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.tercera, "number", false) == false)
                 $('#terceraPremiosModal').addClass('is-filled');
-           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick3, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick3, "number", false) == false)
                 $('#pick3PremiosModal').addClass('is-filled');
-           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick4, "number") == false)
+           if(helperService.empty($scope.datosPremiosModal.selectedLoteriaPremiosModal.pick4, "number", false) == false)
                 $('#pick4PremiosModal').addClass('is-filled');
         }
 

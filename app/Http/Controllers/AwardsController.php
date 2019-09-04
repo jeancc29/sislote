@@ -489,11 +489,21 @@ class AwardsController extends Controller
             'datos.idUsuario' => 'required',
             'datos.idLoteria' => 'required',
             'datos.idBanca' => 'required',
+            'datos.fecha' => '',
         ])['datos'];
 
         
     
-        $fecha = getdate();
+            $fecha = getdate();
+            $fechaRequest = new Carbon($datos['fecha']);
+            $fechaActual = Carbon::now();
+      
+            if($fechaRequest->greaterThan($fechaActual)){
+                return Response::json(['errores' => 1,'mensaje' => 'No está permitido actualizar resultados para fechas en el futuro'], 201);
+            }else{
+                $fecha = getdate(strtotime($datos['fecha']));
+            }
+
         $errores = 0;
         $mensaje = '';
         $idBanca = Branches::whereId($datos['idBanca'])->whereStatus(1)->first();
@@ -506,6 +516,7 @@ class AwardsController extends Controller
         }
 
         $awardsClass = new AwardsClass($datos['idLoteria']);
+        $awardsClass->fecha = $fecha;
         $awardsClass->idUsuario = $datos['idUsuario'];
         // $awardsClass->primera = "";
         // $awardsClass->segunda = "";

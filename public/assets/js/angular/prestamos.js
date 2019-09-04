@@ -8,6 +8,7 @@ myApp
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
         $scope.datos =  {
+            "id":0,
             "idPrestamo":0,
             'idUsuario' : 0,
             "montoPrestado": null,
@@ -36,13 +37,16 @@ myApp
             "optionsBancasFondos": [],
             "optionsBancosFondos": [],
             "optionsFrecuencias": [],
+            "optionsTiposPagos": [],
             "mostrarFormEditar" : false,
             'selectedBanca' : {},
             'selectedBancaFondo' : {},
             'selectedDia' : {},
             'selectedBancoFondo' : {},
             'selectedFrecuencia' : {},
-            'selectedTipoEntidadFondo' : {}
+            'selectedTipoEntidadFondo' : {},
+            'selectedTiposPagos' : {},
+            'selectedBancoCobrar' : {},
         }
 
         $scope.toFecha = function(fecha){
@@ -60,15 +64,20 @@ myApp
             $scope.datos.optionsBancasFondos = bancasGlobal;
             $scope.datos.optionsBancosFondos = bancosGlobal;
             $scope.datos.optionsFrecuencias = frecuenciasGlobal;
+            $scope.datos.optionsTiposPagos = tiposPagosGlobal;
+            $scope.datos.optionsBancosCobrar = bancosGlobal;
 
+            
             $scope.datos.selectedTipoEntidadFondo = $scope.datos.optionsTiposEntidadesFondo[helperService.retornarIndexPorId($scope.datos.selectedTipoEntidadFondo, $scope.datos.optionsTiposEntidadesFondo)];
             $scope.datos.selectedBanca = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBanca, $scope.datos.optionsBancas)];
             $scope.datos.selectedDia = $scope.datos.optionsDias[helperService.retornarIndexPorId($scope.datos.selectedDia, $scope.datos.optionsDias)];
             $scope.datos.selectedBancaFondo = $scope.datos.optionsBancasFondos[helperService.retornarIndexPorId($scope.datos.selectedBancaFondo, $scope.datos.optionsBancasFondos)];
             $scope.datos.selectedBancoFondo = $scope.datos.optionsBancosFondos[helperService.retornarIndexPorId($scope.datos.selectedBancoFondo, $scope.datos.optionsBancosFondos)];
             $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId($scope.datos.selectedFrecuencia, $scope.datos.optionsFrecuencias)];
+            $scope.datos.selectedTiposPagos = $scope.datos.optionsTiposPagos[helperService.retornarIndexPorId($scope.datos.selectedTiposPagos, $scope.datos.optionsTiposPagos)];
+            $scope.datos.selectedBancoCobrar = $scope.datos.optionsBancosCobrar[helperService.retornarIndexPorId($scope.datos.selectedBancoCobrar, $scope.datos.optionsBancosCobrar)];
 
-            console.log('bancos:', $scope.datos.prestamos);
+            console.log('bancos:', $scope.datos.tiposPagosRadio);
                
             // $http.get(rutaGlobal+"/api/loterias")
             //  .then(function(response){
@@ -299,6 +308,8 @@ myApp
              .then(function(response){
                  console.log(response.data);
                 if(response.data.errores == 0){
+                    $scope.datos.prestamos = response.data.prestamos;
+                   console.log('prestamos:', response.data);
                     alert("Se ha guardado correctamente");
                     if($scope.datos.id == 0)
                         $scope.inicializarDatos(true);
@@ -333,6 +344,9 @@ myApp
 
 
         $scope.getPrestamo = function(prestamo){
+            $scope.datos.montoPagado = null;
+            $scope.datos.devuelta = null;
+
             $scope.datos.idPrestamo = prestamo.id;
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.selectedPrestamoPagar = null;
@@ -346,15 +360,21 @@ myApp
                     // $scope.inicializarDatos(true);
                     $('#modal-prestamo').modal('show');
                     response.data.prestamo.amortizacion.forEach(function(valor, indice, array){
+
                         if(indice == 0){
                         array[indice].enable = true;
                         }else{
                             array[indice].enable = false;
                         }
                         array[indice].seleccionado = false;
-                        console.log('indice: ', indice);
+
+                        array[indice].interesAPagar = Number(array[indice].montoInteres) - Number(array[indice].montoPagadoInteres);
+                        array[indice].capitalAPagar = (Number(array[indice].montoCuota) - Number(array[indice].montoInteres)) - Number(array[indice].montoPagadoCapital);
+                        array[indice].cuotaAPagar = Number(array[indice].interesAPagar) + Number(array[indice].capitalAPagar);                        
+                        console.log('indice: ',array[indice] );
                     });
                     $scope.datos.selectedPrestamoPagar = response.data.prestamo;
+                    calcularTotal();
 
 
                 }
@@ -365,32 +385,119 @@ myApp
         $scope.seleccionarCuota = function(cuota){
             console.log('dentro', cuota);
             var index = $scope.datos.selectedPrestamoPagar.amortizacion.findIndex(x => x.id == cuota.id);
+            if(cuota.enable == false){
+                $scope.datos.selectedPrestamoPagar.amortizacion[index].seleccionado = false;
+                return;
+            }
+            
             if(cuota.seleccionado == true){
                 $scope.datos.selectedPrestamoPagar.amortizacion[index].seleccionado = false;
                 $scope.datos.selectedPrestamoPagar.amortizacion.forEach(function(valor, indice, array){
-                    // if(indice > index){
+                    if(indice > index){
                         $scope.datos.selectedPrestamoPagar.amortizacion[indice].enable = false;
                         $scope.datos.selectedPrestamoPagar.amortizacion[indice].seleccionado = false;
-                    // }
+                    }
                 });
             }else{
                 $scope.datos.selectedPrestamoPagar.amortizacion[index].seleccionado = true;
                 if(helperService.empty($scope.datos.selectedPrestamoPagar.amortizacion[index + 1], 'object') != true){
-                    $scope.datos.selectedPrestamoPagar.amortizacion[index].enable = true;
+                    $scope.datos.selectedPrestamoPagar.amortizacion[index + 1].enable = true;
                 }
             }
 
 
 
-
             
+            calcularTotal();
         }
 
 
         $scope.pagar = function(){
             console.log('dentro', $scope.datos.selectedPrestamoPagar.amortizacion);
+            if(helperService.empty($scope.datos.montoPagado, 'number')){
+                alert("El monto debe ser numerico y mayor que cero");
+                return;
+            }
+            if(hayCuotasSeleccionadas() == false){
+                alert("Debe seleccionar al menos una cuota");
+                return;
+            }
+
+            console.log('pagar:', hayCuotasSeleccionadas());
+
+
+            $scope.datos.cuotas = $scope.datos.selectedPrestamoPagar.amortizacion;
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.idTipoPago = $scope.datos.selectedTiposPagos.id;
+            $scope.datos.idBanco = $scope.datos.selectedBancoCobrar.id;
+
+            $http.post(rutaGlobal+"/api/prestamos/cobrar", {'action':'sp_loterias_elimnar', 'datos': $scope.datos})
+            .then(function(response){
+               console.log(response);
+           
+               if(response.data.errores == 0)
+               {
+                   $scope.datos.prestamos = response.data.prestamos;
+                    alert("Se ha pagado correctamente");
+                    $('#modal-prestamo').modal('hide');
+                    return;
+               }
+               else if(response.data.errores == 1){
+                $('#modal-prestamo').modal('hide');
+                    alert(response.data.mensaje);
+                    return;
+               }
+
+               
+               
+           });
+        }
+
+        $scope.txtPagarChanged = function(){
+            if(hayCuotasSeleccionadas() == false){
+                return;
+            }
+
+            if(helperService.empty($scope.datos.montoPagado, 'number') == true){
+                    return;
+            }
+
+            
+            var calculo = $scope.datos.totalAPagar - Number($scope.datos.montoPagado);
+            if(calculo < 0){
+                $scope.datos.devuelta = Math.abs(calculo);
+            }else{
+                $scope.datos.devuelta = 0;
+            }
+
+            calcularTotal();
+            
+        }
+
+        function hayCuotasSeleccionadas(){
+            var hay = false;
+            $scope.datos.selectedPrestamoPagar.amortizacion.forEach(function(valor, indice, array){
+                if(array[indice].seleccionado == true){
+                    hay = true;
+                }
+            });
+
+            return hay;
         }
        
+        function calcularTotal(){
+            var total = 0;
+            $scope.datos.selectedPrestamoPagar.amortizacion.forEach(function(valor, indice, array){
+                if(array[indice].seleccionado == true)
+                    total += array[indice].cuotaAPagar;
+                    console.log('calcularTotal:', array[indice].cuotaAPagar);
+            });
+
+            $scope.datos.totalAPagar = total;
+
+            console.log(total);
+        }
+
 
         /******************* DIAS *********************/
         // $scope.ckbDias_changed = function(check, d){

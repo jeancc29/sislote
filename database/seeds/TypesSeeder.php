@@ -109,5 +109,7 @@ class TypesSeeder extends Seeder
             'renglon' => 'pago'
         ]);
 
+      
+
     }
 }

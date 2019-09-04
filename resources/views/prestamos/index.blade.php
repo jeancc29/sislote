@@ -510,7 +510,6 @@
                 <th scope="col" style="font-size: 13px;" class="font-weight-bold">Total prestado</th>
                 <th scope="col" style="font-size: 13px;" class="font-weight-bold">Tasa interes</th>
                 <th scope="col" style="font-size: 13px;" class="font-weight-bold">Total saldado</th>
-                <th scope="col" style="font-size: 13px;" class="font-weight-bold">Total a pagar</th>
                 <th scope="col" style="font-size: 13px;" class="font-weight-bold">Creado</th>
                 <th scope="col" style="font-size: 13px;" class="font-weight-bold">Ultimo pago</th>
                 <th scope="col" style="font-size: 13px;" class="font-weight-bold"># Cuotas pendientes</th>
@@ -528,12 +527,11 @@
                 <td>@{{l.banca}}</td>
                 <td>@{{l.montoPrestado}}</td>
                 <td>@{{l.tasaInteres}}</td>
-                <td>-</td>
-                <td>-</td>
+                <td>@{{l.totalSaldado}}</td>
                 <td>@{{toFecha(l.created_at) | date:"dd/MM/yyyy"}}</td>
                 <td>-</td>
                 <td>-</td>
-                <td>-</td>
+                <td>@{{l.balancePendiente}}</td>                
                 <td>@{{l.montoCuotas}}</td>
                 <td>@{{l.frecuencia}}</td>
                 <td>-</td>
@@ -586,10 +584,18 @@
             <div class="modal-content">
 
                  <div class="modal-header">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4 mx-0 px-0 ">
                         <h3 class="modal-title" id="exampleModalLabel">Pagar prestamo</h3>
+                        
                     </div>
-                        <div class="col-6 text-right mt-2">
+
+                    <div class="col-sm-4 text-info font-weight-bold mt-2">
+                      <div class="">
+                        <h2>Total: @{{(datos.totalAPagar) ? datos.totalAPagar : 0}}</h2>
+                      </div>
+                    </div>
+                    
+                        <div class="col-3 text-right mt-2">
                               <div class="form-group">
                                 <input ng-click="pagar()" type="submit" class="btn btn-primary" value="Guardar">   
                             </div>
@@ -610,55 +616,91 @@
                    <div class="row justify-content-center">
 
                         
-                      <div class="col-6  ">
+                      <!-- <div class="col-6  ">
                             <div class="input-group form-control-lg pt-0 mt-0">
-                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Prestado a</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style=" font-size:15px;">Prestado a</label>                              
                                 
                                 <div class="form-group col-sm-8 col-10">
-                                <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                <input ng-model="datos.selectedPrestamoPagar.banca" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                <input disabled ng-model="datos.selectedPrestamoPagar.banca" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-6  ">
                             <div class="input-group form-control-lg pt-0 mt-0">
-                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Monto prestado</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style=" font-size:15px;">Monto prestado</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                <input disabled ng-model="datos.selectedPrestamoPagar.montoPrestado" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold mt-2" style="color: black;">Banco</label>                              
+
+                                <div  class=" col-sm-8 col-9">
+                                <select 
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="datos.selectedBancoCobrar"
+                                    ng-options="o.nombre for o in datos.optionsBancosCobrar"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                        <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold mt-2" style="color: black;">Tipo pago</label>                              
+
+                                <div  class=" col-sm-8 col-9">
+                                <select 
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="datos.selectedTiposPagos"
+                                    ng-options="o.descripcion for o in datos.optionsTiposPagos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                        <div class="col-6  ">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-1" style="color: black; font-size:22px;">Pagar</label>                              
                                 
                                 <div class="form-group col-sm-8 col-10">
                                 <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                <input ng-model="datos.selectedPrestamoPagar.montoPrestado" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                <input ng-change="txtPagarChanged()" style="color: black; font-size:22px;" ng-model="datos.montoPagado" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-6  ">
                             <div class="input-group form-control-lg pt-0 mt-0">
-                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Frecuencia</label>                              
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-1" style="color: black; font-size:22px;">Devuelta</label>                              
                                 
                                 <div class="form-group col-sm-8 col-10">
                                 <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                <input ng-model="datos.selectedPrestamoPagar.frecuencia" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                <input disabled ng-model="datos.devuelta" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-6  ">
-                            <div class="input-group form-control-lg pt-0 mt-0">
-                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style="color: black; font-size:15px;">Tasa interes</label>                              
-                                
-                                <div class="form-group col-sm-8 col-10">
-                                <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                <input ng-model="datos.selectedPrestamoPagar.tasaInteres" type="text" class="form-control" id="abreviatura" name="abreviatura">
-                                </div>
-                            </div>
-                        </div>
 
 
 
 
                     </div> <!-- END ROW CAMPOS -->
                    
+                    
 
                     <table class="table table-sm mt-3">
                         <thead class="">
@@ -678,10 +720,10 @@
                         <tbody>
                             <tr ng-click='seleccionarCuota(c)' ng-class="{'bg-disabled' : c.enable == false}" ng-repeat="c in datos.selectedPrestamoPagar.amortizacion">
                                 <td scope="col" class="text-center" >@{{c.fecha}}</td>
-                                <td scope="col" class="text-center" >@{{c.montoCuota - c.montoInteres}}</td>
+                                <td scope="col" class="text-center" >@{{c.capitalAPagar}}</td>
                                 <!-- <td scope="col" class="text-center" >@{{Cerrado}}</td> -->
-                                <td scope="col" class="text-center" >@{{c.montoInteres}}</td>
-                                <td scope="col" class="text-center" >@{{c.montoCuota}}</td>
+                                <td scope="col" class="text-center" >@{{c.interesAPagar}}</td>
+                                <td scope="col" class="text-center" >@{{c.cuotaAPagar}}</td>
                                 <td scope="col" class="text-center" >
                                   <div class="form-check">
                                     <label class="form-check-label">

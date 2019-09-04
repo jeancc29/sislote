@@ -78,8 +78,9 @@ class Prueba extends Command
         // $this->info("Awardsclasss: " . Helper::determinarSorteo("123+", $loteria));
         $usuario = Users::whereUsuario('jean')->first();
         $usuario2 = Users::whereUsuario('u2')->first();
-        $this->info("Awardsclasss: " . Helper::loteriasOrdenadasPorHoraCierre($usuario));
-        $this->info("Awardsclasss2: " . Helper::loteriasOrdenadasPorHoraCierre($usuario2));
+        // $this->info("Awardsclasss: " . Helper::loteriasOrdenadasPorHoraCierre($usuario));
+        // $this->info("Awardsclasss2: " . Helper::loteriasOrdenadasPorHoraCierre($usuario2));
+        $this->info("Awardsclasss2: " . Helper::isNumber("00"));
 
 
         // $awardsClass = new AwardsClass($l['id']);

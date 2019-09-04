@@ -4,11 +4,17 @@ myApp.service('helperService', function(){
     }
     
     
-    this.empty = function(valor, tipo = undefined){
+    this.empty = function(valor, tipo = undefined, validarMayorQueCero = true){
         // console.log("Empty dentro helper:", typeof valor);
    
         if(tipo === 'number' || typeof valor == 'number'){
-            if(Number(valor) == undefined || valor == '' || valor == null || Number(valor) <= 0)
+            if(validarMayorQueCero){
+                if(Number(valor) <= 0){
+                    return true;
+                }
+            }
+            
+            if(Number(valor) == undefined || valor == '' || valor == null || isNaN(valor) == true)
                 return true;
         }
         if(tipo === 'string' || typeof valor == 'string'){
@@ -24,6 +30,8 @@ myApp.service('helperService', function(){
 
         return false;
     }
+
+    this.Number
 
     this.retornarObjectoPorId = function(objeto, arregloDeObjetos, idPorDefectoSiObjetoNulo = undefined){
         var objectoRetornar = {};
