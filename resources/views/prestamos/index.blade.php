@@ -97,13 +97,35 @@
                     <div class="col-12">
                             <h3>Datos entidades</h3>
                           </div>
-                    <div class="col-12 text-center">
+                           <div class="col-6  " ng-show="datos.editar == true">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style=" font-size:15px;">Prestado a</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                <input disabled ng-model="datos.selectedBanca.descripcion" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6  " ng-show="datos.editar == true">
+                            <div class="input-group form-control-lg pt-0 mt-0">
+                              <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold mt-3" style=" font-size:15px;">Fondo desde</label>                              
+                                
+                                <div class="form-group col-sm-8 col-10">
+                                  <input ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banco'" disabled ng-model="datos.selectedBancoFondo.nombre" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                  <input ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banca'" disabled ng-model="datos.selectedBancaFondo.descripcion" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center" ng-show="datos.editar == false">
                             <div class="input-group">
                               
                               <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold " style="color: black;">Prestar a entidad</label>                              
 
                                 <div  class=" col-sm-8 col-9">
                                 <select 
+                                    
                                     ng-change="cbxTipoBloqueosJugadaChanged()"
                                     ng-model="datos.selectedBanca"
                                     ng-options="o.descripcion for o in datos.optionsBancas"
@@ -115,7 +137,7 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
-                          <div class="col-6 text-center">
+                          <div class="col-6 text-center" ng-show="datos.editar == false">
                             <div class="input-group">
                               
                               <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Tipo entidad fondo</label>                              
@@ -133,7 +155,7 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
-                          <div class="col-6 text-center" ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banco'">
+                          <div class="col-6 text-center" ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banco' && datos.editar == false">
                             <div class="input-group">
                               
                               <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
@@ -151,7 +173,7 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
-                          <div class="col-6 text-center" ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banca'">
+                          <div class="col-6 text-center" ng-show="datos.selectedTipoEntidadFondo.descripcion == 'Banca' && datos.editar == false">
                             <div class="input-group">
                               
                               <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black;">Emitir fondo desde</label>                              
@@ -202,7 +224,7 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.numeroCuotas" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-disabled="datos.editar == true && datos.tipoAmortizacion == 'Campo montoCuotas, ya sea con tasaInteres o no'" ng-model="datos.numeroCuotas" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
@@ -213,7 +235,7 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.montoCuotas" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-disabled="datos.editar == true && datos.tipoAmortizacion == 'Campo numeroCuotas, ya sea con tasaInteres o no'" ng-model="datos.montoCuotas" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
@@ -226,7 +248,7 @@
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.tasaInteres" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-disabled="datos.editar == true && datos.tipoAmortizacion == 'Campo montoCuotas y numeroCuotas, se calcula la tasaInteres automatico'" ng-model="datos.tasaInteres" type="text" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
@@ -245,7 +267,7 @@
                     <div class="col-12 ">
                         <h3>Datos frecuencia</h3>
                       </div>
-                          <div class="text-center col-5" >
+                          <div class="text-center col-5" ng-show="datos.editar == false">
                                 <div class="input-group">
                                   
                                   <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Frecuencia</label>                              
@@ -263,18 +285,30 @@
                                 </div> <!-- END INPUT GROUP -->
                               </div>
 
+                              <div class="col-5  " ng-show="datos.editar == true">
+                                <div class="input-group form-control-lg pt-0 mt-0">
+                                  <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Frecuencia</label>                              
+                                    
+                                    <div class="form-group col-sm-8 col-10">
+                                      <input disabled ng-model="datos.selectedFrecuencia.descripcion" type="text" class="form-control" id="abreviatura" name="abreviatura">
+                                    </div>
+                                </div>
+                            </div>
+
                              
 
                               <div class="col-5">
                                   <div class="input-group form-control-lg pt-0 mt-0">
-                                    <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Fecha inicio</label>                              
+                                    <label  class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Fecha inicio</label>                              
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
-                                      <input ng-model="datos.fechaInicio" type="date" class="form-control" id="abreviatura" name="abreviatura">
+                                      <input ng-disabled="datos.editar == true" ng-model="datos.fechaInicio" type="date" class="form-control" id="abreviatura" name="abreviatura">
                                       </div>
                                   </div>
                                 </div>
+
+                                
 
                                 <div class="col-3 col-sm-2">
                                   <div class="input-group form-control-lg">

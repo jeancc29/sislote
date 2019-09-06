@@ -22,5 +22,6 @@ class Loans extends Model
         'detalles',
         'idFrecuencia',
         'fechaInicio',
+        'idTipoAmortizacion',
     ];
 }

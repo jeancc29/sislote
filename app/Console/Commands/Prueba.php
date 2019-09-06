@@ -80,7 +80,21 @@ class Prueba extends Command
         $usuario2 = Users::whereUsuario('u2')->first();
         // $this->info("Awardsclasss: " . Helper::loteriasOrdenadasPorHoraCierre($usuario));
         // $this->info("Awardsclasss2: " . Helper::loteriasOrdenadasPorHoraCierre($usuario2));
-        $this->info("Awardsclasss2: " . Helper::isNumber("00"));
+
+
+        $awardsClass = new AwardsClass(1);
+        $awardsClass->fecha = "2019-09-05";
+        $awardsClass->idUsuario = 1;
+        $awardsClass->primera = "69";
+        $awardsClass->segunda = "49";
+        $awardsClass->tercera = "25";
+        $awardsClass->pick3 = null;
+        $awardsClass->pick4 = null;
+        $awardsClass->numerosGanadores = "694925";
+
+        $premio = $awardsClass->tripletaBuscarPremio(1, 1, "102594", "1");
+
+        $this->info("1ra:" . $premio);
 
 
         // $awardsClass = new AwardsClass($l['id']);

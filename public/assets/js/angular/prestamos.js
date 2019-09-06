@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, helperService){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -47,6 +47,9 @@ myApp
             'selectedTipoEntidadFondo' : {},
             'selectedTiposPagos' : {},
             'selectedBancoCobrar' : {},
+
+            'editar' : false,
+            'tipoAmortizacion' : {},
         }
 
         $scope.toFecha = function(fecha){
@@ -130,104 +133,62 @@ myApp
             console.log('editar: ', d, ' es nuevo: ', esNuevo);
 
             if(esNuevo){
-                $scope.inicializarDatos(true);
+                $scope.datos.editar = false;
+                $scope.datos.id = 0;
+                $scope.datos.status = true;
+                $scope.datos.selectedBanca = $scope.datos.optionsBancas[helperService.retornarIndexPorId({}, $scope.datos.optionsBancas)];
+                $scope.datos.selectedTipoEntidadFondo = $scope.datos.optionsTiposEntidadesFondo[helperService.retornarIndexPorId({}, $scope.datos.optionsTiposEntidadesFondo)];
+                $scope.datos.montoPrestado = null;
+                $scope.datos.numeroCuotas = null;
+                $scope.datos.tasaInteres = null;
+                $scope.datos.montoCuotas = null;
+                $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId({}, $scope.datos.optionsFrecuencias)];
+                $scope.datos.fechaInicio = new Date();
+                $scope.datos.selectedBancoFondo = $scope.datos.optionsBancosFondos[0];
+                $scope.datos.selectedBancaFondo = $scope.datos.optionsBancasFondos[0];
+
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    $('.selectpicker').selectpicker("refresh");
+                    
+                  })
             }
             else{
                 //$scope.inicializarDatos();
                 //$scope.datos.mostrarFormEditar = true;
 
                 $('.form-group').addClass('is-filled');
-
+                $scope.datos.editar = true;
+                // $('#selectPickerBanca').attr('disabled',true);
                 $scope.datos.id = d.id;
-                $scope.datos.descripcion = d.descripcion;
-                $scope.datos.abreviatura = d.abreviatura;
                 $scope.datos.status = (d.status == 1) ? true : false;
-                //$scope.datos.horaCierre = d.horaCierre;
-                //$scope.hora_convertir(false);
-
-                // $scope.datos.ckbDias.forEach(function(valor, indice, array){
-
-                //     array[indice].existe = false;
-
-                //  });
-
-                $scope.datos.ckbSorteos.forEach(function(valor, indice, array){
-
-                    array[indice].existe = false;
-
-                 });
-
-                   
+                $scope.datos.selectedBanca = $scope.datos.optionsBancas[helperService.retornarIndexPorId({}, $scope.datos.optionsBancas, d.idEntidadPrestamo)];
+                $scope.datos.selectedTipoEntidadFondo = $scope.datos.optionsTiposEntidadesFondo[helperService.retornarIndexPorId({}, $scope.datos.optionsTiposEntidadesFondo, d.idTipoEntidadFondo)];
+                $scope.datos.montoPrestado = d.montoPrestado;
+                $scope.datos.numeroCuotas = d.numeroCuotas;
+                $scope.datos.tasaInteres = d.tasaInteres;
+                $scope.datos.montoCuotas = d.montoCuotas;
+                $scope.datos.tipoAmortizacion = d.tipoAmortizacion;
+                $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId({}, $scope.datos.optionsFrecuencias, d.idFrecuencia)];
+               
+                var fechaInicio = d.fechaInicio.split(' ');
+                $scope.datos.fechaInicio = new Date(d.fechaInicio);
                 
-
-                // if(d.dias != undefined){
-
-                //     $scope.datos.dias = d.dias;
-
-                //     $scope.datos.dias.forEach(function(valor, indice, array){
-
-                //         if($scope.datos.ckbDias.find(x => x.id == array[indice].id) != undefined){
-                //             let idx = $scope.datos.ckbDias.findIndex(x => x.id == parseInt(array[indice].id));
-                //             $scope.datos.ckbDias[idx].existe = true;
-                //         }
-
-                //      });
-                // }
-
-                if(d.sorteos != undefined){
-
-                    $scope.datos.sorteos = d.sorteos;
-
-                    $scope.datos.sorteos.forEach(function(valor, indice, array){
-
-                        if($scope.datos.ckbSorteos.find(x => x.id == array[indice].id) != undefined){
-                            let idx = $scope.datos.ckbSorteos.findIndex(x => x.id == parseInt(array[indice].id));
-                            $scope.datos.ckbSorteos[idx].existe = true;
-                        }
-
-                     });
-                }
-
-                if(d.loteriasRelacionadas != undefined){
-                    $scope.datos.loterias.forEach(function(valor, indice, array){
-                        console.log('Pivot: ', d.loteriasRelacionadas.find(x => x.pivot.idLoteria == array[indice].id));
-                        if(d.loteriasRelacionadas.find(x => x.pivot.idLoteria == array[indice].id)){
-                            array[indice].seleccionado = true;
-                            $('#btnLoteria'+ indice).addClass('active2');
-                        }else{
-                            array[indice].seleccionado = false;
-                            $('#btnLoteria'+ indice).removeClass('active2');
-                        }
-    
-                     });
-                }
-
-                /************* PAGOS COMBINACIONES ********************/
-
-                // if(d.pagosCombinaciones != undefined){
-                //     d = d.pagosCombinaciones;
-                //     console.log('ediar: ', d);
-
-                //     $scope.datos.primera = d.primera;
-                //     $scope.datos.segunda = d.segunda;
-                //     $scope.datos.tercera = d.tercera;
-                //     $scope.datos.primeraSegunda = d.primeraSegunda;
-                //     $scope.datos.primeraTercera = d.primeraTercera;
-                //     $scope.datos.segundaTercera = d.segundaTercera;
-                //     $scope.datos.tresNumeros = d.tresNumeros;
-                //     $scope.datos.dosNumeros = d.dosNumeros;
-                // }
-                // else{
-                //     $scope.datos.primera = null;
-                //     $scope.datos.segunda = null;
-                //     $scope.datos.tercera = null;
-                //     $scope.datos.primeraSegunda = null;
-                //     $scope.datos.primeraTercera = null;
-                //     $scope.datos.segundaTercera = null;
-                //     $scope.datos.tresNumeros = null;
-                //     $scope.datos.dosNumeros = null;
-                // }
-                /************* END PAGOS COMBINACIONES ********************/
+                if($scope.datos.selectedTipoEntidadFondo.descripcion =="Banca")
+                    $scope.datos.selectedBancaFondo = $scope.datos.optionsBancasFondos[helperService.retornarIndexPorId({}, $scope.datos.optionsBancasFondos, d.idEntidadFondo)];
+                else
+                    $scope.datos.selectedBancoFondo = $scope.datos.optionsBancosFondos[helperService.retornarIndexPorId({}, $scope.datos.optionsBancosFondos, d.idEntidadFondo)];
+               
+               
+                console.log('editar index:', d.idEntidadFondo);
+                console.log('editar indexRe:', helperService.retornarIndexPorId({}, $scope.datos.optionsBancasFondos, d.idEntidadFondo));
+                console.log('editar selected:', $scope.datos.selectedTipoEntidadFondo.descripcion);
+                
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    $('.selectpicker').selectpicker("refresh");
+                    
+                  })
                 
             }
 
@@ -300,7 +261,7 @@ myApp
             //$scope.hora_convertir(true);
 
 
-    //   console.log($scope.datos);
+    //   console.log($scope.datos.selectedTipoEntidadFondo);
     //   return;
 
 

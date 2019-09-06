@@ -86,13 +86,21 @@ class LoansController extends Controller
                     loans.tasaInteres, 
                     loans.created_at, 
                     loans.status, 
+                    loans.idFrecuencia, 
+                    loans.idTipoEntidadPrestamo, 
+                    loans.idTipoEntidadFondo, 
+                    loans.idEntidadPrestamo, 
+                    loans.idEntidadFondo, 
+                    loans.fechaInicio, 
                     branches.descripcion AS banca, 
                     frecuencies.descripcion AS frecuencia,
+                    types.descripcion AS tipoAmortizacion,
                     (select sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as totalSaldado,
                     (select loans.montoPrestado - sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as balancePendiente
                     ')
                 ->join('branches', 'branches.id', '=', 'loans.idEntidadPrestamo')
                 ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
+                ->join('types', 'loans.idTipoAmortizacion', '=', 'types.id')
                 ->where('loans.status', 1)
                 ->get();
             return view('prestamos.index', compact('controlador', 'bancas', 'bancos', 'frecuencias', 'dias', 'prestamos', 'tiposEntidades', 'tiposPagos'));
@@ -138,11 +146,23 @@ class LoansController extends Controller
             'datos.fechaInicio' => 'required',
         ])['datos'];
 
+        if(isset($datos['numeroCuotas'])){
+            if(Helper::isNumber($datos['numeroCuotas'])){
+                $datos['numeroCuotas'] = (int)$datos['numeroCuotas'];
+            }
+        }
 
+        if(Helper::isNumber($datos['montoCuotas']) == false && Helper::isNumber($datos['numeroCuotas']) == false || (isset($datos['montoCuotas']) == false && isset($datos['numeroCuotas']) == false)){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'El monto y el numero de cuota no deben estar vacio y deben ser numericos'
+                //'colleccon' => $colleccion
+            ], 201);
+        }
         $idTipoBanca = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
         $idTipoBanco = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
 
-
+        
         $prestamo = Loans::where(['id' => $datos['id']])->first();
         if($prestamo != null){
             $prestamo->montoPrestado = $datos['montoPrestado'];
@@ -155,17 +175,18 @@ class LoansController extends Controller
             
 
             // $amortizacion = Helper::amortizar($prestamo->montoPrestado, $prestamo->montoCuotas, $prestamo->numeroCuotas, $prestamo->tasaInteres, $prestamo->idFrecuencia, false);
-            $amortizacion = Helper::amortizar($datos['montoPrestado'], $datos['montoCuotas'], $datos['numeroCuotas'], $datos['tasaInteres'], $datos['idFrecuencia'], false);
-            $datos['montoCuotas'] = $amortizacion[0]['montoCuota'] + $amortizacion[0]['montoInteres'];
+            $amortizacion = Helper::amortizar($datos['montoPrestado'], $datos['montoCuotas'], $datos['numeroCuotas'], $datos['tasaInteres'], $datos['idFrecuencia'], $datos['fechaInicio'], false);
+            $datos['montoCuotas'] = $amortizacion[0]['montoCuota'];
             $datos['numeroCuotas'] = count($amortizacion);
             $datos['tasaInteres'] = ($amortizacion[0]['tasaInteres'] == null) ? 0 : $amortizacion[0]['tasaInteres'];
+            $datos['idTipoAmortizacion'] = $amortizacion[0]['idTipoAmortizacion'];
 
             $fechaInicioCarbon = new Carbon($datos['fechaInicio']);
             $datos['fechaInicio'] = $fechaInicioCarbon->toDateString();
             $prestamo = Loans::create([
                 'idUsuario' => $datos['idUsuario'],
                 'idTipoEntidadPrestamo' => $idTipoBanca->id,
-                'idTipoEntidadFondo' => $idTipoBanco->id,
+                'idTipoEntidadFondo' => $datos['idTipoEntidadFondo'],
                 'idEntidadPrestamo' => $datos['idEntidadPrestamo'],
                 'idEntidadFondo'=> $datos['idEntidadFondo'],
                 'montoPrestado'=> $datos['montoPrestado'],
@@ -175,7 +196,8 @@ class LoansController extends Controller
                 'status'=> $datos['status'],
                 'detalles' => $datos['detalles'],
                 'idFrecuencia' => $datos['idFrecuencia'],
-                'fechaInicio' => $datos['fechaInicio']
+                'fechaInicio' => $datos['fechaInicio'],
+                'idTipoAmortizacion' => $datos['idTipoAmortizacion']
             ]);
 
 
@@ -250,13 +272,21 @@ class LoansController extends Controller
                 loans.tasaInteres, 
                 loans.created_at, 
                 loans.status, 
+                loans.idFrecuencia, 
+                loans.idTipoEntidadPrestamo, 
+                loans.idTipoEntidadFondo, 
+                loans.idEntidadPrestamo, 
+                loans.idEntidadFondo, 
+                loans.fechaInicio, 
                 branches.descripcion AS banca, 
                 frecuencies.descripcion AS frecuencia,
+                types.descripcion AS tipoAmortizacion,
                 (select sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as totalSaldado,
                 (select loans.montoPrestado - sum(montoPagadoInteres + montoPagadoCapital) from amortizations where idPrestamo = loans.id) as balancePendiente
                 ')
             ->join('branches', 'branches.id', '=', 'loans.idEntidadPrestamo')
             ->join('frecuencies', 'loans.idFrecuencia', '=', 'frecuencies.id')
+            ->join('types', 'loans.idTipoAmortizacion', '=', 'types.id')
             ->where('loans.status', 1)
             ->get();
     
@@ -431,11 +461,66 @@ class LoansController extends Controller
     {
         //Aplazar o perdonar cuota
         $datos = request()->validate([
-            'idPrestamo' => '',
-            'idUsuario' => 'required'
+            'datos.idPrestamo' => 'required',
+            'datos.idUsuario' => 'required'
         ])['datos'];
 
 
+        //Recordar validar de que el balance pendiente sea mayor que cero, asi esto me indica de que el prestamo tiene cuotas sin pagar
+        $prestamo = Loans::whereId($datos['idPrestamo'])->whereStatus(1)->first();
+        if($prestamo == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'El prestamo no existe'
+                //'colleccon' => $colleccion
+            ], 201);
+        }
+
+
+
+        $fecha = Carbon::now();
+        $amortizaciones = Amortization::where('idPrestamo', $prestamo->id)->where('fecha', '>', $fecha->toDateString())->get();
+        if($amortizaciones == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'No existen cuotas o todas estan pagadas'
+                //'colleccon' => $colleccion
+            ], 201);
+        }
+
+        list($amortizacionesParaAplazar, $no) = $amortizaciones->partition(function($a){
+            //Vamos a retornar las cuotas que no se han pagado
+            $totalPagado = $a->montoPagadoCapital + $a->montoPagadoInteres;
+            $totalAPagar = $a->montoCuota;
+            return $totalPagado < $totalAPagar;
+        });
+
+        $idAmortizaciones = collect($amortizacionesParaAplazar)->map(function($a){
+            return $a->id;
+        });
+
+        $cuotas = count($amortizacionesParaAplazar);
+        //Tomamos la cuota con la menor fecha y se la pasamos al funcion amortizar del archivo helper
+        $amortizacion = Amortization::whereIn('id', $idAmortizaciones)->orderBy('fecha', 'asc')->first();
+        $amortizacionesHelper = Helper::amortizar($prestamo->montoPrestado, 0, $cuotas, 0, $prestamo->idFrecuencia, $amortizacion->fecha, false);
+        $amortizacionesParaActualizar = Amortization::whereIn('id', $idAmortizaciones)->orderBy('fecha', 'asc')->get();
+
+        $c=0;
+        foreach($amortizacionesParaActualizar as $a){
+            $a->fecha = $amortizacionesHelper[$c]['fecha'];
+            $a->save();
+            $c++;
+        }
+
+        return Response::json([
+            'culoa' => $amortizacion,
+            'errores' => 0,
+            'mensaje' => 'Se ha aplazado correctamente',
+            'amortizacionesParaAplazar' => $amortizacionesParaAplazar,
+            'amortizaciones' => $amortizaciones,
+            'a' => count($amortizacionesParaAplazar)
+            //'colleccon' => $colleccion
+        ], 201);
     }
 
     public function getPrestamo(Loans $loans)

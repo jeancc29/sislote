@@ -109,6 +109,25 @@ class TypesSeeder extends Seeder
             'renglon' => 'pago'
         ]);
 
+        t::create([
+            'descripcion' => 'Campo montoCuotas, ya sea con tasaInteres o no',
+            'status' => 1,
+            'renglon' => 'amortizacion'
+        ]);
+
+        t::create([
+            'descripcion' => 'Campo numeroCuotas, ya sea con tasaInteres o no',
+            'status' => 1,
+            'renglon' => 'amortizacion'
+        ]);
+
+        t::create([
+            'descripcion' => 'Campo montoCuotas y numeroCuotas, se calcula la tasaInteres automatico',
+            'status' => 1,
+            'renglon' => 'amortizacion'
+        ]);
+
+
       
 
     }

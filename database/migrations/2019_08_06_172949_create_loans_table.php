@@ -28,6 +28,13 @@ class CreateLoansTable extends Migration
             $table->integer('status')->default(1);
             $table->integer('diasGracia')->default(0);
             $table->string('detalles')->nullable();
+            //Esto me indicara cuales campos se llenaron para amortizar el prestamo y con esto
+            //al momento de editar un prestamo me permitira desabilitar los campos que no fueron seleccionados
+            //y habilitar los que si fueron, ejemplo... 
+            //1 == montoCuota ya sea con el interes o no
+            //2 == numeroCuota ya sea con el interes o no
+            //3 == montoCuota y numeroCuotas para que el interes se calcule automatico
+            $table->integer('idTipoAmortizacion')->default(0);
 
             $table->unsignedInteger('idFrecuencia');
             $table->dateTime('fechaInicio'); //Fecha desde la cual se empezara a calcular la fecha de pago

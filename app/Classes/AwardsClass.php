@@ -312,32 +312,108 @@ class AwardsClass{
     public function tripletaBuscarPremio($idVenta, $idLoteria, $jugada, $monto){
         $premio = 0;
         $contador = 0;
-        $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
-        $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
-        $busqueda3 = strpos($this->numerosGanadores, substr($jugada, 4, 2));
+        $primerParDeNumeros = substr($jugada, 0, 2);
+        $segundoParDeNumeros = substr($jugada, 2, 2);
+        $tercerParDeNumeros = substr($jugada, 4, 2);
+        $hayPremiadoEnPrimera = false;
+        $hayPremiadoEnSegunda = false;
+        $hayPremiadoEnTercera = false;
+        // $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
+        // $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
+        // $busqueda3 = strpos($this->numerosGanadores, substr($jugada, 4, 2));
 
         $venta = Sales::whereId($idVenta)->first();
         $idBanca = Branches::whereId($venta->idBanca)->first()->id;
 
-        if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer" && gettype($busqueda3) == "integer"){
+        
+        // if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer" && gettype($busqueda3) == "integer"){
+        //     $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tresNumeros');
+        // }
+        // else{
+        //     if(gettype($busqueda1) == "integer")
+        //         $contador++;
+        //     if(gettype($busqueda2) == "integer")
+        //         $contador++;
+        //     if(gettype($busqueda3) == "integer")
+        //         $contador++;
+            
+        //     //Si el contador es = 2 entonces hay premio
+        //     if($contador == 2)
+        //         $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('dosNumeros');
+        //     else
+        //         $premio = 0;
+        // }
+
+        switch ($primerParDeNumeros) {
+            case $this->primera:
+                $hayPremiadoEnPrimera = true;
+                $contador++;
+                break;
+            case $this->segunda:
+                $hayPremiadoEnSegunda = true;
+                $contador++;
+                break;
+            case $this->tercera:
+                $hayPremiadoEnTercera = true;
+                $contador++;
+                break;
+        }
+
+        
+
+        switch ($segundoParDeNumeros) {
+            case $this->primera:
+                if($hayPremiadoEnPrimera == false){
+                    $hayPremiadoEnPrimera = true;
+                    $contador++;
+                }
+                break;
+            case $this->segunda:
+                if($hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                break;
+            case $this->tercera:
+                if($hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
+                    $contador++;
+                }
+                break;
+        }
+
+        
+
+        switch ($tercerParDeNumeros) {
+            case $this->primera:
+                if($hayPremiadoEnPrimera == false){
+                    $hayPremiadoEnPrimera = true;
+                    $contador++;
+                }
+                break;
+            case $this->segunda:
+                if($hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                break;
+            case $this->tercera:
+                if($hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
+                    $contador++;
+                }
+                break;
+        }
+
+        if($contador == 3){
             $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tresNumeros');
         }
-        else{
-            if(gettype($busqueda1) == "integer")
-                $contador++;
-            if(gettype($busqueda2) == "integer")
-                $contador++;
-            if(gettype($busqueda3) == "integer")
-                $contador++;
-            
-            //Si el contador es = 2 entonces hay premio
-            if($contador == 2)
-                $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('dosNumeros');
-            else
-                $premio = 0;
+        else if($contador == 2){
+            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('dosNumeros');
         }
 
         return $premio;
+        // return $premio . ":" . $contador . "1ra:".$hayPremiadoEnPrimera." 2da:" .$hayPremiadoEnSegunda ." 3ra:".$hayPremiadoEnTercera;
     }
 
     public function pick3BuscarPremio($idVenta, $idLoteria, $jugada, $monto, $esStraight = true){
