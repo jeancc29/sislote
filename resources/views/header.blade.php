@@ -1398,6 +1398,15 @@ if(session('idUsuario') == null && $controlador != 'login'){
             </li>
 
             <li class="nav-item ">
+                <a class="nav-link" href="{{route('prestamos')}}">
+                    <i class="material-icons">format_list_numbered</i>
+                    <p> Prestamos 
+                       
+                    </p>
+                </a>
+            </li>
+
+            <li class="nav-item ">
                 <a class="nav-link" href="{{route('entidades')}}">
                     <i class="material-icons">format_list_numbered</i>
                     <p> Entidades 
