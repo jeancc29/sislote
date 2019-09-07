@@ -82,19 +82,20 @@ class Prueba extends Command
         // $this->info("Awardsclasss2: " . Helper::loteriasOrdenadasPorHoraCierre($usuario2));
 
 
-        $awardsClass = new AwardsClass(1);
-        $awardsClass->fecha = "2019-09-05";
-        $awardsClass->idUsuario = 1;
-        $awardsClass->primera = "69";
-        $awardsClass->segunda = "49";
-        $awardsClass->tercera = "25";
-        $awardsClass->pick3 = null;
-        $awardsClass->pick4 = null;
-        $awardsClass->numerosGanadores = "694925";
+        // $awardsClass = new AwardsClass(3);
+        // $awardsClass->fecha = "2019-09-05";
+        // $awardsClass->idUsuario = 1;
+        // $awardsClass->primera = "06";
+        // $awardsClass->segunda = "09";
+        // $awardsClass->tercera = "25";
+        // $awardsClass->pick3 = null;
+        // $awardsClass->pick4 = null;
+        // $awardsClass->numerosGanadores = "694925";
 
-        $premio = $awardsClass->tripletaBuscarPremio(1, 1, "102594", "1");
+        // $sorteo = Draws::whereDescripcion("Super pale")->first();
+        // $premio = $awardsClass->paleBuscarPremio(1, 1, "0609", "1", $sorteo->id);
 
-        $this->info("1ra:" . $premio);
+        $this->info("1ra:" . Helper::amortizar(100, 0, 3, 0, 1, '2019-09-06', false, true));
 
 
         // $awardsClass = new AwardsClass($l['id']);

@@ -37,7 +37,8 @@ myApp
             "optionsBancasFondos": [],
             "optionsBancosFondos": [],
             "optionsFrecuencias": [],
-            "optionsTiposPagos": [],
+            "optionsTiposPagos": [], 
+            "radioNoPagadosPagados": [], 
             "mostrarFormEditar" : false,
             'selectedBanca' : {},
             'selectedBancaFondo' : {},
@@ -47,6 +48,7 @@ myApp
             'selectedTipoEntidadFondo' : {},
             'selectedTiposPagos' : {},
             'selectedBancoCobrar' : {},
+            'selectedNoPagadosPagados' : {},
 
             'editar' : false,
             'tipoAmortizacion' : {},
@@ -69,6 +71,7 @@ myApp
             $scope.datos.optionsFrecuencias = frecuenciasGlobal;
             $scope.datos.optionsTiposPagos = tiposPagosGlobal;
             $scope.datos.optionsBancosCobrar = bancosGlobal;
+            $scope.datos.radioNoPagadosPagados = [{'id' : 1, 'descripcion' : 'Sin pagar'}, {'id' : 2, 'descripcion' : 'Pagadas'}];
 
             
             $scope.datos.selectedTipoEntidadFondo = $scope.datos.optionsTiposEntidadesFondo[helperService.retornarIndexPorId($scope.datos.selectedTipoEntidadFondo, $scope.datos.optionsTiposEntidadesFondo)];
@@ -79,8 +82,9 @@ myApp
             $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId($scope.datos.selectedFrecuencia, $scope.datos.optionsFrecuencias)];
             $scope.datos.selectedTiposPagos = $scope.datos.optionsTiposPagos[helperService.retornarIndexPorId($scope.datos.selectedTiposPagos, $scope.datos.optionsTiposPagos)];
             $scope.datos.selectedBancoCobrar = $scope.datos.optionsBancosCobrar[helperService.retornarIndexPorId($scope.datos.selectedBancoCobrar, $scope.datos.optionsBancosCobrar)];
+            $scope.datos.selectedNoPagadosPagados = $scope.datos.radioNoPagadosPagados[0];
 
-            console.log('bancos:', $scope.datos.tiposPagosRadio);
+            console.log('bancos:', $scope.datos.selectedNoPagadosPagados);
                
             // $http.get(rutaGlobal+"/api/loterias")
             //  .then(function(response){
@@ -125,7 +129,15 @@ myApp
 
 
         
+        $scope.radioNoPagadosPagadosChanged = function(objeto, first = null){
+            if(helperService.empty(objeto, 'object') == true){
+                return;
+            }
 
+            $scope.datos.selectedNoPagadosPagados = objeto;
+
+            console.log('radioNoPagadosPagadosChanged:',  $scope.datos.selectedNoPagadosPagados);
+        }
 
         $scope.editar = function(esNuevo, d){
             
@@ -167,7 +179,7 @@ myApp
                 $scope.datos.montoPrestado = d.montoPrestado;
                 $scope.datos.numeroCuotas = d.numeroCuotas;
                 $scope.datos.tasaInteres = d.tasaInteres;
-                $scope.datos.montoCuotas = d.montoCuotas;
+                $scope.datos.montoCuotas = d.montoCapital; //Cuando se edita el prestamo la cuota debe aparecer sin el montoInteres por lo tanto aqui pongo que el montoCuotas sera igual al capital
                 $scope.datos.tipoAmortizacion = d.tipoAmortizacion;
                 $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId({}, $scope.datos.optionsFrecuencias, d.idFrecuencia)];
                
@@ -265,19 +277,45 @@ myApp
     //   return;
 
 
+   
           $http.post(rutaGlobal+"/api/prestamos/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
              .then(function(response){
                  console.log(response.data);
                 if(response.data.errores == 0){
-                    $scope.datos.prestamos = response.data.prestamos;
-                   console.log('prestamos:', response.data);
-                    alert("Se ha guardado correctamente");
-                    if($scope.datos.id == 0)
-                        $scope.inicializarDatos(true);
-                    else{
-                        $scope.inicializarDatos(false);
-                        $scope.datos.status = ($scope.datos.status == 1) ? true : false;
-                    }
+                    $scope.datos.editar = false;
+                $scope.datos.id = 0;
+                $scope.datos.status = true;
+                $scope.datos.selectedBanca = $scope.datos.optionsBancas[helperService.retornarIndexPorId({}, $scope.datos.optionsBancas)];
+                $scope.datos.selectedTipoEntidadFondo = $scope.datos.optionsTiposEntidadesFondo[helperService.retornarIndexPorId({}, $scope.datos.optionsTiposEntidadesFondo)];
+                $scope.datos.montoPrestado = null;
+                $scope.datos.numeroCuotas = null;
+                $scope.datos.tasaInteres = null;
+                $scope.datos.montoCuotas = null;
+                $scope.datos.selectedFrecuencia = $scope.datos.optionsFrecuencias[helperService.retornarIndexPorId({}, $scope.datos.optionsFrecuencias)];
+                $scope.datos.fechaInicio = new Date();
+                $scope.datos.selectedBancoFondo = $scope.datos.optionsBancosFondos[0];
+                $scope.datos.selectedBancaFondo = $scope.datos.optionsBancasFondos[0];
+
+
+                $scope.datos.prestamos = response.data.prestamos;
+                $scope.datos.mostrarFormEditar = false;
+                
+                console.log('prestamos:', response.data);
+                alert("Se ha guardado correctamente");
+
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    $('.selectpicker').selectpicker("refresh");
+                    
+                  })
+                    
+
+                    // if($scope.datos.id == 0)
+                    //     $scope.inicializarDatos(true);
+                    // else{
+                    //     $scope.inicializarDatos(false);
+                    //     $scope.datos.status = ($scope.datos.status == 1) ? true : false;
+                    // }
 
                     //$scope.hora_convertir(false);
                 }else{
@@ -320,6 +358,7 @@ myApp
                 {
                     // $scope.inicializarDatos(true);
                     $('#modal-prestamo').modal('show');
+                    response.data.prestamo.amortizacionPagadas = [];
                     response.data.prestamo.amortizacion.forEach(function(valor, indice, array){
 
                         if(indice == 0){
@@ -329,10 +368,23 @@ myApp
                         }
                         array[indice].seleccionado = false;
 
-                        array[indice].interesAPagar = Number(array[indice].montoInteres) - Number(array[indice].montoPagadoInteres);
-                        array[indice].capitalAPagar = (Number(array[indice].montoCuota) - Number(array[indice].montoInteres)) - Number(array[indice].montoPagadoCapital);
-                        array[indice].cuotaAPagar = Number(array[indice].interesAPagar) + Number(array[indice].capitalAPagar);                        
+                        array[indice].interesAPagar = helperService.redondear(Number(array[indice].montoInteres) - Number(array[indice].montoPagadoInteres));
+                        array[indice].capitalAPagar = helperService.redondear((Number(array[indice].montoCuota) - Number(array[indice].montoInteres)) - Number(array[indice].montoPagadoCapital));
+                        array[indice].cuotaAPagar = helperService.redondear(Number(array[indice].interesAPagar) + Number(array[indice].capitalAPagar));                        
+                        
+                        if(array[indice].cuotaAPagar <= 0){
+                            response.data.prestamo.amortizacionPagadas.push(array[indice]);
+                        }
                         console.log('indice: ',array[indice] );
+                    });
+
+                    response.data.prestamo.amortizacionPagadas.forEach(function(valor, indice, array){
+
+                        var index = response.data.prestamo.amortizacion.findIndex(x => x.id == array[indice].id);
+                        if(index != -1){
+                            response.data.prestamo.amortizacion.splice(index, 1);
+                        }
+
                     });
                     $scope.datos.selectedPrestamoPagar = response.data.prestamo;
                     calcularTotal();
@@ -370,6 +422,7 @@ myApp
 
             
             calcularTotal();
+            $scope.txtPagarChanged();
         }
 
 
@@ -392,6 +445,10 @@ myApp
             $scope.datos.idTipoPago = $scope.datos.selectedTiposPagos.id;
             $scope.datos.idBanco = $scope.datos.selectedBancoCobrar.id;
 
+            if($scope.datos.devuelta > 0){
+                $scope.datos.montoPagado = $scope.datos.montoPagado - $scope.datos.devuelta;
+            }
+
             $http.post(rutaGlobal+"/api/prestamos/cobrar", {'action':'sp_loterias_elimnar', 'datos': $scope.datos})
             .then(function(response){
                console.log(response);
@@ -413,6 +470,77 @@ myApp
                
            });
         }
+
+
+
+        $scope.aplazarCuota = function(){
+           
+            if($scope.datos.editar != true){
+                return;
+            }
+
+
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.idPrestamo = $scope.datos.id;
+
+
+            
+
+            $http.post(rutaGlobal+"/api/prestamos/aplazarCuota", {'action':'sp_loterias_elimnar', 'datos': $scope.datos})
+            .then(function(response){
+               console.log(response);
+           
+               if(response.data.errores == 0)
+               {
+                   $scope.datos.prestamos = response.data.prestamos;
+                    alert("La cuotas se han aplazado correctamente");
+                    return;
+               }
+               else if(response.data.errores == 1){
+                    alert(response.data.mensaje);
+                    return;
+               }
+
+               
+               
+           });
+        }
+
+
+        $scope.eliminar = function(prestamo){
+           
+            if(helperService.empty(prestamo, 'object') == true){
+                return;
+            }
+
+            if(confirm("Seguro que desea eliminar este prestamo?") == false){
+                return;
+            }
+
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.idPrestamo = prestamo.id;
+
+
+            
+
+            $http.post(rutaGlobal+"/api/prestamos/eliminar", {'action':'sp_loterias_elimnar', 'datos': $scope.datos})
+            .then(function(response){
+               console.log(response);
+           
+               if(response.data.errores == 0)
+               {
+                   $scope.datos.prestamos = response.data.prestamos;
+                    alert(response.data.mensaje);
+                    return;
+               }
+               else if(response.data.errores == 1){
+                    alert(response.data.mensaje);
+                    return;
+               }
+
+           });
+        }
+
 
         $scope.txtPagarChanged = function(){
             if(hayCuotasSeleccionadas() == false){
@@ -454,7 +582,7 @@ myApp
                     console.log('calcularTotal:', array[indice].cuotaAPagar);
             });
 
-            $scope.datos.totalAPagar = total;
+            $scope.datos.totalAPagar = helperService.redondear(total);
 
             console.log(total);
         }

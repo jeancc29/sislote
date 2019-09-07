@@ -23,6 +23,8 @@ class transactions extends Model
         'nota_grupo',
         'status',
         'idGasto',
+        'idPrestamo',
+        'idAmortizacion',
     ];
 
 

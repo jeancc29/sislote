@@ -11,6 +11,7 @@ class Amortization extends Model
         'fecha', 
         'numeroCuota', 
         'montoCuota', 
+        'montoCapital', 
         'montoInteres',
         'amortizacion',
         'montoPagado',

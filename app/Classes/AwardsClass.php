@@ -273,6 +273,7 @@ class AwardsClass{
     public function paleBuscarPremio($idVenta, $idLoteria, $jugada, $monto, $idSorteo){
         // return Response::json(['numGanador' => $numeroGanador['numeroGanador'],'juada' => substr('jean', 0, 2)], 201);
         $premio = 0;
+        $contador = 0;
         $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
         $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
 
@@ -280,31 +281,128 @@ class AwardsClass{
         $idBanca = Branches::whereId($venta->idBanca)->first()->id;
         $sorteo = Draws::whereId($idSorteo)->first();
 
-       //Si el sorteo es diferente de super pale entonces es un pale normal
-        if($sorteo['descripcion'] != "Super pale"){
-            //Verificamos que los tipos de datos de las busquedas sean enteros
-            if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
-                //Primera y segunda
-                if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
-                    $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
-                }
-                //Primera y tercera
-                else if($busqueda1 == 0 && $busqueda2 == 4 || $busqueda2 == 0 && $busqueda1 == 4){
-                    $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraTercera');
-                }
-                //Segunda y tercera
-                else if($busqueda1 == 2 && $busqueda2 == 4 || $busqueda2 == 2 && $busqueda1 == 4){
-                    $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
-                }
-            }else $premio = 0;
-        }else{
-            //Verificamos que los tipos de datos de las busquedas sean enteros
-            if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
-                if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
-                    $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
-                }
-            }else $premio = 0;
+    //    //Si el sorteo es diferente de super pale entonces es un pale normal
+    //     if($sorteo['descripcion'] != "Super pale"){
+    //         //Verificamos que los tipos de datos de las busquedas sean enteros
+    //         if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
+    //             //Primera y segunda
+    //             if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
+    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
+    //             }
+    //             //Primera y tercera
+    //             else if($busqueda1 == 0 && $busqueda2 == 4 || $busqueda2 == 0 && $busqueda1 == 4){
+    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraTercera');
+    //             }
+    //             //Segunda y tercera
+    //             else if($busqueda1 == 2 && $busqueda2 == 4 || $busqueda2 == 2 && $busqueda1 == 4){
+    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
+    //             }
+    //         }else $premio = 0;
+    //     }else{
+    //         //Verificamos que los tipos de datos de las busquedas sean enteros
+    //         if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
+    //             if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
+    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
+    //             }
+    //         }else $premio = 0;
+    //     }
+
+
+
+        $primerParDeNumeros = substr($jugada, 0, 2);
+        $segundoParDeNumeros = substr($jugada, 2, 2);
+        $hayPremiadoEnPrimera = false;
+        $hayPremiadoEnSegunda = false;
+        $hayPremiadoEnTercera = false;
+
+     //Si el sorteo es diferente de super pale entonces es un pale normal
+     if($sorteo['descripcion'] != "Super pale"){
+
+         switch ($primerParDeNumeros) {
+            case $this->primera:
+                $hayPremiadoEnPrimera = true;
+                $contador++;
+                break;
+            case $this->segunda:
+                $hayPremiadoEnSegunda = true;
+                $contador++;
+                break;
+            case $this->tercera:
+                $hayPremiadoEnTercera = true;
+                $contador++;
+                break;
         }
+
+        
+
+        switch ($segundoParDeNumeros) {
+            case $this->primera:
+                if($hayPremiadoEnPrimera == false){
+                    $hayPremiadoEnPrimera = true;
+                    $contador++;
+                }
+                break;
+            case $this->segunda:
+                if($hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                break;
+            case $this->tercera:
+                if($hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
+                    $contador++;
+                }
+                break;
+        }
+
+        if($hayPremiadoEnPrimera == true && $hayPremiadoEnSegunda == true){
+            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
+        }
+        else if($hayPremiadoEnPrimera == true && $hayPremiadoEnTercera == true){
+            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraTercera');
+        }
+        else if($hayPremiadoEnSegunda == true && $hayPremiadoEnTercera){
+            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
+        }
+
+    }else{
+        
+        switch ($primerParDeNumeros) {
+            case $this->primera:
+                $hayPremiadoEnPrimera = true;
+                $contador++;
+                break;
+            case $this->segunda:
+                $hayPremiadoEnSegunda = true;
+                $contador++;
+                break;
+        }
+
+        
+
+        switch ($segundoParDeNumeros) {
+            case $this->primera:
+                if($hayPremiadoEnPrimera == false){
+                    $hayPremiadoEnPrimera = true;
+                    $contador++;
+                }
+                break;
+            case $this->segunda:
+                if($hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                break;
+        }
+
+        if($hayPremiadoEnPrimera == true && $hayPremiadoEnSegunda == true){
+            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
+        }
+
+        // return "1ra:" .$hayPremiadoEnPrimera." 2da:".$hayPremiadoEnSegunda;
+
+    }
 
         return $premio;
     }

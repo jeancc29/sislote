@@ -132,3 +132,4 @@ Route::post('/prestamos/guardar', 'LoansController@store');
 Route::post('/prestamos/getPrestamo', 'LoansController@getPrestamo');
 Route::post('/prestamos/cobrar', 'LoansController@cobrar');
 Route::post('/prestamos/aplazarCuota', 'LoansController@aplazarCuota');
+Route::post('/prestamos/eliminar', 'LoansController@eliminar');

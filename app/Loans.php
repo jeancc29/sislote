@@ -14,6 +14,7 @@ class Loans extends Model
         'idEntidadFondo',
         'montoPrestado',
         'montoCuotas',
+        'montoCapital',
         'numeroCuotas',
         'tasaInteres',
         'mora',

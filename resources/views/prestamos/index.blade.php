@@ -497,6 +497,7 @@
           </div>
           <div class="card-footer">
             <div ng-show="!mostrarBloqueosJugadas" class="row justify-content-end w-100">
+              <input ng-show="datos.editar == true" ng-click="aplazarCuota()" type="button" class="btn btn-success " name="guardar" value="Aplazar cuota">
               <input ng-click="actualizar()" type="button" class="btn btn-info " name="guardar" value="Guardar">
             </div>
             <!-- <div class="mr-auto">
@@ -568,14 +569,16 @@
                 <td>@{{l.balancePendiente}}</td>                
                 <td>@{{l.montoCuotas}}</td>
                 <td>@{{l.frecuencia}}</td>
-                <td>-</td>
+                <td>@{{l.fechaPagoProxima}}</td>
                 <td>@{{(l.status == 1) ? 'Activo' : 'Desactivado'}}</td>
                 <!-- <td>@{{l.horaCierre}}</td> -->
                 <td>
-                  <a style="cursor: pointer" ng-click="editar(false, l)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
-                  <!-- <a style="cursor: pointer" data-toggle="modal" data-target=".bd-example-modal-lg" class="ion-edit d-inline bg-success py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">payment</i></a> -->
-                  <a style="cursor: pointer" ng-click="getPrestamo(l)" class="ion-edit d-inline bg-success py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">payment</i></a>
-                  <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
+                  <div class="row">
+                    <a style="cursor: pointer" ng-click="editar(false, l)" class="ion-edit col-12 d-inline text-primary  text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                    <!-- <a style="cursor: pointer" data-toggle="modal" data-target=".bd-example-modal-lg" class="ion-edit d-inline bg-success  text-white rounded abrir-wizard-editar"><i class="material-icons">payment</i></a> -->
+                    <a style="cursor: pointer" ng-click="getPrestamo(l)" class="ion-edit col-12 d-inline text-success  text-white rounded abrir-wizard-editar"><i class="material-icons">payment</i></a>
+                    <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete col-12 d-inline  text-danger  text-white rounded"><i class="material-icons">delete_forever</i></a>
+                  </div>
                 </td>
               </tr>
              
@@ -734,9 +737,34 @@
 
                     </div> <!-- END ROW CAMPOS -->
                    
-                    
+                      <div class="row justify-content-center">
+                        <div class=" text-center">
+                                    <style>
+                                      .btn-outline-info.active{
+                                        background-color: #00bcd4!important;
+                                        color: #fff!important;
+                                      }
+                                    </style>
+                                          <!-- ng-init="rbxLoteriasChanged(l, $first)" -->
+                                    <div class="btn-group btn-group-toggle btn-group-sm text-center btn-group-not" data-toggle="buttons">
+                                        <label class="btn btn-outline-info" 
+                                          ng-repeat="l in datos.radioNoPagadosPagados"
+                                          ng-class="{'active': $first}"
+                                          ng-click="radioNoPagadosPagadosChanged(l)"
+                                          style="font-size: 15px;">
+                                          <input  type="radio" name="options" id="option@{{$index + 1}}" autocomplete="off" checked> @{{l.descripcion}}
+                                        </label>
+                                        <!-- <label class="btn btn-outline-info">
+                                          <input type="radio" name="options" id="option2" autocomplete="off"> Radio
+                                        </label>
+                                        <label class="btn btn-outline-info">
+                                          <input type="radio" name="options" id="option3" autocomplete="off"> Radio
+                                        </label> -->
+                                    </div>
+                          </div><!-- END COL-12 -->
+                      </div>
 
-                    <table class="table table-sm mt-3">
+                    <table ng-show="datos.selectedNoPagadosPagados.descripcion == 'Sin pagar'" class="table table-sm mt-3">
                         <thead class="">
                             <tr>
                             <th scope="col" class="text-center font-weight-bold" >Fecha</th>
@@ -768,6 +796,48 @@
                                     </label>
                                   </div>
                                 </td>
+                                <!-- <td scope="col" class="text-center" style="font-size: 12px">Marcar pago</td> -->
+                                <!-- <td scope="col" class="text-center" style="font-size: 12px">
+                                    <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline   bg-danger  text-white rounded"><i class="material-icons">delete_forever</i></a>
+                                </td> -->
+                            </tr>
+                            <tr >
+                                <td colspan="2"></td>
+                                <td class="text-center font-weight-bold">TOTAL:</td>
+                                <td class="text-center font-weight-bold">@{{total(true) | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{total(false) | currency}}</td>
+                                <td colspan="4"></td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+
+
+
+
+
+                    <table ng-show="datos.selectedNoPagadosPagados.descripcion == 'Pagadas'" class="table table-sm mt-3">
+                        <thead class="">
+                            <tr>
+                            <th scope="col" class="text-center font-weight-bold" >Fecha</th>
+                            <!-- <th scope="col" class="text-center font-weight-bold" >Cerrado</th> -->
+                            <th scope="col" class="text-center font-weight-bold" >Capital</th>
+                            <th scope="col" class="text-center font-weight-bold" >Interes</th>
+                            <th scope="col" class="text-center font-weight-bold" >Cuota</th>
+                           
+
+                            <!--<th scope="col" class="text-center">Cancelar/Eliminar</th> -->
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr   ng-repeat="c in datos.selectedPrestamoPagar.amortizacionPagadas">
+                                <td scope="col" class="text-center" >@{{c.fecha}}</td>
+                                <td scope="col" class="text-center" >@{{c.montoCapital}}</td>
+                                <!-- <td scope="col" class="text-center" >@{{Cerrado}}</td> -->
+                                <td scope="col" class="text-center" >@{{c.montoInteres}}</td>
+                                <td scope="col" class="text-center" >@{{c.montoCuota}}</td>
+                                
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">Marcar pago</td> -->
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">
                                     <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline   bg-danger  text-white rounded"><i class="material-icons">delete_forever</i></a>

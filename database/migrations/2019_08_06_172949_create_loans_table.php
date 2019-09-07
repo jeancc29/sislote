@@ -22,6 +22,7 @@ class CreateLoansTable extends Migration
             $table->unsignedInteger('idEntidadFondo');
             $table->decimal('montoPrestado', 20, 2)->default(0);
             $table->decimal('montoCuotas', 20, 2)->default(0);
+            $table->decimal('montoCapital', 20, 2)->default(0);
             $table->decimal('numeroCuotas', 20, 2)->default(0);
             $table->decimal('tasaInteres', 20, 2)->default(0);
             $table->decimal('mora', 20, 2)->default(0);
