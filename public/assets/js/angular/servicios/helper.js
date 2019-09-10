@@ -17,11 +17,17 @@ myApp.service('helperService', function(){
             if(Number(valor) == undefined || valor == '' || valor == null || isNaN(valor) == true)
                 return true;
         }
-        if(tipo === 'string' || typeof valor == 'string'){
+        else if(tipo === 'string' || typeof valor == 'string'){
             if(valor == undefined || valor == '' || valor == null)
                 return true;
         }
-        if(tipo === 'object' || typeof valor == 'object'){
+        else if(tipo === 'date' || typeof valor == 'date'){
+            console.log('dentro date service:', valor);
+
+            if(valor == undefined || valor == null)
+                return true;
+        }
+        else if(tipo === 'object' || typeof valor == 'object'){
             if(valor == undefined || valor == '' || valor == null || valor == {})
                 return true;
             if(Object.keys(valor).length == 0)

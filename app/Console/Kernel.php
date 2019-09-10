@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\AutomaticExpenses::class,
         Commands\Transactionsdraws::class,
+        Commands\Transactionsloans::class,
     ];
 
     /**
@@ -30,6 +31,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('transacciones:sorteos')
                  ->everyMinute();
         $schedule->command('transacciones:caidaAcumulada')
+                 ->everyMinute();
+        $schedule->command('transacciones:prestamos')
                  ->everyMinute();
         $schedule->command('prueba:a')
                  ->everyMinute();

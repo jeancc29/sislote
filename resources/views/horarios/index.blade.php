@@ -168,12 +168,14 @@
                                   <div class="form-group">
                                     
                                     <!-- ng-model-options="{ updateOn: 'blur' }" -->
-                                  <input ng-model-onblur ng-change="update()"  ng-model="datos.selectedLoteria.lunes.apertura" type="text"  name="lunesHoraApertura" id="lunesHoraApertura" type="text" class="form-control timepicker">
+                                  <input ng-model-onblur ng-change="update()"  ng-model="datos.selectedLoteria.lunes.apertura" type="time" placeholder="HH:mm"
+                                    name="lunesHoraApertura" id="lunesHoraApertura"  class="form-control">
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model="datos.selectedLoteria.lunes.cierre" type="text"  name="lunesHoraCierre" id="lunesHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model="datos.selectedLoteria.lunes.cierre" type="time" placeholder="HH:mm"
+                                    name="lunesHoraCierre" id="lunesHoraCierre" class="form-control " >
                                   </div>
                                 </div>
                               </div>
@@ -185,12 +187,13 @@
                                 <label class="d-none d-sm-block col-sm-2 col-form-label mt-2">Martes</label>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.martes.apertura" type="text"  name="martesHoraApertura" id="martesHoraApertura" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.martes.apertura" type="time" placeholder="HH:mm"
+                                    name="martesHoraApertura" id="martesHoraApertura"  class="form-control" >
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.martes.cierre" type="text"  name="martesHoraCierre" id="martesHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.martes.cierre" type="time" placeholder="HH:mm"  name="martesHoraCierre" id="martesHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
                               </div>
@@ -201,12 +204,12 @@
                                 <label class="d-none d-sm-block col-sm-2 col-form-label mt-2">Miercoles</label>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.miercoles.apertura" type="text"  name="miercolesHoraApertura" id="miercolesHoraApertura" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.miercoles.apertura" type="time" placeholder="HH:mm"  name="miercolesHoraApertura" id="miercolesHoraApertura"  class="form-control" >
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.miercoles.cierre" type="text"  name="miercolesHoraCierre" id="miercolesHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.miercoles.cierre" type="time" placeholder="HH:mm"  name="miercolesHoraCierre" id="miercolesHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
                               </div>
@@ -218,12 +221,12 @@
                                 <label class="d-none d-sm-block col-sm-2 col-form-label mt-2">Jueves</label>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.jueves.apertura" type="text"  name="juevesHoraApertura" id="juevesHoraApertura" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.jueves.apertura" type="time" placeholder="HH:mm"  name="juevesHoraApertura" id="juevesHoraApertura"  class="form-control" >
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.jueves.cierre" type="text"  name="juevesHoraCierre" id="juevesHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.jueves.cierre" type="time" placeholder="HH:mm"   name="juevesHoraCierre" id="juevesHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
                               </div>
@@ -235,12 +238,12 @@
                                 <label class="d-none d-sm-block col-sm-2 col-form-label mt-2">Viernes</label>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.viernes.apertura" type="text"  name="viernesHoraApertura" id="viernesHoraApertura" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.viernes.apertura" type="time" placeholder="HH:mm"  name="viernesHoraApertura" id="viernesHoraApertura"  class="form-control " >
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.viernes.cierre" type="text"  name="viernesHoraCierre" id="viernesHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.viernes.cierre" type="time" placeholder="HH:mm"  name="viernesHoraCierre" id="viernesHoraCierre"  class="form-control " >
                                   </div>
                                 </div>
                               </div>
@@ -252,12 +255,12 @@
                                 <label class="d-none d-sm-block col-sm-2 col-form-label mt-2">Sabado</label>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.sabado.apertura" type="text"  name="sabadoHoraApertura" id="sabadoHoraApertura" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.sabado.apertura" type="time" placeholder="HH:mm"  name="sabadoHoraApertura" id="sabadoHoraApertura"  class="form-control" >
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.sabado.cierre" type="text"  name="sabadoHoraCierre" id="sabadoHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.sabado.cierre" type="time" placeholder="HH:mm"  name="sabadoHoraCierre" id="sabadoHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
                               </div>
@@ -269,12 +272,12 @@
                                 <label class="d-none d-sm-block col-sm-2 col-form-label mt-2">Domingo</label>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.domingo.apertura" type="text"  name="domingoHoraApertura" id="domingoHoraApertura" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.domingo.apertura" type="time" placeholder="HH:mm"  name="domingoHoraApertura" id="domingoHoraApertura"  class="form-control" >
                                   </div>
                                 </div>
                                 <div class="col-sm-4">
                                   <div class="form-group">
-                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.domingo.cierre" type="text"  name="domingoHoraCierre" id="domingoHoraCierre" type="text" class="form-control timepicker" >
+                                  <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.domingo.cierre" type="time" placeholder="HH:mm"  name="domingoHoraCierre" id="domingoHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
                               </div>

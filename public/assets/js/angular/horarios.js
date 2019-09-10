@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -78,44 +78,67 @@ myApp
             let idx = $scope.datos.loterias.findIndex(x => x.id == $scope.datos.selectedLoteria.id);
 
          
-            if(todas == false){
+            // if(todas == false){
                 
-                    $scope.datos.loterias[idx].lunes.apertura = hora_convertir($scope.datos.loterias[idx].lunes.apertura, _24);
-                    $scope.datos.loterias[idx].lunes.cierre = hora_convertir($scope.datos.loterias[idx].lunes.cierre, _24);
-                    $scope.datos.loterias[idx].martes.apertura = hora_convertir($scope.datos.loterias[idx].martes.apertura, _24);
-                    $scope.datos.loterias[idx].martes.cierre = hora_convertir($scope.datos.loterias[idx].martes.cierre, _24);
-                    $scope.datos.loterias[idx].miercoles.apertura = hora_convertir($scope.datos.loterias[idx].miercoles.apertura, _24);
-                    $scope.datos.loterias[idx].miercoles.cierre = hora_convertir($scope.datos.loterias[idx].miercoles.cierre, _24);
-                    $scope.datos.loterias[idx].jueves.apertura = hora_convertir($scope.datos.loterias[idx].jueves.apertura, _24);
-                    $scope.datos.loterias[idx].jueves.cierre = hora_convertir($scope.datos.loterias[idx].jueves.cierre, _24);
-                    $scope.datos.loterias[idx].viernes.apertura = hora_convertir($scope.datos.loterias[idx].viernes.apertura, _24);
-                    $scope.datos.loterias[idx].viernes.cierre = hora_convertir($scope.datos.loterias[idx].viernes.cierre, _24);
-                    $scope.datos.loterias[idx].sabado.apertura = hora_convertir($scope.datos.loterias[idx].sabado.apertura, _24);
-                    $scope.datos.loterias[idx].sabado.cierre = hora_convertir($scope.datos.loterias[idx].sabado.cierre, _24);
-                    $scope.datos.loterias[idx].domingo.apertura = hora_convertir($scope.datos.loterias[idx].domingo.apertura, _24);
-                    $scope.datos.loterias[idx].domingo.cierre = hora_convertir($scope.datos.loterias[idx].domingo.cierre, _24);
-            }else{
+            //         $scope.datos.loterias[idx].lunes.apertura = hora_convertir($scope.datos.loterias[idx].lunes.apertura, _24);
+            //         $scope.datos.loterias[idx].lunes.cierre = hora_convertir($scope.datos.loterias[idx].lunes.cierre, _24);
+            //         $scope.datos.loterias[idx].martes.apertura = hora_convertir($scope.datos.loterias[idx].martes.apertura, _24);
+            //         $scope.datos.loterias[idx].martes.cierre = hora_convertir($scope.datos.loterias[idx].martes.cierre, _24);
+            //         $scope.datos.loterias[idx].miercoles.apertura = hora_convertir($scope.datos.loterias[idx].miercoles.apertura, _24);
+            //         $scope.datos.loterias[idx].miercoles.cierre = hora_convertir($scope.datos.loterias[idx].miercoles.cierre, _24);
+            //         $scope.datos.loterias[idx].jueves.apertura = hora_convertir($scope.datos.loterias[idx].jueves.apertura, _24);
+            //         $scope.datos.loterias[idx].jueves.cierre = hora_convertir($scope.datos.loterias[idx].jueves.cierre, _24);
+            //         $scope.datos.loterias[idx].viernes.apertura = hora_convertir($scope.datos.loterias[idx].viernes.apertura, _24);
+            //         $scope.datos.loterias[idx].viernes.cierre = hora_convertir($scope.datos.loterias[idx].viernes.cierre, _24);
+            //         $scope.datos.loterias[idx].sabado.apertura = hora_convertir($scope.datos.loterias[idx].sabado.apertura, _24);
+            //         $scope.datos.loterias[idx].sabado.cierre = hora_convertir($scope.datos.loterias[idx].sabado.cierre, _24);
+            //         $scope.datos.loterias[idx].domingo.apertura = hora_convertir($scope.datos.loterias[idx].domingo.apertura, _24);
+            //         $scope.datos.loterias[idx].domingo.cierre = hora_convertir($scope.datos.loterias[idx].domingo.cierre, _24);
+            // }else{
+                // $scope.datos.loterias.forEach(function(valor, indice, array){
+                //     array[indice].lunes.apertura = hora_convertir(array[indice].lunes.apertura, _24);
+                //     array[indice].lunes.cierre = hora_convertir(array[indice].lunes.cierre, _24);
+                //     array[indice].martes.apertura = hora_convertir(array[indice].martes.apertura, _24);
+                //     array[indice].martes.cierre = hora_convertir(array[indice].martes.cierre, _24);
+                //     array[indice].miercoles.apertura = hora_convertir(array[indice].miercoles.apertura, _24);
+                //     array[indice].miercoles.cierre = hora_convertir(array[indice].miercoles.cierre, _24);
+                //     array[indice].jueves.apertura = hora_convertir(array[indice].jueves.apertura, _24);
+                //     array[indice].jueves.cierre = hora_convertir(array[indice].jueves.cierre, _24);
+                //     array[indice].viernes.apertura = hora_convertir(array[indice].viernes.apertura, _24);
+                //     array[indice].viernes.cierre = hora_convertir(array[indice].viernes.cierre, _24);
+                //     array[indice].sabado.apertura = hora_convertir(array[indice].sabado.apertura, _24);
+                //     array[indice].sabado.cierre = hora_convertir(array[indice].sabado.cierre, _24);
+                //     array[indice].domingo.apertura = hora_convertir(array[indice].domingo.apertura, _24);
+                //     array[indice].domingo.cierre = hora_convertir(array[indice].domingo.cierre, _24);
+                // });
+
                 $scope.datos.loterias.forEach(function(valor, indice, array){
-                    array[indice].lunes.apertura = hora_convertir(array[indice].lunes.apertura, _24);
-                    array[indice].lunes.cierre = hora_convertir(array[indice].lunes.cierre, _24);
-                    array[indice].martes.apertura = hora_convertir(array[indice].martes.apertura, _24);
-                    array[indice].martes.cierre = hora_convertir(array[indice].martes.cierre, _24);
-                    array[indice].miercoles.apertura = hora_convertir(array[indice].miercoles.apertura, _24);
-                    array[indice].miercoles.cierre = hora_convertir(array[indice].miercoles.cierre, _24);
-                    array[indice].jueves.apertura = hora_convertir(array[indice].jueves.apertura, _24);
-                    array[indice].jueves.cierre = hora_convertir(array[indice].jueves.cierre, _24);
-                    array[indice].viernes.apertura = hora_convertir(array[indice].viernes.apertura, _24);
-                    array[indice].viernes.cierre = hora_convertir(array[indice].viernes.cierre, _24);
-                    array[indice].sabado.apertura = hora_convertir(array[indice].sabado.apertura, _24);
-                    array[indice].sabado.cierre = hora_convertir(array[indice].sabado.cierre, _24);
-                    array[indice].domingo.apertura = hora_convertir(array[indice].domingo.apertura, _24);
-                    array[indice].domingo.cierre = hora_convertir(array[indice].domingo.cierre, _24);
+                    array[indice].lunes.aperturaGuardar = agregarCeroIzquierda(array[indice].lunes.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].lunes.apertura.getMinutes());
+                    array[indice].lunes.cierreGuardar = agregarCeroIzquierda(array[indice].lunes.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].lunes.cierre.getMinutes());
+                    array[indice].martes.aperturaGuardar = agregarCeroIzquierda(array[indice].martes.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].martes.apertura.getMinutes());
+                    array[indice].martes.cierreGuardar = agregarCeroIzquierda(array[indice].martes.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].martes.cierre.getMinutes());
+                    array[indice].miercoles.aperturaGuardar = agregarCeroIzquierda(array[indice].miercoles.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].miercoles.apertura.getMinutes());
+                    array[indice].miercoles.cierreGuardar = agregarCeroIzquierda(array[indice].miercoles.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].miercoles.cierre.getMinutes());
+                    array[indice].jueves.aperturaGuardar = agregarCeroIzquierda(array[indice].jueves.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].jueves.apertura.getMinutes());
+                    array[indice].jueves.cierreGuardar = agregarCeroIzquierda(array[indice].jueves.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].jueves.cierre.getMinutes());
+                    array[indice].viernes.aperturaGuardar = agregarCeroIzquierda(array[indice].viernes.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].viernes.apertura.getMinutes());
+                    array[indice].viernes.cierreGuardar = agregarCeroIzquierda(array[indice].viernes.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].viernes.cierre.getMinutes());
+                    array[indice].sabado.aperturaGuardar = agregarCeroIzquierda(array[indice].sabado.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].sabado.apertura.getMinutes());
+                    array[indice].sabado.cierreGuardar = agregarCeroIzquierda(array[indice].sabado.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].sabado.cierre.getMinutes());
+                    array[indice].domingo.aperturaGuardar = agregarCeroIzquierda(array[indice].domingo.apertura.getHours()) + ':' + agregarCeroIzquierda(array[indice].domingo.apertura.getMinutes());
+                    array[indice].domingo.cierreGuardar = agregarCeroIzquierda(array[indice].domingo.cierre.getHours()) + ':' + agregarCeroIzquierda(array[indice].domingo.cierre.getMinutes());
                 });
-            }
+            // }
             
             
         }
 
+        agregarCeroIzquierda = function(valor){
+            var str = "" + valor;
+            var pad = "00";
+            var ans = pad.substring(0, pad.length - str.length) + str;
+            return ans;
+        }
 
         function hora_convertir2(phora){
             //Si es verdadero la hora se convertira al formato 24 horas
@@ -253,38 +276,38 @@ myApp
                 $scope.datos.ckbDias = [];
                 jsonLoterias.forEach(function(valor, indice, array){
                     array[indice].lunes = {};
-                    array[indice].lunes.apertura = hora_convertir("01:00:00");
-                    array[indice].lunes.cierre = hora_convertir("23:00:00");
+                    array[indice].lunes.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].lunes.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].lunes.status = 1;
                     
                     array[indice].martes = {};
-                    array[indice].martes.apertura = hora_convertir("01:00:00");
-                    array[indice].martes.cierre = hora_convertir("23:00:00");
+                    array[indice].martes.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].martes.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].martes.status = 1;
 
                     array[indice].miercoles = {};
-                    array[indice].miercoles.apertura = hora_convertir("01:00:00");
-                    array[indice].miercoles.cierre = hora_convertir("23:00:00");
+                    array[indice].miercoles.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].miercoles.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].miercoles.status = 1;
 
                     array[indice].jueves = {};
-                    array[indice].jueves.apertura = hora_convertir("01:00:00");
-                    array[indice].jueves.cierre = hora_convertir("23:00:00");
+                    array[indice].jueves.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].jueves.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].jueves.status = 1;
 
                     array[indice].viernes = {};
-                    array[indice].viernes.apertura = hora_convertir("01:00:00");
-                    array[indice].viernes.cierre = hora_convertir("23:00:00");
+                    array[indice].viernes.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].viernes.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].viernes.status = 1;
 
                     array[indice].sabado = {};
-                    array[indice].sabado.apertura = hora_convertir("01:00:00");
-                    array[indice].sabado.cierre = hora_convertir("23:00:00");
+                    array[indice].sabado.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].sabado.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].sabado.status = 1;
 
                     array[indice].domingo = {};
-                    array[indice].domingo.apertura = hora_convertir("01:00:00");
-                    array[indice].domingo.cierre = hora_convertir("23:00:00");
+                    array[indice].domingo.apertura = new Date(1970, 0, 1, 1, 0, 0);
+                    array[indice].domingo.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].domingo.status = 1;
                     
 
@@ -307,39 +330,42 @@ myApp
 
                             if(arrayDias[indiceDias].descripcion == "Lunes"){
                                 array[indice].lunes.status = 1;
-                                array[indice].lunes.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].lunes.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                // array[indice].lunes.apertura = arrayDias[indiceDias].pivot.horaApertura;
+                                // array[indice].lunes.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                // a.split(':')
+                                array[indice].lunes.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].lunes.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                                 console.log("lunes: ",arrayDias[indiceDias].pivot.horaApertura);
                             }
                             else if(arrayDias[indiceDias].descripcion == "Martes"){
                                 array[indice].martes.status = 1;
-                                array[indice].martes.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].martes.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                array[indice].martes.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].martes.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                             }
                             else if(arrayDias[indiceDias].descripcion == "Miercoles"){
                                 array[indice].miercoles.status = 1;
-                                array[indice].miercoles.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].miercoles.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                array[indice].miercoles.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].miercoles.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                             }
                             else if(arrayDias[indiceDias].descripcion == "Jueves"){
                                 array[indice].jueves.status = 1;
-                                array[indice].jueves.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].jueves.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                array[indice].jueves.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].jueves.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                             }
                             else if(arrayDias[indiceDias].descripcion == "Viernes"){
                                 array[indice].viernes.status = 1;
-                                array[indice].viernes.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].viernes.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                array[indice].viernes.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].viernes.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                             }
                             else if(arrayDias[indiceDias].descripcion == "Sabado"){
                                 array[indice].sabado.status = 1;
-                                array[indice].sabado.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].sabado.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                array[indice].sabado.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].sabado.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                             }
                             else{
                                 array[indice].domingo.status = 1;
-                                array[indice].domingo.apertura = arrayDias[indiceDias].pivot.horaApertura;
-                                array[indice].domingo.cierre = arrayDias[indiceDias].pivot.horaCierre;
+                                array[indice].domingo.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
+                                array[indice].domingo.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
                             }
                         });
                     }
@@ -498,6 +524,30 @@ myApp
         }
 
        
+        hayHorasVacias = function(){
+            var hayVacios = false;
+             $scope.datos.loterias.forEach(function(valor, indice, array){
+                    console.log('hayHorasVacias:', array[indice].lunes.status == 1);
+                    console.log('vacio:', (helperService.empty(array[indice].lunes.apertura, 'date') == true));
+                    if(array[indice].lunes.status == 1 && (helperService.empty(array[indice].lunes.apertura, 'date') == true || helperService.empty(array[indice].lunes.cierre, 'date') == true))
+                        hayVacios = true;
+                    if(array[indice].martes.status == 1 && (helperService.empty(array[indice].martes.apertura, 'date') == true || helperService.empty(array[indice].martes.cierre, 'date') == true))
+                        hayVacios = true;
+                    if(array[indice].miercoles.status == 1 && (helperService.empty(array[indice].miercoles.apertura, 'date') == true || helperService.empty(array[indice].miercoles.cierre, 'date') == true))
+                        hayVacios = true;
+                    if(array[indice].jueves.status == 1 && (helperService.empty(array[indice].jueves.apertura, 'date') == true || helperService.empty(array[indice].jueves.cierre, 'date') == true))
+                        hayVacios = true;
+                    if(array[indice].viernes.status == 1 && (helperService.empty(array[indice].viernes.apertura, 'date') == true || helperService.empty(array[indice].viernes.cierre, 'date') == true))
+                        hayVacios = true;
+                    if(array[indice].sabado.status == 1 && (helperService.empty(array[indice].sabado.apertura, 'date') == true || helperService.empty(array[indice].sabado.cierre, 'date') == true))
+                        hayVacios = true;
+                    if(array[indice].domingo.status == 1 && (helperService.empty(array[indice].domingo.apertura, 'date') == true || helperService.empty(array[indice].domingo.cierre, 'date') == true))
+                        hayVacios = true;
+                });
+
+
+                return hayVacios;
+        }
         
 
         $scope.actualizar = function(){
@@ -511,12 +561,16 @@ myApp
                 return;
             }
             
-
+            if(hayHorasVacias() ==true){
+                alert("Error: Hay campos vacios");
+                return;
+            }
  
             _convertir_apertura_y_cierre(true, true);
 
             
-           
+           console.log('actualizr:', $scope.datos.loterias);
+        //    return;
           $http.post(rutaGlobal+"/api/horarios/normal/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
              .then(function(response){
                 console.log(response.data);

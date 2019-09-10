@@ -681,6 +681,8 @@ class LoansController extends Controller
             
 
             // $amortizacion = Helper::amortizar($prestamo->montoPrestado, $prestamo->montoCuotas, $prestamo->numeroCuotas, $prestamo->tasaInteres, $prestamo->idFrecuencia, false);
+            $fechaInicioCarbon = new Carbon($datos['fechaInicio']);
+            $datos['fechaInicio'] = $fechaInicioCarbon->toDateString();
             $amortizacion = Helper::amortizar($datos['montoPrestado'], $datos['montoCuotas'], $datos['numeroCuotas'], $datos['tasaInteres'], $datos['idFrecuencia'], $datos['fechaInicio'], false);
             $datos['montoCuotas'] = $amortizacion[0]['montoCuota'];
             $datos['montoCapital'] = $amortizacion[0]['amortizacion'];
@@ -688,8 +690,7 @@ class LoansController extends Controller
             $datos['tasaInteres'] = ($amortizacion[0]['tasaInteres'] == null) ? 0 : $amortizacion[0]['tasaInteres'];
             $datos['idTipoAmortizacion'] = $amortizacion[0]['idTipoAmortizacion'];
 
-            $fechaInicioCarbon = new Carbon($datos['fechaInicio']);
-            $datos['fechaInicio'] = $fechaInicioCarbon->toDateString();
+           
             $prestamo = Loans::create([
                 'idUsuario' => $datos['idUsuario'],
                 'idTipoEntidadPrestamo' => $idTipoBanca->id,
@@ -806,7 +807,8 @@ class LoansController extends Controller
     return Response::json([
         'errores' => 0,
         'mensaje' => 'Se ha guardado correctamente',
-        'prestamos' => $prestamos
+        'prestamos' => $prestamos,
+        'a' => $amortizacion
         //'colleccon' => $colleccion
     ], 201);
         
