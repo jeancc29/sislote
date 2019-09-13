@@ -57,6 +57,7 @@ Route::post('/acceder', 'LoginController@accederApi');
 
 Route::get('/principal', 'PrincipalController@index');
 Route::post('/principal/indexPost', 'PrincipalController@indexPost');
+Route::post('/principal/indexPostPrueba', 'PrincipalController@indexPostPrueba');
 Route::post('/principal/guardar', 'PrincipalController@store');
 Route::post('/principal/montodisponible', 'PrincipalController@montodisponible');
 Route::post('/principal/pruebahttp', 'PrincipalController@pruebahttp');

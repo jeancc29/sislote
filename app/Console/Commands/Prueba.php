@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use App\Draws;
+use App\Sales;
 use App\Lotteries;
 use App\Branches;
 use Carbon\Carbon;
@@ -16,6 +17,8 @@ use App\Classes\Helper;
 use App\Classes\AwardsClass;
 use App\Classes\TicketClass;
 use App\Http\Resources\AutomaticexpensesResource;
+use App\Http\Resources\SalesResource;
+use App\Http\Resources\BranchesResource;
 
 class Prueba extends Command
 {
@@ -95,7 +98,12 @@ class Prueba extends Command
         // $sorteo = Draws::whereDescripcion("Super pale")->first();
         // $premio = $awardsClass->paleBuscarPremio(1, 1, "0609", "1", $sorteo->id);
 
-        $this->info("1ra:" . Helper::amortizar(100, 0, 3, 0, 1, '2019-09-06', false, true));
+        // $this->info("1ra:" . Helper::amortizar(100, 0, 3, 0, 1, '2019-09-06', false, true));
+        $a = Helper::indexPost();
+
+        
+        $v = new BranchesResource(Branches::find(1));
+        $this->info("1ra:" . $v->pagosCombinaciones);
 
 
         // $awardsClass = new AwardsClass($l['id']);

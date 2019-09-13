@@ -1810,4 +1810,11 @@ class Helper{
         return $amortizacionesNoPagadas;
     }
 
+
+    public static function indexPost(){
+        return DB::select('call indexPost(?)', array(1));
+
+        
+    }
+
 }

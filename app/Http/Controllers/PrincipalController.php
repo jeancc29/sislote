@@ -124,6 +124,7 @@ class PrincipalController extends Controller
             // if($idBanca != null)
             //     $idBanca = $idBanca->id;
         }
+        
 
         if($idBanca == null){
             return Response::json([
@@ -161,6 +162,61 @@ class PrincipalController extends Controller
             'bancas' => BranchesResource::collection(Branches::whereStatus(1)->get()),
             'idUsuario' => $datos['idUsuario'],
             'idBanca' => $idBanca
+        ], 201);
+
+
+
+
+
+
+
+
+
+        // $idBanca = 0;
+        
+
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required'
+        // ])['datos'];
+
+        // $data = Helper::indexPost();
+        
+
+        //  return Response::json([
+        //     'idVenta' => $data[0]->idVentaHash,
+        //     'loterias' => ($data[0]->loterias != null) ? json_decode($data[0]->loterias) : [],
+        //     'caracteristicasGenerales' =>  ($data[0]->caracteristicasGenerales != null) ? json_decode($data[0]->caracteristicasGenerales) : [],
+        //     'total_ventas' => $data[0]->total_ventas,
+        //     'total_jugadas' => $data[0]->total_jugadas,
+        //     'ventas' => ($data[0]->ventas != null) ? json_decode($data[0]->ventas) : [],
+        //     'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
+        //     'idUsuario' => $datos['idUsuario'],
+        //     'idBanca' => $data[0]->idBanca
+        // ], 201);
+    }
+
+    public function indexPostPrueba()
+    {
+        $idBanca = 0;
+        
+
+        $datos = request()->validate([
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+
+        $data = Helper::indexPost();
+        
+
+         return Response::json([
+            'idVenta' => $data[0]->idVentaHash,
+            'loterias' => ($data[0]->loterias != null) ? json_decode($data[0]->loterias) : [],
+            'caracteristicasGenerales' =>  ($data[0]->caracteristicasGenerales != null) ? json_decode($data[0]->caracteristicasGenerales) : [],
+            'total_ventas' => $data[0]->total_ventas,
+            'total_jugadas' => $data[0]->total_jugadas,
+            'ventas' => ($data[0]->ventas != null) ? json_decode($data[0]->ventas) : [],
+            'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
+            'idUsuario' => $datos['idUsuario'],
+            'idBanca' => $data[0]->idBanca
         ], 201);
     }
 
