@@ -909,6 +909,7 @@ class PrincipalController extends Controller
                 'mensaje' => 'La banca aun no ha abierto'
             ], 201);
         }
+
     
         if($banca->cerrada()){
             return Response::json([
@@ -926,7 +927,7 @@ class PrincipalController extends Controller
     
         
     
-       
+       //Aqui quede
     
         //Generamos y guardamos codigo de barra
         while($codigoBarraCorrecto != true){
