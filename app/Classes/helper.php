@@ -1811,8 +1811,8 @@ class Helper{
     }
 
 
-    public static function indexPost(){
-        return DB::select('call indexPost(?)', array(1));
+    public static function indexPost($idUsuario){
+        return DB::select('call indexPost(?)', array($idUsuario));
 
         
     }

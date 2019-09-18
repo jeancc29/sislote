@@ -109,7 +109,7 @@ class PrincipalController extends Controller
         
     }
 
-    public function indexPost()
+    public function indexPostAntiguo()
     {
         $idBanca = 0;
         
@@ -195,7 +195,7 @@ class PrincipalController extends Controller
         // ], 201);
     }
 
-    public function indexPostPrueba()
+    public function indexPost()
     {
         $idBanca = 0;
         
@@ -204,7 +204,7 @@ class PrincipalController extends Controller
             'datos.idUsuario' => 'required'
         ])['datos'];
 
-        $data = Helper::indexPost();
+        $data = Helper::indexPost($datos['idUsuario']);
         
 
          return Response::json([
