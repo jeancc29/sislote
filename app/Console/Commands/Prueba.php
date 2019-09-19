@@ -99,11 +99,12 @@ class Prueba extends Command
         // $premio = $awardsClass->paleBuscarPremio(1, 1, "0609", "1", $sorteo->id);
 
         // $this->info("1ra:" . Helper::amortizar(100, 0, 3, 0, 1, '2019-09-06', false, true));
-        $a = Helper::indexPost();
+        // $a = Helper::indexPost();
+        $a = Helper::guardarVenta(1, 11, '$2y$10$bWmfs4W10Rj.9r6GtIbsOOXl6eJfBVytTyMFJqSA6KBbpxYVo2nAa', 0, 0, 0, 10, '[{"idLoteria" : "1", "jugada" : "06", "monto" : 300}, {"idLoteria" : "2", "jugada" : "09", "monto" : 12}, {"idLoteria" : "2", "jugada" : "0998", "monto" : 1}]');
 
         
-        $v = new BranchesResource(Branches::find(1));
-        $this->info("1ra:" . $v->pagosCombinaciones);
+        // $v = new BranchesResource(Branches::find(1));
+        $this->info("1ra:" . $a[0]);
 
 
         // $awardsClass = new AwardsClass($l['id']);

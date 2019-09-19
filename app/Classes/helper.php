@@ -1817,4 +1817,8 @@ class Helper{
         
     }
 
+    public static function guardarVenta($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas){
+        return DB::select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
+    }
+
 }

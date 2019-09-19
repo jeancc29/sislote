@@ -109,7 +109,7 @@ class PrincipalController extends Controller
         
     }
 
-    public function indexPostAntiguo()
+    public function indexPost()
     {
         $idBanca = 0;
         
@@ -195,7 +195,7 @@ class PrincipalController extends Controller
         // ], 201);
     }
 
-    public function indexPost()
+    public function indexPostNuevo()
     {
         $idBanca = 0;
         
@@ -811,6 +811,50 @@ class PrincipalController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function storeNuevo(Request $request)
+    {
+        $datos = request()->validate([
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => 'required',
+            'datos.idVenta' => 'required',
+            'datos.compartido' => 'required',
+            'datos.descuentoMonto' => 'required',
+            'datos.hayDescuento' => 'required',
+            'datos.total' => 'required',
+            'datos.subTotal' => 'required',
+    
+            'datos.loterias' => 'required',
+            'datos.jugadas' => 'required',
+        ])['datos'];
+
+        $data = Helper::guardarVenta($datos['idUsuario'], $datos['idBanca'], $datos['idVenta'], $datos['compartido'], $datos['descuentoMonto'], $datos['hayDescuento'], $datos['total'], json_encode($datos['jugadas']));
+        
+        // return Response::json([
+        //     'jugadas' => json_encode($datos['jugadas'])
+        // ], 201);
+
+        if($data[0]->errores == 1){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => $data[0]->mensaje,
+                'idVenta' => $datos['idVenta']
+            ], 201);
+        }
+
+         return Response::json([
+            'idVenta' => $data[0]->idVentaHash,
+            'loterias' => ($data[0]->loterias != null) ? json_decode($data[0]->loterias) : [],
+            'caracteristicasGenerales' =>  ($data[0]->caracteristicasGenerales != null) ? json_decode($data[0]->caracteristicasGenerales) : [],
+            'total_ventas' => $data[0]->total_ventas,
+            'total_jugadas' => $data[0]->total_jugadas,
+            'ventas' => ($data[0]->ventas != null) ? json_decode($data[0]->ventas) : [],
+            'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
+            'idUsuario' => $datos['idUsuario'],
+            'idBanca' => $data[0]->idBanca
+        ], 201);
+    }
+
+
     public function store(Request $request)
     {
         $datos = request()->validate([

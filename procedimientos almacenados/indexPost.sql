@@ -169,10 +169,10 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 		end if;
 		set siguienteIdVenta = siguienteIdVenta + 1;
         
-        select idBanca from idventatemporals where idVenta = siguienteIdVenta into idBancaIdVentaTemporal;
+        select idventatemporals.idBanca from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idBancaIdVentaTemporal;
         if idBancaIdVentaTemporal is not null then
 			if idBanca = idBancaIdVentaTemporal then
-				 select idventatemporals.idVentaHash from idventatemporals where idVenta = siguienteIdVenta into idVentaHash;
+				 select idventatemporals.idVentaHash from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idVentaHash;
             else 
 				select max(id) from idventatemporals into siguienteIdVenta;
                 if siguienteIdVenta is null then
@@ -182,109 +182,23 @@ select JSON_ARRAYAGG(JSON_OBJECT(
             end if;
 		end if;
         
-        if idVentaHash is null then
-			set idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
+       -- if idVentaHash is null then
+			-- set idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
 			-- select CAST(AES_DECRYPT(@j, 'Sistema de loteria jean y valentin') AS CHAR(50)) as desencriptado;
-			insert into idventatemporals(idBanca, idVenta, idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
-		end if;
+            -- select 'dentro insert idVentaHash';
+			-- insert into idventatemporals(idventatemporals.idBanca, idventatemporals.idVenta, idventatemporals.idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
+			
+        -- end if;
           
-    select ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
+          if idVentaHash is null then
+          set @culo = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
+          
+          end if;
+    select ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, @culo as idVenta;
    
 END
  ;;
 delimiter ;
 
-call indexPost(2);
--- DROP TEMPORARY TABLE TempTable;
-select * from idventatemporals where idVentaHash = "$2y$10$6uJ4BymHJENTM38FLkFF9OMZv.EGhGpg1QI2bAc6V6YwqsYtfMyx2"
+-- call indexPost(1);
 
-select date(now());
-select id, total from sales where date(created_at) = date(now()) and status not in(0, 5)
- select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'total', total)) as ventas from sales where date(created_at) = date(now()) and status not in(0, 5)) as idBanca;
-
-use loterias;
-
-select JSON_ARRAYAGG(JSON_OBJECT(
-				'id', s.id, 'total', s.total,
-                'idUsuario', s.idUsuario,
-                'usuario', u.usuario,
-                'idBanca', s.idBanca,
-                'codigo', b.codigo,
-                'banca', b.descripcion,
-                'descuentoPorcentaje', s.descuentoPorcentaje,
-                'descuentoMonto', s.descuentoMonto,
-                'hayDescuento', s.hayDescuento,
-                'subTotal', s.subTotal,
-                'idTicket', s.idTicket,
-                'ticket', t.id,
-                'codigoBarra', t.codigoBarra,
-                'codigoQr', TO_BASE64('t.codigoBarra'),
-                'status', s.status,
-                'created_at', s.created_at,
-                'pagado', s.pagado,
-                'montoPagado', (select sum(premio) from salesdetails where pagado = 1 and idVenta = s.id),
-                'premio', (select sum(premio) from salesdetails where idVenta = s.id),
-                'montoAPagar', (select sum(premio) from salesdetails where pagado = 0 and idVenta = s.id),
-                'montoAPagar', ca.razon,
-                'usuarioCancelacion', JSON_OBJECT('id', uc.id, 'usuario', uc.usuario),
-                'fechaCancelacion', ca.created_at,
-                'loterias', (select JSON_OBJECT('id', id, 'descripcion', descripcion, 'abreviatura', abreviatura) from lotteries where id in(select distinct idLoteria from salesdetails where idVenta = s.id)),
-                'jugadas', (select JSON_OBJECT('id', sd.id, 'idVenta', sd.idVenta, 'jugada', sd.jugada, 'idLoteria', sd.idLoteria, 'idSorteo', sd.idSorteo, 'monto', sd.monto, 'premio', sd.premio, 'pagado', sd.pagado, 'status', sd.status, 'sorteo', JSON_OBJECT('id', d.id, 'descripcion', d.descripcion), 'pagadoPor', u.usuario, 'fechaPagado', lo.created_at) from salesdetails sd inner join draws d on sd.idSorteo = d.id left join logs lo on lo.idRegistroTablaAccion = sd.id left join users u on u.id = lo.idUsuario where sd.idVenta = s.id and lo.tabla = 'salesdetails'),
-                'fecha', DATE_FORMAT(s.created_at, "%r"),
-                'usuario', u.usuario
-			)) as ventas from sales s
-            inner join users u on u.id = s.idUsuario 
-            inner join branches b on b.id = s.idBanca
-            inner join tickets t on t.id = s.idTicket
-            left join cancellations ca on ca.idTicket = s.idTicket
-            left join users uc on uc.id = ca.idUsuario
-            where date(s.created_at) = date(now()) and s.status not in(0, 5) ;
-            
-            
-            
-            select JSON_OBJECT('id', id, 'descripcion', descripcion) from lotteries where id in(select distinct idLoteria from salesdetails where idVenta = 1)
-            
-            declare wday int;
-           set wday =  weekday('2019-09-9');
-           -- Convert wday to wday laravel
-           set wday = wday + 1;
-           if wday = 7 then
-			wday = 0;
-            end if;
-            
-            select hour('2019-09-12 15:20:00')
-            select DATE_FORMAT('2019-09-12 15:20:00','%H:%i:%s')
-           select * from day_lottery
-            (select u.usuario from logs lo on lo.idRegistroTablaAccion = sd.id inner join users u on u.id = lo.idUsuario where lo.tabla = 'salesdetails' and lo.idRegistroTablaAccion = sd.id
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-             select JSON_ARRAYAGG(JSON_OBJECT(
-				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura
-			)) from lotteries l
-            inner join day_lottery dl on dl.idLoteria = l.id
-            inner join days d on d.id = dl.idDia
-            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = 4 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc;
-            
-            
-            select date('14:00')
-            select DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', '14:00'),'%H:%i:%s')
-				select concat(date(now()), ' ', 'hey')
-                
-                
-                
-                select JSON_ARRAYAGG(JSON_OBJECT('id', id)) as loterias2 from lotteries order by JSON_EXTRACT(loterias2, "$.id") desc
-			
-            
-            set @j = AES_ENCRYPT('mi nombre es jean', 'hola');
-            select @j as encriptado;
-            select CAST(AES_DECRYPT(@j, 'hola') AS CHAR(50)) as desencriptado;
-            
-            SELECT AES_DECRYPT('text', UNHEX(SHA2('My secret passphrase',512)));
