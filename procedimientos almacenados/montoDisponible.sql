@@ -1,6 +1,7 @@
 use loterias;
-DELIMITER $$
 DROP FUNCTION IF EXISTS `montoDisponible`;
+DELIMITER $$
+
 CREATE FUNCTION montoDisponible(jugada varchar(8), idLoteria int, idBanca int) RETURNS DECIMAL(10,2)
      READS SQL DATA
 DETERMINISTIC
@@ -29,10 +30,10 @@ BEGIN
                 if length(jugada) = 2 then
 					set idSorteo = 1;
                 elseif length(jugada) = 3 then
-					select id from draws where descripcion = 'Pick 3 Straight' COLLATE utf8mb4_unicode_ci into idSorteo;
+					select id from draws where descripcion = 'Pick 3 Straight' into idSorteo;
 				elseif length(jugada) = 4 then
 					if instr(jugada, '+') = 4 then
-						select id from draws where descripcion = 'Pick 3 Box' COLLATE utf8mb4_unicode_ci into idSorteo;
+						select id from draws where descripcion = 'Pick 3 Box' into idSorteo;
 					else 
 						-- Validamos de que la loteria tenga el sorteo super pale y que el drawsrealations sea mayor que 1
 						if exists(select d.id from draws d inner join draw_lottery dl on dl.idSorteo = d.id where dl.idLoteria = idLoteria and d.descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci) and (select count(id) from drawsrelations where idLoteriaPertenece = idLoteria) > 1
@@ -44,9 +45,9 @@ BEGIN
 					end if;
 				elseif length(jugada) = 5 then
 					if instr(jugada, '+') = 5 then
-						select id from draws where descripcion = 'Pick 4 Box' COLLATE utf8mb4_unicode_ci into idSorteo;
+						select id from draws where descripcion = 'Pick 4 Box'  into idSorteo;
 					elseif instr(jugada, '-') = 5 then
-						select id from draws where descripcion = 'Pick 4 Straight' COLLATE utf8mb4_unicode_ci into idSorteo;
+						select id from draws where descripcion = 'Pick 4 Straight' into idSorteo;
 					end if;
 				elseif length(jugada) = 6 then
 					set idSorteo = 3;
@@ -93,4 +94,4 @@ END$$
 DELIMITER $$
 
 
--- select montoDisponible("1723-", 1, 11)
+-- select montoDisponible("17", 11, 11)
