@@ -14,6 +14,7 @@ BEGIN
 	declare errores int; declare total_ventas int; declare total_jugadas int; declare wday int;
     declare mensaje varchar(100);
     declare ventas LONGTEXT;
+    declare venta LONGTEXT;
     declare bancas LONGTEXT;
     declare loterias LONGTEXT;
     declare caracteristicasGenerales varchar(200);
@@ -178,7 +179,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				elseif length(@jugada) = 5 then
 					if instr(@jugada, '+') = 5 then
 						select id from draws where descripcion = 'Pick 4 Box' COLLATE utf8mb4_unicode_ci into @idSorteo;
-					elseif nstr(@jugada, '-') = 5 then
+					elseif instr(@jugada, '-') = 5 then
 						select id from draws where descripcion = 'Pick 4 Straight' COLLATE utf8mb4_unicode_ci into @idSorteo;
 					end if;
 				elseif length(@jugada) = 6 then
@@ -245,15 +246,15 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					-- primero quitarUltimoCaracter
 			if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
 				then
-					set @jugada = substring(@a, 1, length(@a) - 1);
+					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
 				end if;
 				
 				set @idDia = (select id from days where days.wday = wday);
 				set @montoDisponible = 0;
-				set @montoDisponible = (select monto from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo);
+				set @montoDisponible = (select monto from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada COLLATE utf8mb4_unicode_ci and s.idSorteo = @idSorteo);
                 if @montoDisponible is null 
 				then
-					set @montoDisponible = (select monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
+					set @montoDisponible = (select monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = @idSorteo and b.status = 1);
                     if @montoDisponible is null 
 					then
 						set @montoDisponible = (select monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo);
@@ -335,7 +336,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				elseif length(@jugada) = 5 then
 					if instr(@jugada, '+') = 5 then
 						select id, descripcion from draws where descripcion = 'Pick 4 Box' COLLATE utf8mb4_unicode_ci into @idSorteo, @sorteo;
-					elseif nstr(@jugada, '-') = 5 then
+					elseif instr(@jugada, '-') = 5 then
 						select id, descripcion from draws where descripcion = 'Pick 4 Straight' COLLATE utf8mb4_unicode_ci into @idSorteo, @sorteo;
 					end if;
 				elseif length(@jugada) = 6 then
@@ -350,7 +351,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
                 /****************** quitarUltimoCaracter *******************/
                 if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
 				then
-					set @jugada = substring(@a, 1, length(@a) - 1);
+					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
 				end if;
 				/******** END QUITAR ULTIMO CARACTER ******************/
 				
@@ -360,13 +361,13 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo;
                 else
 					/************* OBTENEMOS EL STOCK DE LA TABLA BLOQUEOS JUGADAS *************/
-					set @montoBloqueo = (select monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
+					set @montoBloqueo = (select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
 					if @montoBloqueo is not null then
-						insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto);
+						insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now());
                     else
 						/**************** OBTENEMOS EL STOCK DE LA TABLA BLOCKLOTTERIES *******/
-						set @montoBloqueo = (select monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo);
-                        insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto);
+						set @montoBloqueo = (select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo);
+                        insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, now(), now());
                     end if;
                 end if;
 				/************ END INSERTAR BLOQUEO O ACTUALIZAR ***************/
@@ -390,7 +391,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					set @comision = (JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.pick4Box'))) / 100) * @monto;
                 end if;
                 
-                select @sorteo, @monto, @comision, JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo')));
+                -- select @sorteo, @monto, @comision, JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo')));
                 insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, now(), now()); 
 			end if;
             /************** END IDLOTERIA = IDLOTERIAJUGADAS ***************/
@@ -455,8 +456,48 @@ select JSON_ARRAYAGG(JSON_OBJECT(
             left join cancellations ca on ca.idTicket = s.idTicket
             left join users uc on uc.id = ca.idUsuario
             where date(s.created_at) = date(now()) and s.status not in(0, 5) and s.idBanca = idBanca into ventas;
+            
+            
+            
+            select JSON_ARRAYAGG(JSON_OBJECT(
+				'id', s.id, 'total', s.total,
+                'idUsuario', s.idUsuario,
+                'usuario', u.usuario,
+                'idBanca', s.idBanca,
+                'codigo', b.codigo,
+                'banca', b.descripcion,
+                'descuentoPorcentaje', s.descuentoPorcentaje,
+                'descuentoMonto', s.descuentoMonto,
+                'hayDescuento', s.hayDescuento,
+                'subTotal', s.subTotal,
+                'idTicket', s.idTicket,
+                'ticket', t.id,
+                'codigoBarra', t.codigoBarra,
+                'codigoQr', TO_BASE64('t.codigoBarra'),
+                'status', s.status,
+                'created_at', s.created_at,
+                'pagado', s.pagado,
+                'montoPagado', (select sum(premio) from salesdetails where pagado = 1 and idVenta = s.id),
+                'premio', (select sum(premio) from salesdetails where idVenta = s.id),
+                'montoAPagar', (select sum(premio) from salesdetails where pagado = 0 and idVenta = s.id),
+                'montoAPagar', ca.razon,
+                'usuarioCancelacion', JSON_OBJECT('id', uc.id, 'usuario', uc.usuario),
+                'fechaCancelacion', ca.created_at,
+                'loterias', (select JSON_ARRAYAGG(JSON_OBJECT('id', lotteries.id, 'descripcion', lotteries.descripcion, 'abreviatura', lotteries.abreviatura)) from lotteries where id in(select distinct salesdetails.idLoteria from salesdetails where salesdetails.idVenta = s.id)),
+                'jugadas', (select JSON_ARRAYAGG(JSON_OBJECT('id', sd.id, 'idVenta', sd.idVenta, 'jugada', sd.jugada, 'idLoteria', sd.idLoteria, 'idSorteo', sd.idSorteo, 'monto', sd.monto, 'premio', sd.premio, 'pagado', sd.pagado, 'status', sd.status, 'sorteo', JSON_OBJECT('id', d.id, 'descripcion', d.descripcion), 'fechaPagado', (select created_at from logs where tabla = 'salesdetails' and idRegistroTablaAccion = sd.id) , 'pagadoPor', (select us.usuario from logs lo inner join users us on us.id = lo.idUsuario where lo.idRegistroTablaAccion = sd.id and lo.tabla = 'salesdetails'))) from salesdetails sd inner join draws d on sd.idSorteo = d.id where sd.idVenta = s.id),
+                'fecha', DATE_FORMAT(s.created_at, "%r"),
+                'usuario', u.usuario,
+                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4),
+                'usuarioObject', JSON_OBJECT('id', u.id, 'nombres', u.nombres, 'usuario', u.usuario)
+			)) as ventas from sales s
+            inner join users u on u.id = s.idUsuario 
+            inner join branches b on b.id = s.idBanca
+            inner join tickets t on t.id = s.idTicket
+            left join cancellations ca on ca.idTicket = s.idTicket
+            left join users uc on uc.id = ca.idUsuario
+            where s.id = idVenta and s.idBanca = idBanca into venta;
 	
-			select sum(total) from sales where date(created_at) = date(now()) and status not in(0, 5) and idBanca = idBanca into total_ventas;
+			select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = idBanca into total_ventas;
             select count(jugada) from salesdetails where date(created_at) = date(now()) and status not in(0, 5) and idBanca = idBanca into total_jugadas;
 
 	
@@ -488,8 +529,8 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'loterias', (select JSON_ARRAYAGG(JSON_OBJECT('id', l.id, 'descripcion', l.descripcion)) from lotteries l inner join branches_lotteries bl on l.id = bl.idLoteria where bl.idBanca = b.id),
                 'comisiones', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'idBanca', idBanca, 'idLoteria', idLoteria, 'directo', directo, 'pale', pale, 'tripleta', tripleta, 'superPale', superPale, 'pick3Straight', pick3Straight, 'pick3Box', pick3Box, 'pick4Straight', pick4Straight, 'pick4Box', pick4Box, 'created_at', created_at)) from commissions where idBanca = b.id),
                 'pagosCombinaciones', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'idBanca', idBanca, 'idLoteria', idLoteria, 'primera', primera, 'segunda', segunda, 'tercera', tercera, 'primeraSegunda', primeraSegunda, 'primeraTercera', primeraTercera, 'segundaTercera', segundaTercera, 'tresNumeros', tresNumeros, 'dosNumeros', dosNumeros, 'primerPago', primerPago, 'pick3TodosEnSecuencia', pick3TodosEnSecuencia, 'pick33Way', pick33Way, 'pick36Way', pick36Way, 'pick4TodosEnSecuencia', pick4TodosEnSecuencia, 'pick44Way', pick44Way, 'pick46Way', pick46Way, 'pick412Way', pick412Way, 'pick424Way', pick424Way, 'created_at', created_at)) from payscombinations where idBanca = b.id),
-                'ventasDelDia', (select sum(total) from sales where date(created_at) = date(now()) and status not in(0, 5) and idBanca = b.id),
-                'ticketsDelDia', (select count(id) from sales where date(created_at) = date(now()) and status not in(0, 5) and idBanca = b.id)
+                'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
+                'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
 			)) as bancas from branches b
             inner join users u on u.id = b.idUsuario into bancas;
             
@@ -538,18 +579,19 @@ select JSON_ARRAYAGG(JSON_OBJECT(
     
     
     -- 				CREAR IDVENTA TEMPORAL 
+		set idVentaHash = null;
 		select max(id) from sales into siguienteIdVenta;
         if siguienteIdVenta is null then
 			set siguienteIdVenta = 0;
 		end if;
 		set siguienteIdVenta = siguienteIdVenta + 1;
         
-        select idBanca from idventatemporals where idVenta = siguienteIdVenta into idBancaIdVentaTemporal;
+        select idventatemporals.idBanca from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idBancaIdVentaTemporal;
         if idBancaIdVentaTemporal is not null then
 			if idBanca = idBancaIdVentaTemporal then
-				 select idventatemporals.idVentaHash from idventatemporals where idVenta = siguienteIdVenta into idVentaHash;
+				 select idventatemporals.idVentaHash from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idVentaHash;
             else 
-				select max(id) from idventatemporals into siguienteIdVenta;
+				select max(idventatemporals.idVenta) from idventatemporals into siguienteIdVenta;
                 if siguienteIdVenta is null then
 					set siguienteIdVenta = 0;
 				end if;
@@ -558,13 +600,19 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 		end if;
         
         if idVentaHash is null then
-			set idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
+			set @idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
+           -- AES_ENCRYPT retorna BLOB entonces lo convertimos a hex
+           set @idVentaHash = HEX(@idVentaHash);
+           set idVentaHash = @idVentaHash;
+           -- para desencriptar le quitamos el HEX con la funcion UNHEX  
+           -- select CAST(AES_DECRYPT(UNHEX(@j), 'hola') AS CHAR(50)) as desencriptado;
 			-- select CAST(AES_DECRYPT(@j, 'Sistema de loteria jean y valentin') AS CHAR(50)) as desencriptado;
-			insert into idventatemporals(idBanca, idVenta, idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
+            -- select 'dentro insert idVentaHash';
+			 insert into idventatemporals(idventatemporals.idBanca, idventatemporals.idVenta, idventatemporals.idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
 		end if;
          
 	if @errores = 0 then
-		select  0 as errores, 'Se ha guardado correctamente' as mensaje, ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
+		select  0 as errores, 'Se ha guardado correctamente' as mensaje, venta, ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
    end if;
 END
  ;;

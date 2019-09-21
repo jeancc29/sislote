@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Blocksplays;
 use Request;
 use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
 
 
 use Faker\Generator as Faker;
@@ -84,6 +85,10 @@ class BlocksplaysController extends Controller
             $fechaDesde = getdate(strtotime($datos['fechaDesde']));
             $fechaHasta = getdate(strtotime($datos['fechaHasta']));
             $fecha = getdate();
+
+            $fechaDesdeCarbon = new Carbon($datos['fechaDesde']);
+            $fechaHastaCarbon = new Carbon($datos['fechaHasta']);
+            $fechaActualCarbon = Carbon::now();
     
             $loterias = Lotteries::whereStatus(1)->get();
             $bancas = Branches::whereStatus(1)->get();
@@ -111,6 +116,28 @@ class BlocksplaysController extends Controller
                     if($bloqueo != null){
                         $bloqueo['monto'] = $datos['monto'];
                         $bloqueo->save();
+
+                        if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
+                        {
+                            $stocksJugadasDelDiaActual = Stock::where(
+                                [
+                                    'idBanca' => $banca['id'], 
+                                    'idLoteria' => $l['id'], 
+                                    'jugada' => $datos['jugada'],
+                                    'idSorteo' => $datos['idSorteo']
+                                ])
+                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
+                                ->get();
+
+                                foreach($stocksJugadasDelDiaActual as $s)
+                                {
+                                    $montoVendido = $s['montoInicial'] - $s['monto'];
+                                    $s['montoInicial'] = $datos['monto'];
+                                    $s['monto'] = $datos['monto'] - $montoVendido;
+                                    $s['esBloqueoJugada'] = 1;
+                                    $s->save();
+                                }
+                        }
                     }else{
                         Blocksplays::create([
                             'idBanca' => $banca['id'],
@@ -124,6 +151,28 @@ class BlocksplaysController extends Controller
                             'idUsuario' => $datos['idUsuario'],
                             'status' => 1
                         ]);
+
+                        if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
+                        {
+                            $stocksJugadasDelDiaActual = Stock::where(
+                                [
+                                    'idBanca' => $banca['id'], 
+                                    'idLoteria' => $l['id'], 
+                                    'jugada' => $datos['jugada'],
+                                    'idSorteo' => $datos['idSorteo']
+                                ])
+                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
+                                ->get();
+
+                                foreach($stocksJugadasDelDiaActual as $s)
+                                {
+                                    $montoVendido = $s['montoInicial'] - $s['monto'];
+                                    $s['montoInicial'] = $datos['monto'];
+                                    $s['monto'] = $datos['monto'] - $montoVendido;
+                                    $s['esBloqueoJugada'] = 1;
+                                    $s->save();
+                                }
+                        }
                     }
                    
           

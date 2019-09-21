@@ -497,6 +497,10 @@ myApp
                 }
             }
 
+            if(helperService.empty($scope.datos.bloqueoJugada.monto, 'number') == true){
+                alert("El campo monto no puede estar vacio y ser numerico")
+                    return;
+            }
 
             $scope.datos.bloqueoJugada.idUsuario = $scope.datos.idUsuario;
             $scope.datos.bloqueoJugada.idSorteo = $scope.datos.selectedSorteo.id;

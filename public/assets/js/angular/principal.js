@@ -189,7 +189,7 @@ myApp
                     return;
                 }
                 
-console.log(response)
+
                 $scope.datos.idVenta = response.data.idVenta;
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
@@ -198,6 +198,8 @@ console.log(response)
                 // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
                 $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
                 $scope.datos.idBanca = response.data.idBanca;
+
+                
 
                 $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
                 $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];

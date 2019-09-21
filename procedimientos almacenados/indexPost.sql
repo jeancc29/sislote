@@ -113,8 +113,8 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'loterias', (select JSON_ARRAYAGG(JSON_OBJECT('id', l.id, 'descripcion', l.descripcion)) from lotteries l inner join branches_lotteries bl on l.id = bl.idLoteria where bl.idBanca = b.id),
                 'comisiones', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'idBanca', idBanca, 'idLoteria', idLoteria, 'directo', directo, 'pale', pale, 'tripleta', tripleta, 'superPale', superPale, 'pick3Straight', pick3Straight, 'pick3Box', pick3Box, 'pick4Straight', pick4Straight, 'pick4Box', pick4Box, 'created_at', created_at)) from commissions where idBanca = b.id),
                 'pagosCombinaciones', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'idBanca', idBanca, 'idLoteria', idLoteria, 'primera', primera, 'segunda', segunda, 'tercera', tercera, 'primeraSegunda', primeraSegunda, 'primeraTercera', primeraTercera, 'segundaTercera', segundaTercera, 'tresNumeros', tresNumeros, 'dosNumeros', dosNumeros, 'primerPago', primerPago, 'pick3TodosEnSecuencia', pick3TodosEnSecuencia, 'pick33Way', pick33Way, 'pick36Way', pick36Way, 'pick4TodosEnSecuencia', pick4TodosEnSecuencia, 'pick44Way', pick44Way, 'pick46Way', pick46Way, 'pick412Way', pick412Way, 'pick424Way', pick424Way, 'created_at', created_at)) from payscombinations where idBanca = b.id),
-                'ventasDelDia', (select sum(total) from sales where date(created_at) = date(now()) and status not in(0, 5) and idBanca = b.id),
-                'ticketsDelDia', (select count(id) from sales where date(created_at) = date(now()) and status not in(0, 5) and idBanca = b.id)
+                'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
+                'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
 			)) as bancas from branches b
             inner join users u on u.id = b.idUsuario into bancas;
             
@@ -174,7 +174,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 			if idBanca = idBancaIdVentaTemporal then
 				 select idventatemporals.idVentaHash from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idVentaHash;
             else 
-				select max(id) from idventatemporals into siguienteIdVenta;
+				select max(idventatemporals.idVenta) from idventatemporals into siguienteIdVenta;
                 if siguienteIdVenta is null then
 					set siguienteIdVenta = 0;
 				end if;
@@ -182,19 +182,19 @@ select JSON_ARRAYAGG(JSON_OBJECT(
             end if;
 		end if;
         
-       -- if idVentaHash is null then
-			-- set idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
+        if idVentaHash is null then
+			set @idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
+           -- AES_ENCRYPT retorna BLOB entonces lo convertimos a hex
+           set @idVentaHash = HEX(@idVentaHash);
+           set idVentaHash = @idVentaHash;
+           -- para desencriptar le quitamos el HEX con la funcion UNHEX  
+           -- select CAST(AES_DECRYPT(UNHEX(@j), 'hola') AS CHAR(50)) as desencriptado;
 			-- select CAST(AES_DECRYPT(@j, 'Sistema de loteria jean y valentin') AS CHAR(50)) as desencriptado;
             -- select 'dentro insert idVentaHash';
-			-- insert into idventatemporals(idventatemporals.idBanca, idventatemporals.idVenta, idventatemporals.idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
-			
-        -- end if;
+			 insert into idventatemporals(idventatemporals.idBanca, idventatemporals.idVenta, idventatemporals.idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
+		end if;
           
-          if idVentaHash is null then
-          set @culo = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
-          
-          end if;
-    select ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, @culo as idVenta;
+    select ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
    
 END
  ;;

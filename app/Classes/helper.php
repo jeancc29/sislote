@@ -1821,4 +1821,8 @@ class Helper{
         return DB::select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
     }
 
+    public static function montoDisponibleFuncion($jugada, $idLoteria, $idBanca){
+        return DB::select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
+    }
+
 }

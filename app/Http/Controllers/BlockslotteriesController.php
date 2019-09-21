@@ -7,6 +7,7 @@ use Request;
 
 use Illuminate\Support\Facades\Route; 
 use Illuminate\Support\Facades\Response;
+use Carbon\Carbon;
 
 
 use Faker\Generator as Faker;
@@ -153,8 +154,8 @@ class BlockslotteriesController extends Controller
             });
            
         
-          
-    
+          $fecha = getdate();
+          $fechaActualCarbon = Carbon::now();
     
     foreach($datos['bancas'] as $banca):
         foreach($loterias_seleccionadas as $l):
@@ -183,6 +184,30 @@ class BlockslotteriesController extends Controller
                     if($bloqueo != null){
                         $bloqueo['monto'] = $s['monto'];
                         $bloqueo->save();
+
+                        
+                            $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
+                            if($dia != null){
+                                $stocksJugadasDelDiaActual = Stock::where(
+                                [
+                                    'idBanca' => $banca['id'], 
+                                    'idLoteria' => $l['id'], 
+                                    'idSorteo' => $s['id'],
+                                    'esBloqueoJugada' => 0
+                                ])
+                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaActualCarbon->toDateString() . ' 23:50:00'))
+                                ->get();
+
+                                foreach($stocksJugadasDelDiaActual as $sj)
+                                {
+                                    $montoVendido = $sj['montoInicial'] - $sj['monto'];
+                                    $sj['montoInicial'] = $s['monto'];
+                                    $sj['monto'] = $s['monto'] - $montoVendido;
+                                    $sj->save();
+                                }
+                            }
+                            
+                        
                     }else{
                         Blockslotteries::create([
                             'idBanca' => $banca['id'],
@@ -191,6 +216,26 @@ class BlockslotteriesController extends Controller
                             'idDia' => $d['id'],
                             'monto' => $s['monto']
                         ]);
+
+                        if($dia != null){
+                            $stocksJugadasDelDiaActual = Stock::where(
+                            [
+                                'idBanca' => $banca['id'], 
+                                'idLoteria' => $l['id'], 
+                                'idSorteo' => $s['id'],
+                                'esBloqueoJugada' => 0
+                            ])
+                            ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaActualCarbon->toDateString() . ' 23:50:00'))
+                            ->get();
+
+                            foreach($stocksJugadasDelDiaActual as $sj)
+                            {
+                                $montoVendido = $sj['montoInicial'] - $sj['monto'];
+                                $sj['montoInicial'] = $s['monto'];
+                                $sj['monto'] = $s['monto'] - $montoVendido;
+                                $sj->save();
+                            }
+                        }
                     }
                 endforeach; //End foreach dias
             endforeach;//End foreach sorteos

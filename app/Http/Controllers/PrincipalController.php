@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Response; 
 use Carbon\Carbon;
 use App\Classes\Helper;
-use App\Classes\TicketPrintClass;
+use App\Classes\TicketPrintClass; 
+use App\Classes\TicketToHtmlClass; 
 
 
 // use Faker\Generator as Faker;
@@ -109,7 +110,7 @@ class PrincipalController extends Controller
         
     }
 
-    public function indexPost()
+    public function indexPostAntiguo()
     {
         $idBanca = 0;
         
@@ -195,7 +196,7 @@ class PrincipalController extends Controller
         // ], 201);
     }
 
-    public function indexPostNuevo()
+    public function indexPost()
     {
         $idBanca = 0;
         
@@ -811,7 +812,7 @@ class PrincipalController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function storeNuevo(Request $request)
+    public function store(Request $request)
     {
         $datos = request()->validate([
             'datos.idUsuario' => 'required',
@@ -830,18 +831,22 @@ class PrincipalController extends Controller
         $data = Helper::guardarVenta($datos['idUsuario'], $datos['idBanca'], $datos['idVenta'], $datos['compartido'], $datos['descuentoMonto'], $datos['hayDescuento'], $datos['total'], json_encode($datos['jugadas']));
         
         // return Response::json([
-        //     'jugadas' => json_encode($datos['jugadas'])
+        //     'jugadas' => $data
         // ], 201);
 
         if($data[0]->errores == 1){
             return Response::json([
                 'errores' => 1,
-                'mensaje' => $data[0]->mensaje,
-                'idVenta' => $datos['idVenta']
+                'mensaje' => $data[0]->mensaje
             ], 201);
         }
 
+        $img = new TicketToHtmlClass($data);
+
+        
          return Response::json([
+            'errores' => 0,
+            'mensaje' => $data[0]->mensaje,
             'idVenta' => $data[0]->idVentaHash,
             'loterias' => ($data[0]->loterias != null) ? json_decode($data[0]->loterias) : [],
             'caracteristicasGenerales' =>  ($data[0]->caracteristicasGenerales != null) ? json_decode($data[0]->caracteristicasGenerales) : [],
@@ -850,12 +855,13 @@ class PrincipalController extends Controller
             'ventas' => ($data[0]->ventas != null) ? json_decode($data[0]->ventas) : [],
             'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
             'idUsuario' => $datos['idUsuario'],
-            'idBanca' => $data[0]->idBanca
+            'idBanca' => $data[0]->idBanca,
+            'img' => $img->generate()
         ], 201);
     }
 
 
-    public function store(Request $request)
+    public function storeViejo(Request $request)
     {
         $datos = request()->validate([
             'datos.idUsuario' => 'required',
@@ -1153,7 +1159,8 @@ class PrincipalController extends Controller
                             'idSorteo' => $idSorteo,
                             'jugada' => $d['jugada'],
                             'montoInicial' => $stock['monto'],
-                            'monto' => $stock['monto'] - $d['monto']
+                            'monto' => $stock['monto'] - $d['monto'],
+                            'esBloqueoJugada' => 1
                         ]);
                     }else{
                         $stock = Blockslotteries::where([
@@ -1233,6 +1240,28 @@ class PrincipalController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function montodisponible(Request $request)
+    {
+        $datos = request()->validate([
+            'datos.jugada' => 'required|min:2|max:6',
+            'datos.idLoteria' => 'required',
+            'datos.idBanca' => 'required'
+        ])['datos'];
+    
+       
+       
+
+    $bloqueo = (new Helper)->montoDisponibleFuncion($datos['jugada'], $datos['idLoteria'], $datos['idBanca']);
+    
+       
+    
+       if($bloqueo == null) $bloqueo = 0;
+    
+        return Response::json([
+            'monto' => $bloqueo[0]->monto
+        ], 201);
+    }
+
+    public function montodisponibleViejo(Request $request)
     {
         $datos = request()->validate([
             'datos.jugada' => 'required|min:2|max:6',
