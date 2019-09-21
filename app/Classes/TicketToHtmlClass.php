@@ -188,10 +188,10 @@ class TicketToHtmlClass{
         // $data = base64_encode($img);
 
         /*************** RUTA PC DEBUG **************************/
-        $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
-        $file = fopen($output_file, "wb");
-        fwrite($file, $this->html);
-        fclose($file);
+        // $output_file = public_path() . "\\assets\\ticket\\" . $this->venta->idTicket . ".html";
+        // $file = fopen($output_file, "wb");
+        // fwrite($file, $this->html);
+        // fclose($file);
 
         // ob_start();
         // $command = "C:\\loterias\\lote\\public\\assets\\ticket\\wkhtmltoimage --zoom 2.125 --width 314 ";
