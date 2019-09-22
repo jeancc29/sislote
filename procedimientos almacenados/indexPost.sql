@@ -206,5 +206,5 @@ END
  ;;
 delimiter ;
 
--- call indexPost(1);
+-- call indexPost(1, 0);
 
