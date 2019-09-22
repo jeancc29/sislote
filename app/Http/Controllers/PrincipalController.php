@@ -831,7 +831,7 @@ class PrincipalController extends Controller
             'datos.total' => 'required',
             'datos.subTotal' => 'required',
     
-            'datos.loterias' => 'required',
+            'datos.loterias' => '',
             'datos.jugadas' => 'required',
         ])['datos'];
 

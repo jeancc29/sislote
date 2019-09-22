@@ -194,13 +194,17 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					  -- VALIDAR DECIMALES DEL MONTO ES VALIDO
 				set @montoValido = false;
 				set @monto = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].monto'));
+                set @monto = JSON_UNQUOTE(@monto);
 				if instr(@monto, '.') != 0 then
-					set @sorteo = (select descripcion from draws where idSorteo = @idSorteo);
+					set @sorteo = (select draws.descripcion from draws where draws.id = @idSorteo);
 					if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 3 Straight' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
 					then
-						if @monto = '0.50' then
-							set @montoValido = true;
-						end if;
+					-- si el monto redondeado es igual al monto normal eso quiere decir que le monto tiene cero como decimales por lo tanto es correcto, ejemplo 1 == 1.00
+						
+							if @monto = 0.50 or round(@monto) = @monto then
+								set @montoValido = true;
+							end if;
+						
 					end if;
 				else
 					set @montoValido = true;
@@ -208,7 +212,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				
 				if @montoValido = false then
 					set @errores = 1;
-					select 1 as errores, 'Error: El monto de la jugada ' + @jugada + ' es incorrecto' as mensaje;
+					select 1 as errores, concat('Error: El monto de la jugada ' , @jugada , ' es incorrecto: ', @monto, ' ', round(@monto), ' = ', round(@monto) = @monto) as mensaje;
 				end if;
 			-- END MONTO VALIDO
 			
@@ -430,7 +434,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'usuario', u.usuario,
                 'idBanca', s.idBanca,
                 'codigo', b.codigo,
-                'banca', b.descripcion,
+                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4),
                 'descuentoPorcentaje', s.descuentoPorcentaje,
                 'descuentoMonto', s.descuentoMonto,
                 'hayDescuento', s.hayDescuento,

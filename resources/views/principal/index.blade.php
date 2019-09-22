@@ -965,6 +965,10 @@
             max-width: 90% !important;
         }
 
+        .modal-lg-normal {
+            max-width: 60% !important;
+        }
+
         
     </style>
 
@@ -1163,7 +1167,7 @@
     <!-- MODAL DUPLICAR TICKET AVANZADO -->
 
     <div id="modal-duplicar-avanzado" class="modal fade modal-duplicar-avanzado" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg-normal">
             <div class="modal-content">
 
                  <div class="modal-header">

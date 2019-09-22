@@ -374,7 +374,7 @@ class AwardsController extends Controller
                     }
                     $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
                 }
-                else if($sorteo->descripcion == "Pale"){
+                else if($sorteo->descripcion == "Pale" || $sorteo->descripcion == "Super pale"){
                     if(!is_numeric($awardsClass->numerosGanadores)){
                         return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
                     }

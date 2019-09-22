@@ -600,7 +600,7 @@ myApp
                 $scope.jugada = null;
 
                 $scope.calcularTotal();
-                    
+                console.log('jugada_insertar:',$scope.datos.jugadas);
                 } // END IF PRINCIPAL
             
             
@@ -881,12 +881,12 @@ myApp
                     alert('No hay jugadas realizadas');
                     return;
                 }
-                if(Object.keys($scope.datos.loterias).length ==0)
-                {
-                    map = {9: false, 16: false};
-                    alert('Debe seleccionar una loteria');
-                    return;
-                }
+                // if(Object.keys($scope.datos.loterias).length ==0)
+                // {
+                //     map = {9: false, 16: false};
+                //     alert('Debe seleccionar una loteria');
+                //     return;
+                // }
 
                 $scope.datos.total = $scope.datos.monto_jugado;
                 $scope.datos.idBanca = $scope.datos.selectedBancas.id;
@@ -1217,9 +1217,7 @@ myApp
                 if(response.data.errores == 0){
                     $('#modal-duplicar').modal('toggle');
                     $('#modal-duplicar-avanzado').modal('toggle');
-                    $scope.datos.idVenta = 0;
-                    // $scope.datos.loterias = [];
-                    // $scope.datos.jugadas = [];
+
 
                     $scope.datos.duplicar.numeroticket = null;
                     $scope.datos.duplicar.optionsLoterias = helperService.copiarObjecto($scope.datos.optionsLoterias);
@@ -1236,7 +1234,7 @@ myApp
                         array[indice].selectedComboLoteria = $scope.datos.duplicar.optionsLoterias[0];
                     });
     
-                    console.log('duplicar loterias:', $scope.datos.duplicar.optionsLoterias);
+                    
 
                     $timeout(function() {
                         // anything you want can go here and will safely be run on the next digest.
@@ -1301,6 +1299,7 @@ myApp
             $scope.datos.duplicar.optionsLoterias = [];
             $scope.datos.duplicar.loterias = [];
             $scope.datos.duplicar.jugadas = [];
+            $scope.calcularTotal();
             $('#modal-duplicar-avanzado').modal('toggle');
             console.log('duplicarInsertar:', $scope.datos.jugadas);
         }

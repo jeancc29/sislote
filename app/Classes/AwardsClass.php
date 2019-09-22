@@ -366,6 +366,7 @@ class AwardsClass{
             $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
         }
 
+        
     }else{
         
         switch ($primerParDeNumeros) {
@@ -400,7 +401,7 @@ class AwardsClass{
             $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
         }
 
-        // return "1ra:" .$hayPremiadoEnPrimera." 2da:".$hayPremiadoEnSegunda;
+       
 
     }
 

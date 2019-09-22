@@ -85,15 +85,17 @@ class Prueba extends Command
         // $this->info("Awardsclasss2: " . Helper::loteriasOrdenadasPorHoraCierre($usuario2));
 
 
-        // $awardsClass = new AwardsClass(3);
-        // $awardsClass->fecha = "2019-09-05";
-        // $awardsClass->idUsuario = 1;
-        // $awardsClass->primera = "06";
-        // $awardsClass->segunda = "09";
-        // $awardsClass->tercera = "25";
-        // $awardsClass->pick3 = null;
-        // $awardsClass->pick4 = null;
-        // $awardsClass->numerosGanadores = "694925";
+        $awardsClass = new AwardsClass(5);
+        $awardsClass->fecha = "2019-09-05";
+        $awardsClass->idUsuario = 1;
+        $awardsClass->primera = "09";
+        $awardsClass->segunda = "19";
+        $awardsClass->tercera = "11";
+        $awardsClass->pick3 = null;
+        $awardsClass->pick4 = null;
+        $awardsClass->numerosGanadores = "694925";
+        $premio = $awardsClass->paleBuscarPremio(52, 5, "0919", "1", 4);
+        $this->info("1ra:" . $premio);
 
         // $sorteo = Draws::whereDescripcion("Super pale")->first();
         // $premio = $awardsClass->paleBuscarPremio(1, 1, "0609", "1", $sorteo->id);
@@ -104,7 +106,7 @@ class Prueba extends Command
 
         
         // $v = new BranchesResource(Branches::find(1));
-        $this->info("1ra:" . helper::premiosPorBanca(1));
+        //$this->info("1ra:" . helper::premiosPorBanca(1));
 
 
         // $awardsClass = new AwardsClass($l['id']);
