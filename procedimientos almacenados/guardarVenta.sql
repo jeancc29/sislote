@@ -1,3 +1,6 @@
+
+-- quitar COLLATE utf8mb4_unicode_ci del mysql del servidor linux de digitalocean porque eso no funciona ahi
+
 use loterias;
 DROP PROCEDURE IF EXISTS `guardarVenta`;
 delimiter ;;
@@ -435,7 +438,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'idTicket', s.idTicket,
                 'ticket', t.id,
                 'codigoBarra', t.codigoBarra,
-                'codigoQr', TO_BASE64('t.codigoBarra'),
+                'codigoQr', TO_BASE64(t.codigoBarra),
                 'status', s.status,
                 'created_at', s.created_at,
                 'pagado', s.pagado,
@@ -465,7 +468,6 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'usuario', u.usuario,
                 'idBanca', s.idBanca,
                 'codigo', b.codigo,
-                'banca', b.descripcion,
                 'descuentoPorcentaje', s.descuentoPorcentaje,
                 'descuentoMonto', s.descuentoMonto,
                 'hayDescuento', s.hayDescuento,
@@ -473,7 +475,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'idTicket', s.idTicket,
                 'ticket', t.id,
                 'codigoBarra', t.codigoBarra,
-                'codigoQr', TO_BASE64('t.codigoBarra'),
+                'codigoQr', TO_BASE64(t.codigoBarra),
                 'status', s.status,
                 'created_at', s.created_at,
                 'pagado', s.pagado,

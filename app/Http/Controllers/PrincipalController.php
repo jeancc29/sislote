@@ -856,7 +856,8 @@ class PrincipalController extends Controller
             'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
             'idUsuario' => $datos['idUsuario'],
             'idBanca' => $data[0]->idBanca,
-            'img' => $img->generate()
+            'img' => $img->generate(),
+            'venta' => ($data[0]->venta != null) ? json_decode($data[0]->venta)[0] : []
         ], 201);
     }
 
