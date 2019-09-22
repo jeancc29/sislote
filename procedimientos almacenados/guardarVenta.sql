@@ -204,7 +204,10 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 							if @monto = 0.50 or round(@monto) = @monto then
 								set @montoValido = true;
 							end if;
-						
+					else
+						if round(@monto) = @monto then
+								set @montoValido = true;
+							end if;
 					end if;
 				else
 					set @montoValido = true;
@@ -212,7 +215,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				
 				if @montoValido = false then
 					set @errores = 1;
-					select 1 as errores, concat('Error: El monto de la jugada ' , @jugada , ' es incorrecto: ', @monto, ' ', round(@monto), ' = ', round(@monto) = @monto) as mensaje;
+					select 1 as errores, concat('Error: El monto de la jugada ' , @jugada , ' es incorrecto') as mensaje;
 				end if;
 			-- END MONTO VALIDO
 			
