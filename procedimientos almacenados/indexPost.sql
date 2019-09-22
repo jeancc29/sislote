@@ -1,7 +1,7 @@
 use loterias;
 DROP PROCEDURE IF EXISTS `indexPost`;
 delimiter ;;
-CREATE PROCEDURE `indexPost` (IN pidUsuario varchar(30))
+CREATE PROCEDURE `indexPost` (IN pidUsuario varchar(30), pidBanca int)
 BEGIN
 -- , OUT psalida nvarchar(1000)
 	declare idBanca int; declare errores int; declare total_ventas int; declare total_jugadas int; declare wday int;
@@ -13,21 +13,27 @@ BEGIN
     declare siguienteIdVenta bigInt;
     declare idVentaHash varchar(200);
     declare idBancaIdVentaTemporal int;
+    
     	
 	DROP TEMPORARY TABLE IF EXISTS `TempTable`;
 	
     CREATE TEMPORARY TABLE TempTable (id int primary key auto_increment, loterias json not null); 
 
     
-    
-	select id from branches where idUsuario = pidUsuario and status = 1 into idBanca;
-	if idBanca is null
-    then
-		if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar como cualquier banca')
-			then
-				select id from branches where  status = 1 order by id asc limit 1 into idBanca;
-            end if;
+    if pidBanca != 0 then
+		set idBanca = pidBanca;
+	else
+		select id from branches where idUsuario = pidUsuario and status = 1 into idBanca;
+		if idBanca is null
+		then
+			if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar como cualquier banca')
+				then
+					select id from branches where  status = 1 order by id asc limit 1 into idBanca;
+				end if;
+		end if;
     end if;
+    
+	
     
   --   if idBanca is null then
 -- 		set psalida = json_objectagg('idBanca', idBanca);
@@ -134,14 +140,14 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
 				inner join days d on d.id = dl.idDia
-				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday order by dl.horaCierre asc;
+				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
 				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id
             inner join days d on d.id = dl.idDia
-            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
+            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
 		
         
         -- select JSON_ARRAYAGG(JSON_OBJECT(

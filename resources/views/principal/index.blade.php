@@ -1158,6 +1158,76 @@
 
 
 
+
+
+    <!-- MODAL DUPLICAR TICKET AVANZADO -->
+
+    <div id="modal-duplicar-avanzado" class="modal fade modal-duplicar-avanzado" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                 <div class="modal-header">
+                    <h3 class="modal-title" id="exampleModalLabel">Duplicar ticket</h3>
+                    <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                    </div> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                    
+
+                    <div class="row">
+                    <div class="col-12 text-center" ng-repeat="c in datos.duplicar.loterias">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold mt-2" style="color: black;">@{{c.descripcion}}</label>                              
+
+                                <div  class=" col-sm-8 col-9">
+                                <select 
+                                
+                                    ng-change="cbxTipoBloqueosJugadaChanged()"
+                                    ng-model="c.selectedComboLoteria"
+                                    ng-options="o.descripcion for o in datos.duplicar.optionsLoterias"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+
+                          <div class="form-group col-sm-3">
+                            <input ng-click="duplicarInsertar()" type="submit" class="btn btn-primary" value="Duplicar">   
+                        </div>
+                    </div>
+
+                   
+                    
+
+                    <div class="container">
+
+                        <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                        </div> -->
+                    </div>
+
+                </div> <!-- END MODAL-BODY -->
+                
+            </div> <!-- END MODAL-CONTENT-->
+        </div>
+    </div>
+
+    <!-- END MODAL DUPLICAR TICKET AVANZADO -->
+
+
+
+
+
     
     <!-- MODAL JUGADAS -->
    

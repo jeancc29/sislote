@@ -23,7 +23,7 @@ myApp
             "idVenta":0,
             "compartido":0,
         "idUsuario": 0,
-        "idBanca" : 1,
+        "idBanca" : 0,
         "codigoBarra":"barra29",
         "total": 0,
         "subTotal":0,
@@ -115,6 +115,7 @@ myApp
     $scope.bancasChanged = function(klk){
         // console.log('bancasChanged:', $scope.datos.optionsBancas);
         $scope.datos.selectedBancas = $scope.datos.optionsBancas.find(x => x.id == klk.id);
+        console.log('Bancas changed:', $scope.datos.selectedBancas);
     }
         $scope.inicializarDatos = function(response = null){
 
@@ -180,16 +181,21 @@ myApp
                 $scope.datos.jugadasReporte.optionsLoterias = [];
                 $scope.datos.jugadasReporte.selectedLoteria = {};
                 $scope.datos.optionsLoterias = [];
+                console.log('idBanca2:', $scope.datos.idBanca);
+                
                 $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
+                
 
-
+                console.log('idBanca2:', $scope.datos.idBanca);
+                
+                
                 if(response.data.errores == 1){
                     alert('Error: ' + response.data.mensaje);
                     return;
                 }
                 
-
+                
                 $scope.datos.idVenta = response.data.idVenta;
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
@@ -199,7 +205,7 @@ myApp
                 $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
                 $scope.datos.idBanca = response.data.idBanca;
 
-                
+                console.log('idBanca:', response.data );
 
                 $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
                 $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
@@ -426,6 +432,25 @@ myApp
             else
                 return 'otro';
           }
+
+          $scope.agregarGuionPorSorteo = function(jugada, sorteo){
+            var cadena = jugada;
+    
+             if(sorteo == "Pick 3 Box"){
+                cadena +='+';
+            }
+            else if(sorteo == "Pick 4 Straight"){
+                cadena +='-';
+            }
+            else if(sorteo == "Pick 4 Box"){
+                cadena +='+';
+            }
+    
+    
+    
+    
+            return cadena;
+        }
   
           $scope.jugada_insertar = function(evento, sinevento = false){
            
@@ -1023,7 +1048,7 @@ myApp
         }
 
 
-        $scope.duplicar = function(){
+        $scope.duplicarViejo = function(){
 
             if($scope.datos.duplicar.numeroticket == null || $scope.datos.duplicar.numeroticket == undefined)
             {
@@ -1114,6 +1139,118 @@ myApp
             });
         }
 
+
+
+        $scope.duplicar = function(){
+
+            if($scope.datos.duplicar.numeroticket == null || $scope.datos.duplicar.numeroticket == undefined)
+            {
+                alert('El numero de ticket no debe estar vacio');
+                return;
+            }
+
+            if(Number($scope.datos.duplicar.numeroticket) != $scope.datos.duplicar.numeroticket)
+            {
+                alert('El numero de ticket debe ser numerico');
+                return;
+            }
+
+            $scope.datos.duplicar.codigoBarra = $scope.datos.duplicar.numeroticket;
+
+            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': $scope.datos.duplicar})
+             .then(function(response){
+
+               
+                if(response.data.errores == 0){
+                    $('#modal-duplicar').modal('toggle');
+                    $('#modal-duplicar-avanzado').modal('toggle');
+                    $scope.datos.idVenta = 0;
+                    // $scope.datos.loterias = [];
+                    // $scope.datos.jugadas = [];
+
+                    $scope.datos.duplicar.numeroticket = null;
+                    $scope.datos.duplicar.optionsLoterias = helperService.copiarObjecto($scope.datos.optionsLoterias);
+                    $scope.datos.duplicar.loterias = response.data.loterias;
+                    $scope.datos.duplicar.jugadas = response.data.jugadas;
+                    
+                    $scope.datos.duplicar.optionsLoterias.unshift({'id' : 0, 'descripcion' : "No copiar"});
+                    $scope.datos.duplicar.optionsLoterias.unshift({'id' : -1, 'descripcion' : "No mover"});
+                    $scope.datos.duplicar.selectedLoteria = $scope.datos.duplicar.optionsLoterias[0];
+                    
+    
+                    
+                    $scope.datos.duplicar.loterias.forEach(function(valor, indice, array){
+                        array[indice].selectedComboLoteria = $scope.datos.duplicar.optionsLoterias[0];
+                    });
+    
+                    console.log('duplicar loterias:', $scope.datos.duplicar.optionsLoterias);
+
+                    $timeout(function() {
+                        // anything you want can go here and will safely be run on the next digest.
+                        ////Aqui se seleccionan las loterias
+                        
+                        $('.selectpicker').selectpicker("refresh");
+                      })
+                    
+                }
+
+                
+               
+
+            
+                
+               
+
+            });
+        }
+
+        $scope.duplicarInsertar = function(){
+            $scope.datos.duplicar.loterias.forEach(function(valor, indice, array){
+                $scope.datos.duplicar.jugadas.forEach(function(valorJugada, indiceJugada, arrayJugada){
+                    if(array[indice].id == arrayJugada[indiceJugada].idLoteria){
+                        if(array[indice].selectedComboLoteria.descripcion != "No copiar")
+                       {
+                        arrayJugada[indiceJugada].jugada = $scope.agregarGuionPorSorteo(arrayJugada[indiceJugada].jugada, arrayJugada[indiceJugada].sorteo);
+                           if(array[indice].selectedComboLoteria.descripcion == "No mover")
+                            {
+                                if($scope.datos.jugadas.find(x => (x.jugada == arrayJugada[indiceJugada].jugada && x.idLoteria == array[indice].id)) != undefined){        
+                                    if (confirm('La jugada ' + arrayJugada[indiceJugada].jugada +' existe en la loteria ' + array[indice].descripcion + ', Desea agregar?')) {
+                                        let idx = $scope.datos.jugadas.findIndex(x => (x.jugada == arrayJugada[indiceJugada].jugada && x.idLoteria == array[indice].id));
+                                        $scope.datos.jugadas[idx].monto = parseFloat($scope.datos.jugadas[idx].monto)+ parseFloat(arrayJugada[indiceJugada].monto);
+                                    }
+                                    
+                                }
+                                else{
+                                    $scope.datos.jugadas.push({'jugada':arrayJugada[indiceJugada].jugada, 'monto':arrayJugada[indiceJugada].monto, 
+                                                                'tam': arrayJugada[indiceJugada].jugada.length, 'idLoteria': array[indice].id,
+                                                                'descripcion':array[indice].descripcion, 'abreviatura' : array[indice].abreviatura});
+                                }
+                            }else
+                            {
+                                if($scope.datos.jugadas.find(x => (x.jugada == arrayJugada[indiceJugada].jugada && x.idLoteria == array[indice].selectedComboLoteria.id)) != undefined){        
+                                    if (confirm('La jugada ' + arrayJugada[indiceJugada].jugada +' existe en la loteria ' + array[indice].selectedComboLoteria.descripcion + ', Desea agregar?')) {
+                                        let idx = $scope.datos.jugadas.findIndex(x => (x.jugada == arrayJugada[indiceJugada].jugada && x.idLoteria == array[indice].selectedComboLoteria.id));
+                                        $scope.datos.jugadas[idx].monto = parseFloat($scope.datos.jugadas[idx].monto)+ parseFloat(arrayJugada[indiceJugada].monto);
+                                    }
+                                }
+                                else{
+                                    $scope.datos.jugadas.push({'jugada':arrayJugada[indiceJugada].jugada, 'monto':arrayJugada[indiceJugada].monto, 
+                                                                'tam': arrayJugada[indiceJugada].jugada.length, 'idLoteria': array[indice].selectedComboLoteria.id,
+                                                                'descripcion':array[indice].selectedComboLoteria.descripcion, 'abreviatura' : array[indice].selectedComboLoteria.abreviatura});
+                                }
+                            }
+                       }
+                    }
+                });
+            });
+
+            $scope.datos.duplicar.numeroticket = null;
+            $scope.datos.duplicar.optionsLoterias = [];
+            $scope.datos.duplicar.loterias = [];
+            $scope.datos.duplicar.jugadas = [];
+            $('#modal-duplicar-avanzado').modal('toggle');
+            console.log('duplicarInsertar:', $scope.datos.jugadas);
+        }
 
         $scope.buscar_jugadas = function(){
 

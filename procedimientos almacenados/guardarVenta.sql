@@ -552,14 +552,14 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
 				inner join days d on d.id = dl.idDia
-				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday order by dl.horaCierre asc;
+				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
 				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id
             inner join days d on d.id = dl.idDia
-            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
+            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
 		
         
         -- select JSON_ARRAYAGG(JSON_OBJECT(

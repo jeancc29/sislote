@@ -202,10 +202,16 @@ class PrincipalController extends Controller
         
 
         $datos = request()->validate([
-            'datos.idUsuario' => 'required'
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => ''
         ])['datos'];
 
-        $data = Helper::indexPost($datos['idUsuario']);
+        $idBanca = 0;
+        if(isset($datos['idBanca'])){
+            $idBanca = $datos['idBanca'];
+        }
+
+        $data = Helper::indexPost($datos['idUsuario'], $idBanca);
         
 
          return Response::json([
@@ -217,7 +223,8 @@ class PrincipalController extends Controller
             'ventas' => ($data[0]->ventas != null) ? json_decode($data[0]->ventas) : [],
             'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
             'idUsuario' => $datos['idUsuario'],
-            'idBanca' => $data[0]->idBanca
+            'idBanca' => $data[0]->idBanca,
+            'culo' => $idBanca
         ], 201);
     }
 

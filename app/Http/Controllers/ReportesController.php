@@ -138,7 +138,7 @@ class ReportesController extends Controller
                 return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                     'descuentos' => $descuentos, 
                     'premios' => $premios, 
-                    'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                    'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance + round($totalNeto, 2), 
                     'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
             });
 
@@ -182,7 +182,7 @@ class ReportesController extends Controller
             return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                 'descuentos' => $descuentos, 
                 'premios' => $premios, 
-                'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance + round($totalNeto, 2), 
                 'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
         });
         

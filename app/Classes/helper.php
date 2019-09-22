@@ -793,7 +793,7 @@ class Helper{
             return $id->id;
         });
 
-        return round(Sales::whereIn('id', $idVentas)->sum('premios'), 2);
+        return round(Salesdetails::whereIn('idVenta', $idVentas)->sum('premio'), 2);
     }
 
     static function ticketsPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
@@ -1811,8 +1811,8 @@ class Helper{
     }
 
 
-    public static function indexPost($idUsuario){
-        return DB::select('call indexPost(?)', array($idUsuario));
+    public static function indexPost($idUsuario, $idBanca){
+        return DB::select('call indexPost(?, ?)', array($idUsuario, $idBanca));
 
         
     }
