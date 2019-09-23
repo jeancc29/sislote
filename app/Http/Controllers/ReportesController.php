@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Route; 
 use Illuminate\Support\Facades\Response; 
+use Carbon\Carbon;
 
 use App\Sales;
 use Request;
@@ -117,14 +118,21 @@ class ReportesController extends Controller
     public function historico()
     {
         $controlador = Route::getCurrentRoute()->getName();
+        $fecha = getdate();
+        $fechaActualCarbon = Carbon::now();
+       
+
         
         if(!strpos(Request::url(), '/api/')){
             // return "<h1>Dentro reporte jugadas: $controlador </h1>";
-            $fecha = getdate();
+           
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+            $fechaFinalSinHora = Carbon::now();
+            $fechaFinalSinHora = $fechaFinalSinHora->toDateString();
+            
             $bancas = Branches::whereStatus(1)->get();
-            $bancas = collect($bancas)->map(function($d){
+            $bancas = collect($bancas)->map(function($d) use($fechaActualCarbon, $fechaFinalSinHora){
                 $ventas = Helper::ventasPorBanca($d['id']);
                 $descuentos = Helper::descuentosPorBanca($d['id']);
                 $premios = Helper::premiosPorBanca($d['id']);
@@ -135,12 +143,21 @@ class ReportesController extends Controller
                 $balance = Helper::saldo($d['id'], 1);
                 $caidaAcumulada = Helper::saldo($d['id'], 3);
 
+                $sumarVentasNetas = false;
+                
+                if($fechaFinalSinHora < $fechaActualCarbon->toDateString()){
+                    $sumarVentasNetas = false;
+                }
+                else if($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false){
+                    $sumarVentasNetas = true;
+                }
+
                 return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                     'descuentos' => $descuentos, 
                     'premios' => $premios, 
-                    'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance + round($totalNeto, 2), 
+                    'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
                     'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
-                    'balanceActual' => round(($balance + round($totalNeto, 2)))
+                    'balanceActual' => ($sumarVentasNetas == true) ? round(($balance + $totalNeto), 2) : $balance
                 ];
             });
 
@@ -154,6 +171,8 @@ class ReportesController extends Controller
             'datos.fechaHasta' => ''
         ])['datos'];
     
+        $fechaFinalSinHora = new Carbon($datos['fechaHasta']);
+        $fechaFinalSinHora = $fechaFinalSinHora->toDateString();
         $fecha = getdate();
   
         if($datos['fechaDesde'] != null && $datos['fechaHasta'] != null){
@@ -170,7 +189,7 @@ class ReportesController extends Controller
         
     
         $bancas = Branches::whereStatus(1)->get();
-        $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal){
+        $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal, $fechaActualCarbon, $fechaFinalSinHora){
             $ventas = Helper::ventasPorBanca($d['id'], $fechaInicial, $fechaFinal);
             $descuentos = Helper::descuentosPorBanca($d['id'], $fechaInicial, $fechaFinal);
             $premios = Helper::premiosPorBanca($d['id'], $fechaInicial, $fechaFinal);
@@ -178,14 +197,25 @@ class ReportesController extends Controller
             $tickets = Helper::ticketsPorBanca($d['id'], $fechaInicial, $fechaFinal);
             $ticketsPendientes = Helper::ticketsPendientesPorBanca($d['id'], $fechaInicial, $fechaFinal);
             $totalNeto = $ventas - ($descuentos + $premios + $comisiones);
-            $balance = Helper::saldoPorFecha($d['id'], 1, $fechaFinal);
-            $caidaAcumulada = Helper::saldoPorFecha($d['id'], 3, $fechaFinal);
+            $balance = Helper::saldoPorFecha($d['id'], 1, $fechaFinalSinHora);
+            $caidaAcumulada = Helper::saldoPorFecha($d['id'], 3, $fechaFinalSinHora);
+
+            $sumarVentasNetas = false;
+
+            if($fechaFinalSinHora < $fechaActualCarbon->toDateString()){
+                $sumarVentasNetas = false;
+            }
+            else if($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false){
+                $sumarVentasNetas = true;
+            }
 
             return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                 'descuentos' => $descuentos, 
                 'premios' => $premios, 
-                'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance + round($totalNeto, 2), 
-                'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
+                'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
+                'balanceActual' => ($sumarVentasNetas == true) ? round(($balance + $totalNeto), 2) : $balance,
+                'sumar' => $sumarVentasNetas];
         });
         
       
@@ -195,7 +225,11 @@ class ReportesController extends Controller
             'bancas' => $bancas,
             'fechaInicial' => $fechaInicial,
             'fechaFinal' => $fechaFinal,
-            'a' => $datos['fechaDesde']
+            'a' => $datos['fechaDesde'], 
+            'sumar' => ($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false),
+            'sin' => $fechaFinalSinHora == $fechaActualCarbon->toDateString(),
+            'af' =>$fechaFinalSinHora,
+            'af1' =>$fechaActualCarbon->toDateString(),
         ], 201);
     }
 

@@ -128,7 +128,8 @@
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Neto</th>
                             <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Caida</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Final</th> -->
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance sin monto neto</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance neto</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Caida acumulada</th>
 
 
@@ -146,6 +147,7 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.premios}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balance}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.balanceActual >= 0), 'bg-mal text-mal': (c.balanceActual < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balanceActual}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.caidaAcumulada >= 0), 'bg-mal text-mal': (c.caidaAcumulada < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.caidaAcumulada}}</td>
                             </tr>
                             
