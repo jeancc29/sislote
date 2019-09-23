@@ -139,7 +139,9 @@ class ReportesController extends Controller
                     'descuentos' => $descuentos, 
                     'premios' => $premios, 
                     'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance + round($totalNeto, 2), 
-                    'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes];
+                    'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
+                    'balanceActual' => round(($balance + round($totalNeto, 2)))
+                ];
             });
 
            return view('reportes.historico', compact('controlador', 'bancas'));
@@ -176,8 +178,8 @@ class ReportesController extends Controller
             $tickets = Helper::ticketsPorBanca($d['id'], $fechaInicial, $fechaFinal);
             $ticketsPendientes = Helper::ticketsPendientesPorBanca($d['id'], $fechaInicial, $fechaFinal);
             $totalNeto = $ventas - ($descuentos + $premios + $comisiones);
-            $balance = Helper::saldo($d['id'], 1);
-            $caidaAcumulada = Helper::saldo($d['id'], 3);
+            $balance = Helper::saldoPorFecha($d['id'], 1, $fechaFinal);
+            $caidaAcumulada = Helper::saldoPorFecha($d['id'], 3, $fechaFinal);
 
             return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                 'descuentos' => $descuentos, 
@@ -427,12 +429,16 @@ class ReportesController extends Controller
                                 (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as premios,
                                 (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
                                 (select substring(numeroGanador, 3, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as segunda,
-                                (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera
+                                (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera,
+                                (select pick3 from awards where idLoteria = lotteries.id and created_at between ? and ?) as pick3,
+                                (select pick4 from awards where idLoteria = lotteries.id and created_at between ? and ?) as pick4
                                 ', [$datos['idBanca'], $fechaInicial, $fechaFinal, //Parametros para ventas
                                     $datos['idBanca'], $fechaInicial, $fechaFinal, //Parametros para premios
                                     $fechaInicial, $fechaFinal, //Parametros primera
                                     $fechaInicial, $fechaFinal, //Parametros segunda
-                                    $fechaInicial, $fechaFinal //Parametros tercera
+                                    $fechaInicial, $fechaFinal, //Parametros tercera
+                                    $fechaInicial, $fechaFinal, //Parametros pick3
+                                    $fechaInicial, $fechaFinal //Parametros pick4
                                     ])
                             ->where('lotteries.status', '=', '1')
                             ->get();
@@ -498,7 +504,7 @@ class ReportesController extends Controller
                             $d->segunda = "";
                         if($d->tercera == null)
                             $d->tercera = "";
-                        return ['id' => $d->id, 'descripcion' => $d->descripcion, 'comisiones' => $comisionesMonto, 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
+                        return ['id' => $d->id, 'descripcion' => $d->descripcion, 'comisiones' => $comisionesMonto, 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera,'pick3' => $d->pick3, 'pick4' => $d->pick4, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
                     });
     
       

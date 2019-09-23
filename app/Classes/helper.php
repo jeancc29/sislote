@@ -146,7 +146,7 @@ class Helper{
                     'status' => 1
                 ])
                 ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
-                ->where('created_at', '<', $fechaHasta)
+                ->where('created_at', '<=', $fechaHasta)
                 ->sum('debito');
             $credito =  transactions::where(
                 [
@@ -155,7 +155,7 @@ class Helper{
                     'status' => 1
                 ])
                 ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
-                ->where('created_at', '<', $fechaHasta)
+                ->where('created_at', '<=', $fechaHasta)
                 ->sum('credito');
             //El debito desembolso es un fondo emitido para un prestamo desde esta entidad, osea, que es un dinero que sale
             // por lo tanto este se le suma al credito
@@ -165,7 +165,8 @@ class Helper{
                     'idTipoEntidad2' => $idTipoEntidad1->id, 
                     'status' => 1
                 ])
-                ->where('idTipo', Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)                
+                ->where('idTipo', Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)   
+                ->where('created_at', '<=', $fechaHasta)             
                 ->sum('debito');
             $saldo_inicial = $debito - ($credito + $debitoDesembolso);
         }else if($datos["entidad"] == 2){
@@ -178,7 +179,7 @@ class Helper{
                     'status' => 1
                 ])
                 ->where('idTipo', '!=', $tipo->id)
-                ->where('created_at', '<', $fechaHasta)
+                ->where('created_at', '<=', $fechaHasta)
                 ->sum('debito');
             $credito = transactions::where(
                 [
@@ -187,7 +188,7 @@ class Helper{
                     'status' => 1
                 ])
                 ->where('idTipo', '!=', $tipo->id)
-                ->where('created_at', '<', $fechaHasta)
+                ->where('created_at', '<=', $fechaHasta)
                 ->sum('credito');
             $saldo_inicial = $credito - $debito;
         }
@@ -202,7 +203,7 @@ class Helper{
                     'idTipo' => $tipo->id
                 ])
                 ->where('idTipo', '=', $tipo->id)
-                ->where('created_at', '<', $fechaHasta)
+                ->where('created_at', '<=', $fechaHasta)
                 ->sum('debito');
             $credito = transactions::where(
                 [
@@ -212,7 +213,7 @@ class Helper{
                     'idTipo' => $tipo->id
                 ])
                 ->where('idTipo', '=', $tipo->id)
-                ->where('created_at', '<', $fechaHasta)
+                ->where('created_at', '<=', $fechaHasta)
                 ->sum('credito');
                 $saldo_inicial = $debito - $credito;
         }
