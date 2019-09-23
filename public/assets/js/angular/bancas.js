@@ -494,7 +494,7 @@ myApp
                             $scope.datos.ckbLoterias[idx].existe = true;
                             $scope.datos.loteriasSeleccionadas.push($scope.datos.ckbLoterias[idx]);
                         }else{
-                            $scope.datos.ckbLoterias[idx].existe = false;
+                            $scope.datos.ckbLoterias[indice].existe = false;
                         }
 
                      });

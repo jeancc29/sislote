@@ -19,7 +19,7 @@ myApp
         $scope.es_cliente = false;
         $scope.datos =  {
             "descripcionBanca" : null,
-            "accionBusqueda" : "todos",
+            "accionBusqueda" : "con ventas",
             "idVenta":0,
         "idBanca" : null,
         "idLoteria" : null,

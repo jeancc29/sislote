@@ -298,6 +298,7 @@ myApp
                     limpiar();
                     $scope.datos.addTransaccion = [];
                     alert('Se ha guardado correctamente');
+                    $('#transactionGroupModal').modal('hide');
                }else{
                 limpiar();
                 $scope.datos.addTransaccion = [];
