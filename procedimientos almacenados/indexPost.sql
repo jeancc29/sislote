@@ -77,7 +77,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'fechaCancelacion', ca.created_at,
                 'loterias', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'descripcion', descripcion, 'abreviatura', abreviatura)) from lotteries where id in(select distinct idLoteria from salesdetails where idVenta = s.id)),
                 'jugadas', (select JSON_ARRAYAGG(JSON_OBJECT('id', sd.id, 'idVenta', sd.idVenta, 'jugada', sd.jugada, 'idLoteria', sd.idLoteria, 'idSorteo', sd.idSorteo, 'monto', sd.monto, 'premio', sd.premio, 'pagado', sd.pagado, 'status', sd.status, 'sorteo', JSON_OBJECT('id', d.id, 'descripcion', d.descripcion), 'fechaPagado', (select created_at from logs where tabla = 'salesdetails' and idRegistroTablaAccion = sd.id) , 'pagadoPor', (select us.usuario from logs lo inner join users us on us.id = lo.idUsuario where lo.idRegistroTablaAccion = sd.id and lo.tabla = 'salesdetails'))) from salesdetails sd inner join draws d on sd.idSorteo = d.id where sd.idVenta = s.id),
-                'fecha', DATE_FORMAT(s.created_at, "%r"),
+                'fecha', concat(date(s.created_at), ' ', DATE_FORMAT(s.created_at, "%r")),
                 'usuario', u.usuario
 			)) as ventas from sales s
             inner join users u on u.id = s.idUsuario 
