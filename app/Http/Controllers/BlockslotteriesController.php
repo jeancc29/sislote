@@ -217,6 +217,7 @@ class BlockslotteriesController extends Controller
                             'monto' => $s['monto']
                         ]);
 
+                        $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                         if($dia != null){
                             $stocksJugadasDelDiaActual = Stock::where(
                             [
