@@ -88,13 +88,13 @@ class Prueba extends Command
         $awardsClass = new AwardsClass(5);
         $awardsClass->fecha = "2019-09-05";
         $awardsClass->idUsuario = 1;
-        $awardsClass->primera = "09";
-        $awardsClass->segunda = "19";
+        $awardsClass->primera = "12";
+        $awardsClass->segunda = "11";
         $awardsClass->tercera = "11";
         $awardsClass->pick3 = null;
         $awardsClass->pick4 = null;
         $awardsClass->numerosGanadores = "694925";
-        $premio = $awardsClass->paleBuscarPremio(52, 5, "0919", "1", 4);
+        $premio = $awardsClass->directoBuscarPremio(78, 5, "11", "1");
         $this->info("1ra:" . $premio);
 
         // $sorteo = Draws::whereDescripcion("Super pale")->first();

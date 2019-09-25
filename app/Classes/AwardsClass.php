@@ -255,17 +255,36 @@ class AwardsClass{
     public function directoBuscarPremio($idVenta, $idLoteria, $jugada, $monto){
         $premio = 0;
         $busqueda = strpos($this->numerosGanadores, $jugada);
-                    
-                    
-        if(gettype($busqueda) == "integer"){
-            $venta = Sales::whereId($idVenta)->first();
-            $idBanca = Branches::whereId($venta->idBanca)->first()->id;
-            if($busqueda == 0) $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primera');
-            else if($busqueda == 2) $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segunda');
-            else if($busqueda == 4) $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tercera');
+
+        $venta = Sales::whereId($idVenta)->first();
+        $idBanca = Branches::whereId($venta->idBanca)->first()->id;  
+        
+        
+        if($this->primera == $jugada){
+            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primera');
         }
-        else
-            $premio = 0;
+
+        if($this->segunda == $jugada){
+            if($premio == null) $premio = 0;
+            $premio += $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segunda');
+        }
+
+        
+
+        if($this->tercera == $jugada){
+            if($premio == null) $premio = 0;
+            $premio += $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tercera');
+        }
+
+        // if(gettype($busqueda) == "integer"){
+        //     $venta = Sales::whereId($idVenta)->first();
+        //     $idBanca = Branches::whereId($venta->idBanca)->first()->id;
+        //     if($busqueda == 0) $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primera');
+        //     else if($busqueda == 2) $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segunda');
+        //     else if($busqueda == 4) $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tercera');
+        // }
+        // else
+        //     $premio = 0;
 
         return $premio;
     }

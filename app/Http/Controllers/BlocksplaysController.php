@@ -109,12 +109,12 @@ class BlocksplaysController extends Controller
                             'idSorteo' => $datos['idSorteo'],
                             'status' => 1
                         ])
-                        ->where('fechaDesde', '<=', $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00')
-                        ->where('fechaHasta', '>=', $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00')->first();
-    
+                        ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
     
                     if($bloqueo != null){
                         $bloqueo['monto'] = $datos['monto'];
+                        $bloqueo['fechaDesde'] = $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00';
+                        $bloqueo['fechaHasta'] = $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00';
                         $bloqueo->save();
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())

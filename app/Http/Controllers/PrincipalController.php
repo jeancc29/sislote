@@ -239,7 +239,8 @@ class PrincipalController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
-            return view('principal.pruebahttp', compact('controlador'));
+            // return view('principal.pruebahttp', compact('controlador'));
+            return view('principal.p', compact('controlador'));
         }
 
         

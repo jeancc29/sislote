@@ -23,7 +23,7 @@ myApp
             "idVenta":0,
             "compartido":0,
         "idUsuario": 0,
-        "idBanca" : 0,
+        "idBanca" : 1,
         "codigoBarra":"barra29",
         "total": 0,
         "subTotal":0,
@@ -133,11 +133,11 @@ myApp
                 $scope.datos.optionsBancas = response.data.bancas;
                 let idx = 0;
                 
-                if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
-                    idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
-                // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
-                $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
-                $scope.datos.idBanca = response.data.idBanca;
+                // if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
+                //     idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
+                // // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
+                // $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
+                // $scope.datos.idBanca = response.data.idBanca;
 
                 console.log('idBanca:', response.data );
 
@@ -146,11 +146,11 @@ myApp
                  $scope.datos.optionsLoterias =response.data.loterias;
                 //  console.log('select: ',$scope.datos.selectedVentas);
                 //  console.log($scope.datos.optionsLoterias);
-                $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
-                $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
+                // $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
+                // $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
 
-                $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
-                $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
+                // $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
+                // $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
                 // // $scope.datos.loterias.push($scope.datos.optionsLoterias[0]);
                 // // $scope.datos.loterias.push($scope.datos.optionsLoterias[1]);
                 // //$scope.datos.loterias = [$scope.datos.optionsLoterias[0], $scope.datos.optionsLoterias[1]];
@@ -249,27 +249,27 @@ myApp
                 
                 
                 $scope.datos.idVenta = response.data.idVenta;
-                $scope.datos.optionsBancas = response.data.bancas;
+                bancasGlobal = helperService.copiarObjecto(response.data.bancas);
                 let idx = 0;
                 
-                if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
-                    idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
-                // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
-                $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
-                $scope.datos.idBanca = response.data.idBanca;
+                // if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
+                //     idx = $scope.datos.optionsBancas.findIndex(x => x.id == response.data.idBanca);
+                // // $scope.datos.selectedBancas = $scope.datos.optionsBancas[idx];
+                // $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
+                // $scope.datos.idBanca = response.data.idBanca;
 
                 console.log('idBanca:', response.data );
 
-                $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
-                $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
+                // $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
+                // $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
                  $scope.datos.optionsLoterias =response.data.loterias;
                 //  console.log('select: ',$scope.datos.selectedVentas);
                 //  console.log($scope.datos.optionsLoterias);
-                $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
-                $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
+                // $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
+                // $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
 
-                $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
-                $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
+                // $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
+                // $scope.datos.estadisticas_ventas.total = response.data.total_ventas;
                 // // $scope.datos.loterias.push($scope.datos.optionsLoterias[0]);
                 // // $scope.datos.loterias.push($scope.datos.optionsLoterias[1]);
                 // //$scope.datos.loterias = [$scope.datos.optionsLoterias[0], $scope.datos.optionsLoterias[1]];
@@ -281,13 +281,13 @@ myApp
 
 
                 
-                $timeout(function() {
-                    // anything you want can go here and will safely be run on the next digest.
-                    //$('#multiselect').selectpicker('val', []);
-                    $('#multiselect').selectpicker("refresh");
-                    $('.selectpicker').selectpicker("refresh");
-                    //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
-                  })
+                // $timeout(function() {
+                //     // anything you want can go here and will safely be run on the next digest.
+                //     //$('#multiselect').selectpicker('val', []);
+                //     $('#multiselect').selectpicker("refresh");
+                //     $('.selectpicker').selectpicker("refresh");
+                //     //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+                //   })
             });
             }
             
@@ -301,11 +301,6 @@ myApp
             // console.log('ROOT_PATH: ', ruta);
             $scope.inicializarDatos();
 
-          $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
-          //$scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
-
-          var a = new Hola("Jean", "Contreras");
-        //   console.log('clase: ', ruta);
         }
 
         function eliminarUltimoCaracter(d){
@@ -424,21 +419,21 @@ myApp
                 //jugada = parseInt(jugada);
                 
                 if($scope.datos.jugada != null){
-                    if(Object.keys($scope.datos.loterias).length <= 0){
-                        if(esBlur == false)
-                            alert("Debes seleccionar una loteria");
-                        return;
-                    }
+                    // if(Object.keys($scope.datos.loterias).length <= 0){
+                    //     if(esBlur == false)
+                    //         alert("Debes seleccionar una loteria");
+                    //     return;
+                    // }
                     
-                    if(Object.keys($scope.datos.loterias).length > 1){
-                        $scope.datos.montoExistente = 'X';
-                        $('#inputMonto').focus();
-                        return;
-                    }
+                    // if(Object.keys($scope.datos.loterias).length > 1){
+                    //     $scope.datos.montoExistente = 'X';
+                    //     $('#inputMonto').focus();
+                    //     return;
+                    // }
                     
 
-                    $scope.datos.idLoteria = $scope.datos.loterias[0].id;
-                    $scope.datos.idBanca = $scope.datos.selectedBancas.id;
+                    // $scope.datos.idLoteria = $scope.datos.loterias[0].id;
+                    // $scope.datos.idBanca = $scope.datos.selectedBancas.id;
                     $('#inputMonto').focus();
                    
                     // $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
@@ -449,8 +444,10 @@ myApp
                     //       return;
                     //   })
 
+                    $scope.datos.idLoteria = $scope.datos.loterias[0].id;
+                   
                     
-                    $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
+                    $http.post("https://loteriasdo.ml/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                     .then(function(response){
                           console.log(response);
                        $scope.datos.montoExistente = response.data.monto;
@@ -465,7 +462,7 @@ myApp
           }
   
           $scope.hola = function(){
-            $scope.datos.idLoteria = $scope.datos.loterias[0].id;
+         
             console.log('hola: ', $scope.datos);
             $http.post("https://loteriasdo.ml/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                            .then(function(response){
