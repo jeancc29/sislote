@@ -136,7 +136,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr   ng-repeat="c in datos.bancas | filter:greaterThan(datos.accionBusqueda)">
+                            <tr ng-repeat="c in datos.bancas | filter:greaterThan(datos.accionBusqueda)">
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descripcion}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.codigo}}</td>
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
@@ -149,6 +149,20 @@
                                 <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balance | currency}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.balanceActual >= 0), 'bg-mal text-mal': (c.balanceActual < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balanceActual | currency}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.caidaAcumulada >= 0), 'bg-mal text-mal': (c.caidaAcumulada < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.caidaAcumulada | currency}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="1"></td>
+                                <td class="text-center font-weight-bold">TOTAL:</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalTickets}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalVentas}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalComisiones}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalDescuentos}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalPremios}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalTotalNeto}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalBalance}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalBalanceActual}}</td>
+                                <td class="text-center font-weight-bold">@{{datos.totalcaidaAcumulada}}</td>
+                                
                             </tr>
                             
                         </tbody>

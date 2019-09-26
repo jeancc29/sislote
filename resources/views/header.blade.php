@@ -239,10 +239,11 @@ if($controlador != "login"){
     right:0;
     max-width: 470px;
     width: 500px;
+    margin-right: 10px;
     box-shadow: none;
     -webkit-box-shadow: none;
     z-index: 99999;
-    
+    -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
 #mytable >tbody>tr>td{

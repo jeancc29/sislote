@@ -181,12 +181,12 @@
                                 <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1.descripcion}}</td>
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">@{{Cerrado}}</td> -->
                                 <td scope="col" class="text-center" style="font-size: 12px">@{{(c.tipoEntidad2 == 'Banco') ? c.entidad2.nombre : c.entidad2.descripcion}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1_saldo_inicial}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad2_saldo_inicial}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.debito}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.credito}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1_saldo_final}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad2_saldo_final}}</td>
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1_saldo_inicial | currency}}</td>
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad2_saldo_inicial | currency}}</td>
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.debito | currency}}</td>
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.credito | currency}}</td>
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1_saldo_final | currency}}</td>
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad2_saldo_final | currency}}</td>
                                 <td scope="col" class="text-center" style="font-size: 12px"> @{{c.nota}}</td>
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">Marcar pago</td> -->
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">

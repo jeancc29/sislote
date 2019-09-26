@@ -131,7 +131,7 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.nombre}}</td>
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.usuario}}</td> -->
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
-                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" scope="col" class="text-center" style="font-size: 13px">@{{c.balance}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" scope="col" class="text-center" style="font-size: 13px">@{{c.balance | currency}}</td>
                                 <!-- <td  scope="col" class="text-center" style="font-size: 13px">@{{c.prestamo}}</td> -->
                                 <!-- <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto}}</td> -->
                             </tr>

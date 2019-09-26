@@ -117,49 +117,33 @@ myApp
 
       
         $scope.calcularTotal = function(){
-            var monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_monto_total = 0;
-             $scope.datos.jugadas.forEach(function(valor, indice, array){
+            var totalTickets = 0, totalVentas = 0, totalComisiones = 0, totalDescuentos = 0, totalPremios = 0, totalTotalNeto = 0, totalBalance = 0, totalBalanceActual = 0, totalBalanceActual = 0, totalcaidaAcumulada = 0;
+             $scope.datos.bancas.forEach(function(valor, indice, array){
 
-                if(array[indice].tam == 2) total_directo += parseFloat(array[indice].monto);
-                if(array[indice].tam == 4) total_pale += parseFloat(array[indice].monto);
-                if(array[indice].tam == 6) total_tripleta += parseFloat(array[indice].monto);
-                if(array[indice].tam == 4 || array[indice].tam == 6) total_palet_tripleta += parseFloat(array[indice].monto);
-
-                monto_a_pagar +=  parseFloat(array[indice].monto);
+                totalTickets += parseFloat(array[indice].tickets);
+                totalVentas += parseFloat(array[indice].ventas);
+                totalComisiones += parseFloat(array[indice].comisiones);
+                totalDescuentos += parseFloat(array[indice].descuentos);
+                totalPremios += parseFloat(array[indice].premios);
+                totalTotalNeto += parseFloat(array[indice].totalNeto);
+                totalBalance += parseFloat(array[indice].balance);
+                totalBalanceActual += parseFloat(array[indice].balanceActual);
+                totalcaidaAcumulada += parseFloat(array[indice].caidaAcumulada);
+               
              });
 
 
-            //  $scope.datos.monto_a_pagar = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * monto_a_pagar : monto_a_pagar;
-            //  $scope.datos.total_directo = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * total_directo : total_directo;
-            //  $scope.datos.total_pale = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * total_pale : total_pale;
-            //  $scope.datos.total_tripleta = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * total_tripleta : total_tripleta;
-            //  $scope.datos.total_palet_tripleta = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * total_palet_tripleta : total_palet_tripleta;
-            //  $scope.datos.total_jugadas = (Object.keys($scope.datos.loterias).length > 1) ? Object.keys($scope.datos.loterias).length * Object.keys($scope.datos.jugadas).length : Object.keys($scope.datos.jugadas).length;
-            //  $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_a_pagar) / parseFloat($scope.datos.caracteristicasGenerales[0].cantidadAplicar)) * parseFloat($scope.datos.caracteristicasGenerales[0].descuentoValor) : 0;
-             
-             $scope.datos.monto_a_pagar =  monto_a_pagar;
-             $scope.datos.total_directo =  total_directo;
-             $scope.datos.total_pale =  total_pale;
-             $scope.datos.total_tripleta = total_tripleta;
-             $scope.datos.total_palet_tripleta =  total_palet_tripleta;
-             $scope.datos.total_jugadas =  Object.keys($scope.datos.jugadas).length;
-             $scope.datos.descuentoMonto = ($scope.datos.hayDescuento) ? parseInt(parseFloat($scope.datos.monto_a_pagar) / parseFloat($scope.datos.selectedBancas.deCada)) * parseFloat($scope.datos.selectedBancas.descontar)  : 0;
-             
+            $scope.datos.totalTickets = totalTickets;
+            $scope.datos.totalVentas = totalVentas;
+            $scope.datos.totalComisiones = totalComisiones;
+            $scope.datos.totalDescuentos = totalDescuentos;
+            $scope.datos.totalPremios = totalPremios;
+            $scope.datos.totalTotalNeto = totalTotalNeto;
+            $scope.datos.totalBalance = totalBalance;
+            $scope.datos.totalBalanceActual = totalBalanceActual;
+            $scope.datos.totalcaidaAcumulada = totalcaidaAcumulada;
 
-             //Calcular total jugdasReporte
-             $scope.datos.jugadasReporte.jugadas.forEach(function(valor, indice, array){
-
-                if(array[indice].jugada.length == 2) jugada_total_directo += parseFloat(array[indice].monto);
-                if(array[indice].tam == 4) jugdada_total_palet += parseFloat(array[indice].monto);
-                if(array[indice].tam == 6) jugada_total_tripleta += parseFloat(array[indice].monto);
-
-                jugada_monto_total +=  parseFloat(array[indice].monto);
-             });
-
-             $scope.datos.jugadasReporte.total_directo = jugada_total_directo;
-             $scope.datos.jugadasReporte.total_palet = jugdada_total_palet;
-             $scope.datos.jugadasReporte.total_tripleta = jugada_total_tripleta;
-             $scope.datos.jugadasReporte.monto_total = jugada_monto_total;
+           
         
         }
 
@@ -214,6 +198,7 @@ myApp
                 // if(response.data.errores == 0){
 
                     $scope.datos.bancas = response.data.bancas;
+                    $scope.calcularTotal();
                     
                 // }else{
                 //     alert(response.data.mensaje);
@@ -287,7 +272,7 @@ myApp
             
             
             return function(item){
-                console.log('greaterThan:');
+                
                 if(helperService.empty($scope.datos.descripcionBanca, 'string') == true){
                     if($scope.datos.accionBusqueda == "con premios")
                     return item['premios'] > 0;
