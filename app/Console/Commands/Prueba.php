@@ -97,6 +97,28 @@ class Prueba extends Command
         $premio = $awardsClass->directoBuscarPremio(78, 5, "11", "1");
         $this->info("1ra:" . $premio);
 
+
+
+        if (is_numeric($postMaxSize = ini_get('post_max_size'))) {
+             (int) $postMaxSize;
+        }
+
+        $metric = strtoupper(substr($postMaxSize, -1));
+        $postMaxSize = (int) $postMaxSize;
+
+        switch ($metric) {
+            case 'K':
+                 $postMaxSize * 1024;
+            case 'M':
+                 $postMaxSize * 1048576;
+            case 'G':
+                 $postMaxSize * 1073741824;
+            default:
+                 $postMaxSize;
+        }
+
+        $this->info("1ra:" . $postMaxSize);
+
         // $sorteo = Draws::whereDescripcion("Super pale")->first();
         // $premio = $awardsClass->paleBuscarPremio(1, 1, "0609", "1", $sorteo->id);
 
