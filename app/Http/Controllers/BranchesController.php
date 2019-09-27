@@ -48,6 +48,7 @@ class BranchesController extends Controller
      */
     public function index()
     {
+        
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
             return view('bancas.index', compact('controlador'));
@@ -57,16 +58,30 @@ class BranchesController extends Controller
 
 
         
-        $bancas = Branches::whereIn('status', array(0, 1))->get();
+        $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
+        // $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
+        // $loterias = collect($loterias)->map(function($l){
+        //     $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria')->get();
+        //     return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
+        // });
 
 
         return Response::json([
-            'bancas' => BranchesResource::collection($bancas),
+            'bancas' => $bancas,
             'usuarios' => Users::whereIn('status', array(0, 1))->get(),
-            'loterias' => LotteriesResource::collection(Lotteries::whereStatus(1)->has('sorteos')->get()),
+            'loterias' => [],
             'frecuencias' => Frecuency::all(),
             'dias' => Days::all()
         ], 201);
+
+        
+        // return Response::json([
+        //     'bancas' => BranchesResource::collection($bancas),
+        //     'usuarios' => Users::whereIn('status', array(0, 1))->get(),
+        //     'loterias' => LotteriesResource::collection(Lotteries::whereStatus(1)->has('sorteos')->get()),
+        //     'frecuencias' => Frecuency::all(),
+        //     'dias' => Days::all()
+        // ], 201);
     }
 
     /**
@@ -446,7 +461,34 @@ class BranchesController extends Controller
      */
     public function show(Branches $branches)
     {
-        //
+        $datos = request()->validate([
+            'datos.id' => 'required'
+        ])['datos'];
+
+
+        $banca = Branches::whereId($datos['id'])->first();
+        if($banca == null){
+            return Response::json([
+                'errores' => 1,
+                'usuarios' => 'La banca no existe'
+            ], 201);
+        }
+
+
+        $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
+        $loterias = collect($loterias)->map(function($l){
+            $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria')->get();
+            return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
+        });
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => '',
+            'banca' => new BranchesResource($banca),
+            'loterias' => $loterias,
+            'frecuencias' => Frecuency::all(),
+            'dias' => Days::all()
+        ], 201);
     }
 
     /**

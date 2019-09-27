@@ -117,6 +117,7 @@ class Prueba extends Command
                  $postMaxSize;
         }
 
+        $request->server('CONTENT_LENGTH');
         $this->info("1ra:" . $postMaxSize);
 
         // $sorteo = Draws::whereDescripcion("Super pale")->first();

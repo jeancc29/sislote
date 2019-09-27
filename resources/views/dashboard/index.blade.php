@@ -163,23 +163,29 @@
 
       </div> <!-- END ROW -->
 
+      <style>
+          .fz-12{
+            font-size: 12px;
+          }
+      </style>
+
       <div class="row justify-content-center">
         @foreach ($sorteos as $s)
-        <div class="card my-0 mx-1 d-inline-block mx-0" style="min-width: 160px; max-width: 160px; min-height: 290px; width: 15.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+        <div class="card my-0 mb-2 mx-1 d-inline-block mx-0" style=" min-height: 290px; width: 23.5%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon my-0 py-0">
                   <div class="card-icon" style="width:20%!important; height: 25%!important; padding: 2px; margin-right: 0px; margin-left: 0px; margin-top: 0px;">
                     <i class="material-icons" style="width: 0px; height: 0px; margin: 0 auto; padding: 0 auto; line-height: 0px; margin-top: 20px;" >assignment</i>
                   </div>
-                  <h4 class="card-title py-0 my-0 text-center">{{$s['descripcion']}}</h4>
+                  <h4 class="card-title py-0 my-0 text-center font-weight-bold">{{$s['descripcion']}}</h4>
                 </div>
                 <div class="card-body px-0 mx-0 pt-0 mt-0"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="">
-                    <table class="table">
+                    <table class="table table-fixed">
                     <thead>
                         <tr>
-                        <th class="font-weight-bold" style="font-size: 11px">LOT</th>
-                        <th class="font-weight-bold " style="font-size: 11px">NUM</th>
-                        <th class="text-right font-weight-bold" style="font-size: 11px">MONT</th>
+                        <th class="font-weight-bold text-center col-4" style="font-size: 15px">LOT</th>
+                        <th class="font-weight-bold text-center col-4" style="font-size: 15px">NUM</th>
+                        <th class="text-right font-weight-bold text-center col-4" style="font-size: 15px">MONT</th>
                         <!-- <th class="text-right font-weight-bold  d-md-block d-lg-none" style="font-size: 11px">MONT</th> -->
                         <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
                         </tr>
@@ -187,12 +193,34 @@
                     <tbody class="">
                     @foreach ($s['jugadas'] as $j)
                         <tr>
-                        <td  style="font-size: 11px;">{{$j['abreviatura']}}</td>
-                        <td  style="font-size: 11px;">{{$j['jugada']}}</td>
-                        <td class="text-center" style="font-size: 12px;">
+                        
+                        @if ($s['descripcion'] == 'Tripleta')
+                        <td class="text-center col-4" style="font-size: 12px;">{{$j['abreviatura']}}</td>
+                        @endif
+                        @if ($s['descripcion'] != 'Tripleta')
+                        <td class="text-center col-4" style="font-size: 15px;">{{$j['abreviatura']}}</td>
+                        @endif
+
+                        @if ($s['descripcion'] == 'Tripleta')
+                        <td class="text-center col-4 font-weight-bold" style="font-size: 12px;">{{$j['jugada']}}</td>
+                        @endif
+                        @if ($s['descripcion'] != 'Tripleta')
+                        <td class="text-center col-4" style="font-size: 15px;">{{$j['jugada']}}</td>
+                        @endif
+                       
+                        @if ($s['descripcion'] == 'Tripleta')
+                        <td class="text-center col-4" style="font-size: 12px;">
                         {{$j['monto']}}
                            
                         </td>
+                        @endif
+                        @if ($s['descripcion'] != 'Tripleta')
+                        <td class="text-center col-4" style="font-size: 15px;">
+                        {{$j['monto']}}
+                           
+                        </td>
+                        @endif
+                        
                         
                         </tr>
                       @endforeach

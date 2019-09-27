@@ -67,9 +67,19 @@
               </h3>
             </div>
             </div>
+
+            <div class="row mt-3" ng-show="datos.cargando == true">
+            <div class="col-12 ">
+            <div  class="loader"></div>
+            </div>
+            </div>
+
+            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
            
           </div>
-          <div class="wizard-navigation">
+          <div class="wizard-navigation" ng-show="datos.cargando == false">
             <ul class="nav nav-pills">
               <li class="nav-item">
                 <a ng-init="mostrarPagos = false" ng-click="mostrarPagos = false" class="nav-link" href="#about" data-toggle="tab" role="tab">
@@ -114,6 +124,24 @@
             </ul>
           </div>
           <div class="card-body">
+          <style>
+          .loader {
+                border: 16px solid #f3f3f3; /* Light grey */
+                border-top: 16px solid #3498db; /* Blue */
+                border-radius: 50%;
+                width: 120px;
+                height: 120px;
+                animation: spin 2s linear infinite;
+                margin: 0px auto;
+              }
+
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+          </style>
+
+
             <div class="tab-content">
               <div class="tab-pane active" id="about">
                 <!-- <h5 class="info-text"> Let's start with the basic information (with validation)</h5> -->
@@ -1319,10 +1347,39 @@
 
 
 
+<!-- TODAS LAS LOTERIAS -->
+<div ng-show="datos.mostrarFormEditar == false" class="row justify-content-center">
+  <div class="col-md-12">
+      <div class="card ">
+        <div class="card-header card-header-info card-header-text">
+          <div class="card-text">
+            <h4 class="card-title">Todas</h4>
+          </div>
+        </div>
+        <div class="card-body ">
+          
+          <div class="row justify-content-center mt-5">
+            <div class="col-12 text-center">
+                            <h1>En Reparacion</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+  </div>
+</div>
+
 
 
 <!-- TODAS LAS LOTERIAS -->
-<div ng-show="datos.mostrarFormEditar == false" class="row justify-content-center">
+<div ng-show="datos.mostrarFormEditar == true" class="row justify-content-center">
   <div class="col-md-12">
       <div class="card ">
         <div class="card-header card-header-info card-header-text">
