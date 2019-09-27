@@ -133,7 +133,7 @@ class DashboardController extends Controller
 
             $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
             idLoteria')->join('sales', 'sales.id', 'salesdetails.idVenta')
-            ->where('salesdetails.idLoteria', 8)
+            ->where('salesdetails.idLoteria', $loteria['id'])
             ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->whereNotIn('sales.status', [0,5])
             ->groupBy('salesdetails.jugada', 'salesdetails.idSorteo', 'salesdetails.idLoteria')
