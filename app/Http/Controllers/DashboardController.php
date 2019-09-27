@@ -126,9 +126,18 @@ class DashboardController extends Controller
             $loteria = $loteria[0];
         }
         
-        $ventas = Sales::join('salesdetails', 'salesdetails.idVenta', 'sales.id')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        // $ventas = Sales::join('salesdetails', 'salesdetails.idVenta', 'sales.id')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        //     ->whereNotIn('sales.status', [0,5])
+        //     ->where('salesdetails.idLoteria', $loteria['id'])
+        //     ->get();
+
+            $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
+            idLoteria')->join('sales', 'sales.id', 'salesdetails.idVenta')
+            ->where('salesdetails.idLoteria', 8)
+            ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->whereNotIn('sales.status', [0,5])
-            ->where('salesdetails.idLoteria', $loteria['id'])
+            ->groupBy('salesdetails.jugada', 'salesdetails.idSorteo', 'salesdetails.idLoteria')
+            ->orderBy('monto', 'desc')
             ->get();
 
         // return $loteria;
