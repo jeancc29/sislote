@@ -122,15 +122,13 @@ class DashboardController extends Controller
         $fecha = getdate();
         $usuario = Users::whereId(session("idUsuario"))->first();
         $loteria = helper::loteriasOrdenadasPorHoraCierre($usuario, true);
-        if($loteria != null){
-            $loteria = $loteria[0];
-        }
-        
-        // $ventas = Sales::join('salesdetails', 'salesdetails.idVenta', 'sales.id')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-        //     ->whereNotIn('sales.status', [0,5])
-        //     ->where('salesdetails.idLoteria', $loteria['id'])
-        //     ->get();
+        $sorteos = Draws::all();
+        $totalVentasLoterias = 0;
+        $totalPremiosLoterias = 0;
+        if($loteria != null && count($loteria) > 0){
+            //$loteria = $loteria[0];
 
+            
             $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
             idLoteria')->join('sales', 'sales.id', 'salesdetails.idVenta')
             ->where('salesdetails.idLoteria', $loteria['id'])
@@ -140,23 +138,51 @@ class DashboardController extends Controller
             ->orderBy('monto', 'desc')
             ->get();
 
+
+            
+            $sorteos = collect($sorteos)->map(function($d) use($ventas){
+                list($jugadas, $no) = $ventas->partition(function($v) use($d){
+                   return $v['idSorteo'] == $d['id'];
+                });
+    
+                $jugadas = collect($jugadas)->map(function($j){
+                    $loteria = Lotteries::whereId($j['idLoteria'])->first();
+                    return ['descripcion' => $loteria['descripcion'], 'abreviatura' => $loteria['abreviatura'], 'jugada' => Helper::agregarGuion($j['jugada'], $j['idSorteo']), 'monto' => $j['monto']];
+                });
+                return ['descripcion' => $d['descripcion'], 'jugadas' => $jugadas];
+            });
+
+            foreach($loterias as $l){
+                $totalVentasLoterias += $l['ventas'];
+                $totalPremiosLoterias += $l['premios'];
+            }
+
+            
+
+        }else{
+            $ventas = null;
+            $sorteos = collect($sorteos)->map(function($d){
+               
+    
+               
+                return ['descripcion' => $d['descripcion'], 'jugadas' => []];
+            });
+        }
+        
+        
+        // $ventas = Sales::join('salesdetails', 'salesdetails.idVenta', 'sales.id')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        //     ->whereNotIn('sales.status', [0,5])
+        //     ->where('salesdetails.idLoteria', $loteria['id'])
+        //     ->get();
+
+           
+
         // return $loteria;
 
         // $idVentas = collect($ventas)->map(function($id){
         //     return $id->id;
         // });
-        $sorteos = Draws::all();
-        $sorteos = collect($sorteos)->map(function($d) use($ventas){
-            list($jugadas, $no) = $ventas->partition(function($v) use($d){
-               return $v['idSorteo'] == $d['id'];
-            });
-
-            $jugadas = collect($jugadas)->map(function($j){
-                $loteria = Lotteries::whereId($j['idLoteria'])->first();
-                return ['descripcion' => $loteria['descripcion'], 'abreviatura' => $loteria['abreviatura'], 'jugada' => Helper::agregarGuion($j['jugada'], $j['idSorteo']), 'monto' => $j['monto']];
-            });
-            return ['descripcion' => $d['descripcion'], 'jugadas' => $jugadas];
-        });
+       
         // $sorteos = collect($sorteos)->map(function($d) use($idVentas){
         //     $jugadasConMayoresMontesJugadosEnLoterias = Salesdetails::whereIn('idVenta', $idVentas)->where('idSorteo', $d['id'])->orderBy('monto', 'desc')->take(5)->get();
         //     $jugadasConMayoresMontesJugadosEnLoterias = collect($jugadasConMayoresMontesJugadosEnLoterias)->map(function($j){
@@ -166,19 +192,21 @@ class DashboardController extends Controller
         //     return ['descripcion' => $d['descripcion'], 'jugadas' => $jugadasConMayoresMontesJugadosEnLoterias];
         // });
 
-        $idBancas = collect($ventas)->map(function($id){
+        
+        $idBancas = Sales::whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            ->whereNotIn('sales.status', [0,5])
+            ->get();
+            
+        $idBancas = collect($idBancas)->map(function($id){
             return $id['idBanca'];
         });
 
+        
         $bancasConVentas = Branches::whereIn('id', $idBancas)->whereStatus(1)->count();
         $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->whereStatus(1)->count();
 
-        $totalVentasLoterias = 0;
-        $totalPremiosLoterias = 0;
-        foreach($loterias as $l){
-            $totalVentasLoterias += $l['ventas'];
-            $totalPremiosLoterias += $l['premios'];
-        }
+        
+        
 
         return view('dashboard.index', compact('controlador', 'ventasGrafica', 'loterias', 'sorteos', 'bancasConVentas', 'bancasSinVentas', 'totalVentasLoterias', 'totalPremiosLoterias'));
         
