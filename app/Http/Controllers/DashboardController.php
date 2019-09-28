@@ -125,9 +125,31 @@ class DashboardController extends Controller
         $sorteos = Draws::all();
         $totalVentasLoterias = 0;
         $totalPremiosLoterias = 0;
+        
         if($loteriasOrdenadasPorHoraCierre != null && count($loteriasOrdenadasPorHoraCierre) > 0){
             list($loteriasValidadas, $no) = $loteriasOrdenadasPorHoraCierre->partition(function($l) use($loteriasOrdenadasPorHoraCierre){
-                return $l['horaCierre'] == $loteriasOrdenadasPorHoraCierre[0]['horaCierre'];
+                $fechaActual = Carbon::now();
+                
+                $horaCierreCarbonPrimeraLoteria = new Carbon($fechaActual->toDateString() . " " . $loteriasOrdenadasPorHoraCierre[0]['horaCierre']);
+                $horaCierreCarbonOtraLoteria = new Carbon($fechaActual->toDateString() . " " . $l['horaCierre']);
+
+                if($l['horaCierre'] == $loteriasOrdenadasPorHoraCierre[0]['horaCierre'])
+                    return true;
+
+                //Si la primera loteria no ha cerrado entonces le sumamos 20 minutos a la horaCierreCarbonPrimeraLoteria 
+                //para tambien incluir y retornar las loterias que tengan la misma hora pero que sean menores o iguales a los 20 minutos extra
+                // pero si la loteria ha cerrado entonces le sumamos los 20 minutos a la $fchaActual
+                if($fechaActual->gt($horaCierreCarbonPrimeraLoteria) == false){
+                    $horaCierreCarbonPrimeraLoteria->addMinutes(20);
+                    if($horaCierreCarbonPrimeraLoteria->gt($horaCierreCarbonOtraLoteria) == true)
+                        return true;
+                }else{
+                    $fechaActual->addMinutes(20);
+                    if($fechaActual->gt($horaCierreCarbonOtraLoteria) == true)
+                        return true;
+                }
+
+                
              });
 
             $idLoterias = collect($loteriasValidadas)->map(function($l){

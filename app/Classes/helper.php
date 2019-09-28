@@ -676,6 +676,13 @@ class Helper{
         return $ans;
     }
 
+    function to2Digitos($string){
+        $str = $string;
+        $pad = "00";
+        $ans = substr($pad, 0, strlen($pad) - strlen($str)) . $str;
+        return $ans;
+    }
+
     static function isNumber($number){
         $c = true;
         try {
@@ -1292,15 +1299,15 @@ class Helper{
         return $montoValido;
     }
 
-    static function loteriasOrdenadasPorHoraCierre($usuario, $retornarSoloAbiertas = false){
+    static function loteriasOrdenadasPorHoraCierre($usuario){
         $loterias = Lotteries::whereStatus(1)->get();
         $loterias = collect($loterias);
         $idDia = Days::whereWday(getdate()['wday'])->first()->id;
-        list($loterias, $no) = $loterias->partition(function($l) use($usuario, $retornarSoloAbiertas){
+        list($loterias, $no) = $loterias->partition(function($l) use($usuario){
             $loteria = Lotteries::whereId($l['id'])->first();
             
             //Si puede jugar fuera de horario entonces solo nos retornamos las loterias que no tengan premios registrados
-            if($usuario->tienePermiso('Jugar fuera de horario') && $retornarSoloAbiertas == false)
+            if($usuario->tienePermiso('Jugar fuera de horario'))
                 return Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
             else
                 return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
