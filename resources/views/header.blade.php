@@ -129,6 +129,7 @@ if($controlador != "login"){
 
 
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
+<script src="{{asset('assets/js/angular/angular-animate.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
 <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script>
@@ -225,6 +226,22 @@ if($controlador != "login"){
     <!-- <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script> -->
 
 <style>
+html{
+    /* Scroll para microsoft edge e internet explorer */
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+.sample-show-hide {
+  transition: all linear 0.5s;
+}
+
+.sample-show-hide.ng-show {
+  opacity: 1;
+}
+
+.sample-show-hide.ng-hide {
+    opacity: 0;
+}
+
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
                         /* background-color: #f5f2f2; */
                         background-color: #eae9e9;
@@ -243,7 +260,7 @@ if($controlador != "login"){
     box-shadow: none;
     -webkit-box-shadow: none;
     z-index: 99999;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
+    
 }
 
 #mytable >tbody>tr>td{

@@ -391,6 +391,20 @@ myApp
 
         
         function llenarckbLoterias(loterias){
+            var copiarATodas = {'id' : 0, 'descripcion' : 'COPIAR A TODAS', "sorteos":[
+                {"id": 5, "descripcion": "Pick 3 Straight"},
+                {"id": 6, "descripcion": "Pick 3 Box"},
+                {"id": 7, "descripcion": "Pick 4 Straight"},
+                {"id": 8, "descripcion": "Pick 4 Box"},
+                {"id": 1, "descripcion": "Directo"},
+                {"id": 2, "descripcion": "Pale"},
+                {"id": 3, "descripcion": "Tripleta"},
+                {"id": 4, "descripcion": "Super pale"},
+               ]}
+            
+
+           
+            loterias.unshift(copiarATodas);
             loterias.forEach(function(valor, indice, array){
                 array[indice].comisiones = {};
                 array[indice].comisiones.directo = null;
@@ -477,7 +491,14 @@ myApp
             else if(esNuevo == 2){
                 //$scope.inicializarDatos();
                 //$scope.datos.mostrarFormEditar = true;
-                $scope.datos.cargando = true;
+                window.scrollTo(0, 0);
+
+                // PerfectScrollBar
+                // $("html, body").animate({ scrollTop: 0 }, 600);
+                // $(".ps-scrollbar-y").scrollTop = 0;
+                // $scope.datos.cargando = true;
+
+
                 $http.post(rutaGlobal+"/api/bancas/get", {'action':'sp_bancas_actualizar', 'datos': d})
                 .then(function(response){
                     $scope.datos.cargando = false;
@@ -1041,22 +1062,27 @@ myApp
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0){
-                    
-                    if($scope.datos.id == 0)
-                        {
                             $scope.inicializarDatos(true);
-                            $scope.datos.mostrarFormEditar = false;
-                            _convertir_apertura_y_cierre(false);
                             alert("Se ha guardado correctamente");
-                        }
-                    else{
-                        //$scope.inicializarDatos(true);
-                        $scope.datos.status = ($scope.datos.status == 1) ? true : false;
-                        _convertir_apertura_y_cierre(false);
-                        $scope.datos.bancas = response.data.bancas;
-                        $scope.editar(2, response.data.banca[0]);
-                        alert("Se ha guardado correctamente");
-                    }
+                            $scope.datos.mostrarFormEditar = false;
+                            
+                            
+
+                    // if($scope.datos.id == 0)
+                    //     {
+                    //         $scope.inicializarDatos(true);
+                    //         $scope.datos.mostrarFormEditar = false;
+                    //         _convertir_apertura_y_cierre(false);
+                    //         alert("Se ha guardado correctamente");
+                    //     }
+                    // else{
+                    //     //$scope.inicializarDatos(true);
+                    //     $scope.datos.status = ($scope.datos.status == 1) ? true : false;
+                    //     _convertir_apertura_y_cierre(false);
+                    //     $scope.datos.bancas = response.data.bancas;
+                    //     $scope.editar(2, response.data.banca[0]);
+                    //     alert("Se ha guardado correctamente");
+                    // }
                 }else{
                     _convertir_apertura_y_cierre(false);
                     alert(response.data.mensaje);
@@ -1366,7 +1392,8 @@ myApp
 
 
         $scope.existeSorteo = function(sorteo, es_comisiones = true){
-            //console.log('existesorteo: ', $scope.datos.comisiones.selectedLoteria);
+            if(es_comisiones == false)
+            
             var existe = false;
             if(es_comisiones){
                 if($scope.datos.selectedLoteriaComisiones.sorteos == undefined)
@@ -1389,7 +1416,7 @@ myApp
             }
 
             //console.log('sorteos: ',$scope.datos.selectedLoteriaPagosCombinaciones.sorteos,' sorteo: ', sorteo, ' ,pagos: ', $scope.datos.selectedLoteriaPagosCombinaciones.sorteos.find(x => x.descripcion == sorteo))
-
+            // console.log('existesorteo: ', $scope.datos.selectedLoteriaPagosCombinaciones);
             return existe;
         }
        

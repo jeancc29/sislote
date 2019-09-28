@@ -477,7 +477,7 @@ class BranchesController extends Controller
 
         $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
         $loterias = collect($loterias)->map(function($l){
-            $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria')->get();
+            $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria', $l['id'])->get();
             return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
         });
 

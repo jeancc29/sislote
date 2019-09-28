@@ -1,2 +1,2 @@
 window.myApp = angular
-    .module("myModule", [])
+    .module("myModule", ['ngAnimate'])

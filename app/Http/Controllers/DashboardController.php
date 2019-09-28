@@ -126,7 +126,7 @@ class DashboardController extends Controller
         $totalVentasLoterias = 0;
         $totalPremiosLoterias = 0;
         if($loteria != null && count($loteria) > 0){
-            //$loteria = $loteria[0];
+            $loteria = $loteria[0];
 
             
             $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
