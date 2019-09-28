@@ -1319,7 +1319,7 @@ class Helper{
             ->get();
 
             $loterias = collect($loterias)->map(function($l){
-                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura']];
+                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaCierre' => $l['horaCierre']];
             });
 
         return $loterias;

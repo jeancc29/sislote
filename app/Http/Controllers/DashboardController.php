@@ -121,24 +121,33 @@ class DashboardController extends Controller
         //Jugadas con mayores montos jugados en loterías disponibles
         $fecha = getdate();
         $usuario = Users::whereId(session("idUsuario"))->first();
-        $loteria = helper::loteriasOrdenadasPorHoraCierre($usuario, true);
+        $loteriasOrdenadasPorHoraCierre = helper::loteriasOrdenadasPorHoraCierre($usuario, true);
         $sorteos = Draws::all();
         $totalVentasLoterias = 0;
         $totalPremiosLoterias = 0;
-        if($loteria != null && count($loteria) > 0){
-            $loteria = $loteria[0];
+        if($loteriasOrdenadasPorHoraCierre != null && count($loteriasOrdenadasPorHoraCierre) > 0){
+            list($loteriasValidadas, $no) = $loteriasOrdenadasPorHoraCierre->partition(function($l) use($loteriasOrdenadasPorHoraCierre){
+                return $l['horaCierre'] == $loteriasOrdenadasPorHoraCierre[0]['horaCierre'];
+             });
 
+            $idLoterias = collect($loteriasValidadas)->map(function($l){
+                return $l['id'];
+            });
+            
+
+          
             
             $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
             idLoteria')->join('sales', 'sales.id', 'salesdetails.idVenta')
-            ->where('salesdetails.idLoteria', $loteria['id'])
             ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->whereNotIn('sales.status', [0,5])
+            ->whereIn('salesdetails.idLoteria', $idLoterias)
             ->groupBy('salesdetails.jugada', 'salesdetails.idSorteo', 'salesdetails.idLoteria')
             ->orderBy('monto', 'desc')
             ->get();
 
 
+            
             
             $sorteos = collect($sorteos)->map(function($d) use($ventas){
                 list($jugadas, $no) = $ventas->partition(function($v) use($d){
