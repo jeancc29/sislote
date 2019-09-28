@@ -22,6 +22,7 @@ class BranchesResource extends JsonResource
             'ip' => $this->ip,
             'codigo' => $this->codigo,
             'status' => $this->status,
+            'imprimirCodigoQr' => $this->imprimirCodigoQr,
             'idUsuario' => $this->idUsuario,
             'usuario' => $this->usuario->usuario,
             'dueno' => $this->dueno,

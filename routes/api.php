@@ -77,6 +77,7 @@ Route::post('/loterias/eliminar', 'LotteriesController@destroy');
 
 Route::get('/bancas', 'BranchesController@index');
 Route::post('/bancas/get', 'BranchesController@show');
+Route::post('/bancas/getDatos', 'BranchesController@getDatos');
 Route::post('/bancas/guardar', 'BranchesController@store');
 Route::post('/bancas/eliminar', 'BranchesController@destroy');
 

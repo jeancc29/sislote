@@ -22,7 +22,8 @@ class Branches extends Model
         'piepagina2',
         'piepagina3',
         'piepagina4',
-        'status'
+        'status',
+        'imprimirCodigoQr'
     ];
 
 

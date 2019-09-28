@@ -123,6 +123,7 @@ class BranchesController extends Controller
             'datos.piepagina3' => '',
             'datos.piepagina4' => '',
             'datos.status' => 'required',
+            'datos.imprimirCodigoQr' => 'required',
     
             'datos.lunes' => '',
             'datos.martes' => '',
@@ -180,6 +181,7 @@ class BranchesController extends Controller
             $banca['piepagina3'] = $datos['piepagina3'];
             $banca['piepagina4'] = $datos['piepagina4'];
             $banca['status'] = $datos['status'];
+            $banca['imprimirCodigoQr'] = $datos['imprimirCodigoQr'];
             $banca->save();
     
         }else{
@@ -206,7 +208,8 @@ class BranchesController extends Controller
                 'piepagina2' => $datos['piepagina2'],
                 'piepagina3' => $datos['piepagina3'],
                 'piepagina4' => $datos['piepagina4'],
-                'status' => $datos['status']
+                'status' => $datos['status'],
+                'imprimirCodigoQr' => $datos['imprimirCodigoQr']
             ]);
     
     
@@ -485,6 +488,31 @@ class BranchesController extends Controller
             'errores' => 0,
             'mensaje' => '',
             'banca' => new BranchesResource($banca),
+            'loterias' => $loterias,
+            'frecuencias' => Frecuency::all(),
+            'dias' => Days::all()
+        ], 201);
+    }
+
+    public function getDatos(Branches $branches)
+    {
+        $datos = request()->validate([
+            'datos.id' => ''
+        ])['datos'];
+
+
+       
+
+
+        $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
+        $loterias = collect($loterias)->map(function($l){
+            $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria', $l['id'])->get();
+            return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
+        });
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => '',
             'loterias' => $loterias,
             'frecuencias' => Frecuency::all(),
             'dias' => Days::all()

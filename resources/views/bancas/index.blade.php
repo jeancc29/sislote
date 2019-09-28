@@ -172,7 +172,7 @@
                         <select 
                             ng-model="datos.selectedUsuario"
                             ng-options="o.nombres for o in datos.optionsUsuarios"
-                            class="selectpicker w-100" 
+                            class="selectpicker col-12" 
                             data-style="select-with-transition" 
                             title="Select Usuario">
                         <!-- <option value="Afghanistan"> Afghanistan </option>
@@ -413,6 +413,21 @@
                                     <label for="piepagina4" class="bmd-label-floating">4to pie de pagina</label>
                                     <input ng-model="datos.piepagina4" type="text" class="form-control" id="piepagina4" name="piepagina4">
                                   </div>
+                                </div>
+
+                                <div class="col-12">
+                                  <div class="input-group form-control-lg">
+                                      <div class="form-group">
+                                        <div class="form-check">
+                                          <label class="form-check-label">
+                                            <input ng-model="datos.imprimirCodigoQr" class="form-check-input" type="checkbox" value="" checked> Imprimir codigo Qr
+                                            <span class="form-check-sign">
+                                              <span class="check"></span>
+                                            </span>
+                                          </label>
+                                        </div>
+                                      </div>
+                                    </div>
                                 </div>
 
                                 
@@ -1176,7 +1191,23 @@
           </div>
           <div class="card-footer">
             <div ng-show="!mostrarBloqueosJugadas" class="row justify-content-end w-100">
-              <input ng-click="actualizar()" type="button" class="btn btn-info " name="guardar" value="Guardar">
+            
+              <!-- <input ng-hide="datos.btnCargando == true;" ng-click="actualizar()" type="button" class="btn btn-info " name="guardar" value="Guardar"> -->
+              <button ng-click="actualizar()"  class="btn btn-info" type="button" ng-disabled="datos.btnCargando == true">
+                <span ng-show="datos.btnCargando == true" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span ng-show="datos.btnCargando == true" class="sr-only">Guardando...</span>
+                <p ng-show="datos.btnCargando == false" class="p-0 m-0 d-inline">Guardar</p>
+                <p ng-show="datos.btnCargando == true" class="p-0 m-0 d-inline">Guardando...</p>
+            </button>
+
+
+            <!-- <button ng-show="datos.btnCargando == true;" class="btn btn-info" type="button">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span class="sr-only">Guardando...</span>
+                Guardando...
+            </button> -->
+
+
             </div>
             <!-- <div class="mr-auto">
               <input type="button" class="btn btn-previous btn-fill btn-default btn-wd disabled" name="previous" value="Previous">

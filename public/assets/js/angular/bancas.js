@@ -159,6 +159,7 @@ myApp
             "ckbPermisosAdicionales": [],
             "mostrarFormEditar" : false,
             "cargando" : false,
+            "btnCargando" : false,
 
 
             "optionsUsuariosTipos" : [],
@@ -391,6 +392,7 @@ myApp
 
         
         function llenarckbLoterias(loterias){
+            console.log('llenarckbLoterias: ', loterias);
             var copiarATodas = {'id' : 0, 'descripcion' : 'COPIAR A TODAS', "sorteos":[
                 {"id": 5, "descripcion": "Pick 3 Straight"},
                 {"id": 6, "descripcion": "Pick 3 Box"},
@@ -456,37 +458,92 @@ myApp
             $scope.datos.mostrarFormEditar = true;
             $scope.datos.ckbLoterias = $scope.datos.ckbLoteriasGuardar;
             $scope.datos.gastos = [];
+            $scope.datos.imprimirCodigoQr = true;
 
             if(esNuevo == 1){
-                $scope.inicializarDatos(true);
-                $scope.datos.gastos = [];
 
-                $scope.datos.ckbLoterias.forEach(function(valor, indice, array){
+                
 
-                    array[indice].existe = true;
+                $scope.datos.id = 0;
+                $scope.datos.descripcion = null;
+                $scope.datos.codigo = null;
+                $scope.datos.ip = null;
+                $scope.datos.dueno = null;
+                $scope.datos.localidad = null;
 
-                 });
-                 $scope.datos.lunes.apertura = hora_convertir("01:00:00");
-                 $scope.datos.lunes.cierre = hora_convertir("23:00:00");
-                 $scope.datos.martes.apertura = hora_convertir("01:00:00");
-                 $scope.datos.martes.cierre = hora_convertir("23:00:00");
-                 $scope.datos.miercoles.apertura = hora_convertir("01:00:00");
-                 $scope.datos.miercoles.cierre = hora_convertir("23:00:00");
-                 $scope.datos.jueves.apertura = hora_convertir("01:00:00");
-                 $scope.datos.jueves.cierre = hora_convertir("23:00:00");
-                 $scope.datos.viernes.apertura = hora_convertir("01:00:00");
-                 $scope.datos.viernes.cierre = hora_convertir("23:00:00");
-                 $scope.datos.sabado.apertura = hora_convertir("01:00:00");
-                 $scope.datos.sabado.cierre = hora_convertir("23:00:00");
-                 $scope.datos.domingo.apertura = hora_convertir("01:00:00");
-                 $scope.datos.domingo.cierre = hora_convertir("23:00:00");
+                $scope.datos.porcentajeCaida = null;
+                $scope.datos.balanceDesactivacion = null;
+                $scope.datos.limiteVenta = null;
+                $scope.datos.descontar = null;
+                $scope.datos.deCada = null;
+                $scope.datos.minutosCancelarTicket = null;
+                $scope.datos.piepagina1 = null;
+                $scope.datos.piepagina2 = null;
+                $scope.datos.piepagina3 = null;
+                $scope.datos.piepagina4 = null;
 
-                 
+                $scope.datos.estado = true;
+                $scope.datos.idTipoUsuario = 0;
 
-                //  $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0], false);
-                //  $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0], false);
-                 $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0]);
-                 $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0]);
+                $scope.datos.permisos = [];
+                $scope.datos.ckbPermisosAdicionales = [];
+
+                $scope.datos.cargando = true;
+
+
+
+                 $http.post(rutaGlobal+"/api/bancas/getDatos", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+             .then(function(response){
+                // console.log(response.data);
+                if(response.data.errores == 0){
+                   
+                    $scope.datos.cargando = false;
+                    llenarckbLoterias(response.data.loterias);
+                    $scope.datos.gastos = [];
+    
+                   
+                     $scope.datos.lunes.apertura = hora_convertir("01:00:00");
+                     $scope.datos.lunes.cierre = hora_convertir("23:00:00");
+                     $scope.datos.martes.apertura = hora_convertir("01:00:00");
+                     $scope.datos.martes.cierre = hora_convertir("23:00:00");
+                     $scope.datos.miercoles.apertura = hora_convertir("01:00:00");
+                     $scope.datos.miercoles.cierre = hora_convertir("23:00:00");
+                     $scope.datos.jueves.apertura = hora_convertir("01:00:00");
+                     $scope.datos.jueves.cierre = hora_convertir("23:00:00");
+                     $scope.datos.viernes.apertura = hora_convertir("01:00:00");
+                     $scope.datos.viernes.cierre = hora_convertir("23:00:00");
+                     $scope.datos.sabado.apertura = hora_convertir("01:00:00");
+                     $scope.datos.sabado.cierre = hora_convertir("23:00:00");
+                     $scope.datos.domingo.apertura = hora_convertir("01:00:00");
+                     $scope.datos.domingo.cierre = hora_convertir("23:00:00");
+    
+                     
+                    
+                    //  $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0], false);
+                    //  $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0], false);
+                    
+                     $scope.rbxLoteriasComisionesChanged($scope.datos.ckbLoterias[0]);
+                     $scope.rbxLoteriasPagosCombinacionesChanged($scope.datos.ckbLoterias[0]);
+                     
+                }else{
+                    _convertir_apertura_y_cierre(false);
+                    $scope.datos.cargando = false;
+                    alert(response.data.mensaje);
+                    return;
+                }
+                
+            }
+            ,
+            function(response) {
+                // Handle error here
+                $scope.datos.cargando = false;
+                console.log('Error jean: ', response);
+                alert("Error");
+            }
+            );
+
+
+                 //End nuevo
             }
             else if(esNuevo == 2){
                 //$scope.inicializarDatos();
@@ -496,7 +553,7 @@ myApp
                 // PerfectScrollBar
                 // $("html, body").animate({ scrollTop: 0 }, 600);
                 // $(".ps-scrollbar-y").scrollTop = 0;
-                // $scope.datos.cargando = true;
+                $scope.datos.cargando = true;
 
 
                 $http.post(rutaGlobal+"/api/bancas/get", {'action':'sp_bancas_actualizar', 'datos': d})
@@ -525,6 +582,7 @@ myApp
                     $scope.datos.piepagina3 = d.piepagina3;
                     $scope.datos.piepagina4 = d.piepagina4;
                     $scope.datos.estado = (d.status == 1) ? true : false;
+                    $scope.datos.imprimirCodigoQr = (d.imprimirCodigoQr == 1) ? true : false;
     
                     
                     
@@ -728,6 +786,7 @@ myApp
                 $scope.datos.piepagina3 = d.piepagina3;
                 $scope.datos.piepagina4 = d.piepagina4;
                 $scope.datos.estado = (d.status == 1) ? true : false;
+                $scope.datos.imprimirCodigoQr = (d.imprimirCodigoQr == 1) ? true : false;
 
                 
                 
@@ -1047,7 +1106,9 @@ myApp
             //     return;
             // }
 
-            
+            if($scope.datos.btnCargando == true){
+                return;
+            }
             
             $scope.datos.status = ($scope.datos.estado) ? 1 : 0;
             $scope.datos.idUsuario = idUsuario;
@@ -1058,6 +1119,7 @@ myApp
            
    
             _convertir_apertura_y_cierre(true);
+            $scope.datos.btnCargando = true;
           $http.post(rutaGlobal+"/api/bancas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
              .then(function(response){
                 console.log(response.data);
@@ -1065,7 +1127,7 @@ myApp
                             $scope.inicializarDatos(true);
                             alert("Se ha guardado correctamente");
                             $scope.datos.mostrarFormEditar = false;
-                            
+                            $scope.datos.btnCargando = false;
                             
 
                     // if($scope.datos.id == 0)
@@ -1085,17 +1147,19 @@ myApp
                     // }
                 }else{
                     _convertir_apertura_y_cierre(false);
+                    $scope.datos.btnCargando = false;
                     alert(response.data.mensaje);
                     return;
                 }
                 
             }
-            // ,
-            // function(response) {
-            //     // Handle error here
-            //     console.log('Error jean: ', response);
-            //     alert("Error");
-            // }
+            ,
+            function(response) {
+                // Handle error here
+                $scope.datos.btnCargando = false;
+                console.log('Error jean: ', response);
+                alert("Error");
+            }
             );
         
 

@@ -440,7 +440,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'usuario', u.usuario,
                 'idBanca', s.idBanca,
                 'codigo', b.codigo,
-                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4),
+                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4, 'imprimirCodigoQr', b.imprimirCodigoQr),
                 'descuentoPorcentaje', s.descuentoPorcentaje,
                 'descuentoMonto', s.descuentoMonto,
                 'hayDescuento', s.hayDescuento,
@@ -499,7 +499,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'jugadas', (select JSON_ARRAYAGG(JSON_OBJECT('id', sd.id, 'idVenta', sd.idVenta, 'jugada', sd.jugada, 'idLoteria', sd.idLoteria, 'idSorteo', sd.idSorteo, 'monto', sd.monto, 'premio', sd.premio, 'pagado', sd.pagado, 'status', sd.status, 'sorteo', d.descripcion, 'fechaPagado', (select created_at from logs where tabla = 'salesdetails' and idRegistroTablaAccion = sd.id) , 'pagadoPor', (select us.usuario from logs lo inner join users us on us.id = lo.idUsuario where lo.idRegistroTablaAccion = sd.id and lo.tabla = 'salesdetails'))) from salesdetails sd inner join draws d on sd.idSorteo = d.id where sd.idVenta = s.id),
                 'fecha', concat(date(s.created_at), ' ', DATE_FORMAT(s.created_at, "%r")),
                 'usuario', u.usuario,
-                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4),
+                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4, 'imprimirCodigoQr', b.imprimirCodigoQr),
                 'usuarioObject', JSON_OBJECT('id', u.id, 'nombres', u.nombres, 'usuario', u.usuario)
 			)) as ventas from sales s
             inner join users u on u.id = s.idUsuario 

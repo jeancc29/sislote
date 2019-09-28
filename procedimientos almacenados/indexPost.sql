@@ -57,7 +57,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'usuario', u.usuario,
                 'idBanca', s.idBanca,
                 'codigo', b.codigo,
-                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4),
+                'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4, 'imprimirCodigoQr', b.imprimirCodigoQr),
                 'descuentoPorcentaje', s.descuentoPorcentaje,
                 'descuentoMonto', s.descuentoMonto,
                 'hayDescuento', s.hayDescuento,
