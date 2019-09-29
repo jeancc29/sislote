@@ -1299,15 +1299,15 @@ class Helper{
         return $montoValido;
     }
 
-    static function loteriasOrdenadasPorHoraCierre($usuario){
+    static function loteriasOrdenadasPorHoraCierre($usuario, $retornarSoloAbiertas = false){
         $loterias = Lotteries::whereStatus(1)->get();
         $loterias = collect($loterias);
         $idDia = Days::whereWday(getdate()['wday'])->first()->id;
-        list($loterias, $no) = $loterias->partition(function($l) use($usuario){
+        list($loterias, $no) = $loterias->partition(function($l) use($usuario, $retornarSoloAbiertas){
             $loteria = Lotteries::whereId($l['id'])->first();
             
             //Si puede jugar fuera de horario entonces solo nos retornamos las loterias que no tengan premios registrados
-            if($usuario->tienePermiso('Jugar fuera de horario'))
+            if($usuario->tienePermiso('Jugar fuera de horario') && $retornarSoloAbiertas == false)
                 return Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
             else
                 return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
