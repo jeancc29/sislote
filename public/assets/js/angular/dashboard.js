@@ -89,75 +89,8 @@ myApp
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
         $scope.datos =  {
-            "id":0,
-            "descripcion": null,
-            "codigo" : null,
-            "ip" : null,
-            "usuario" : null,
-            "clave" : null,
-            "idTipoUsuario" : 0,
-            "estado":true,
-            "permisos": [],
-            "minutosCancelarTicket" : null,
-
-            "piepagina1" : null,
-            "piepagina2" : null,
-            "piepagina3" : null,
-            "piepagina4" : null,
-
-            "bancas" : [],
-
-            "ckbPermisosAdicionales": [],
-            "mostrarFormEditar" : false,
-
-
-            "optionsUsuariosTipos" : [],
-            "selectedUsuariosTipos" : {},
-
-
-            "loterias" : [],
-            "ckbLoterias" : [],
-            "loteriasSeleccionadas" : [],
-            "selectedLoteriaComisiones" : {},
-            "selectedLoteriaPagosCombinaciones" : {},
-
-
-            'lunes' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'martes' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'miercoles' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'jueves' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'viernes' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'sabado' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'domingo' : {
-                'apertura': hora_convertir("23:00:00"),
-                'cierre' : hora_convertir("24:00:00")
-            },
-            'comisiones' :{
-                'loterias' : [],
-                'selectedLoteria' : {}
-            },
-            'pagosCombinaciones' :{
-                'loterias' : [],
-                'selectedLoteria' : {}
-            }
+            "loteriasJugadasDashboard":[],
+            "selectedLoteria" : {}
         }
 
         
@@ -192,14 +125,21 @@ myApp
         
 
         $scope.load = function(codigo_usuario){
-            $scope.inicializarDatos(true);
- 
+            $scope.datos.loteriasJugadasDashboard = loteriasJugadasDashboardGlobal;
+            
         }
 
 
         
 
-
+        $scope.cambiarLoteria = function(loteria, first = null){
+            if(first != null && first == true){
+                $scope.datos.selectedLoteria = loteria;
+            }
+            else if(first == null){
+                $scope.datos.selectedLoteria = loteria;
+            }
+        }
        
         
 

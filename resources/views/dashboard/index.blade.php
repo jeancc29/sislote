@@ -170,13 +170,43 @@
       </style>
 
       <div class="row justify-content-center">
-        @foreach ($sorteos as $s)
-        <div class="card my-0 mb-2 mx-1 d-inline-block mx-0" style=" min-height: 290px; width: 23.5%;"> <!-- min-height: 455px; max-height: 455px; -->
+      <div class="col-md-12">
+      <div class="card ">
+        <!-- <div class="card-header ">
+          <h4 class="card-title">Loterias proximas a cerra -
+            <small class="description">Horizontal Tabs</small>
+          </h4>
+        </div> -->
+        <div class="card-body ">
+          <ul class="nav nav-pills nav-pills-primary" role="tablist">
+            <li ng-click="cambiarLoteria(l)" ng-init="cambiarLoteria(l, $first)" ng-repeat="l in datos.loteriasJugadasDashboard track by l.id" class="nav-item">
+              <a  ng-class="{'active': $first}" class="nav-link" data-toggle="tab" href="#link1" role="tablist">
+                @{{l.descripcion}}
+              </a>
+            </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#link2" role="tablist">
+                Settings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#link3" role="tablist">
+                Options
+              </a>
+            </li> -->
+          </ul>
+          
+        </div>
+      </div>
+    </div>  <!-- END COL-12 --> 
+
+        
+        <div ng-repeat="s in datos.selectedLoteria.sorteos" class="card my-0 mb-2 mx-1 d-inline-block mx-0" style=" min-height: 290px; width: 23.5%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon my-0 py-0">
                   <div class="card-icon" style="width:20%!important; height: 25%!important; padding: 2px; margin-right: 0px; margin-left: 0px; margin-top: 0px;">
                     <i class="material-icons" style="width: 0px; height: 0px; margin: 0 auto; padding: 0 auto; line-height: 0px; margin-top: 20px;" >assignment</i>
                   </div>
-                  <h4 class="card-title py-0 my-0 text-center font-weight-bold">{{$s['descripcion']}}</h4>
+                  <h4 class="card-title py-0 my-0 text-center font-weight-bold">@{{s['descripcion']}}</h4>
                 </div>
                 <div class="card-body px-0 mx-0 pt-0 mt-0"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
                 <div class="">
@@ -191,39 +221,39 @@
                         </tr>
                     </thead>
                     <tbody class="">
-                    @foreach ($s['jugadas'] as $j)
-                        <tr>
+                   
+                        <tr ng-repeat="j in s.jugadas">
                         
-                        @if ($s['descripcion'] == 'Tripleta')
-                        <td class="text-center col-4" style="font-size: 12px;">{{$j['abreviatura']}}</td>
-                        @endif
-                        @if ($s['descripcion'] != 'Tripleta')
-                        <td class="text-center col-4" style="font-size: 15px;">{{$j['abreviatura']}}</td>
-                        @endif
+                        
+                        <td ng-if="s.descripcion == 'Tripleta'" class="text-center col-4" style="font-size: 12px;">@{{j['abreviatura']}}</td>
+                        
+                        
+                        <td ng-if="s.descripcion != 'Tripleta'" class="text-center col-4" style="font-size: 15px;">@{{j['abreviatura']}}</td>
+                        
 
-                        @if ($s['descripcion'] == 'Tripleta')
-                        <td class="text-center col-4 font-weight-bold" style="font-size: 12px;">{{$j['jugada']}}</td>
-                        @endif
-                        @if ($s['descripcion'] != 'Tripleta')
-                        <td class="text-center col-4" style="font-size: 15px;">{{$j['jugada']}}</td>
-                        @endif
+                        
+                        <td ng-if="s.descripcion == 'Tripleta'" class="text-center col-4 font-weight-bold" style="font-size: 12px;">@{{j['jugada']}}</td>
+                        
+                        
+                        <td ng-if="s.descripcion != 'Tripleta'" class="text-center col-4" style="font-size: 15px;">@{{j['jugada']}}</td>
                        
-                        @if ($s['descripcion'] == 'Tripleta')
-                        <td class="text-center col-4" style="font-size: 12px;">
-                        {{$j['monto']}}
+                       
+                        
+                        <td ng-if="s.descripcion == 'Tripleta'" class="text-center col-4" style="font-size: 12px;">
+                        @{{j['monto']}}
                            
                         </td>
-                        @endif
-                        @if ($s['descripcion'] != 'Tripleta')
-                        <td class="text-center col-4" style="font-size: 15px;">
-                        {{$j['monto']}}
+                       
+                        
+                        <td ng-if="s.descripcion != 'Tripleta'" class="text-center col-4" style="font-size: 15px;">
+                        @{{j['monto']}}
                            
                         </td>
-                        @endif
+                        
                         
                         
                         </tr>
-                      @endforeach
+                      
                         
                     </tbody>
                     </table>
@@ -232,7 +262,7 @@
                    
                 </div>
             </div> <!-- END CARD -->
-        @endforeach
+     
           
         <!-- <tr>
                         <td  style="font-size: 11px;">LN PM</td>
