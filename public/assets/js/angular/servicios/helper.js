@@ -96,4 +96,20 @@ myApp.service('helperService', function(){
         //JSON.parse(JSON.stringify(objeto)) esto retorna una copia exacta de un objeto
         return JSON.parse(JSON.stringify(objeto));
     }
+
+    this.ordenarMenorAMayor = function(jugada){
+        if(jugada.length == 4 && isNaN(Number(jugada)) != true){
+            
+            var primerParNumeros = jugada.substr(0, 2);
+            var segundoParNumeros = jugada.substr(2, 2);
+            if(Number(primerParNumeros) < Number(segundoParNumeros)){
+                return jugada;
+            }else{
+                jugada = segundoParNumeros + primerParNumeros;
+                return jugada;
+            }
+        }
+
+        return jugada;
+    }
 });

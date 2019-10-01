@@ -297,6 +297,9 @@ class ReportesController extends Controller
         $falso = false;
 
         if(isset($datos['bancas']) == true){
+            $datos['bancas'] = collect($datos['bancas'])->map(function($b){
+                return $b['id'];
+            });
             $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
             sum(sales.subTotal) subTotal, 
             sum(sales.total) total, 
@@ -345,7 +348,8 @@ class ReportesController extends Controller
             'ventas' => $ventas,
             'fechaInicial' => $fechaInicial,
             'fechaFinal' => $fechaFinal,
-            'a' => $falso
+            'a' => $falso,
+            'bancas' => $datos['bancas']
         ], 201);
     }
 

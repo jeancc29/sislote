@@ -436,10 +436,16 @@ myApp
                         return;
                     }
                     
-
+                    $scope.datos.jugada = $scope.datos.jugada;
                     $scope.datos.idLoteria = $scope.datos.loterias[0].id;
                     $scope.datos.idBanca = $scope.datos.selectedBancas.id;
                     $('#inputMonto').focus();
+
+                    //Esto lo hago para que el valor de $scope.datos.jugada no cambie al momento de ordenarMenorAMayor los pale
+                    $scope.datos.montoDisponible = {};
+                    $scope.datos.montoDisponible.jugada = helperService.ordenarMenorAMayor($scope.datos.jugada);
+                    $scope.datos.montoDisponible.idLoteria = $scope.datos.idLoteria;
+                    $scope.datos.montoDisponible.idBanca = $scope.datos.idBanca;
                    
                     // $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                     //   .then(function(response){
@@ -450,7 +456,7 @@ myApp
                     //   })
 
                     
-                    $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
+                    $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos.montoDisponible, 'action':'sp_jugadas_obtener_montoDisponible'})
                     .then(function(response){
                           console.log(response);
                        $scope.datos.montoExistente = response.data.monto;
@@ -572,6 +578,7 @@ myApp
                                     return;
                                 }
                                 else{
+                                    $scope.datos.jugada =helperService.ordenarMenorAMayor($scope.datos.jugada);
                                     if($scope.datos.jugadas.find(x => (x.jugada == $scope.datos.jugada && x.idLoteria == array[indice].id)) != undefined){
                                         
                                         let idx = $scope.datos.jugadas.findIndex(x => (x.jugada == $scope.datos.jugada && x.idLoteria == array[indice].id));

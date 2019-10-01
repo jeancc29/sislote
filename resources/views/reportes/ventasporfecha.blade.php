@@ -93,7 +93,7 @@
                                   <select 
                                   ng-model="datos.selectedBancas"
                                       ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
-                                      class="selectpicker w-100" 
+                                      class="selectpicker col-12" 
                                       data-style="select-with-transition" 
                                        title="Seleccionar dias"
                                        multiple

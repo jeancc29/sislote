@@ -128,8 +128,8 @@
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Neto</th>
                             <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Caida</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Final</th> -->
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance sin monto neto</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance neto</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance a la fecha</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Balance</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Caida acumulada</th>
 
 
