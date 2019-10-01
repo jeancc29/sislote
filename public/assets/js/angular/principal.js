@@ -441,7 +441,17 @@ myApp
                     $scope.datos.idBanca = $scope.datos.selectedBancas.id;
                     $('#inputMonto').focus();
 
-                    //Esto lo hago para que el valor de $scope.datos.jugada no cambie al momento de ordenarMenorAMayor los pale
+                    //Esto lo hago para que el valor de $scope.datos.jugada no cambie al momento de ordenarMenorAMayor los pale.
+                    /* 
+                        Solucione el problema de que duraba mucho al hacer la peticion al servidor para obtener el monto 
+                        disponible, gracias a las 4 lineas de codigo de abajo.
+
+                        el tiempo de renderizado de angularjs disminuyo por lo tanto haciendo que la peticion al servidor se haga mas rapida
+                         ya que la variable $scope.datos.montoDisponible tiene pocos datos a diferencia de la variable $scope.datos que tiene muchos
+                         datos por renderizar haciendo un trabajo mas pesado para angularjs y tambien para el servidor
+
+                         asi pude darme cuenta que trabajando los datos con variables diferentes angularjs funciona mejor
+                    */
                     $scope.datos.montoDisponible = {};
                     $scope.datos.montoDisponible.jugada = helperService.ordenarMenorAMayor($scope.datos.jugada);
                     $scope.datos.montoDisponible.idLoteria = $scope.datos.idLoteria;
