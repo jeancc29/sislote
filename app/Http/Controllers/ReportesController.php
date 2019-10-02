@@ -245,18 +245,56 @@ class ReportesController extends Controller
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
             
             $bancas = Branches::whereStatus(1)->get();
-            $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
-                    sum(sales.subTotal) subTotal, 
-                    sum(sales.total) total, 
-                    sum(sales.premios) premios, 
-                    sum(descuentoMonto)  as descuentoMonto,
-                    sum(salesdetails.comision) as comisiones'))
+           
+
+            $idVentas = Sales::select(DB::raw('sales.id'))
+            ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+            ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            ->whereNotIn('sales.status', [0,5])
+            // ->groupBy('fecha')
+            //->orderBy('created_at', 'asc')
+            ->get();
+
+            
+            $idVentas = collect($idVentas)->map(function($v){
+                return $v['id'];
+            });
+
+
+            
+
+            $fechasVentas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            sum(sales.subTotal) subTotal, 
+            sum(sales.total) total, 
+            sum(sales.premios) premios, 
+            sum(descuentoMonto)  as descuentoMonto,
+            sum(salesdetails.comision) as comisiones'))
             ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
             ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('sales.status', [0,5])
             ->groupBy('fecha')
             //->orderBy('created_at', 'asc')
             ->get();
+
+            $ventas = collect($fechasVentas)->map(function($f) use($idVentas){
+                $comision = Salesdetails::whereRaw('date(created_at) = date(?)', [$f['fecha']])->whereIn('idVenta', $idVentas)->sum('comision');
+                
+                $ventas = Sales::select(DB::raw('
+                sum(sales.subTotal) subTotal, 
+                sum(sales.total) total, 
+                sum(sales.premios) premios, 
+                sum(descuentoMonto)  as descuentoMonto'))
+                ->whereRaw('date(sales.created_at) = ? ', [$f['fecha']])
+                ->whereIn('sales.id', $idVentas)
+                ->get();
+
+                // $total = Sales::
+                // whereRaw('date(sales.created_at) = ? ', [$f['fecha']])
+                // ->whereIn('sales.id', $idVentas)
+                // ->sum('total');
+
+                return ['fecha' => $f['fecha'], 'total' => $ventas[0]->total, 'premios' => $ventas[0]->premios, 'descuentoMonto' => $ventas[0]->descuentoMonto, 'comisiones' => $comision, ];
+            });
 
        
             $ventas = collect($ventas)->map(function($d){
@@ -300,7 +338,56 @@ class ReportesController extends Controller
             $datos['bancas'] = collect($datos['bancas'])->map(function($b){
                 return $b['id'];
             });
-            $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            // $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            // sum(sales.subTotal) subTotal, 
+            // sum(sales.total) total, 
+            // sum(sales.premios) premios, 
+            // sum(descuentoMonto)  as descuentoMonto,
+            // sum(salesdetails.comision) as comisiones'))
+            // ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+            // ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            // ->whereNotIn('sales.status', [0,5])
+            // ->whereIn('sales.idBanca', $datos['bancas'])
+            // ->groupBy('fecha', 'sales.idBanca')
+            // //->orderBy('created_at', 'asc')
+            // ->distinct('idBanca')
+            // ->get();
+
+            // $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            // sum(sales.subTotal) subTotal, 
+            // sum(sales.total) total, 
+            // sum(sales.premios) premios, 
+            // sum(descuentoMonto)  as descuentoMonto,
+            // sum(salesdetails.comision) as comisiones'))
+            // ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+            // ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            // ->whereNotIn('sales.status', [0,5])
+            // ->whereIn('sales.idBanca', $datos['bancas'])
+            // ->groupBy('fecha')
+            // //->orderBy('created_at', 'asc')
+            // ->get();
+
+            $idVentas = Sales::select(DB::raw('sales.id'))
+            ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+            ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            ->whereNotIn('sales.status', [0,5])
+            ->whereIn('sales.idBanca', $datos['bancas'])
+            // ->groupBy('fecha', 'sales.idBanca')
+            //->orderBy('created_at', 'asc')
+            
+            ->get();
+
+
+            
+
+            $idVentas = collect($idVentas)->map(function($v){
+                return $v['id'];
+            });
+
+
+            
+
+            $fechasVentas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
             sum(sales.subTotal) subTotal, 
             sum(sales.total) total, 
             sum(sales.premios) premios, 
@@ -310,11 +397,75 @@ class ReportesController extends Controller
             ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('sales.status', [0,5])
             ->whereIn('sales.idBanca', $datos['bancas'])
+            // ->groupBy('fecha', 'sales.idBanca')
             ->groupBy('fecha')
             //->orderBy('created_at', 'asc')
             ->get();
+
+            $ventas = collect($fechasVentas)->map(function($f) use($idVentas){
+                $comision = Salesdetails::whereRaw('date(created_at) = date(?)', [$f['fecha']])->whereIn('idVenta', $idVentas)->sum('comision');
+                
+                $ventas = Sales::select(DB::raw('
+                sum(sales.subTotal) subTotal, 
+                sum(sales.total) total, 
+                sum(sales.premios) premios, 
+                sum(descuentoMonto)  as descuentoMonto'))
+                ->whereRaw('date(sales.created_at) = ? ', [$f['fecha']])
+                ->whereIn('sales.id', $idVentas)
+                ->get();
+
+                // $total = Sales::
+                // whereRaw('date(sales.created_at) = ? ', [$f['fecha']])
+                // ->whereIn('sales.id', $idVentas)
+                // ->sum('total');
+
+                return ['fecha' => $f['fecha'], 'total' => $ventas[0]->total, 'premios' => $ventas[0]->premios, 'descuentoMonto' => $ventas[0]->descuentoMonto, 'comisiones' => $comision, ];
+            });
+
+            
         }else{
-            $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            // $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            // sum(sales.subTotal) subTotal, 
+            // sum(sales.total) total, 
+            // sum(sales.premios) premios, 
+            // sum(descuentoMonto)  as descuentoMonto,
+            // sum(salesdetails.comision) as comisiones'))
+            // ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+            // ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            // ->whereNotIn('sales.status', [0,5])
+            // ->groupBy('fecha')
+            // //->orderBy('created_at', 'asc')
+            // ->get();
+
+            // $ventas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
+            // sum(sales.subTotal) subTotal, 
+            // sum(sales.total) total, 
+            // sum(sales.premios) premios, 
+            // sum(descuentoMonto)  as descuentoMonto,
+            // (select sum(salesdetails.comision) from salesdetails where idVenta = sales.id) as comisiones'))
+            // ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            // ->whereNotIn('sales.status', [0,5])
+            // ->groupBy('fecha')
+            // //->orderBy('created_at', 'asc')
+            // ->get();
+
+            $idVentas = Sales::select(DB::raw('sales.id'))
+            ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+            ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            ->whereNotIn('sales.status', [0,5])
+            // ->groupBy('fecha')
+            //->orderBy('created_at', 'asc')
+            ->get();
+
+            
+            $idVentas = collect($idVentas)->map(function($v){
+                return $v['id'];
+            });
+
+
+            
+
+            $fechasVentas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
             sum(sales.subTotal) subTotal, 
             sum(sales.total) total, 
             sum(sales.premios) premios, 
@@ -326,6 +477,26 @@ class ReportesController extends Controller
             ->groupBy('fecha')
             //->orderBy('created_at', 'asc')
             ->get();
+
+            $ventas = collect($fechasVentas)->map(function($f) use($idVentas){
+                $comision = Salesdetails::whereRaw('date(created_at) = date(?)', [$f['fecha']])->whereIn('idVenta', $idVentas)->sum('comision');
+                
+                $ventas = Sales::select(DB::raw('
+                sum(sales.subTotal) subTotal, 
+                sum(sales.total) total, 
+                sum(sales.premios) premios, 
+                sum(descuentoMonto)  as descuentoMonto'))
+                ->whereRaw('date(sales.created_at) = ? ', [$f['fecha']])
+                ->whereIn('sales.id', $idVentas)
+                ->get();
+
+                // $total = Sales::
+                // whereRaw('date(sales.created_at) = ? ', [$f['fecha']])
+                // ->whereIn('sales.id', $idVentas)
+                // ->sum('total');
+
+                return ['fecha' => $f['fecha'], 'total' => $ventas[0]->total, 'premios' => $ventas[0]->premios, 'descuentoMonto' => $ventas[0]->descuentoMonto, 'comisiones' => $comision, ];
+            });
 
             $false = true;
         }
@@ -547,11 +718,21 @@ class ReportesController extends Controller
     
       
         $ticketsGanadores = Sales::
-            whereStatus(2)
-            ->wherePagado(0)
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->where('idBanca', $datos['idBanca'])
+            select('salesdetails.idVenta')
+            ->join('salesdetails', 'salesdetails.idVenta', 'sales.id')
+            ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            ->where(['sales.idBanca'=> $datos['idBanca'], 'sales.pagado' =>0])
+            ->where('salesdetails.premio', '>', 0)
+            ->whereNotIn('sales.status', [0, 5])
             ->get();
+
+            $ticketsGanadores = collect($ticketsGanadores)->map(function($t){
+                return $t['idVenta'];
+            });
+
+            
+
+            $ticketsGanadores = Sales::whereIn('id', $ticketsGanadores)->get();
     
             $comisionesMonto = 0;
             $datosComisiones = Commissions::where('idBanca', $datos['idBanca'])->get();
