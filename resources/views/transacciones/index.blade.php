@@ -158,6 +158,7 @@
                     <table class="table table-sm table-striped">
                         <thead>
                             <tr>
+                            <th scope="col" class="text-center" style="font-size: 12px;">Fecha</th>
                             <th scope="col" class="text-center" style="font-size: 12px;">Tipo</th>
                             <th scope="col" class="text-center" style="font-size: 12px;">Entidad #1</th>
                             <!-- <th scope="col" class="text-center" style="font-size: 12px;">Cerrado</th> -->
@@ -177,6 +178,7 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="c in datos.transacciones">
+                                <td scope="col" class="text-center" style="font-size: 12px">@{{toFecha(c.created_at.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <td scope="col" class="text-center" style="font-size: 12px">@{{c.tipo.descripcion}}</td>
                                 <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1.descripcion}}</td>
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">@{{Cerrado}}</td> -->

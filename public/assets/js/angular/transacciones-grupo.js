@@ -37,6 +37,7 @@ myApp
             "selectedGrupo" : {},
             "fechaDesde" : new Date(),
             "fechaHasta" : new Date(),
+            'btnCargando' : false
         }
 
        
@@ -290,6 +291,7 @@ myApp
             }
 
             $scope.datos.idUsuario = idUsuario;
+            $scope.datos.btnCargando = true;
             $http.post(rutaGlobal+"/api/transacciones/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
             .then(function(response){
                console.log(response.data);
@@ -297,11 +299,13 @@ myApp
                     $scope.datos.grupos = response.data.grupos;
                     limpiar();
                     $scope.datos.addTransaccion = [];
+                    $scope.datos.btnCargando = false;
                     alert('Se ha guardado correctamente');
                     $('#transactionGroupModal').modal('hide');
                }else{
                 limpiar();
                 $scope.datos.addTransaccion = [];
+                $scope.datos.btnCargando = false;
                 alert(response.data.mensajes);
                }
                
@@ -311,6 +315,7 @@ myApp
             function(response) {
                 // Handle error here
                 console.log('Error jean: ', response);
+                $scope.datos.btnCargando = false;
                 alert('Error');
             });
 

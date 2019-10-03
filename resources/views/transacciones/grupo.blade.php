@@ -159,7 +159,13 @@
                     </div>
                         <div class="col-6 text-right mt-2">
                               <div class="form-group">
-                                <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">   
+                                <button ng-click="actualizar()"  class="btn btn-primary" type="button" ng-disabled="datos.btnCargando == true">
+                                    <span ng-show="datos.btnCargando == true" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span ng-show="datos.btnCargando == true" class="sr-only">Guardando...</span>
+                                    <p ng-show="datos.btnCargando == false" class="p-0 m-0 d-inline">Guardar</p>
+                                    <p ng-show="datos.btnCargando == true" class="p-0 m-0 d-inline">Guardando...</p>
+                                </button>
+                                <!-- <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">    -->
                             </div>
                           </div>
                     
@@ -372,7 +378,13 @@
 
                     <div class="col-12 text-right mt-2">
                               <div class="form-group">
-                                <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">   
+                              <button ng-click="actualizar()"  class="btn btn-primary" type="button" ng-disabled="datos.btnCargando == true">
+                                    <span ng-show="datos.btnCargando == true" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span ng-show="datos.btnCargando == true" class="sr-only">Guardando...</span>
+                                    <p ng-show="datos.btnCargando == false" class="p-0 m-0 d-inline">Guardar</p>
+                                    <p ng-show="datos.btnCargando == true" class="p-0 m-0 d-inline">Guardando...</p>
+                                </button>
+                                <!-- <input ng-click="actualizar()" type="submit" class="btn btn-primary" value="Guardar">    -->
                             </div>
                           </div>
 

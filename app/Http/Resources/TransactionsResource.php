@@ -36,7 +36,8 @@ class TransactionsResource extends JsonResource
             'entidad2_saldo_final' => $this->entidad2_saldo_final,
             'nota' => $this->nota,
             'nota_grupo' => $this->nota_grupo,
-            'status' => $this->status
+            'status' => $this->status,
+            'created_at' => $this->created_at
         ];
     }
 }
