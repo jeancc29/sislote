@@ -153,15 +153,15 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td class="text-center font-weight-bold">TOTAL:</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalTickets}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalVentas}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalComisiones}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalDescuentos}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalPremios}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalTotalNeto}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalBalance}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalBalanceActual}}</td>
-                                <td class="text-center font-weight-bold">@{{datos.totalcaidaAcumulada}}</td>
+                                <td class="text-center font-weight-bold">@{{totalTickets}}</td>
+                                <td class="text-center font-weight-bold">@{{totalVentas | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalComisiones | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalDescuentos | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalPremios | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalTotalNeto | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalBalance | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalBalanceActual | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalcaidaAcumulada | currency}}</td>
                                 
                             </tr>
                             

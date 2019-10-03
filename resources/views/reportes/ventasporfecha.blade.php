@@ -191,6 +191,15 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descuentos}}</td>
                                 <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto}}</td>
                             </tr>
+                            <tr>
+                                
+                                <td class="text-center font-weight-bold">TOTAL:</td>
+                                <td class="text-center font-weight-bold">@{{totalVentas | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalPremios | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalComisiones | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalDescuentos | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalNeto | currency}}</td>
+                            </tr>
                             
                         </tbody>
                     </table>

@@ -790,6 +790,8 @@ class ReportesController extends Controller
             $comisiones = 0;
             $neto = $ventas -  ($premios + $descuentos + $comisionesMonto);
 
+            
+
         return Response::json([
             'errores' => 0,
             'balanceHastaLaFecha' => $balanceHastaLaFecha,

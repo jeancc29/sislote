@@ -2,6 +2,7 @@ myApp
     .controller("myController", function($scope, $http, $timeout, $window, $document, helperService){
         $scope.busqueda = "";
         var ruta = '';
+        var bancasBusqueda = [];
         $scope.txtActive = 0;
         $scope.es_movil = false;
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
@@ -269,31 +270,82 @@ myApp
         }
 
         $scope.greaterThan = function(prop, val){
+
+         
             
+            bancasBusqueda = [];
+            $scope.totalVentas = 0;
+            $scope.totalTickets = 0;
+            $scope.totalComisiones = 0;
+            $scope.totalDescuentos = 0;
+            $scope.totalPremios = 0;
+            $scope.totalTotalNeto = 0;
+            $scope.totalBalance = 0;
+            $scope.totalBalanceActual = 0;
+            $scope.totalcaidaAcumulada = 0;
             
             return function(item){
                 
                 if(helperService.empty($scope.datos.descripcionBanca, 'string') == true){
-                    if($scope.datos.accionBusqueda == "con premios")
-                    return item['premios'] > 0;
-                    else if($scope.datos.accionBusqueda == "con ventas")
-                        return item['ventas'] > 0;
-                    else if($scope.datos.accionBusqueda == "con tickets pendientes")
-                        return item['ticketsPendientes'] > 0;
-                    else
-                        return true;
+                    var mostrar = false;
+                    if($scope.datos.accionBusqueda == "con premios"){
+                        mostrar = item['premios'] > 0;
+                    }
+                    else if($scope.datos.accionBusqueda == "con ventas"){
+                        mostrar = item['ventas'] > 0;
+                    }
+                    else if($scope.datos.accionBusqueda == "con tickets pendientes"){
+                        mostrar = item['ticketsPendientes'] > 0;
+                    }
+                    else{
+                        mostrar = true;
+                    }
+
+                    if(mostrar == true){
+                        $scope.totalVentas += Number(item.ventas);
+                        $scope.totalTickets += Number(item.tickets);
+                        $scope.totalComisiones += Number(item.comisiones);
+                        $scope.totalDescuentos += Number(item.descuentos);
+                        $scope.totalPremios += Number(item.premios);
+                        $scope.totalTotalNeto += Number(item.totalNeto);
+                        $scope.totalBalance += Number(item.balance);
+                        $scope.totalBalanceActual += Number(item.balanceActual);
+                        $scope.totalcaidaAcumulada += Number(item.caidaAcumulada);
+                        bancasBusqueda.push(item);
+                    }
+                    console.log('greaterThan: ',bancasBusqueda);
+                    return mostrar;
                 }else{
+                    var mostrar = false;
+
                     if($scope.datos.accionBusqueda == "con premios")
-                        return item['premios'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['premios'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
                     else if($scope.datos.accionBusqueda == "con ventas" )
-                        return item['ventas'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['ventas'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
                     else if($scope.datos.accionBusqueda == "con tickets pendientes")
-                        return item['ticketsPendientes'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['ticketsPendientes'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
                     else
-                        return item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                    
+                        if(mostrar == true){
+                            $scope.totalVentas += Number(item.ventas);
+                            $scope.totalTickets += Number(item.tickets);
+                            $scope.totalComisiones += Number(item.comisiones);
+                            $scope.totalDescuentos += Number(item.descuentos);
+                            $scope.totalPremios += Number(item.premios);
+                            $scope.totalTotalNeto += Number(item.totalNeto);
+                            $scope.totalBalance += Number(item.balance);
+                            $scope.totalBalanceActual += Number(item.balanceActual);
+                            $scope.totalcaidaAcumulada += Number(item.caidaAcumulada);
+                            bancasBusqueda.push(item);
+                        }
+                    return mostrar;
                 }
                 
             }
+
+            
+            
         }
 
 

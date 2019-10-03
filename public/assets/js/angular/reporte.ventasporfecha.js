@@ -279,13 +279,38 @@ myApp
 
         $scope.greaterThan = function(prop, val){
             
+            $scope.totalVentas = 0;
+            $scope.totalPremios = 0;
+            $scope.totalComisiones = 0;
+            $scope.totalDescuentos = 0;
+            $scope.totalNeto = 0;
             
             return function(item){
-                console.log('greaterThan:');
+                
+                var mostrar = false;;
                 if(helperService.empty($scope.datos.fechaFiltro, 'string') == true){
-                        return true;
+                    mostrar = true;
+
+                    if(mostrar == true){
+                        $scope.totalVentas += Number(item.ventas);
+                        $scope.totalPremios += Number(item.premios);
+                        $scope.totalComisiones += Number(item.comisiones);
+                        $scope.totalDescuentos += Number(item.descuentos);
+                        $scope.totalNeto += Number(item.totalNeto);
+                    }
+                    console.log('greaterThan:', $scope.totalVentas);
+                    return mostrar;
                 }else{
-                        return item['fecha'].indexOf($scope.datos.fechaFiltro.toUpperCase()) != -1;
+                    mostrar = item['fecha'].indexOf($scope.datos.fechaFiltro.toUpperCase()) != -1;
+
+                    if(mostrar == true){
+                        $scope.totalVentas += Number(item.ventas);
+                        $scope.totalPremios += Number(item.premios);
+                        $scope.totalComisiones += Number(item.comisiones);
+                        $scope.totalDescuentos += Number(item.descuentos);
+                        $scope.totalNeto += Number(item.totalNeto);
+                    }
+                    return mostrar;
                 }
                 
             }
