@@ -279,8 +279,10 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					end if;
 				
 				if (@montoDisponible <@monto) or (@montoDisponible <@monto) is null then
-					set @errores = 1;
-					select 1 as errores, concat('No hay existencia suficiente para la jugada ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria)) as mensaje;
+                if not exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar sin disponibilidad') then
+						set @errores = 1;
+						select 1 as errores, concat('No hay existencia suficiente para la jugada ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria)) as mensaje;
+                    end if;
 				end if;
 				-- END GET MONTO DISPONIBLE
                 

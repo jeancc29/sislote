@@ -132,7 +132,7 @@ class ReportesController extends Controller
             $fechaFinalSinHora = $fechaFinalSinHora->toDateString();
             
             $bancas = Branches::whereStatus(1)->get();
-            $bancas = collect($bancas)->map(function($d) use($fechaActualCarbon, $fechaFinalSinHora){
+            $bancas = collect($bancas)->map(function($d) use($fechaActualCarbon, $fechaFinalSinHora, $fechaInicial, $fechaFinal){
                 $ventas = Helper::ventasPorBanca($d['id']);
                 $descuentos = Helper::descuentosPorBanca($d['id']);
                 $premios = Helper::premiosPorBanca($d['id']);
@@ -143,21 +143,46 @@ class ReportesController extends Controller
                 $balance = Helper::saldo($d['id'], 1);
                 $caidaAcumulada = Helper::saldo($d['id'], 3);
 
-                $sumarVentasNetas = false;
+                // $sumarVentasNetas = false;
                 
-                if($fechaFinalSinHora < $fechaActualCarbon->toDateString()){
-                    $sumarVentasNetas = false;
-                }
-                else if($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false){
-                    $sumarVentasNetas = true;
-                }
+                // if($fechaFinalSinHora < $fechaActualCarbon->toDateString()){
+                //     $sumarVentasNetas = false;
+                // }
+                // else if($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false){
+                //     $sumarVentasNetas = true;
+                // }
+                //'balanceActual' => ($sumarVentasNetas == true) ? round(($balance + $totalNeto), 2) : $balance
+
+                $pendientes = Sales::
+                    whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                    ->whereStatus(1)
+                    ->where('idBanca', $d['id'])
+                    ->count();
+            
+                $ganadores = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                            ->whereStatus('2')
+                            ->where('idBanca', $d['id'])
+                            ->count();
+                // $premios = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                //     ->whereStatus('2')
+                //     ->where('idBanca', $d['id'])
+                //     ->sum("premios");
+                            
+                        
+                $perdedores = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                            ->whereStatus('3')
+                            ->where('idBanca', $d['id'])
+                            ->count();
 
                 return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                     'descuentos' => $descuentos, 
                     'premios' => $premios, 
                     'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
                     'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
-                    'balanceActual' => ($sumarVentasNetas == true) ? round(($balance + $totalNeto), 2) : $balance
+                    'balanceActual' => round(($balance + $totalNeto), 2),
+                    'pendientes' => $pendientes,
+                    'ganadores' => $ganadores,
+                    'perdedores' => $perdedores
                 ];
             });
 
@@ -200,22 +225,47 @@ class ReportesController extends Controller
             $balance = Helper::saldoPorFecha($d['id'], 1, $fechaFinalSinHora);
             $caidaAcumulada = Helper::saldoPorFecha($d['id'], 3, $fechaFinalSinHora);
 
-            $sumarVentasNetas = false;
+            // $sumarVentasNetas = false;
 
-            if($fechaFinalSinHora < $fechaActualCarbon->toDateString()){
-                $sumarVentasNetas = false;
-            }
-            else if($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false){
-                $sumarVentasNetas = true;
-            }
+            // if($fechaFinalSinHora < $fechaActualCarbon->toDateString()){
+            //     $sumarVentasNetas = false;
+            // }
+            // else if($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false){
+            //     $sumarVentasNetas = true;
+            // }
+            //'balanceActual' => ($sumarVentasNetas == true) ? round(($balance + $totalNeto), 2) : $balance,
+
+            $pendientes = Sales::
+                    whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                    ->whereStatus(1)
+                    ->where('idBanca', $d['id'])
+                    ->count();
+            
+                $ganadores = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                            ->whereStatus('2')
+                            ->where('idBanca', $d['id'])
+                            ->count();
+                // $premios = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                //     ->whereStatus('2')
+                //     ->where('idBanca', $d['id'])
+                //     ->sum("premios");
+                            
+                        
+                $perdedores = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                            ->whereStatus('3')
+                            ->where('idBanca', $d['id'])
+                            ->count();
 
             return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
                 'descuentos' => $descuentos, 
                 'premios' => $premios, 
                 'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
                 'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
-                'balanceActual' => ($sumarVentasNetas == true) ? round(($balance + $totalNeto), 2) : $balance,
-                'sumar' => $sumarVentasNetas];
+                'balanceActual' => round(($balance + $totalNeto), 2),
+                'pendientes' => $pendientes,
+                'ganadores' => $ganadores,
+                'perdedores' => $perdedores
+            ];
         });
         
       
