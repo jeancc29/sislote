@@ -274,6 +274,9 @@ myApp
          
             
             bancasBusqueda = [];
+            $scope.totalGanadores = 0;
+            $scope.totalPendientes = 0;
+            $scope.totalPerdedores = 0;
             $scope.totalVentas = 0;
             $scope.totalTickets = 0;
             $scope.totalComisiones = 0;
@@ -302,6 +305,9 @@ myApp
                     }
 
                     if(mostrar == true){
+                        $scope.totalGanadores += Number(item.ganadores);
+                        $scope.totalPendientes += Number(item.pendientes);
+                        $scope.totalPerdedores += Number(item.perdedores);
                         $scope.totalVentas += Number(item.ventas);
                         $scope.totalTickets += Number(item.tickets);
                         $scope.totalComisiones += Number(item.comisiones);
@@ -328,6 +334,9 @@ myApp
                         mostrar = item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
                     
                         if(mostrar == true){
+                            $scope.totalGanadores += Number(item.ganadores);
+                            $scope.totalPendientes += Number(item.pendientes);
+                            $scope.totalPerdedores += Number(item.perdedores);
                             $scope.totalVentas += Number(item.ventas);
                             $scope.totalTickets += Number(item.tickets);
                             $scope.totalComisiones += Number(item.comisiones);

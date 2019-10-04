@@ -119,6 +119,9 @@
                             <tr>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Banca</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Codigo</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Pendientes</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Ganadores</th>
+                            <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Perdedores</th>
                             <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Cerrado</th> -->
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Tickets</th>
                             <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Venta</th>
@@ -139,6 +142,9 @@
                             <tr ng-repeat="c in datos.bancas | filter:greaterThan(datos.accionBusqueda)">
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descripcion}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.codigo}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.pendientes}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.ganadores}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.perdedores}}</td>
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.tickets}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.ventas | currency}}</td>
@@ -153,6 +159,9 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td class="text-center font-weight-bold">TOTAL:</td>
+                                <td class="text-center font-weight-bold">@{{totalPendientes}}</td>
+                                <td class="text-center font-weight-bold">@{{totalGanadores}}</td>
+                                <td class="text-center font-weight-bold">@{{totalPerdedores}}</td>
                                 <td class="text-center font-weight-bold">@{{totalTickets}}</td>
                                 <td class="text-center font-weight-bold">@{{totalVentas | currency}}</td>
                                 <td class="text-center font-weight-bold">@{{totalComisiones | currency}}</td>
