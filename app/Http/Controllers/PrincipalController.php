@@ -686,6 +686,135 @@ class PrincipalController extends Controller
     }
 
 
+    public function cancelarMovil()
+    {
+        $datos = request()->validate([
+            'datos.codigoBarra' => 'required',
+            'datos.razon' => 'required',
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => 'required'
+        ])['datos'];
+    
+        $usuario = Users::whereId($datos['idUsuario'])->first();
+        // if(!$usuario->tienePermiso("Eliminar ticket")){
+        //     return Response::json([
+        //         'errores' => 1,
+        //         'mensaje' => 'No tiene permisos para realizar esta accion'
+        //     ], 201);
+        // }
+    
+       //return $datos;
+        $fecha = getdate();
+    
+        $errores = 0;
+        $mensaje = '';
+        $loterias = null;
+        $jugadas = null;
+    
+        
+    
+        
+        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+            //Obtenemos el ticket
+            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0, 5])->get()->first();
+    
+            
+            
+            if($venta != null){
+                if($usuario->roles->descripcion != "Administrador" && $venta->compartido == 1){
+                    return Response::json([
+                        'errores' => 1,
+                        'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
+                    ], 201);
+                }
+                $banca = Branches::whereId($datos['idBanca'])->first();
+                $minutoTicketJugado =  getdate(strtotime($venta['created_at']));
+                $minutoActual = $fecha['minutes'];
+    
+                
+                if(!$usuario->tienePermiso("Cancelar tickets en cualquier momento")){
+                    if($minutoTicketJugado['year'] != $fecha['year']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar",
+                            'ticket' => $minutoTicketJugado
+                        ], 201);
+                    }
+                    if($minutoTicketJugado['mon'] != $fecha['mon']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
+                        ], 201);
+                    }
+                    if($minutoTicketJugado['mday'] != $fecha['mday']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
+                        ], 201);
+                    }
+                    if($minutoTicketJugado['hours'] != $fecha['hours']){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar"
+                        ], 201);
+                    }
+                }
+               // return ($minutoActual - $minutoTicketJugado) . " - " .$banca[' minutosCancelarTicket'];
+    
+                if(($minutoActual - $minutoTicketJugado['minutes']) < $banca['minutosCancelarTicket'] || $usuario->tienePermiso("Cancelar tickets en cualquier momento")){
+                    $venta['pagado'] = 0;
+                    $venta['status'] = 0;
+                    $venta->save();
+
+                    $ventasDetalles = Salesdetails::where('idVenta', $venta['id'])->get();
+                    foreach($ventasDetalles as $v){
+                        $v['premio'] = 0;
+                        $v['status'] = 0;
+                        $v->save();
+                    }
+    
+                    Cancellations::create([
+                        'idTicket' => $venta['idTicket'],
+                        'idUsuario' => $datos['idUsuario'],
+                        'razon' => $datos['razon']
+                    ]);
+    
+                    $mensaje = "El ticket se ha cancelado correctamente";
+                }else{
+                    $errores = 1;
+                    $mensaje = "Han pasado los " . $banca[' minutosCancelarTicket'] ." minutos de plazo para cancelar";
+                    //$mensaje = "minutos actual: $minutoActual, minutosticket: $minutoTicketJugado";
+                }
+                
+    
+            }else{
+                $errores = 1;
+                $mensaje = "El ticket no existe o ya ha sido cancelado";
+            }
+        }else{
+                $errores = 1;
+                $mensaje = "El numero de ticket no es correcto";
+        }
+
+        $fecha = getdate();
+        $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                ->whereNotIn('status', [0,5])->get();
+    
+        $idVentas = collect($ventas)->map(function($id){
+            return $id->id;
+        });
+    
+    
+    
+        return Response::json([
+            'errores' => $errores,
+            'mensaje' => $mensaje,
+            'ticket' ($errores == 0) ? new SalesResource($venta) : []
+        ], 201);
+    }
+
+
 
     public function eliminar()
     {
