@@ -999,7 +999,8 @@ class ReportesController extends Controller
         
        $monitoreo = collect($monitoreo)->map(function($m){
            $codigo = Branches::select('codigo')->whereId($m['idBanca'])->first();
-           return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
+           $codigoBarra = Tickets::whereId($m['idTicket'])->first();
+           return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'codigoBarra' =>$codigoBarra['codigoBarra'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
        });
     
         return Response::json([
