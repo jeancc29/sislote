@@ -234,6 +234,7 @@ class DashboardController extends Controller
         }
         
         
+        
         // $ventas = Sales::join('salesdetails', 'salesdetails.idVenta', 'sales.id')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
         //     ->whereNotIn('sales.status', [0,5])
         //     ->where('salesdetails.idLoteria', $loteria['id'])
@@ -268,7 +269,10 @@ class DashboardController extends Controller
         
         $bancasConVentas = Branches::whereIn('id', $idBancas)->whereStatus(1)->count();
         $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->whereStatus(1)->count();
-
+        foreach($loterias as $l){
+            $totalVentasLoterias += $l['ventas'];
+            $totalPremiosLoterias += $l['premios'];
+        }
         
         
 
