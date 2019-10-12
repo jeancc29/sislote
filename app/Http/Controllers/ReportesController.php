@@ -1032,7 +1032,7 @@ class ReportesController extends Controller
     
     
         return Response::json([
-            'monitoreo' => new SalesResource($ticket),
+            'ticket' => new SalesResource($ticket),
             'errores' => 0,
             'mensaje' => "El ticket no existe",
         ], 201);
