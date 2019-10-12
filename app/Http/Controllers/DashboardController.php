@@ -215,10 +215,10 @@ class DashboardController extends Controller
             //     return ['descripcion' => $d['descripcion'], 'jugadas' => $jugadas];
             // });
 
-            foreach($loterias as $l){
-                $totalVentasLoterias += $l['ventas'];
-                $totalPremiosLoterias += $l['premios'];
-            }
+            // foreach($loterias as $l){
+            //     $totalVentasLoterias += $l['ventas'];
+            //     $totalPremiosLoterias += $l['premios'];
+            // }
 
             
 
