@@ -943,6 +943,75 @@ class ReportesController extends Controller
         ], 201);
     }
 
+
+    public function monitoreoMovil()
+    {
+        $datos = request()->validate([
+            'datos.fecha' => 'required',
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => '',
+            'datos.layout' => ''
+        ])['datos'];
+    
+        $usuario = Users::whereId($datos['idUsuario'])->first();
+        if(!$usuario->tienePermiso("Monitorear ticket")){
+            // return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'No tiene permisos para realizar esta accion'
+            // ], 201);
+             //Datos['layout'] es un parametro que me indicara si se esta accediendo 
+            // desde la ventana principal o desde otra venta, si es de la ventana principal entonces
+            // se verifica que la variable $datos['layout'] este definida y que su valor sea igual a 'Principal', 
+            // de lo contrario no tendra permisos
+            if(!isset($datos['layout'])){
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'No tiene permisos para realizar esta accion'
+                ], 201);
+            }
+            else if($datos['layout'] != 'Principal'){
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'No tiene permisos para realizar esta accion'
+                ], 201);
+            }
+        }
+
+        if(isset($datos['idBanca'])){
+            $datos['idBanca'] = Branches::where(['id' => $datos['idBanca'], 'status' => 1])->first();
+            if($datos['idBanca'] != null)
+                $datos['idBanca'] = $datos['idBanca']->id;
+        }else{
+            $datos['idBanca'] = Branches::where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
+        }
+    
+        $fecha = getdate(strtotime($datos['fecha']));
+    
+    
+    
+        $monitoreo = Sales::select('id', 'idTicket', 'idBanca')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                    ->where('idBanca', $datos['idBanca'])
+                    ->where('status', '!=', '5')
+                    ->orderBy('id', 'desc')
+                    ->get();
+    
+       // return $ventas;
+        
+       $monitoreo = collect($monitoreo)->map(function($m){
+           $codigo = Branches::select('codigo')->whereId($m['idBanca'])->first();
+           return ['id' =>$m['id'], 'idTicket' =>$m['idTicket'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
+       });
+    
+        return Response::json([
+            'monitoreo' => $monitoreo,
+            'loterias' => Lotteries::whereStatus(1)->get(),
+            'caracteristicasGenerales' =>  Generals::all(),
+            'total_ventas' => Sales::sum('total'),
+            'total_jugadas' => Salesdetails::count('jugada'),
+            'errores' => 0
+        ], 201);
+    }
+
     public function ticketsPendientesDePago()
     {
         $datos = request()->validate([
