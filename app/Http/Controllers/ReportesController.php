@@ -989,7 +989,7 @@ class ReportesController extends Controller
     
     
     
-        $monitoreo = Sales::select('id', 'idTicket', 'idBanca', 'total')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        $monitoreo = Sales::select('id', 'idTicket', 'idBanca', 'total', 'status')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                     ->where('idBanca', $datos['idBanca'])
                     ->where('status', '!=', '5')
                     ->orderBy('id', 'desc')
@@ -999,7 +999,7 @@ class ReportesController extends Controller
         
        $monitoreo = collect($monitoreo)->map(function($m){
            $codigo = Branches::select('codigo')->whereId($m['idBanca'])->first();
-           return ['id' =>$m['id'], 'total' =>$m['total'], 'idTicket' =>$m['idTicket'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
+           return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
        });
     
         return Response::json([
