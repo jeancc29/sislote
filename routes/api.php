@@ -104,6 +104,7 @@ Route::post('/bloqueos/loterias/buscar', 'BlockslotteriesController@buscar');
 
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
+Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
 Route::post('/reportes/ventas/', 'ReportesController@ventas');
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
 Route::post('/reportes/historico/', 'ReportesController@historico');

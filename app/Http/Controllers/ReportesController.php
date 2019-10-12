@@ -1012,6 +1012,32 @@ class ReportesController extends Controller
         ], 201);
     }
 
+
+    public function getTicketById()
+    {
+        $datos = request()->validate([
+            'datos.idTicket' => 'required',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+    
+       
+
+        $ticket = Sales::where('idTicket', $datos['idTicket'])->first();
+        if($ticket == null){
+            return Response::json([
+                'errores' => 0,
+                'mensaje' => "El ticket no existe",
+            ], 201);
+        }
+    
+    
+        return Response::json([
+            'monitoreo' => new SalesResource($ticket),
+            'errores' => 0,
+            'mensaje' => "El ticket no existe",
+        ], 201);
+    }
+
     public function ticketsPendientesDePago()
     {
         $datos = request()->validate([
