@@ -810,7 +810,7 @@ class PrincipalController extends Controller
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'ticket' ($errores == 0) ? new SalesResource($venta) : []
+            'ticket' => ($errores == 0) ? new SalesResource($venta) : []
         ], 201);
     }
 
