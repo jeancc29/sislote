@@ -53,32 +53,15 @@ BEGIN
 		
 select JSON_ARRAYAGG(JSON_OBJECT(
 				'id', s.id, 'total', s.total,
-                'idUsuario', s.idUsuario,
-                'usuario', u.usuario,
+                
                 'idBanca', s.idBanca,
                 'codigo', b.codigo,
                 'banca', JSON_OBJECT('id', b.id, 'descripcion', b.descripcion, 'codigo', b.codigo, 'piepagina1', b.piepagina1, 'piepagina2', b.piepagina2, 'piepagina3', b.piepagina3, 'piepagina4', b.piepagina4, 'imprimirCodigoQr', b.imprimirCodigoQr),
-                'descuentoPorcentaje', s.descuentoPorcentaje,
-                'descuentoMonto', s.descuentoMonto,
-                'hayDescuento', s.hayDescuento,
-                'subTotal', s.subTotal,
                 'idTicket', s.idTicket,
                 'ticket', t.id,
                 'codigoBarra', t.codigoBarra,
-                'codigoQr', TO_BASE64('t.codigoBarra'),
-                'status', s.status,
-                'created_at', s.created_at,
-                'pagado', s.pagado,
-                'montoPagado', (select sum(premio) from salesdetails where pagado = 1 and idVenta = s.id),
-                'premio', (select sum(premio) from salesdetails where idVenta = s.id),
-                'montoAPagar', (select sum(premio) from salesdetails where pagado = 0 and idVenta = s.id),
-                'montoAPagar', ca.razon,
-                'usuarioCancelacion', JSON_OBJECT('id', uc.id, 'usuario', uc.usuario),
-                'fechaCancelacion', ca.created_at,
-                'loterias', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'descripcion', descripcion, 'abreviatura', abreviatura)) from lotteries where id in(select distinct idLoteria from salesdetails where idVenta = s.id)),
-                'jugadas', (select JSON_ARRAYAGG(JSON_OBJECT('id', sd.id, 'idVenta', sd.idVenta, 'jugada', sd.jugada, 'idLoteria', sd.idLoteria, 'idSorteo', sd.idSorteo, 'monto', sd.monto, 'premio', sd.premio, 'pagado', sd.pagado, 'status', sd.status, 'sorteo', JSON_OBJECT('id', d.id, 'descripcion', d.descripcion), 'fechaPagado', (select created_at from logs where tabla = 'salesdetails' and idRegistroTablaAccion = sd.id) , 'pagadoPor', (select us.usuario from logs lo inner join users us on us.id = lo.idUsuario where lo.idRegistroTablaAccion = sd.id and lo.tabla = 'salesdetails'))) from salesdetails sd inner join draws d on sd.idSorteo = d.id where sd.idVenta = s.id),
-                'fecha', concat(date(s.created_at), ' ', DATE_FORMAT(s.created_at, "%r")),
-                'usuario', u.usuario
+                'codigoQr', TO_BASE64('t.codigoBarra')
+                
 			)) as ventas from sales s
             inner join users u on u.id = s.idUsuario 
             inner join branches b on b.id = s.idBanca
@@ -102,23 +85,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				'id', b.id, 'descripcion', b.descripcion,
                 'codigo', b.codigo,
                 'status', b.status,
-                'idUsuario', b.idUsuario,
-                'usuario', u.usuario,
-                'dueno', b.dueno,
-                'localidad', b.localidad,
-                'balanceDesactivacion', b.balanceDesactivacion,
-                'limiteVenta', b.limiteVenta,
-                'descontar', b.descontar,
-                'deCada', b.deCada,
-                'minutosCancelarTicket', b.minutosCancelarTicket,
-                'piepagina1', b.piepagina1,
-                'piepagina2', b.piepagina2,
-                'piepagina3', b.piepagina3,
-                'piepagina4', b.piepagina4,
-                'dias', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from days d inner join branches_days bd on d.id = bd.idDia where bd.idBanca = b.id),
-                'loterias', (select JSON_ARRAYAGG(JSON_OBJECT('id', l.id, 'descripcion', l.descripcion)) from lotteries l inner join branches_lotteries bl on l.id = bl.idLoteria where bl.idBanca = b.id),
-                'comisiones', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'idBanca', idBanca, 'idLoteria', idLoteria, 'directo', directo, 'pale', pale, 'tripleta', tripleta, 'superPale', superPale, 'pick3Straight', pick3Straight, 'pick3Box', pick3Box, 'pick4Straight', pick4Straight, 'pick4Box', pick4Box, 'created_at', created_at)) from commissions where idBanca = b.id),
-                'pagosCombinaciones', (select JSON_ARRAYAGG(JSON_OBJECT('id', id, 'idBanca', idBanca, 'idLoteria', idLoteria, 'primera', primera, 'segunda', segunda, 'tercera', tercera, 'primeraSegunda', primeraSegunda, 'primeraTercera', primeraTercera, 'segundaTercera', segundaTercera, 'tresNumeros', tresNumeros, 'dosNumeros', dosNumeros, 'primerPago', primerPago, 'pick3TodosEnSecuencia', pick3TodosEnSecuencia, 'pick33Way', pick33Way, 'pick36Way', pick36Way, 'pick4TodosEnSecuencia', pick4TodosEnSecuencia, 'pick44Way', pick44Way, 'pick46Way', pick46Way, 'pick412Way', pick412Way, 'pick424Way', pick424Way, 'created_at', created_at)) from payscombinations where idBanca = b.id),
+                
                 'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
                 'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
 			)) as bancas from branches b
