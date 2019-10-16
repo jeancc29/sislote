@@ -670,10 +670,21 @@ class ReportesController extends Controller
                     ->where('idBanca', $datos['idBanca'])
                     ->sum('descuentoMonto');
     
-                    $premios = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                    // $premios = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                    // ->whereIn('status', array(1,2))
+                    // ->where('idBanca', $datos['idBanca'])
+                    // ->sum('premios');
+
+                    $idVentasPremios = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                     ->whereIn('status', array(1,2))
                     ->where('idBanca', $datos['idBanca'])
-                    ->sum('premios');
+                    ->get();
+
+                    $idVentasPremios = collect($idVentasPremios)->map(function($v){
+                        return $v['id'];
+                    });
+
+                    $premios = Salesdetails::whereIn('idVenta', $idVentasPremios)->sum('premio');
     
                     //Obtener loterias con el monto total jugado y con los premios totales
     
