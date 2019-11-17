@@ -611,6 +611,9 @@ myApp
                 $http.post(rutaGlobal+"/api/bloqueosgenerales/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
                 .then(function(response){
                     console.log(response);
+                    $scope.datos.tabSelectedLoteria.sorteos.splice(index, 1);
+                    $scope.datos.tabSelectedLoteria.cantidadDeBloqueos = $scope.datos.tabSelectedLoteria.cantidadDeBloqueos - 1;
+
                     alert("Se ha eliminado correctamente");
 
                 },
@@ -628,6 +631,7 @@ myApp
                 .then(function(response){
                     console.log(response);
                     $scope.datos.tabSelectedLoteria.jugadas.splice(index, 1);
+                    $scope.datos.tabSelectedLoteria.cantidadDeBloqueos = $scope.datos.tabSelectedLoteria.cantidadDeBloqueos - 1;
                     alert("Se ha eliminado correctamente");
 
                 },
@@ -646,7 +650,8 @@ myApp
                 $http.post(rutaGlobal+"/api/bloqueos/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
                     .then(function(response){
                     console.log(response);
-                    
+                    $scope.datos.tabSelectedLoteria.sorteos.splice(index, 1);
+                    $scope.datos.tabSelectedLoteria.cantidadDeBloqueos = $scope.datos.tabSelectedLoteria.cantidadDeBloqueos - 1;
                     alert("Se ha eliminado correctamente");
                 }
                 ,

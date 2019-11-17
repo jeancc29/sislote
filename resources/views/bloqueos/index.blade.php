@@ -215,7 +215,7 @@
                                       <li ng-repeat="l in datos.tabSelectedBanca.loterias" 
                                           ng-click="tabLoteriasChanged(l)" 
                                       class="nav2-item" style="padding: 0px;">
-                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}<span ng-class="{'bg-danger text-white': l.cantidadDeBloqueos == 0}" class="rounded ml-2 p-1 font-weight-bold">@{{l.cantidadDeBloqueos}}</span></a>
                                       </li>
                                       <!-- <li class="nav2-item" style="padding: 0px;">
                                         <a class="nav2-link" href="#">Link</a>
@@ -283,7 +283,7 @@
                                       <li ng-repeat="l in datos.tabSelectedDia.loterias" 
                                           ng-click="tabLoteriasChanged(l)" 
                                       class="nav2-item" style="padding: 0px;">
-                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}} <span ng-class="{'bg-danger text-white': l.cantidadDeBloqueos == 0}" class="rounded ml-2 p-1 font-weight-bold">@{{l.cantidadDeBloqueos}}</span></a>
                                       </li>
                                       <!-- <li class="nav2-item" style="padding: 0px;">
                                         <a class="nav2-link" href="#">Link</a>
@@ -356,7 +356,7 @@
                                       <li ng-repeat="l in datos.buscar.resultados" 
                                           ng-click="tabLoteriasChanged(l)" 
                                       class="nav2-item" style="padding: 0px;">
-                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}<span ng-class="{'bg-danger text-white': l.cantidadDeBloqueos == 0}" class="rounded ml-2 p-1 font-weight-bold">@{{l.cantidadDeBloqueos}}</span></a>
                                       </li>
                                       <!-- <li class="nav2-item" style="padding: 0px;">
                                         <a class="nav2-link" href="#">Link</a>

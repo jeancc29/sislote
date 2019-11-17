@@ -98,7 +98,11 @@ class BlockslotteriesController extends Controller
                             $bloqueo = null;
                         return ["id" => $s['id'], "descripcion" => $s['descripcion'], "bloqueo" => $montoBloqueo, "idBloqueo" => ($bloqueo != null) ? $bloqueo['id'] : $bloqueo];
                     });
-                    return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos];
+                    //VALIDAMOS DE QUE EL BLOQUEO EXISTE PARA ELLO NOS ASEGURAMOS DE QUE EL IDBLOQUE NO SEA NULO
+                    list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
+                        return $l['idBloqueo'] != null;
+                    });
+                    return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
                 });
                 return ["id" => $d->id, "descripcion" => $d->descripcion, "wday" => $d->wday, "loterias" => $loterias];
             });
@@ -129,7 +133,11 @@ class BlockslotteriesController extends Controller
                                 $bloqueo = null;
                             return ["id" => $s['id'], "descripcion" => $s['descripcion'], "bloqueo" => $montoBloqueo, "idBloqueo" => ($bloqueo != null) ? $bloqueo['id'] : $bloqueo];
                         });
-                        return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos];
+                         //VALIDAMOS DE QUE EL BLOQUEO EXISTE PARA ELLO NOS ASEGURAMOS DE QUE EL IDBLOQUE NO SEA NULO
+                        list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
+                            return $l['idBloqueo'] != null;
+                        });
+                        return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
                     });
                     return ["id" => $b['id'], "descripcion" => $b['descripcion'], "loterias" => $loterias];
                 });
@@ -147,7 +155,7 @@ class BlockslotteriesController extends Controller
                 $jugadas = collect($jugadas)->map(function($j){
                     return ["id" => $j["id"], "jugada" => $j["jugada"], "monto" => $j["monto"], "idSorteo" => $j["idSorteo"], "sorteo" => Draws::whereId($j["idSorteo"])->first()->descripcion, "fechaDesde" => $j["fechaDesde"], "fechaHasta" => $j["fechaHasta"],  "idBloqueo" => $j["id"]];
                 });
-                return ["id" => $l['id'], "descripcion" => $l['descripcion'], "jugadas" => $jugadas];
+                return ["id" => $l['id'], "descripcion" => $l['descripcion'], "jugadas" => $jugadas, "cantidadDeBloqueos" => count($jugadas)];
             });
 
             return Response::json([
