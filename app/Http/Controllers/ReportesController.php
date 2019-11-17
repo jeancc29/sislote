@@ -847,7 +847,10 @@ class ReportesController extends Controller
                 }
             }
 
-            $balanceHastaLaFecha = (new Helper)->saldo($datos['idBanca'], 1);
+            $fechaFinalSinHora = explode(' ', $fechaFinal);
+            $fechaFinalSinHora = new Carbon($fechaFinalSinHora[0]);
+            $fechaFinalSinHora = $fechaFinalSinHora->toDateString();
+            $balanceHastaLaFecha = (new Helper)->saldoPorFecha($datos['idBanca'], 1, $fechaFinalSinHora);
             $comisiones = 0;
             $neto = $ventas -  ($premios + $descuentos + $comisionesMonto);
 

@@ -999,6 +999,57 @@ class PrincipalController extends Controller
     }
 
 
+    public function storeMovil(Request $request)
+    {
+        $datos = request()->validate([
+            'datos.idUsuario' => 'required',
+            'datos.idBanca' => 'required',
+            'datos.idVenta' => 'required',
+            'datos.compartido' => 'required',
+            'datos.descuentoMonto' => 'required',
+            'datos.hayDescuento' => 'required',
+            'datos.total' => 'required',
+            'datos.subTotal' => 'required',
+    
+            'datos.loterias' => '',
+            'datos.jugadas' => 'required',
+        ])['datos'];
+        $datos["jugadas"] = json_decode($datos["jugadas"]);
+
+        $data = Helper::guardarVenta($datos['idUsuario'], $datos['idBanca'], $datos['idVenta'], $datos['compartido'], $datos['descuentoMonto'], $datos['hayDescuento'], $datos['total'], json_encode($datos['jugadas']));
+        
+        // return Response::json([
+        //     'jugadas' => $data
+        // ], 201);
+
+        if($data[0]->errores == 1){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => $data[0]->mensaje
+            ], 201);
+        }
+
+        $img = new TicketToHtmlClass($data);
+
+        
+         return Response::json([
+            'errores' => 0,
+            'mensaje' => $data[0]->mensaje,
+            'idVenta' => $data[0]->idVentaHash,
+            'loterias' => ($data[0]->loterias != null) ? json_decode($data[0]->loterias) : [],
+            'caracteristicasGenerales' =>  ($data[0]->caracteristicasGenerales != null) ? json_decode($data[0]->caracteristicasGenerales) : [],
+            'total_ventas' => $data[0]->total_ventas,
+            'total_jugadas' => $data[0]->total_jugadas,
+            'ventas' => ($data[0]->ventas != null) ? json_decode($data[0]->ventas) : [],
+            'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
+            'idUsuario' => $datos['idUsuario'],
+            'idBanca' => $data[0]->idBanca,
+            'img' => $img->generate(),
+            'venta' => ($data[0]->venta != null) ? json_decode($data[0]->venta)[0] : []
+        ], 201);
+    }
+
+
     public function storeViejo(Request $request)
     {
         $datos = request()->validate([

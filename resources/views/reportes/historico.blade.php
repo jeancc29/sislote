@@ -123,25 +123,23 @@
                     <table class="table table-sm table-striped oh" ng-init="mostrarVentanaTicket = false">
                         <thead>
                             <tr>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Banca</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Codigo</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Pendientes</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Ganadores</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Perdedores</th>
-                            <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Cerrado</th> -->
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Tickets</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Venta</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Comisiones</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Descuentos</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Premios</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Neto</th>
-                            <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Caida</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Final</th> -->
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance a la fecha</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance</th>
-                            <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Caida acumulada</th>
-
-
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Banca</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Codigo</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Pendientes</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Ganadores</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Perdedores</th>
+                                <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 14px;">Cerrado</th> -->
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Tickets</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Venta</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Comisiones</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Descuentos</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Premios</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Neto</th>
+                                <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Caida</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Final</th> -->
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance a la fecha</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Caida acumulada</th>
                             </tr>
                         </thead>
                         <tbody>

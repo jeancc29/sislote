@@ -112,4 +112,68 @@ myApp.service('helperService', function(){
 
         return jugada;
     }
+
+    this.agregar_guion_y_letra = function(cadena){
+        if(cadena.length == 4 && this.esPick3Pick4UOtro(cadena) == "otro"){
+            cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3];
+        }
+        else if(cadena.length == 6){
+            cadena = cadena[0] + cadena[1] + '-' + cadena[2] + cadena[3] + '-' + cadena[4] + cadena[5];
+        }
+        else if(this.esPick3Pick4UOtro(cadena) == "pick3Straight"){
+            cadena = cadena;
+        }
+        else if(this.esPick3Pick4UOtro(cadena) == "pick3Box"){
+            cadena = cadena.substring(0, cadena.length - 1);
+        }
+        else if(this.esPick3Pick4UOtro(cadena) == "pick4Box"){
+            cadena = cadena.substring(0, cadena.length - 1);
+        }
+        else if(this.esPick3Pick4UOtro(cadena) == "pick4Straight"){
+            cadena = cadena.substring(0, cadena.length - 1);
+        }
+       return cadena;
+    }
+
+    this.esPick3Pick4UOtro = function(jugada){
+        if(jugada.length == 3){
+            return 'pick3Straight'
+        }
+        else if(jugada.length == 4 && jugada.indexOf('+') != -1)
+            return 'pick3Box'
+        else if(jugada.length == 5 && jugada.indexOf('+') != -1)
+            return 'pick4Box'
+        else if(jugada.length == 5 && jugada.indexOf('-') != -1)
+            return 'pick4Straight'
+        else
+            return 'otro';
+      }
+
+
+      this.jugadaEsCorrecta = function(jugada){
+        if(jugada == undefined || jugada == null)
+          return false;
+        var jugadaTmp = '';
+
+        //Quitamos los caracteres especiales como (-, +) 
+        if(jugada.length == 4 && jugada.indexOf('+') != -1){
+            jugada = jugada.substring(0, jugada.length - 1);
+        }
+        if(jugada.length == 5 && (jugada.indexOf('+') != -1 || jugada.indexOf('-') != -1)){
+            jugada = jugada.substring(0, jugada.length - 1);
+        }
+
+        for (let index = 0; index < jugada.length; index++) {
+            if(jugada[index] != '+' && jugada[index] != '-'){
+                jugadaTmp += jugada[index];
+            }
+        }
+
+
+        if(Number(jugadaTmp) == jugada)
+            return true;
+        else
+          return false;
+    }
+
 });

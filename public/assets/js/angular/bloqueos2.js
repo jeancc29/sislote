@@ -205,10 +205,13 @@ myApp
                 'selectedLoteria' : {}
             },
             'bloqueoJugada' : {
+                "jugadas" : [],
                 "jugada" : null,
                 "monto" : null,
                 "fechaDesde" : new Date(),
                 "fechaHasta" : new Date(),
+                "ignorarDemasBloqueosTmp": false,
+                "ignorarDemasBloqueos": false,
             },
             'buscar' : {
                 "dias" : [],
@@ -223,11 +226,15 @@ myApp
 
         
         $scope.inicializarDatos = function(idUsuario = 0, response = null, responseJugadas = null){
+
+            $scope.datos.buscar.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General loterias'}, {'idTipoBloqueo' : 2, 'descripcion' : 'General jugadas'}, {'idTipoBloqueo': 3, 'descripcion' : 'Por banca loterias'}, {'idTipoBloqueo': 4, 'descripcion' : 'Por banca jugadas'}];
+            $scope.datos.buscar.selectedTipoBloqueos = $scope.datos.buscar.optionsTipoBloqueos[0];
                
             if(response != null){
                  
-                $scope.datos.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General para grupo'}, {'idTipoBloqueo': 2, 'descripcion' : 'General por banca'}];
+                $scope.datos.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General'}, {'idTipoBloqueo': 2, 'descripcion' : 'General por banca'}];
                 $scope.datos.selectedTipoBloqueos = $scope.datos.optionsTipoBloqueos[0];
+                
 
                 var jsonLoterias = response.data.loterias;
                 $scope.datos.optionsBancas = [];
@@ -280,7 +287,7 @@ myApp
             }
             if(responseJugadas != null){
                  
-                $scope.datos.bloqueoJugada.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General para grupo'}, {'idTipoBloqueo': 2, 'descripcion' : 'General por banca'}];
+                $scope.datos.bloqueoJugada.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General'}, {'idTipoBloqueo': 2, 'descripcion' : 'Por banca'}];
                 $scope.datos.bloqueoJugada.selectedTipoBloqueos = $scope.datos.bloqueoJugada.optionsTipoBloqueos[0];
 
                 var jsonLoterias = responseJugadas.data.loterias;
@@ -307,7 +314,9 @@ myApp
                 $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
 
                 console.log('inicializarDatos bloqueo2.js: ', $scope.datos.optionsSorteos);
-
+                $scope.datos.bloqueoJugada.jugadas = [];
+                $scope.datos.bloqueoJugada.jugada = null;
+                $scope.datos.bloqueoJugada.monto = null;
 
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
@@ -326,8 +335,10 @@ myApp
                 
 
                 
-                $scope.datos.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General para grupo'}, {'idTipoBloqueo': 2, 'descripcion' : 'General por banca'}];
+                $scope.datos.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General'}, {'idTipoBloqueo': 2, 'descripcion' : 'Por banca'}];
                 $scope.datos.selectedTipoBloqueos = $scope.datos.optionsTipoBloqueos[0];
+                $scope.datos.bloqueoJugada.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General'}, {'idTipoBloqueo': 2, 'descripcion' : 'Por banca'}];
+                $scope.datos.bloqueoJugada.selectedTipoBloqueos = $scope.datos.bloqueoJugada.optionsTipoBloqueos[0];
 
                 var jsonLoterias = response.data.loterias;
                 $scope.datos.optionsBancas = response.data.bancas;
@@ -359,8 +370,7 @@ myApp
 
 
               
-                $scope.datos.bloqueoJugada.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General para grupo'}, {'idTipoBloqueo': 2, 'descripcion' : 'General por banca'}];
-                $scope.datos.bloqueoJugada.selectedTipoBloqueos = $scope.datos.bloqueoJugada.optionsTipoBloqueos[0];
+                
 
                 jsonLoterias = response.data.loterias;
                 $scope.datos.bloqueoJugada.optionsBancas = [];
@@ -460,15 +470,10 @@ myApp
 
         
         if($scope.datos.selectedTipoBloqueos.idTipoBloqueo == 1){
-            $scope.datos.bancas =  $scope.datos.optionsBancas;
-        }else{
-            if(Object.keys($scope.datos.bancas).length == 0){
-                alert("Debe seleccionar una banca")
-                return;
-            }
-        }
-            
-          $http.post(rutaGlobal+"/api/bloqueos/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+            // $scope.datos.bancas =  $scope.datos.optionsBancas;
+            $scope.datos.bancas =  [];
+
+            $http.post(rutaGlobal+"/api/bloqueos/general/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0){
@@ -482,6 +487,31 @@ myApp
                 }
                 
             });
+        }else{
+            if(Object.keys($scope.datos.bancas).length == 0){
+                alert("Debe seleccionar una banca")
+                return;
+            }
+
+            $http.post(rutaGlobal+"/api/bloqueos/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+             .then(function(response){
+                console.log(response.data);
+                if(response.data.errores == 0){
+                    
+                            $scope.inicializarDatos($scope.datos.idUsuario, response);
+                            alert("Se ha guardado correctamente");
+                     
+                }else{
+                    alert(response.data.mensaje);
+                    return;
+                }
+                
+            });
+        }
+
+        
+            
+          
         
 
         }
@@ -489,40 +519,282 @@ myApp
         $scope.actualizarJugadas = function(){
          
             if($scope.datos.bloqueoJugada.selectedTipoBloqueos.idTipoBloqueo == 1){
-                $scope.datos.bloqueoJugada.bancas =  $scope.datos.bloqueoJugada.optionsBancas;
+                // $scope.datos.bloqueoJugada.bancas =  $scope.datos.bloqueoJugada.optionsBancas;
+                
+                if(Object.keys($scope.datos.bloqueoJugada.jugadas).length == 0){
+                    alert("Debe crear jugadas");
+                    return;
+                }
+    
+                $scope.datos.bloqueoJugada.idUsuario = $scope.datos.idUsuario;
+                $scope.datos.bloqueoJugada.idSorteo = $scope.datos.selectedSorteo.id;
+                $scope.datos.bloqueoJugada.ignorarDemasBloqueos = ($scope.datos.bloqueoJugada.ignorarDemasBloqueosTmp == true) ? 1 : 0;
+
+                
+                    
+                $http.post(rutaGlobal+"/api/bloqueos/general/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
+                    .then(function(response){
+                    console.log(response);
+                    if(response.data.errores == 0){
+                        
+                                $scope.datos.bloqueoJugada.jugada = null;
+                                $scope.datos.bloqueoJugada.monto = null;
+                                $scope.datos.bloqueoJugada.jugadas = [];
+                                // $scope.inicializarDatos($scope.datos.idUsuario, null, response);
+                                alert("Se ha guardado correctamente");
+                            
+                    }else{
+                        alert(response.data.mensaje);
+                        return;
+                    }
+                    
+                });
             }else{
                 if(Object.keys($scope.datos.bloqueoJugada.bancas).length == 0){
                     alert("Debe seleccionar una banca")
                     return;
                 }
-            }
 
-            if(helperService.empty($scope.datos.bloqueoJugada.monto, 'number', false) == true){
-                alert("El campo monto no puede estar vacio y ser numerico")
-                    return;
-            }
-
-            $scope.datos.bloqueoJugada.idUsuario = $scope.datos.idUsuario;
-            $scope.datos.bloqueoJugada.idSorteo = $scope.datos.selectedSorteo.id;
-                
-            $http.post(rutaGlobal+"/api/bloqueos/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
-                .then(function(response){
-                console.log(response);
-                if(response.data.errores == 0){
-                    
-                            $scope.inicializarDatos($scope.datos.idUsuario, null, response);
-                            alert("Se ha guardado correctamente");
-                        
-                }else{
-                    alert(response.data.mensaje);
+                if(Object.keys($scope.datos.bloqueoJugada.jugadas).length == 0){
+                    alert("Debe crear jugadas")
                     return;
                 }
-                
-            });
+
+                // if(helperService.empty($scope.datos.bloqueoJugada.monto, 'number', false) == true){
+                //     alert("El campo monto no puede estar vacio y ser numerico")
+                //         return;
+                // }
+    
+                $scope.datos.bloqueoJugada.idUsuario = $scope.datos.idUsuario;
+                $scope.datos.bloqueoJugada.idSorteo = $scope.datos.selectedSorteo.id;
+                    
+                $http.post(rutaGlobal+"/api/bloqueos/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
+                    .then(function(response){
+                    console.log(response);
+                    if(response.data.errores == 0){
+                        
+                        $scope.datos.bloqueoJugada.jugada = null;
+                        $scope.datos.bloqueoJugada.monto = null;
+                        $scope.datos.bloqueoJugada.jugadas = [];
+                        $scope.datos.bloqueoJugada.selectedBanca = {};
+                        $scope.datos.bloqueoJugada.bancas = [];
+                        $timeout(function() {
+                            // anything you want can go here and will safely be run on the next digest.
+                            //$('#multiselect').selectpicker('val', []);
+                            $('#multiselect').selectpicker("refresh");
+                            $('.selectpicker').selectpicker("refresh");
+                            // $('#cbxBanca').selectpicker('val', [])
+                        });
+                            // $scope.inicializarDatos($scope.datos.idUsuario, null, response);
+                        alert("Se ha guardado correctamente");
+                            
+                    }else{
+                        alert(response.data.mensaje);
+                        return;
+                    }
+                    
+                });
+
+            }
+
+           
         
 
         }
 
+        //ELIMINAR DESDE EL CONTROLADOR
+
+        $scope.eliminarBloqueo = function(bloqueo, index){
+         
+           if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General loterias"){
+            //    bloqueo.idBloqueo = 100000;
+                $http.post(rutaGlobal+"/api/bloqueosgenerales/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                .then(function(response){
+                    console.log(response);
+                    alert("Se ha eliminado correctamente");
+
+                },
+                function(response) {
+                    // Handle error here
+                    // $scope.datos.cargando = false;
+                    console.log('Error jean: ', response);
+                    alert("Error");
+                }
+                );
+           }
+           else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General jugadas"){
+            //    bloqueo.idBloqueo = 100000;
+                $http.post(rutaGlobal+"/api/bloqueosgenerales/jugadas/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                .then(function(response){
+                    console.log(response);
+                    $scope.datos.tabSelectedLoteria.jugadas.splice(index, 1);
+                    alert("Se ha eliminado correctamente");
+
+                },
+                function(response) {
+                    // Handle error here
+                    // $scope.datos.cargando = false;
+                    console.log('Error jean: ', response);
+                    alert("Error");
+                }
+                );
+           }
+
+           else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca loterias"){
+                var block;
+                console.log(bloqueo);
+                $http.post(rutaGlobal+"/api/bloqueos/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                    .then(function(response){
+                    console.log(response);
+                    
+                    alert("Se ha eliminado correctamente");
+                }
+                ,
+                function(response) {
+                    // Handle error here
+                    // $scope.datos.cargando = false;
+                    console.log('Error jean: ', response);
+                    alert("Error");
+                }
+                );
+            }
+          
+        
+
+        }
+
+        $scope.insertarJugada = function(evento)
+        {
+            if(evento.keyCode == 13){
+
+               
+                
+                if(helperService.empty($scope.datos.bloqueoJugada.jugada, "string") == true){
+                    alert("El campo jugada no puede estar vacio");
+                    return;
+                }
+                if(helperService.jugadaEsCorrecta($scope.datos.bloqueoJugada.jugada) == false){
+                    alert("La jugada no es correcta");
+                    $('#txtJugada').focus();
+                    return;
+                }
+                if(helperService.empty($scope.datos.bloqueoJugada.monto, "number", false) == true){
+                    alert("EL monto no puede estar vacio");
+                    return;
+                }
+
+                var tmp = helperService.ordenarMenorAMayor($scope.datos.bloqueoJugada.jugada);
+                if(helperService.empty($scope.datos.bloqueoJugada.jugadas, "object") == false){
+                    if($scope.datos.bloqueoJugada.jugadas.find(x => x.jugada == tmp) != undefined){
+                        var idx = $scope.datos.bloqueoJugada.jugadas.findIndex(x => x.jugada == tmp);
+                        $scope.datos.bloqueoJugada.jugadas[idx].monto = $scope.datos.bloqueoJugada.monto;
+                    }else{
+                        $scope.datos.bloqueoJugada.jugadas.push({"jugada" : tmp, "monto" : $scope.datos.bloqueoJugada.monto, "tam" : tmp.length});
+                    }
+                }else{
+                    $scope.datos.bloqueoJugada.jugadas = [];
+                    $scope.datos.bloqueoJugada.jugadas.push({"jugada" : tmp, "monto" : $scope.datos.bloqueoJugada.monto, "tam" : tmp.length});
+                }
+
+                $('#txtJugada').focus();
+                $('#txtJugada').select();
+
+                console.log("insertar 2: ", $scope.datos.bloqueoJugada.jugadas);
+            }
+        }
+
+
+        $scope.eliminarJugada = function(jugada)
+        {
+            if(helperService.empty($scope.datos.bloqueoJugada.jugadas, "object") == false){
+                if($scope.datos.bloqueoJugada.jugadas.find(x => x.jugada == jugada) != undefined){
+                    var idx = $scope.datos.bloqueoJugada.jugadas.findIndex(x => x.jugada == jugada);
+                    $scope.datos.bloqueoJugada.jugadas.splice(idx,1);
+                }
+            }
+        }
+
+        $scope.txtMontoFocus = function(evento)
+        {
+            if(evento.keyCode == 13){
+
+               
+                
+                if(helperService.empty($scope.datos.bloqueoJugada.jugada, "string") == true){
+                    return;
+                }
+                if(helperService.jugadaEsCorrecta($scope.datos.bloqueoJugada.jugada) == false){
+                    return;
+                }
+
+               
+
+                $('#txtMonto').focus();
+                $('#txtMonto').select();
+
+                
+            }
+            else if(evento.keyCode == 187){
+                
+                if(helperService.empty($scope.datos.bloqueoJugada.jugada, "string") == true){
+                    return;
+                }
+                if(helperService.jugadaEsCorrecta($scope.datos.bloqueoJugada.jugada) == false){
+                    return;
+                }
+                if($scope.datos.bloqueoJugada.jugada.length != 4 && $scope.datos.bloqueoJugada.jugada.length != 5){
+                    return;
+                }
+
+                $('#txtMonto').focus();
+                $('#txtMonto').select();
+            }
+            else if(evento.keyCode == 189){
+                
+                if(helperService.empty($scope.datos.bloqueoJugada.jugada, "string") == true){
+                    return;
+                }
+                if(helperService.jugadaEsCorrecta($scope.datos.bloqueoJugada.jugada) == false){
+                    return;
+                }
+                if($scope.datos.bloqueoJugada.jugada.length != 5){
+                    return;
+                }
+
+                $('#txtMonto').focus();
+                $('#txtMonto').select();
+            }
+
+        }
+
+        $scope.agregar_guion = function(jugada)
+        {
+            return helperService.agregar_guion_y_letra(jugada);
+        }
+
+        $scope.esPick3Pick4UOtro = function(jugada)
+        {
+            return helperService.esPick3Pick4UOtro(jugada);
+        }
+
+        $scope.seleccionarTodasChanged = function(seleccionarTodas)
+        {
+            // if(seleccionarTodas == true)
+            // {
+                $scope.datos.bloqueoJugada.loterias.forEach(function(valor, indice, array){
+                    array[indice].seleccionado = seleccionarTodas;
+                    if(seleccionarTodas == true)
+                        $('#btnLoteriaJugada'+ indice).addClass('active2');
+                    else
+                    $('#btnLoteriaJugada'+ indice).removeClass('active2');
+                    console.log("dentro foreach:" + array);
+                });
+
+               
+
+                console.log("seleccionarTodas:", $scope.datos.bloqueoJugada);
+            // }
+        }
 
         $scope.eliminar = function(d){
             console.log('bancas eliminar: ',d);
@@ -720,31 +992,41 @@ myApp
 
 
         $scope.buscar = function(){
+            
+            if($scope.datos.buscar.selectedTipoBloqueos.descripcion != "General jugadas" && $scope.datos.buscar.selectedTipoBloqueos.descripcion != "Por banca jugadas")
             if(helperService.empty($scope.datos.buscar.dias, 'object') == true){
                 alert("Debe seleccionar los dias");
                 return;
             }
-            if(helperService.empty($scope.datos.buscar.bancas, 'object') == true){
-                alert("Debe seleccionar las bancas");
-                return;
+            if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca loterias" || $scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca jugadas"){
+                if(helperService.empty($scope.datos.buscar.bancas, 'object') == true){
+                    alert("Debe seleccionar las bancas");
+                    return;
+                }
             }
+            
             $scope.datos.buscar.idUsuario = idUsuario;
+            $scope.datos.buscar.idTipoBloqueo = $scope.datos.buscar.selectedTipoBloqueos.idTipoBloqueo;
             $http.post(rutaGlobal+"/api/bloqueos/loterias/buscar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.buscar})
              .then(function(response){
                 console.log(response.data);
-                $scope.datos.buscar.resultados = response.data.dias;
-                $scope.tabDiasChanged($scope.datos.buscar.resultados[0]);
-                $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0]);
-                $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
-                if(response.data.errores == 0){
-                    
-                            // $scope.inicializarDatos($scope.datos.idUsuario, response);
-                            // alert("Se ha guardado correctamente");
-                     
-                }else{
-                    //alert(response.data.mensaje);
-                    return;
+                
+                if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General loterias"){
+                    $scope.datos.buscar.resultados = response.data.dias;
+                    $scope.tabDiasChanged($scope.datos.buscar.resultados[0]);
+                    $scope.tabLoteriasChanged($scope.datos.tabSelectedDia.loterias[0]);
                 }
+                else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca loterias"){
+                    $scope.datos.buscar.resultados = response.data.dias;
+                    $scope.tabDiasChanged($scope.datos.buscar.resultados[0]);
+                    $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0]);
+                    $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
+                }
+                else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General jugadas"){
+                    $scope.datos.buscar.resultados = response.data.loterias;
+                    $scope.tabLoteriasChanged($scope.datos.buscar.resultados[0]);
+                }
+                
                 
             });
         }
@@ -753,8 +1035,14 @@ myApp
         $scope.tabDiasChanged = function(dia, first = null){
             $scope.contador++;
             $scope.datos.tabSelectedDia = dia;
-            $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0])
-            $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
+            if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General loterias"){
+                $scope.tabLoteriasChanged($scope.datos.tabSelectedDia.loterias[0]);
+            }
+            else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca loterias"){
+                $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0])
+                $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
+            }
+            
 
             // $scope.datos.indexLoteriaComisiones = $scope.datos.ckbLoterias.findIndex( x => x.id == loteria.id);
         }
@@ -767,6 +1055,7 @@ myApp
     
         $scope.tabLoteriasChanged = function(loteria, first = null){
             $scope.datos.tabSelectedLoteria = loteria;
+            console.log("tabLoteriasChanged: ", loteria);
             // $scope.datos.indexLoteriaComisiones = $scope.datos.ckbLoterias.findIndex( x => x.id == loteria.id);
         }
        
@@ -778,6 +1067,32 @@ myApp
    
 
 
+    myApp.directive('selectAllOnClick', [function() {
+        return {
+          restrict: 'A',
+          link: function(scope, element, attrs) {
+            var hasSelectedAll = false;
+            element.on('click', function($event) {
+              if (!hasSelectedAll) {
+                try {
+                  //IOs, Safari, thows exception on Chrome etc
+                  this.selectionStart = 0;
+                  this.selectionEnd = this.value.length + 1;
+                  hasSelectedAll = true;
+                } catch (err) {
+                  //Non IOs option if not supported, e.g. Chrome
+                  this.select();
+                  hasSelectedAll = true;
+                }
+              }
+            });
+            //On blur reset hasSelectedAll to allow full select
+            element.on('blur', function($event) {
+              hasSelectedAll = false;
+            });
+          }
+        };
+      }]);
 
   
 

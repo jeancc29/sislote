@@ -59,6 +59,7 @@ Route::get('/principal', 'PrincipalController@index');
 Route::post('/principal/indexPost', 'PrincipalController@indexPost');
 // Route::post('/principal/indexPostPrueba', 'PrincipalController@indexPostPrueba');
 Route::post('/principal/guardar', 'PrincipalController@store');
+Route::post('/principal/guardarMovil', 'PrincipalController@storeMovil');
 Route::post('/principal/montodisponible', 'PrincipalController@montodisponible');
 Route::post('/principal/pruebahttp', 'PrincipalController@pruebahttp');
 Route::post('/principal/pagar', 'PrincipalController@pagar');
@@ -97,9 +98,14 @@ Route::post('/premios/erase', 'AwardsController@erase');
 Route::post('/premios/guardar', 'AwardsController@store');
 
 Route::get('/bloqueos', 'BlockslotteriesController@index');
+Route::post('/bloqueos/general/loterias/guardar', 'BlockslotteriesController@storeGeneral');
 Route::post('/bloqueos/loterias/guardar', 'BlockslotteriesController@store');
 Route::post('/bloqueos/jugadas/guardar', 'BlocksplaysController@store');
+Route::post('/bloqueos/general/jugadas/guardar', 'BlocksplaysController@storeGeneral');
 Route::post('/bloqueos/loterias/buscar', 'BlockslotteriesController@buscar');
+Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@eliminar');
+Route::post('/bloqueosgenerales/loterias/eliminar', 'BlocksgeneralsController@eliminar');
+Route::post('/bloqueosgenerales/jugadas/eliminar', 'BlocksplaysgeneralsController@eliminar');
 
 
 

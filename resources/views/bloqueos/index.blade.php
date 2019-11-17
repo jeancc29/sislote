@@ -106,55 +106,73 @@
                       <div class="col-12">
 
                       <div class="row">
-                      <div class="col-5 text-center">
-                            <div class="input-group">
-                            <label  for="jugada" class="bmd-label-floating font-weight-bold">Dias</label>
-                              <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Dias</label>                               -->
-                                <style>
-                                  #multiselectDias{
-                                    font-size: 8px;
-                                  }
-                                </style>
-                                <!-- <div  class="col-9"> -->
-                                  <select 
-                                  id="multiselectDias"
-                                      ng-model="datos.buscar.dias"
-                                      ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
-                                      class="selectpicker col-12" 
-                                      data-style="select-with-transition" 
-                                      multiple title="Seleccionar bancas"
-                                      data-size="7" aria-setsize="2">
-                                  </select>
-                              <!-- </div> -->
-                            </div> <!-- END INPUT GROUP -->
-                          </div>
-
-                          <div class="col-5">
+                        <div class="col-12 text-center">
                             <div class="input-group">
                               
-                              <!-- <label class="d-none d-sm-block  col-sm-2 col-form-label  font-weight-bold " style="color: black;">Bancas</label>                               -->
-                              <label  for="jugada" class="bmd-label-floating font-weight-bold">Bancas</label>
-                                <!-- <div  class="col-10"> -->
-                                  <select 
-                                  id="multiselectBancas"
-                                      ng-model="datos.buscar.bancas"
-                                      ng-options="o.descripcion for o in datos.buscar.optionsBancas track by o.id"
-                                      class="selectpicker col-12" 
-                                      data-style="select-with-transition" 
-                                      multiple title="Seleccionar bancas"
-                                      data-size="7" aria-setsize="2">
-                                  </select>
-                              <!-- </div> -->
+                              <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                              
+
+                                <div  class=" col-sm-9 col-9">
+                                <select 
+                                    ng-change="cbxTipoBloqueosChanged()"
+                                    ng-model="datos.buscar.selectedTipoBloqueos"
+                                    ng-options="o.descripcion for o in datos.buscar.optionsTipoBloqueos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
                             </div> <!-- END INPUT GROUP -->
-                          </div>
+                          </div><!-- END COL 12 -->
+
+                          <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion != 'Por banca jugadas' && datos.buscar.selectedTipoBloqueos.descripcion != 'General jugadas'" ng-class="{'col-5': datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas', 'col-10': datos.buscar.selectedTipoBloqueos.descripcion == 'General loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'General jugadas'}" class="text-center">
+                              <div class="input-group">
+                              <!-- <label  for="jugada" class="bmd-label-floating font-weight-bold" style="color: black;">Dias</label> -->
+                                <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold " style="color: black;">Dias</label>                              
+                                  <style>
+                                    #multiselectDias{
+                                      font-size: 8px;
+                                    }
+                                  </style>
+                                  <div  class="col-9">
+                                    <select 
+                                    id="multiselectDias"
+                                        ng-model="datos.buscar.dias"
+                                        ng-options="o.descripcion for o in datos.buscar.optionsDias track by o.id"
+                                        class="selectpicker col-12" 
+                                        data-style="select-with-transition" 
+                                        multiple title="Selecc. dias"
+                                        data-size="7" aria-setsize="2">
+                                    </select>
+                                </div>
+                              </div> <!-- END INPUT GROUP -->
+                            </div><!-- END COL 5 -->
+
+                            <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas'" class="col-5">
+                              <div class="input-group">
+                                
+                                <label class="d-none d-sm-block  col-sm-3 col-form-label  font-weight-bold " style="color: black;">Bancas</label>                              
+                                <!-- <label  for="bancas" class="bmd-label-floating font-weight-bold" style="color: black;">Bancas</label> -->
+                                  <div  class="col-9">
+                                    <select 
+                                    id="multiselectBancas"
+                                        ng-model="datos.buscar.bancas"
+                                        ng-options="o.descripcion for o in datos.buscar.optionsBancas track by o.id"
+                                        class="selectpicker col-12" 
+                                        data-style="select-with-transition" 
+                                        multiple title="Selecc. bancas"
+                                        data-size="7" aria-setsize="2">
+                                    </select>
+                                </div>
+                              </div> <!-- END INPUT GROUP -->
+                            </div><!-- END COL 5 -->
 
                           <div class="col-2">
-                            <a href="#" class="btn btn-success mt-4" ng-click="buscar()">Buscar</a>
+                            <a href="#" class="btn btn-success mt-2" ng-click="buscar()">Buscar</a>
                           </div>
                       </div><!-- END ROW CONTENEDOR DATOS BUSQUEDA -->
 
 
-                        <div class="card text-center" ng-show="datos.buscar.resultados.length > 0">
+                        <div class="card text-center" ng-show="datos.buscar.resultados.length > 0 && (datos.buscar.selectedTipoBloqueos.idTipoBloqueo == 1 || datos.buscar.selectedTipoBloqueos.idTipoBloqueo == 3)"><!-- CARD1 -->
                           <div class="card-header2" style="background-color: #f4f4f4;">
                             <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
                               <li 
@@ -172,8 +190,8 @@
                             </ul>
                           </div>
                           <div class="card-body" style="padding-bottom: 0px;">
-                            <!-- CARD2 -->
-                            <div class="card text-center" style="padding-top: 0px; margin-top:0px;">
+                            
+                            <div ng-show="datos.buscar.selectedTipoBloqueos.idTipoBloqueo == 3" class="card text-center" style="padding-top: 0px; margin-top:0px;"><!-- CARD2 -->
                               <div class="card-header2" style="background-color: #f4f4f4;">
                                 <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
                                   <li ng-repeat="b in datos.tabSelectedDia.bancas" 
@@ -190,72 +208,222 @@
                                 </ul>
                               </div>
                               <div class="card-body">
-                                <!-- CARD3 -->
-                            <div class="card text-center" style="padding-top: 0px; margin-top:0px;">
-                              <div class="card-header2" style="background-color: #f4f4f4;">
-                                <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
-                                  <li ng-repeat="l in datos.tabSelectedBanca.loterias" 
-                                      ng-click="tabLoteriasChanged(l)" 
-                                   class="nav2-item" style="padding: 0px;">
-                                    <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
-                                  </li>
-                                  <!-- <li class="nav2-item" style="padding: 0px;">
-                                    <a class="nav2-link" href="#">Link</a>
-                                  </li>
-                                  <li class="nav2-item" style="padding: 0px;">
-                                    <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                                  </li> -->
-                                </ul>
-                              </div>
-                              <div class="card-body">
-                                <div class="col-12">
-                                  <table class="table table-sm table-striped">
-                                        <thead>
-                                            <tr>
-                                            <th scope="col" class="text-center">ID</th>
-                                            <th scope="col" class="text-center">SORTEO</th>
-                                            <th scope="col" class="text-center">BLOQUEO</th>
-                                            <!-- <th scope="col" class="text-center"></th> -->
-                                            <!-- <th scope="col" class="text-center">Cerrado</th> -->
-                                            
-                                            
-
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                          <!-- | filter:datos.monitoreo.datosBusqueda -->
-                                            <tr ng-repeat="c in datos.tabSelectedLoteria.sorteos">
-                                                <td scope="col" class="text-center" style="font-size: 14px">@{{$index + 1}}</td>
-                                                <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
-                                                <td scope="col" class="text-center">@{{c.descripcion}}</td>
-                                                <td scope="col" class="text-center">
-                                                  <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="d-inline  bg-primary p-1 text-white rounded">@{{c.bloqueo | currency}}</a>
-                                                </td>
-                                                <!-- <td scope="col" class="text-center">@{{c.frecuencia.descripcion}}</td>
-                                                <td scope="col" class="text-center">@{{toFecha(c.fechaInicio) | date:"dd/MM/yyyy"}}</td>
-                                                <td scope="col" class="text-center">@{{toFecha(c.fechaProximoGasto) | date:"dd/MM/yyyy"}}</td>
-                                                 -->
+                                
+                                <div class="card text-center" style="padding-top: 0px; margin-top:0px;"><!-- CARD3 -->
+                                  <div class="card-header2" style="background-color: #f4f4f4;">
+                                    <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                      <li ng-repeat="l in datos.tabSelectedBanca.loterias" 
+                                          ng-click="tabLoteriasChanged(l)" 
+                                      class="nav2-item" style="padding: 0px;">
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                      </li>
+                                      <!-- <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link" href="#">Link</a>
+                                      </li>
+                                      <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                      </li> -->
+                                    </ul>
+                                  </div>
+                                  <div class="card-body">
+                                    <div class="col-12">
+                                      <table class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                <th scope="col" class="text-center">ID</th>
+                                                <th scope="col" class="text-center">SORTEO</th>
+                                                <th scope="col" class="text-center">BLOQUEO</th>
+                                                <th scope="col" class="text-center">ElIMINAR</th>
+                                                <!-- <th scope="col" class="text-center"></th> -->
+                                                <!-- <th scope="col" class="text-center">Cerrado</th> -->
                                                 
-                                                <td>
-                                                  <!-- <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a> -->
-                                                  <!-- <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a> -->
-                                                </td>
-                                            </tr>
-                                            
-                                        </tbody>
-                                    </table>
-                                </div> <!-- END COL-12 -->
-                              </div> <!-- END CARD-BODY -->
-                            </div>
+                                                
 
-                            <!-- END CARD3 -->
-                              </div>
-                            </div>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                              <!-- | filter:datos.monitoreo.datosBusqueda -->
+                                                <tr ng-repeat="c in datos.tabSelectedLoteria.sorteos">
+                                                    <td scope="col" class="text-center" style="font-size: 14px">@{{$index + 1}}</td>
+                                                    <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
+                                                    <td scope="col" class="text-center">@{{c.descripcion}}</td>
+                                                    <td scope="col" class="text-center">
+                                                      <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="d-inline  bg-primary p-1 text-white rounded">@{{c.bloqueo | currency}}</a>
+                                                    </td>
+                                                    <td class=" text-center">
+                                                      <button ng-click="eliminarBloqueo(c, $index)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                                          <i class="material-icons font-weight-bold">close</i>
+                                                      </button>
+                                                    </td>
+                                                    <!-- <td scope="col" class="text-center">@{{c.frecuencia.descripcion}}</td>
+                                                    <td scope="col" class="text-center">@{{toFecha(c.fechaInicio) | date:"dd/MM/yyyy"}}</td>
+                                                    <td scope="col" class="text-center">@{{toFecha(c.fechaProximoGasto) | date:"dd/MM/yyyy"}}</td>
+                                                    -->
+                                                    
+                                                    <!-- <td>
+                                                      <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                                                      <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
+                                                    </td> -->
+                                                </tr>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div> <!-- END COL-12 -->
+                                  </div> <!-- END CARD-BODY -->
+                                </div> <!-- END CARD3 -->
 
-                            <!-- END CARD2 -->
                             
-                          </div>
-                        </div>
+                              </div><!-- END CARD-BODY -->
+                            </div><!-- END CARD2 -->
+
+                            <!---------------------------------- GENERAL POR LOTERIA EN EL CARD 1 -------------------------------------->
+                              <div ng-show="datos.buscar.selectedTipoBloqueos.idTipoBloqueo == 1" class="card text-center" style="padding-top: 0px; margin-top:0px;"><!-- CARD3 -->
+                                  <div class="card-header2" style="background-color: #f4f4f4;">
+                                    <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                      <li ng-repeat="l in datos.tabSelectedDia.loterias" 
+                                          ng-click="tabLoteriasChanged(l)" 
+                                      class="nav2-item" style="padding: 0px;">
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                      </li>
+                                      <!-- <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link" href="#">Link</a>
+                                      </li>
+                                      <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                      </li> -->
+                                    </ul>
+                                  </div>
+                                  <div class="card-body">
+                                    <div class="col-12">
+                                      <table class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                <th scope="col" class="text-center">ID</th>
+                                                <th scope="col" class="text-center">SORTEO</th>
+                                                <th scope="col" class="text-center">BLOQUEO</th>
+                                                <th scope="col" class="text-center">ELIMINAR</th>
+                                                <!-- <th scope="col" class="text-center"></th> -->
+                                                <!-- <th scope="col" class="text-center">Cerrado</th> -->
+                                                
+                                                
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                              <!-- | filter:datos.monitoreo.datosBusqueda -->
+                                                <tr ng-repeat="c in datos.tabSelectedLoteria.sorteos">
+                                                    <td scope="col" class="text-center" style="font-size: 14px">@{{$index + 1}}</td>
+                                                    <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
+                                                    <td scope="col" class="text-center">@{{c.descripcion}}</td>
+                                                    <td scope="col" class="text-center">
+                                                      <a style="cursor: pointer"  class="d-inline  bg-primary p-1 text-white rounded">@{{c.bloqueo | currency}}</a>
+                                                    </td>
+                                                    <!-- <td scope="col" class="text-center">@{{c.frecuencia.descripcion}}</td>
+                                                    <td scope="col" class="text-center">@{{toFecha(c.fechaInicio) | date:"dd/MM/yyyy"}}</td>
+                                                    <td scope="col" class="text-center">@{{toFecha(c.fechaProximoGasto) | date:"dd/MM/yyyy"}}</td>
+                                                    -->
+                                                    
+                                                    <!-- <td>
+                                                      <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                                                      <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
+                                                    </td> -->
+
+                                                    <td class=" text-center">
+                                                      <button ng-click="eliminarBloqueo(c, $index)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                                          <i class="material-icons font-weight-bold">close</i>
+                                                      </button>
+                                                    </td>
+                                                </tr>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div> <!-- END COL-12 -->
+                                  </div> <!-- END CARD-BODY -->
+                                </div> <!-- END CARD3 -->
+                            
+                          </div><!-- END CARD-BODY -->
+                        </div><!-- END CARD1 -->
+
+
+
+
+
+
+                        
+                        <div id="blabla" ng-show="datos.buscar.selectedTipoBloqueos.idTipoBloqueo == 2" class="card text-center" style="padding-top: 0px; margin-top:0px;"><!-- CARD3 -->
+                                  <div class="card-header2" style="background-color: #f4f4f4;">
+                                    <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                      <li ng-repeat="l in datos.buscar.resultados" 
+                                          ng-click="tabLoteriasChanged(l)" 
+                                      class="nav2-item" style="padding: 0px;">
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}</a>
+                                      </li>
+                                      <!-- <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link" href="#">Link</a>
+                                      </li>
+                                      <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                      </li> -->
+                                    </ul>
+                                  </div>
+                                  <div class="card-body">
+                                    <div class="col-12">
+
+                                    <table class="table table-sm table-striped">
+                                          <thead>
+                                              <tr>
+                                              <th scope="col" class="text-center">ID</th>
+                                              <th scope="col" class="text-center">JUGADA</th>
+                                              <th scope="col" class="text-center">BLOQUEO</th>
+                                              <th scope="col" class="text-center">SORTEO</th>
+                                              <th scope="col" class="text-center">DESDE</th>
+                                              <th scope="col" class="text-center">HASTA</th>
+                                              <th scope="col" class="text-center">ELIMINAR</th>
+                                              <!-- <th scope="col" class="text-center"></th> -->
+                                              <!-- <th scope="col" class="text-center">Cerrado</th> -->
+                                              
+                                              
+
+                                              </tr>
+                                          </thead>
+                                          <tbody>
+                                            <!-- | filter:datos.monitoreo.datosBusqueda -->
+                                              <tr ng-repeat="c in datos.tabSelectedLoteria.jugadas">
+                                                  <td scope="col" class="text-center" style="font-size: 14px">@{{$index + 1}}</td>
+                                                  <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
+                                                  <td scope="col" class="text-center">@{{c.jugada}}</td>
+                                                  <td scope="col" class="text-center">
+                                                    <a style="cursor: pointer"  class="d-inline  bg-primary p-1 text-white rounded">@{{c.monto | currency}}</a>
+                                                  </td>
+                                                  <td scope="col" class="text-center">@{{c.sorteo}}</td>
+                                                  <td scope="col" class="text-center">@{{c.fechaDesde | date:"dd/MM/yyyy"}}</td>
+                                                  <td scope="col" class="text-center">@{{c.fechaHasta | date:"dd/MM/yyyy"}}</td>
+                                                 
+                                                  <!-- <td scope="col" class="text-center">@{{c.frecuencia.descripcion}}</td>
+                                                  <td scope="col" class="text-center">@{{toFecha(c.fechaInicio) | date:"dd/MM/yyyy"}}</td>
+                                                  <td scope="col" class="text-center">@{{toFecha(c.fechaProximoGasto) | date:"dd/MM/yyyy"}}</td>
+                                                  -->
+                                                  
+                                                  <!-- <td>
+                                                    <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                                                    <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
+                                                  </td> -->
+
+                                                  <td class=" text-center">
+                                                    <button ng-click="eliminarBloqueo(c, $index)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                                        <i class="material-icons font-weight-bold">close</i>
+                                                    </button>
+                                                  </td>
+                                              </tr>
+                                              
+                                          </tbody>
+                                      </table>
+                                    </div> <!-- END COL-12 -->
+                                  </div> <!-- END CARD-BODY -->
+                                </div> <!-- END CARD3 -->
+
+
+                       
 
 
                       </div> <!-- END DIV FORMULARIO -->
@@ -452,7 +620,7 @@
 
                         
 
-                      <div class="row justify-content-center">
+                      <div class="row">
                       
 
                           
@@ -496,6 +664,48 @@
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
+                            
+                          <div class="col-3">
+                            <div class="row">
+                              <div class="col-12 text-center">
+                                <h3>Opciones</h3>
+                              </div>
+
+                              <div class="col-12">
+                              
+                              </div>
+
+                              <div class="col-sm-12 checkbox-radios">
+
+                              
+                                <div ng-show="datos.bloqueoJugada.selectedTipoBloqueos.idTipoBloqueo == 1" class="form-check form-check-inline">
+                                  <label class="form-check-label">
+                                    <input ng-model="datos.bloqueoJugada.ignorarDemasBloqueosTmp" class="form-check-input" type="checkbox" value=""> Ignorar demas bloqueos
+                                    <span class="form-check-sign">
+                                      <span class="check"></span>
+                                    </span>
+                                  </label>
+                                </div>
+
+                                <div  class="form-check form-check-inline">
+                                  <label class="form-check-label">
+                                    <input ng-change="seleccionarTodasChanged(seleccionarTodas)" ng-model="seleccionarTodas" class="form-check-input" type="checkbox" value=""> Todas las loterias
+                                    <span class="form-check-sign">
+                                      <span class="check"></span>
+                                    </span>
+                                  </label>
+                                </div>
+
+
+
+                              </div>
+
+                             
+
+                             
+
+                            </div>
+                          </div>
                           
 
                           <div class="col-6">
@@ -524,12 +734,12 @@
                                 width: 100%;
                             }
                         </style>
-                          <div class="col-12">
+                          <!-- <div class="col-12">
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
                                 <label for="porcentajecaid" class="bmd-label-floating">Entidad #1</label>
-                                <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
+                                <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid">
                                 <select 
                                 ng-model="datos.selectedSorteo"
                                     ng-options="o.descripcion for o in datos.optionsSorteos"
@@ -542,19 +752,21 @@
                                 </div>
                             </div>
                           
-                          </div> <!-- END COL-12 -->
+                          </div>  -->
 
                               
                               
 
-                              <div class="col-12 col-md-12">
+                              <div class="col-6 col-md-6">
                                   <div id="divInputJugada" class="form-group">
                                                 <label  for="jugada" class="bmd-label-floating">Jugada</label>
                                                 <input 
+                                                select-all-on-click
                                                     ng-model="datos.bloqueoJugada.jugada"
+                                                    ng-keyup="txtMontoFocus($event)"
                                                     autocomplete="off"
                                                     class="form-control h4" 
-                                                    id="inputJugada" 
+                                                    id="txtJugada" 
                                                     type="text" name="text" 
                                                     minLength="2" maxLength="6"  />
                                             </div>
@@ -562,19 +774,23 @@
 
                              
 
-                              <div class="col-12 col-md-12">
+                              <div class="col-6 col-md-6">
                                   <div id="divInputJugada" class="form-group">
                                                 <label  for="jugada" class="bmd-label-floating">Monto</label>
                                                 <input 
+                                                    id="txtMonto"
                                                     ng-model="datos.bloqueoJugada.monto"
                                                     autocomplete="off"
                                                     class="form-control h4" 
                                                     type="text" name="text" 
+                                                    ng-keyup="insertarJugada($event)"
                                                 />
                                             </div>
                               </div>
 
                               
+
+
 
                             </div> <!-- END ROW JUGADAS -->
                           
@@ -583,14 +799,181 @@
                                 
                          
 
+
                         
 
                       </div> <!-- END ROW -->
 
                       <div class="row justify-content-center">
+                       <div ng-show="datos.jugadasReporte.monto_total > 0" class="col-12 text-center">
+                           <h2>Total loteria @{{datos.jugadasReporte.selectedLoteria.descripcion}}: @{{datos.jugadasReporte.monto_total | currency}}</h2>
+                       </div>
+                       <div class="col-4 col-sm-3 col-lg-3">
+                           <h4 class="text-center">DIRECTO</h4>
+                            <div class="table-responsive">
+                                <table class="table table-fixed table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">Jugada</th>
+                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-repeat="c in datos.bloqueoJugada.jugadas | filter: {tam: 2}">
+                                    <td class="col-sm-5 text-center">@{{c.jugada}}</td>
+                                    <td class="col-6 text-center">
+                                      @{{c.monto}}
+                                      <i  ng-click="eliminarJugada(c.jugada)" class="material-icons text-center  b-0 p-0" style="margin:0px!important; margin-top: 2px!important; padding:0px!important;font-size: 15px; cursor:pointer;">close</i>
+                                    </td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td> -->
+                                    </tr>
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                                <!-- <div class="float-right mt-3">
+                                        <div style="font-size: 16px;" class="font-weight-bold">
+                                            Total
+                                            <small class="h4 ml-3">&euro;0</small>
+                                        </div> 
+                                        
+                                </div> -->
+                            </div> <!-- END RESPONSIVE TABLE -->
+                       </div> <!-- COL-3 -->
+
+                       <div class="col-4 col-sm-4 col-lg-3">
+                           <h5 class="text-center">PALE Y TRIPLETA</h5>
+                            <div class="table-responsive">
+                                <table class="table table-fixed table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">Jugada</th>
+                                    <th class="font-weight-bold col-5 text-center" style="font-size: 14px">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-if="(c.tam == 4 || c.tam == 6) && esPick3Pick4UOtro(c.jugada) == 'otro'" ng-repeat="c in datos.bloqueoJugada.jugadas">
+                                    <td class="col-sm-6 text-center font-weight-bold" style="font-size: 11px">@{{agregar_guion(c.jugada)}}</td>
+                                    <td style="font-size: 12px" class="col-5 text-center font-weight-bold">
+                                    @{{c.monto}}
+                                    <i ng-click="eliminarJugada(c.jugada)" class="material-icons text-center  b-0 p-0" style="margin:0px!important; margin-top: 2px!important; padding:0px!important;font-size: 15px; cursor:pointer;">close</i>
+                                    </td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td>
+                                    </tr> -->
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                                <!-- <div class="float-right mt-3">
+                                        <div style="font-size: 16px;" class="font-weight-bold">
+                                            Total
+                                            <small class="h4 ml-3">&euro;0</small>
+                                        </div> 
+                                        
+                                </div> -->
+                            </div> <!-- END RESPONSIVE TABLE -->
+                       </div> <!-- COL-3 -->
+
+
+                       <div class="col-4 col-sm-4 col-lg-3">
+                           <h4 class="text-center">PICK 3</h4>
+                            <div class="table-responsive">
+                                <table class="table table-fixed table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">Jugada</th>
+                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-if="esPick3Pick4UOtro(c.jugada) == 'pick3Straight' || esPick3Pick4UOtro(c.jugada) == 'pick3Box'" ng-repeat="c in datos.bloqueoJugada.jugadas">
+                                    <td class="col-sm-5 text-center">
+                                      @{{agregar_guion(c.jugada)}}
+                                      <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick3Box'" class="text-danger font-weight-bold">B</small>
+                                      <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick3Straight'" class="text-primary font-weight-bold">S</small>
+                                    </td>
+                                    <td class="col-6 text-center">
+                                      @{{c.monto}}
+                                      <i  ng-click="eliminarJugada(c.jugada)" class="material-icons text-center  b-0 p-0" style="margin:0px!important; margin-top: 2px!important; padding:0px!important;font-size: 15px; cursor:pointer;">close</i>
+                                    </td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td> -->
+                                    </tr>
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                                <!-- <div class="float-right mt-3">
+                                        <div style="font-size: 16px;" class="font-weight-bold">
+                                            Total
+                                            <small class="h4 ml-3">&euro;0</small>
+                                        </div> 
+                                        
+                                </div> -->
+                            </div> <!-- END RESPONSIVE TABLE -->
+
+                       </div> <!-- COL-3 -->
+
+                       <div class="col-4 col-sm-4 col-lg-3">
+                           <h4 class="text-center">PICK 4</h4>
+                            <div class="table-responsive">
+                                <table class="table table-fixed table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">Jugada</th>
+                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight' || esPick3Pick4UOtro(c.jugada) == 'pick4Box'" ng-repeat="c in datos.bloqueoJugada.jugadas">
+                                    <td style="font-size: 13px" class="col-sm-6 text-center">
+                                      @{{agregar_guion(c.jugada)}}
+                                      <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Box'" class="text-danger font-weight-bold">B</small>
+                                      <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight'" class="text-primary font-weight-bold">S</small>
+                                    </td>
+
+                                    <td class="col-6 text-center">
+                                      @{{c.monto}}
+                                      <i ng-click="eliminarJugada(c.jugada)" class="material-icons text-center  b-0 p-0" style="margin:0px!important; margin-top: 2px!important; padding:0px!important;font-size: 15px; cursor:pointer;">close</i>
+                                    </td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td> -->
+                                    </tr>
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                                <!-- <div class="float-right mt-3">
+                                        <div style="font-size: 16px;" class="font-weight-bold">
+                                            Total
+                                            <small class="h3 ml-3">&euro;0</small>
+                                        </div> 
+                                        
+                                </div> -->
+                            </div> <!-- END RESPONSIVE TABLE -->
+
+                       </div> <!-- COL-3 -->
+                   </div>
+
+                      <div class="row justify-content-center">
                           <div class="col-12 text-center">
                             <h3>Loterias</h3>
                           </div>
+                          
                           <div class="col-12 text-center">
                                 <style>
                                   .btn-outline-info.active2{
