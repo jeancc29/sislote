@@ -663,6 +663,26 @@ myApp
                 }
                 );
             }
+
+
+            else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca jugadas"){
+                //    bloqueo.idBloqueo = 100000;
+                    $http.post(rutaGlobal+"/api/bloqueos/jugadas/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                    .then(function(response){
+                        console.log(response);
+                        $scope.datos.tabSelectedLoteria.jugadas.splice(index, 1);
+                        $scope.datos.tabSelectedLoteria.cantidadDeBloqueos = $scope.datos.tabSelectedLoteria.cantidadDeBloqueos - 1;
+                        alert("Se ha eliminado correctamente");
+    
+                    },
+                    function(response) {
+                        // Handle error here
+                        // $scope.datos.cargando = false;
+                        console.log('Error jean: ', response);
+                        alert("Error");
+                    }
+                    );
+               }
           
         
 
@@ -1025,6 +1045,11 @@ myApp
                     $scope.datos.buscar.resultados = response.data.dias;
                     $scope.tabDiasChanged($scope.datos.buscar.resultados[0]);
                     $scope.tabBancasChanged($scope.datos.tabSelectedDia.bancas[0]);
+                    $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
+                }
+                else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca jugadas"){
+                    $scope.datos.buscar.resultados = response.data.bancas;
+                    $scope.tabBancasChanged($scope.datos.buscar.resultados[0]);
                     $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
                 }
                 else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General jugadas"){

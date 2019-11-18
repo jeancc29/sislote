@@ -35,6 +35,9 @@ use App\Http\Resources\BranchesResource;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 
+use App\Http\Requests\BlocksplaysRequest;
+
+
 use Illuminate\Support\Facades\Crypt;
 
 class BlocksplaysController extends Controller
@@ -658,5 +661,17 @@ class BlocksplaysController extends Controller
     public function destroy(Blocksplays $blocksplays)
     {
         //
+    }
+
+    public function eliminar(BlocksplaysRequest $request)
+    {
+        
+        $validated = $request->validated();
+        Blocksplays::whereId($validated["datos"]["idBloqueo"])->delete();
+
+    
+        return Response::json([
+            'mensaje' => "Se ha eliminado correctamente"
+        ], 201);
     }
 }

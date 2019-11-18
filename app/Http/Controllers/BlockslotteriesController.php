@@ -162,6 +162,39 @@ class BlockslotteriesController extends Controller
                 'loterias' => $loterias
             ], 201);
         }
+
+        else if($datos['idTipoBloqueo'] == 4){
+            
+            $idBancas = collect($datos['bancas'])->map(function($d){
+                return $d['id'];
+            });
+
+            
+            
+                $bancas = BranchesResource::collection(Branches::whereIn('id', $idBancas)->get());
+                //COLLECT BANCAS
+                $bancas = collect($bancas)->map(function($b){
+                    //COLLECT LOTERIAS
+                    $loterias = collect($b['loterias'])->map(function($l) use($b){
+                        //COLLECT SORTEOS
+                        $fecha = Carbon::now();
+                        $jugadas = Blocksplays::where(['idLoteria' => $l['id'], "idBanca" => $b['id']])
+                        ->whereRaw('date(blocksplays.fechaHasta) >= ? ', [$fecha->toDateString()])
+                        ->get();
+                        $jugadas = collect($jugadas)->map(function($j){
+                            return ["id" => $j["id"], "jugada" => $j["jugada"], "monto" => $j["monto"], "idSorteo" => $j["idSorteo"], "sorteo" => Draws::whereId($j["idSorteo"])->first()->descripcion, "fechaDesde" => $j["fechaDesde"], "fechaHasta" => $j["fechaHasta"],  "idBloqueo" => $j["id"]];
+                        });
+                        return ["id" => $l['id'], "descripcion" => $l['descripcion'], "jugadas" => $jugadas, "cantidadDeBloqueos" => count($jugadas)];
+                    
+                    });
+                    return ["id" => $b['id'], "descripcion" => $b['descripcion'], "loterias" => $loterias];
+                });
+
+                return Response::json([
+                    'bancas' => $bancas
+                ], 201);
+           
+        }
         
 
         

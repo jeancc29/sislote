@@ -352,19 +352,26 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				/******** END QUITAR ULTIMO CARACTER ******************/
 				
                 /******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
+                set @idStock = null;
                 if exists(select id from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0)
                 then
-					if exists(select id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1)
+					set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1);
+					-- if exists(select id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1)
+                    if @idStock is not null
                     then 
-						update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1;
+						-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1;
+                        update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
 					elseif exists(select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.ignorarDemasBloqueos = 1 and b.status = 1)
 					then
                         set @montoBloqueo = (select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.ignorarDemasBloqueos = 1 and b.status = 1);
                         insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.esGeneral, stocks.ignorarDemasBloqueos, stocks.created_at, stocks.updated_at) values(1, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, 1, 1, now(), now());
-					else
-                        update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0;
+						set @idStock = (SELECT LAST_INSERT_ID());
+                    else
+						set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0);
+                        -- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0;
+						update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
                     end if;
-                elseif exists(select id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1)
+                elseif exists(select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1)
                 then
 					set @ignorarDemasBloqueos = (select s.ignorarDemasBloqueos from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1);
 					if @ignorarDemasBloqueos != 1
@@ -372,17 +379,23 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 						set @montoBloqueo = (select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
 						if @montoBloqueo is not null then
 							insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now());
+							set @idStock = (SELECT LAST_INSERT_ID());
                         else
 							set @montoBloqueo = (select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo);
 							if @montoBloqueo is not null then
 								insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, now(), now());
-							else
-								update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
+								set @idStock = (SELECT LAST_INSERT_ID());
+                            else
+								-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
+								set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1);
+								update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
                             end if;
                         end if;
                     else
-						update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
-					end if;
+						-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
+						(select s.id from stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1);
+                    
+                    end if;
                 else
 					
                     if exists(select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.ignorarDemasBloqueos = 1 and b.status = 1)

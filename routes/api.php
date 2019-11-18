@@ -101,6 +101,7 @@ Route::get('/bloqueos', 'BlockslotteriesController@index');
 Route::post('/bloqueos/general/loterias/guardar', 'BlockslotteriesController@storeGeneral');
 Route::post('/bloqueos/loterias/guardar', 'BlockslotteriesController@store');
 Route::post('/bloqueos/jugadas/guardar', 'BlocksplaysController@store');
+Route::post('/bloqueos/jugadas/eliminar', 'BlocksplaysController@eliminar');
 Route::post('/bloqueos/general/jugadas/guardar', 'BlocksplaysController@storeGeneral');
 Route::post('/bloqueos/loterias/buscar', 'BlockslotteriesController@buscar');
 Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@eliminar');
