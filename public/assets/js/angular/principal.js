@@ -440,6 +440,7 @@ myApp
                     $scope.datos.idLoteria = $scope.datos.loterias[0].id;
                     $scope.datos.idBanca = $scope.datos.selectedBancas.id;
                     $('#inputMonto').focus();
+                    $('#inputMonto').select();
 
                     //Esto lo hago para que el valor de $scope.datos.jugada no cambie al momento de ordenarMenorAMayor los pale.
                     /* 
@@ -631,7 +632,7 @@ myApp
                 }); //END FOREACH
 
                 //$('#inputJugada').focus();
-                $scope.datos.monto = null;
+                // $scope.datos.monto = null;
                 $scope.datos.jugada = null;
                 $scope.jugada = null;
 

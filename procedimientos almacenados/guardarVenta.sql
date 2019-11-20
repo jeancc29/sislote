@@ -393,8 +393,8 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
                         end if;
                     else
 						-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
-						(select s.id from stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1);
-                    
+						set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1);
+						update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
                     end if;
                 else
 					
@@ -402,28 +402,33 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					then	
 						set @montoBloqueo = (select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
 						insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.esGeneral, stocks.ignorarDemasBloqueos, stocks.created_at, stocks.updated_at) values(1, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, 1, 1, now(), now());
+						set @idStock = (SELECT LAST_INSERT_ID());
                     else
 						
                         /************* OBTENEMOS EL STOCK DE LA TABLA BLOQUEOS JUGADAS *************/
 						set @montoBloqueo = (select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
 						if @montoBloqueo is not null then
 							insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now());
-						else
+							set @idStock = (SELECT LAST_INSERT_ID());
+                        else
 							/**************** OBTENEMOS EL STOCK DE LA TABLA BLOCKSPLAYSGENERALS *******/
 							set @montoBloqueo = (select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1);
 							if @montoBloqueo is not null then
 								insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.esGeneral, stocks.created_at, stocks.updated_at) values(1, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, 1, now(), now());
-							end if;
+								set @idStock = (SELECT LAST_INSERT_ID());
+                            end if;
 							
 							 if @montoBloqueo is null then
 							/**************** OBTENEMOS EL STOCK POR BANCA DE LA TABLA BLOCKLOTTERIES *******/
 								set @montoBloqueo = (select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo);
 								if @montoBloqueo is not null then
 									insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, now(), now());
-								else
+									set @idStock = (SELECT LAST_INSERT_ID());
+                                else
 									set @montoBloqueo = (select b.monto from blocksgenerals b where b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo);
 									insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esGeneral, stocks.created_at, stocks.updated_at) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now());
-							end if;
+									set @idStock = (SELECT LAST_INSERT_ID());
+                            end if;
                         end if;
                         
                         
@@ -459,7 +464,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					set @comision = 0;
 				end if;
                 -- select @sorteo, @monto, @comision, JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo')));
-                insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, now(), now()); 
+                insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.idStock, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, @idStock, now(), now()); 
 			end if;
             /************** END IDLOTERIA = IDLOTERIAJUGADAS ***************/
             

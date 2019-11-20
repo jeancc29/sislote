@@ -14,8 +14,7 @@ class AddIdbloqueoToSalesdetails extends Migration
     public function up()
     {
         Schema::table('salesdetails', function (Blueprint $table) {
-            $table->unsignedInteger('idBloqueo');     
-            $table->foreign('idBloqueo')->references('id')->on('stocks');
+            $table->unsignedBigInteger('idStock');     
         });
     }
 
@@ -27,8 +26,7 @@ class AddIdbloqueoToSalesdetails extends Migration
     public function down()
     {
         Schema::table('salesdetails', function (Blueprint $table) {
-            $table->dropForeign(['idBloqueo']);   
-            $table->dropColumn('idBloqueo');
+            $table->dropColumn('idStock');
         });
     }
 }

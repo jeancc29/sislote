@@ -1083,7 +1083,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                 </select> -->
                               </div>
                             </div>
-                            <div class="col-2 col-sm-1" ng-show="existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
+                            <div ng-class="{'col-2 col-sm-2': existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) == true, 'col-2 col-sm-1' : existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) == false}" class="" ng-show="existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Tripleta', datosPremiosModal.selectedLoteriaPremiosModal)
                                 || existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) || datosPremiosModal.selectedLoteriaPremiosModal == null">
@@ -1098,7 +1098,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
-                            <div class="col-2 col-sm-1" 
+                            <div ng-class="{'col-2 col-sm-2': existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) == true, 'col-2 col-sm-1' : existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) == false}" class="" 
                               ng-show="
                                 existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
                                 || existeSorteoPremiosModal('Directo', datosPremiosModal.selectedLoteriaPremiosModal) 
