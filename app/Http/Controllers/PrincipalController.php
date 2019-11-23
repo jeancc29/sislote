@@ -347,7 +347,7 @@ class PrincipalController extends Controller
             $idTicket = $codigoBarra['codigoBarra'];
         }
         
-        $idVenta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0,5])->value('id');
+        $idVenta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [5])->value('id');
         
         // if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
             if($idVenta != null){
