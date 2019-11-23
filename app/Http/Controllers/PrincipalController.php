@@ -776,6 +776,11 @@ class PrincipalController extends Controller
                     foreach($ventasDetalles as $v){
                         $v['premio'] = 0;
                         $v['status'] = 0;
+                        $stock = Stock::whereId($v["idStock"])->first();
+                        if($stock != null){
+                            $stock->monto = $stock->monto + $v["monto"];
+                            $stock->save();
+                        }
                         $v->save();
                     }
     
