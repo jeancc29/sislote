@@ -430,7 +430,8 @@
     if(series.key == "neto" && row.y < 0)
       return "#dc2365";
     else
-      return "#c2c2d6";
+      // return "#c2c2d6";
+      return "#95999e";
     }
 });
 
