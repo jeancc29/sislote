@@ -511,7 +511,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
             inner join tickets t on t.id = s.idTicket
             left join cancellations ca on ca.idTicket = s.idTicket
             left join users uc on uc.id = ca.idUsuario
-            where date(s.created_at) = date(now()) and s.status not in(0, 5) and s.idBanca = idBanca into ventas;
+            where date(s.created_at) = date(now()) and s.status not in(0, 5) and s.idBanca = idBanca order by t.id desc into ventas;
             
             
             
