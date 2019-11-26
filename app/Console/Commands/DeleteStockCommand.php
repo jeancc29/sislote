@@ -40,7 +40,7 @@ class DeleteStockCommand extends Command
      */
     public function handle()
     {
-        $prueba = new Carbon("2019-01-20 01:10");
+        $prueba = new Carbon("2019-01-20 24:10");
 
         $fecha = Carbon::now();
         
@@ -48,7 +48,7 @@ class DeleteStockCommand extends Command
         $this->info('Eliminar:stock: ' . $prueba->hour);
 
 
-        if($fecha->hour != 15)
+        if($fecha->hour != 0)
             return;
 
         Stock::truncate();
