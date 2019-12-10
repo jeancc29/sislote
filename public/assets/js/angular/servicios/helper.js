@@ -176,4 +176,15 @@ myApp.service('helperService', function(){
           return false;
     }
 
+
+    this.actualizarScrollBar = function(){
+        /* javascript for updating the Perfect Scrollbar when the content of the page is changing */
+        $('.main-panel').perfectScrollbar('update');
+    }
+
+    this.destruirScrollBar = function(){
+        /* javascript for detroying the Perfect Scrollbar */
+        $('.main-panel').perfectScrollbar('destroy');
+    }
+
 });

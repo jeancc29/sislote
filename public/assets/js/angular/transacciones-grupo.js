@@ -35,6 +35,7 @@ myApp
             "mostrarTotalDC" : false,
 
             "selectedGrupo" : {},
+            "fecha" : new Date(),
             "fechaDesde" : new Date(),
             "fechaHasta" : new Date(),
             'btnCargando' : false
@@ -71,6 +72,9 @@ myApp
                 $http.get(rutaGlobal+"/api/transacciones/grupo")
                     .then(function(response){
                         console.log('Transacciones inicializarDatos: ', response.data);
+
+                        $scope.datos.optionsTipoTransaccion = [{'idTipoBloqueo' : 1, 'descripcion' : 'Normal'}, {'idTipoBloqueo' : 2, 'descripcion' : 'Programada'}];
+                        $scope.datos.selectedTipoTransaccion = $scope.datos.optionsTipoTransaccion[0];
 
                         $scope.datos.entidades = response.data.entidades;
                         $scope.datos.grupos = response.data.grupos;
@@ -170,6 +174,19 @@ myApp
             else if($scope.datos.selectedTipo.descripcion == 'Pago'){
                 $scope.datos.credito = 0;
             }
+            else if($scope.datos.selectedTipo.descripcion == 'Descuento dias no laborados'){
+                $scope.datos.credito = 0;
+            }
+        }
+
+        $scope.cbxTiposTransaccionChange = function(){
+            if($scope.datos.selectedTipoTransaccion == null || $scope.datos.selectedTipoTransaccion == undefined)
+                return;
+
+            if($scope.datos.selectedTipoTransaccion.descripcion == 'Programada'){
+                $scope.datos.debito = 0;
+            }
+            
         }
 
         $scope.total = function(es_debito, grupo = false){
@@ -267,8 +284,12 @@ myApp
             t.entidad2_saldo_final = $scope.datos.entidad2_saldo_final;
             t.nota = $scope.datos.nota;
             t.nota_grupo = $scope.datos.nota_grupo;
+            t.tipoTransaccion = $scope.datos.selectedTipoTransaccion.descripcion;
+            t.fecha = $scope.datos.fecha;
 
             $scope.datos.addTransaccion.push(t);
+            console.log('addTra1: ', $scope.datos.addTransaccion);
+
 
             limpiar();
             
@@ -290,6 +311,7 @@ myApp
                 return;
             }
 
+            
             $scope.datos.idUsuario = idUsuario;
             $scope.datos.btnCargando = true;
             $http.post(rutaGlobal+"/api/transacciones/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})

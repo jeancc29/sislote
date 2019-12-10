@@ -12,42 +12,42 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->truncateTables([
-                    'users',
-                    'permissions', 
-                    'roles', 'permission_role', 
-                    'lotteries', 
-                    'draws', 
-                    'blockslotteries', 
-                    'blocksplays', 
-                    'branches', 
-                    'generals', 
-                    'days', 
+                    // 'users',
+                    // 'permissions', 
+                    // 'roles', 'permission_role', 
+                    // 'lotteries', 
+                    // 'draws', 
+                    // 'blockslotteries', 
+                    // 'blocksplays', 
+                    // 'branches', 
+                    // 'generals', 
+                    // 'days', 
                     'types', 
-                    'entities', 
-                    'drawsrelations', 
-                    'frecuencies',
-                    'coins',
-                    'settings',
+                    // 'entities', 
+                    // 'drawsrelations', 
+                    // 'frecuencies',
+                    // 'coins',
+                    // 'settings',
                     ]);
 
-        $this->call('CoinsSeeder');
-        $this->call('SettingsSeeder');
-        $this->call('DrawsSeeder');
+        // $this->call('CoinsSeeder');
+        // $this->call('SettingsSeeder');
+        // $this->call('DrawsSeeder');
 
-        $this->call('CountriesSeeder');
-        $this->call('PermissionSeeder');
-        $this->call('LotteriesSeeder');
+        // $this->call('CountriesSeeder');
+        // $this->call('PermissionSeeder');
+        // $this->call('LotteriesSeeder');
         
-        $this->call('RolesSeeder');
-        $this->call('PermissionRoleSeeder');
-        $this->call('UsersSeeder');
-        $this->call('BlockslotteriesSeeder');
-        $this->call('BranchesSeeder');
-        $this->call('GeneralsSeeder');
-        $this->call('DaysSeeder');
-        $this->call('FrecuencySeeder');
+        // $this->call('RolesSeeder');
+        // $this->call('PermissionRoleSeeder');
+        // $this->call('UsersSeeder');
+        // $this->call('BlockslotteriesSeeder');
+        // $this->call('BranchesSeeder');
+        // $this->call('GeneralsSeeder');
+        // $this->call('DaysSeeder');
+        // $this->call('FrecuencySeeder');
         $this->call('TypesSeeder');
-        $this->call('EntitySeeder');
+        // $this->call('EntitySeeder');
     }
 
 

@@ -285,7 +285,7 @@
                                 </div> <!-- END INPUT GROUP -->
                               </div>
 
-                              <div class="col-5  " ng-show="datos.editar == true">
+                              <div class="col-3  " ng-show="datos.editar == true">
                                 <div class="input-group form-control-lg pt-0 mt-0">
                                   <label class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Frecuencia</label>                              
                                     
@@ -297,9 +297,10 @@
 
                              
 
-                              <div class="col-5">
+                              <div class="col-6">
                                   <div class="input-group form-control-lg pt-0 mt-0">
-                                    <label  class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Fecha inicio</label>                              
+                                    <label  class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:13px;">Fecha Primer Pago</label>                              
+                                    <!-- <label  class="d-none d-sm-block text-right col-sm-4 col-form-label  font-weight-bold " style="color: black; font-size:15px;">Fecha inicio</label>                               -->
                                       
                                       <div class="form-group col-sm-8 col-10">
                                       <!-- <label for="abreviatura" class="bmd-label-floating font-weight-bold" style="color: black;">Monto prestamo</label> -->
@@ -310,7 +311,7 @@
 
                                 
 
-                                <div class="col-3 col-sm-2">
+                                <div class="col-3 col-sm-1">
                                   <div class="input-group form-control-lg">
                                       <div class="form-group">
                                         <div class="form-check">

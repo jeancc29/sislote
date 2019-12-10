@@ -358,7 +358,7 @@ myApp
                 
 
               
-                
+             
 
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
@@ -454,6 +454,7 @@ myApp
 
         $scope.editar = function(esNuevo, d){
             $('#fechaGasto').addClass('is-filled');
+            helperService.destruirScrollBar();
             
             $scope.datos.mostrarFormEditar = true;
             $scope.datos.ckbLoterias = $scope.datos.ckbLoteriasGuardar;

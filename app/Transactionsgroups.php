@@ -15,6 +15,11 @@ class Transactionsgroups extends Model
         return $this->belongsToMany('App\transactions', 'transaction_transactionsgroup', 'idGrupo', 'idTransaccion');
     }
 
+    public function transaccionesProgramadas()
+    {
+        return $this->belongsToMany('App\Transactionscheduled', 'transactionscheduled_transactionsgroup', 'idGrupo', 'idTransaccion');
+    }
+
     public function usuario()
     {
         //Modelo, foreign key, local key

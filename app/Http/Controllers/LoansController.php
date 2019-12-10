@@ -1134,11 +1134,11 @@ class LoansController extends Controller
         $prestamo = Loans::where(['id' => $datos['idPrestamo'], 'status' => 1])->first();
         if($prestamo != null){
            
-           $transacciones = transactions::where(['idPrestamo' => $prestamo->id, 'status' => 1])->get();
-           foreach($transacciones as $t){
-               $t->status = 0;
-               $t->save();
-           }
+        //    $transacciones = transactions::where(['idPrestamo' => $prestamo->id, 'status' => 1])->get();
+        //    foreach($transacciones as $t){
+        //        $t->status = 0;
+        //        $t->save();
+        //    }
 
            $prestamo->status = 0;
            $prestamo->save();

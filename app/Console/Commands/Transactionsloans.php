@@ -137,6 +137,8 @@ class Transactionsloans extends Command
 
                 $montoInteresAPagar = 0;
                 $montoCapitalAPagar = 0;
+                //Si el monto pagado del interes y capital es igual a cero entonces el $montoInteresAPagar sera igual 
+                //al montoInteres y el $montoCapitalAPagar sera igual a montoCapital
                 if($amortizacion->montoPagadoCapital == 0 && $amortizacion->montoPagadoInteres == 0){
                     $montoInteresAPagar = $amortizacion->montoInteres;
                     $montoCapitalAPagar =$amortizacion->montoCapital;

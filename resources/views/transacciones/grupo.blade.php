@@ -182,11 +182,40 @@
 
                    <div class="row justify-content-center">
 
+                        <div class="col-12">
+                            <div class="row justify-content-center">
+                                <div class="col-6">
+                                    <div class="input-group form-control-lg m-0 p-0">
+                                        <div class="form-group w-100">
+                                            <label for="porcentajecaid" class="bmd-label-floating" style="color: black; font-size: 17px">Tipo transaccion</label>
+                                            <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
+                                            <select 
+                                                    ng-model="datos.selectedTipoTransaccion"
+                                                    ng-options="o.descripcion for o in datos.optionsTipoTransaccion"
+                                                    ng-change="cbxTiposTransaccionChange()"
+                                                    class="selectpicker col-12" 
+                                                    data-style="select-with-transition" 
+                                                    title="Select Usuario">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-show="datos.selectedTipoTransaccion.descripcion == 'Programada'" class="row justify-content-center my-2">
+                                <div class="col-6">
+                                    <div id="divInputFechaDesde" class="form-group">
+                                        <label  for="jugada" class="bmd-label-floating" style="color: black; font-size: 17px">Fecha para realizar transaccion</label>
+                                        <input ng-model="datos.fecha" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-4">
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
-                                <label for="porcentajecaid" class="bmd-label-floating">Concepto</label>
+                                <label for="porcentajecaid" class="bmd-label-floating" style="color: black;">Concepto</label>
                                 <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
                                 <select 
                                         ng-model="datos.selectedTipo"
@@ -201,7 +230,7 @@
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
-                                <label for="porcentajecaid" class="bmd-label-floating">Entidad #1</label>
+                                <label for="porcentajecaid" class="bmd-label-floating" style="color: black;">Entidad #1</label>
                                 <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
                                 <select 
                                         ng-model="datos.selectedBanca"
@@ -218,7 +247,7 @@
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
-                                <label for="porcentajecaid" class="bmd-label-floating">Entidad #2</label>
+                                <label for="porcentajecaid" class="bmd-label-floating" style="color: black;">Entidad #2</label>
                                 <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
                                 <select 
                                         ng-model="datos.selectedEntidad"
@@ -235,7 +264,7 @@
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
-                                <label for="descontar" class="bmd-label-floating">Notas</label>
+                                <label for="descontar" class="bmd-label-floating" style="color: black;">Notas</label>
                                 <input ng-model="datos.nota" type="text" class="form-control" id="notas" name="notas">
                                 </div>
                             </div>
@@ -265,13 +294,13 @@
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div id="entidad1_saldo_inicial" class="form-group w-100">
-                                <label for="balanceDesactivacion" class="bmd-label-floating">Saldo inicial ENTIDAD #1</label>
+                                <label for="balanceDesactivacion" class="bmd-label-floating" style="color: black;">Saldo inicial ENTIDAD #1</label>
                                 <input disabled ng-model="datos.entidad1_saldo_inicial" type="text" class="form-control" id="balanceDesactivacion" name="balanceDesactivacion">
                                 </div>
                             </div>
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div id="entidad2_saldo_inicial" class="form-group w-100">
-                                <label for="entidad2_saldo_inicial" class="bmd-label-floating">Saldo inicial ENTIDAD #2</label>
+                                <label for="entidad2_saldo_inicial" class="bmd-label-floating" style="color: black;">Saldo inicial ENTIDAD #2</label>
                                 <input disabled ng-model="datos.entidad2_saldo_inicial" type="text" class="form-control" id="entidad2_saldo_inicial" name="entidad2_saldo_inicial">
                                 </div>
                             </div>
@@ -279,19 +308,20 @@
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
-                                <label  for="debito" class="bmd-label-floating">DEBITO</label>
+                                <label  for="debito" class="bmd-label-floating" style="color: black;">DEBITO</label>
                                 <input 
                                     select-all-on-click
                                     ng-keyup="addTransaccion($event)"
                                     ng-blur="saldoFinal(true)" 
-                                    ng-disabled="datos.selectedTipo.descripcion == 'Cobro'" ng-model="datos.debito" type="number" class="form-control" id="debito" name="debito">
+                                    
+                                    ng-disabled="datos.selectedTipo.descripcion == 'Cobro' || datos.selectedTipo.descripcion == 'Descuento dias no laborados'" ng-model="datos.debito" type="number" class="form-control" id="debito" name="debito">
                                 </div>
                             </div>
 
 
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div class="form-group w-100">
-                                <label for="credito" class="bmd-label-floating">CREDITO</label>
+                                <label for="credito" class="bmd-label-floating" style="color: black;">CREDITO</label>
                                 <input 
                                     select-all-on-click
                                     ng-keyup="addTransaccion($event)"
@@ -303,13 +333,13 @@
 
                              <div class="input-group form-control-lg m-0 p-0">
                                 <div id="entidad1_saldo_final" class="form-group w-100">
-                                <label for="entidad1_saldo_final" class="bmd-label-floating">Saldo final ENTIDAD #1</label>
+                                <label for="entidad1_saldo_final" class="bmd-label-floating" style="color: black;">Saldo final ENTIDAD #1</label>
                                 <input disabled ng-model="datos.entidad1_saldo_final" type="text" class="form-control" id="entidad1_saldo_final" name="entidad1_saldo_final">
                                 </div>
                             </div>
                             <div class="input-group form-control-lg m-0 p-0">
                                 <div id="entidad2_saldo_final" class="form-group w-100">
-                                <label for="entidad2_saldo_final" class="bmd-label-floating">Saldo final ENTIDAD #2</label>
+                                <label for="entidad2_saldo_final" class="bmd-label-floating" style="color: black;">Saldo final ENTIDAD #2</label>
                                 <input disabled ng-model="datos.entidad2_saldo_final" type="text" class="form-control" id="entidad2_saldo_final" name="entidad2_saldo_final">
                                 </div>
                             </div>

@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\AutomaticExpenses::class,
         Commands\Transactionsdraws::class,
         Commands\Transactionsloans::class,
+        Commands\Transactionsdiasnolaborados::class,
         Commands\DeleteStockCommand::class,
     ];
 
@@ -34,6 +35,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('transacciones:caidaAcumulada')
                  ->everyMinute();
         $schedule->command('transacciones:prestamos')
+                 ->everyMinute();
+        $schedule->command('transacciones:nolaborados')
                  ->everyMinute();
         $schedule->command('eliminar:stock')
                  ->everyMinute();

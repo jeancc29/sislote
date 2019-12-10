@@ -96,6 +96,11 @@ class TypesSeeder extends Seeder
             'status' => 1,
             'renglon' => 'transaccion'
         ]);
+        t::create([
+            'descripcion' => 'Descuento dias no laborados',
+            'status' => 1,
+            'renglon' => 'transaccion'
+        ]);
 
         t::create([
             'descripcion' => 'Pago cuota',

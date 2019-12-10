@@ -1378,7 +1378,7 @@
         <div class="card-body ">
           <div class="row justify-content-end">
             <!-- .abrir-wizard la uso en el archivo demo.js para obtener los datos reales del wizard al momento de quitarle el display none -->
-            <a ng-click="editar(1, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva loteria</a>
+            <a ng-click="editar(1, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva banca</a>
           </div>
           <table class="table table-sm table-striped">
             <thead>

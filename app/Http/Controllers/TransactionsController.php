@@ -34,6 +34,7 @@ use App\Permissions;
 use App\Types;
 use App\Entity;
 use App\Transactionsgroups;
+use App\Transactionscheduled;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -214,7 +215,7 @@ class TransactionsController extends Controller
         return Response::json([
             'bancas' => Branches::whereStatus(1)->get(),
             'entidades' => Entity::whereStatus(1)->get(),
-            'tipos' => Types::whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago'])->get(),
+            'tipos' => Types::whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago', 'Descuento dias no laborados'])->get(),
             'grupos' => TransactionsgroupsResource::collection($t)
         ], 201);
     }
@@ -321,7 +322,6 @@ class TransactionsController extends Controller
         $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first()->id;
         $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first()->id;
 
-        $grupo = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);
 
         $u = Users::whereId($datos['idUsuario'])->first();
         foreach($datos['addTransaccion'] as $t){
@@ -351,51 +351,109 @@ class TransactionsController extends Controller
                     ], 201);
                 }
             }
+
+
            
             
         }
 
         $c = 0;
-        foreach($datos['addTransaccion'] as $t){
-            $transaccion = transactions::create([
-                'idUsuario' => $datos['idUsuario'],
-                'idTipo' => $t['tipo']['id'],
-                'idTipoEntidad1' => $idTipoEntidad1,
-                'idTipoEntidad2' => $idTipoEntidad2,
-                'idEntidad1' => $t['entidad1']['id'],
-                'idEntidad2' => $t['entidad2']['id'],
-                'entidad1_saldo_inicial' => $t['entidad1_saldo_inicial'],
-                'entidad2_saldo_inicial' => $t['entidad2_saldo_inicial'],
-                'debito' => $t['debito'],
-                'credito' => $t['credito'],
-                'entidad1_saldo_final' => $t['entidad1_saldo_final'],
-                'entidad2_saldo_final' => $t['entidad2_saldo_final'],
-                'nota' => $t['nota'],
-                'nota_grupo' => $t['nota_grupo']
-            ]);
+        $colleccionNormal = null;
+        $grupoNormal = null;
+        $grupoProgramada = null;
+        $colleccionProgramada = null;
 
-             if($c == 0){
-                    $colleccion = collect([[
-                        'idGrupo' => $grupo->id,
-                        'idTransaccion' => $transaccion->id
+        foreach($datos['addTransaccion'] as $t){
+           
+            if($t["tipoTransaccion"] == "Programada"){
+                if($colleccionProgramada == null){
+                    $grupoProgramada = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);                    
+                }
+                $fecha = new Carbon($t['fecha']);
+                $transaccionProgramada = Transactionscheduled::create([
+                    'fecha' => $fecha->toDateString(),
+                    'idUsuario' => $datos['idUsuario'],
+                    'idTipo' => $t['tipo']['id'],
+                    'idTipoEntidad1' => $idTipoEntidad1,
+                    'idTipoEntidad2' => $idTipoEntidad2,
+                    'idEntidad1' => $t['entidad1']['id'],
+                    'idEntidad2' => $t['entidad2']['id'],
+                    'entidad1_saldo_inicial' => $t['entidad1_saldo_inicial'],
+                    'entidad2_saldo_inicial' => $t['entidad2_saldo_inicial'],
+                    'debito' => $t['debito'],
+                    'credito' => $t['credito'],
+                    'entidad1_saldo_final' => $t['entidad1_saldo_final'],
+                    'entidad2_saldo_final' => $t['entidad2_saldo_final'],
+                    'nota' => $t['nota'],
+                    'nota_grupo' => $t['nota_grupo']
+                ]);
+
+                if($c == 0){
+                    $colleccionProgramada = collect([[
+                        'idGrupo' => $grupoProgramada->id,
+                        'idTransaccion' => $transaccionProgramada->id
                     ]]);
                 }else{
-                    $colleccion->push([
-                        'idGrupo' => $grupo->id,
-                        'idTransaccion' => $transaccion->id
+                    $colleccionProgramada->push([
+                        'idGrupo' => $grupoProgramada->id,
+                        'idTransaccion' => $transaccionProgramada->id
                     ]);
                 }
+            }else{
+                if($colleccionNormal == null){
+                    $grupoNormal = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);                    
+                }
+                $transaccion = transactions::create([
+                    'idUsuario' => $datos['idUsuario'],
+                    'idTipo' => $t['tipo']['id'],
+                    'idTipoEntidad1' => $idTipoEntidad1,
+                    'idTipoEntidad2' => $idTipoEntidad2,
+                    'idEntidad1' => $t['entidad1']['id'],
+                    'idEntidad2' => $t['entidad2']['id'],
+                    'entidad1_saldo_inicial' => $t['entidad1_saldo_inicial'],
+                    'entidad2_saldo_inicial' => $t['entidad2_saldo_inicial'],
+                    'debito' => $t['debito'],
+                    'credito' => $t['credito'],
+                    'entidad1_saldo_final' => $t['entidad1_saldo_final'],
+                    'entidad2_saldo_final' => $t['entidad2_saldo_final'],
+                    'nota' => $t['nota'],
+                    'nota_grupo' => $t['nota_grupo']
+                ]);
+    
+                 if($colleccionNormal == null){
+                        $colleccionNormal = collect([[
+                            'idGrupo' => $grupoNormal->id,
+                            'idTransaccion' => $transaccion->id
+                        ]]);
+                    }else{
+                        $colleccionNormal->push([
+                            'idGrupo' => $grupoNormal->id,
+                            'idTransaccion' => $transaccion->id
+                        ]);
+                    }
+            }
+            
           
            $c++;
         }
 
-        $grupo = Transactionsgroups::whereId($grupo->id)->first();
-        $grupo->transacciones()->detach();
-        $colleccion = collect($colleccion)->map(function($c){
-            return ['idGrupo' => $c['idGrupo'], 'idTransaccion' => $c['idTransaccion'] ];
-        });
-       $grupo->transacciones()->attach($colleccion);
+        
+        if($colleccionNormal != null){
+            $grupoNormal->transacciones()->detach();
+            $colleccionNormal = collect($colleccionNormal)->map(function($c){
+                return ['idGrupo' => $c['idGrupo'], 'idTransaccion' => $c['idTransaccion'] ];
+            });
+           $grupoNormal->transacciones()->attach($colleccionNormal);
+        }
+        
 
+        if($colleccionProgramada != null){
+            $grupoProgramada->transaccionesProgramadas()->detach();
+            $colleccionProgramada = collect($colleccionProgramada)->map(function($c){
+                return ['idGrupo' => $c['idGrupo'], 'idTransaccion' => $c['idTransaccion'] ];
+            });
+           $grupoProgramada->transaccionesProgramadas()->attach($colleccionProgramada);
+        }
 
 
 
@@ -419,6 +477,8 @@ class TransactionsController extends Controller
     ], 201);
     
     }
+
+    
 
     /**
      * Display the specified resource.
