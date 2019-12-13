@@ -72,7 +72,7 @@ class Transactionsdiasnolaborados extends Command
         // $this->info($prueba->hour);
         // return;
 
-        if($fecha->hour != 19)
+        if($fecha->hour != 0)
         return;
        
         if($usuario == null || $tipo == null)
