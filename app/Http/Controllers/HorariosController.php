@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Classes\Helper;
 use App\Days;
 use Request;
 use Carbon\Carbon;
@@ -47,6 +47,13 @@ class HorariosController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
+            if(!(new Helper)->existe_sesion()){
+                return redirect()->route('login');
+            }
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar horarios de loterias") == true){
+                return redirect()->route('principal');
+            }
             return view('horarios.index', compact('controlador'));
         }
         
@@ -100,37 +107,37 @@ class HorariosController extends Controller
                 $loteria = Lotteries::whereId($d["id"])->first();
     
                 if($d["lunes"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Lunes")->first()->id, 'horaApertura' => $d["lunes"]["aperturaGuardar"], 'horaCierre' => $d["lunes"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Lunes")->first()->id, 'horaApertura' => $d["lunes"]["aperturaGuardar"], 'horaCierre' => $d["lunes"]["cierreGuardar"], 'minutosExtras' => $d["lunes"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
                 
                 if($d["martes"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Martes")->first()->id, 'horaApertura' => $d["martes"]["aperturaGuardar"], 'horaCierre' => $d["martes"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Martes")->first()->id, 'horaApertura' => $d["martes"]["aperturaGuardar"], 'horaCierre' => $d["martes"]["cierreGuardar"], 'minutosExtras' => $d["martes"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
     
                 if($d["miercoles"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Miercoles")->first()->id, 'horaApertura' => $d["miercoles"]["aperturaGuardar"], 'horaCierre' => $d["miercoles"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Miercoles")->first()->id, 'horaApertura' => $d["miercoles"]["aperturaGuardar"], 'horaCierre' => $d["miercoles"]["cierreGuardar"], 'minutosExtras' => $d["miercoles"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
     
                 if($d["jueves"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Jueves")->first()->id, 'horaApertura' => $d["jueves"]["aperturaGuardar"], 'horaCierre' => $d["jueves"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Jueves")->first()->id, 'horaApertura' => $d["jueves"]["aperturaGuardar"], 'horaCierre' => $d["jueves"]["cierreGuardar"], 'minutosExtras' => $d["jueves"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
     
                 if($d["viernes"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Viernes")->first()->id, 'horaApertura' => $d["viernes"]["aperturaGuardar"], 'horaCierre' => $d["viernes"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Viernes")->first()->id, 'horaApertura' => $d["viernes"]["aperturaGuardar"], 'horaCierre' => $d["viernes"]["cierreGuardar"], 'minutosExtras' => $d["viernes"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
     
                 if($d["sabado"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Sabado")->first()->id, 'horaApertura' => $d["sabado"]["aperturaGuardar"], 'horaCierre' => $d["sabado"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Sabado")->first()->id, 'horaApertura' => $d["sabado"]["aperturaGuardar"], 'horaCierre' => $d["sabado"]["cierreGuardar"], 'minutosExtras' => $d["sabado"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
     
                 if($d["domingo"]["status"] == 1){
-                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Domingo")->first()->id, 'horaApertura' => $d["domingo"]["aperturaGuardar"], 'horaCierre' => $d["domingo"]["cierreGuardar"]];
+                    $horario = ['idLoteria' => $d['id'], 'idDia' => Days::whereDescripcion("Domingo")->first()->id, 'horaApertura' => $d["domingo"]["aperturaGuardar"], 'horaCierre' => $d["domingo"]["cierreGuardar"], 'minutosExtras' => $d["domingo"]["minutosExtras"]];
                     $loteria->dias()->attach([$horario]);
                 }
             }

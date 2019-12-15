@@ -13,8 +13,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->truncateTables([
                     // 'users',
-                    // 'permissions', 
-                    // 'roles', 'permission_role', 
+                    'permissions', 
+                    // 'roles', 
+                    'permission_role', 
                     // 'lotteries', 
                     // 'draws', 
                     // 'blockslotteries', 
@@ -22,7 +23,7 @@ class DatabaseSeeder extends Seeder
                     // 'branches', 
                     // 'generals', 
                     // 'days', 
-                    'types', 
+                    // 'types', 
                     // 'entities', 
                     // 'drawsrelations', 
                     // 'frecuencies',
@@ -35,18 +36,18 @@ class DatabaseSeeder extends Seeder
         // $this->call('DrawsSeeder');
 
         // $this->call('CountriesSeeder');
-        // $this->call('PermissionSeeder');
+        $this->call('PermissionSeeder');
         // $this->call('LotteriesSeeder');
         
         // $this->call('RolesSeeder');
-        // $this->call('PermissionRoleSeeder');
+        $this->call('PermissionRoleSeeder');
         // $this->call('UsersSeeder');
         // $this->call('BlockslotteriesSeeder');
         // $this->call('BranchesSeeder');
         // $this->call('GeneralsSeeder');
         // $this->call('DaysSeeder');
         // $this->call('FrecuencySeeder');
-        $this->call('TypesSeeder');
+        // $this->call('TypesSeeder');
         // $this->call('EntitySeeder');
     }
 

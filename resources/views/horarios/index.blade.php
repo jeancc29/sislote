@@ -158,6 +158,9 @@
                                 <div class="col-sm-4 text-center">
                                   <h4 class="font-weight-bold">Cierre</h4>
                                 </div>
+                                <div class="col-sm-2 text-center">
+                                  <h4 class="font-weight-bold">Min. extras</h4>
+                                </div>
                               </div>
                             </div>
 
@@ -178,6 +181,12 @@
                                     name="lunesHoraCierre" id="lunesHoraCierre" class="form-control " >
                                   </div>
                                 </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.lunes.minutosExtras" type="number"
+                                    name="lunesMinutosExtra" id="lunesMinutosExtra" class="form-control " >
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -196,6 +205,12 @@
                                   <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.martes.cierre" type="time" placeholder="HH:mm"  name="martesHoraCierre" id="martesHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.martes.minutosExtras" type="number"
+                                    name="martesMinutosExtra" id="martesMinutosExtra" class="form-control " >
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -210,6 +225,12 @@
                                 <div class="col-sm-4">
                                   <div class="form-group">
                                   <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.miercoles.cierre" type="time" placeholder="HH:mm"  name="miercolesHoraCierre" id="miercolesHoraCierre"  class="form-control" >
+                                  </div>
+                                </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.miercoles.minutosExtras" type="number"
+                                    name="miercolesMinutosExtra" id="miercolesMinutosExtra" class="form-control " >
                                   </div>
                                 </div>
                               </div>
@@ -229,6 +250,12 @@
                                   <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.jueves.cierre" type="time" placeholder="HH:mm"   name="juevesHoraCierre" id="juevesHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.jueves.minutosExtras" type="number"
+                                    name="juevesMinutosExtra" id="juevesMinutosExtra" class="form-control " >
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -244,6 +271,12 @@
                                 <div class="col-sm-4">
                                   <div class="form-group">
                                   <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.viernes.cierre" type="time" placeholder="HH:mm"  name="viernesHoraCierre" id="viernesHoraCierre"  class="form-control " >
+                                  </div>
+                                </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.viernes.minutosExtras" type="number"
+                                    name="viernesMinutosExtra" id="viernesMinutosExtra" class="form-control " >
                                   </div>
                                 </div>
                               </div>
@@ -263,6 +296,12 @@
                                   <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.sabado.cierre" type="time" placeholder="HH:mm"  name="sabadoHoraCierre" id="sabadoHoraCierre"  class="form-control" >
                                   </div>
                                 </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.sabado.minutosExtras" type="number"
+                                    name="sabadoMinutosExtra" id="sabadoMinutosExtra" class="form-control " >
+                                  </div>
+                                </div>
                               </div>
                             </div>
 
@@ -278,6 +317,12 @@
                                 <div class="col-sm-4">
                                   <div class="form-group">
                                   <input ng-model-onblur ng-change="update()" ng-model="datos.selectedLoteria.domingo.cierre" type="time" placeholder="HH:mm"  name="domingoHoraCierre" id="domingoHoraCierre"  class="form-control" >
+                                  </div>
+                                </div>
+                                <div class="col-sm-2">
+                                  <div class="form-group">
+                                  <input ng-model="datos.selectedLoteria.domingo.minutosExtras" type="number"
+                                    name="domingoMinutosExtra" id="domingoMinutosExtra" class="form-control " >
                                   </div>
                                 </div>
                               </div>

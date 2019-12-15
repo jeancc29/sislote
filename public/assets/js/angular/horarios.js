@@ -279,36 +279,43 @@ myApp
                     array[indice].lunes.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].lunes.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].lunes.status = 1;
+                    array[indice].lunes.minutosExtras = 0;
                     
                     array[indice].martes = {};
                     array[indice].martes.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].martes.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].martes.status = 1;
+                    array[indice].martes.minutosExtras = 0;
 
                     array[indice].miercoles = {};
                     array[indice].miercoles.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].miercoles.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].miercoles.status = 1;
+                    array[indice].miercoles.minutosExtras = 0;
 
                     array[indice].jueves = {};
                     array[indice].jueves.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].jueves.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].jueves.status = 1;
+                    array[indice].jueves.minutosExtras = 0;
 
                     array[indice].viernes = {};
                     array[indice].viernes.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].viernes.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].viernes.status = 1;
+                    array[indice].viernes.minutosExtras = 0;
 
                     array[indice].sabado = {};
                     array[indice].sabado.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].sabado.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].sabado.status = 1;
+                    array[indice].sabado.minutosExtras = 0;
 
                     array[indice].domingo = {};
                     array[indice].domingo.apertura = new Date(1970, 0, 1, 1, 0, 0);
                     array[indice].domingo.cierre = new Date(1970, 0, 1, 23, 0, 0);
                     array[indice].domingo.status = 1;
+                    array[indice].domingo.minutosExtras = 0;
                     
 
                 });
@@ -335,37 +342,44 @@ myApp
                                 // a.split(':')
                                 array[indice].lunes.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].lunes.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].lunes.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;
                                 console.log("lunes: ",arrayDias[indiceDias].pivot.horaApertura);
                             }
                             else if(arrayDias[indiceDias].descripcion == "Martes"){
                                 array[indice].martes.status = 1;
                                 array[indice].martes.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].martes.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].martes.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;                            
                             }
                             else if(arrayDias[indiceDias].descripcion == "Miercoles"){
                                 array[indice].miercoles.status = 1;
                                 array[indice].miercoles.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].miercoles.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].miercoles.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;                            
                             }
                             else if(arrayDias[indiceDias].descripcion == "Jueves"){
                                 array[indice].jueves.status = 1;
                                 array[indice].jueves.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].jueves.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].jueves.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;                            
                             }
                             else if(arrayDias[indiceDias].descripcion == "Viernes"){
                                 array[indice].viernes.status = 1;
                                 array[indice].viernes.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].viernes.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].viernes.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;                            
                             }
                             else if(arrayDias[indiceDias].descripcion == "Sabado"){
                                 array[indice].sabado.status = 1;
                                 array[indice].sabado.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].sabado.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].sabado.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;                            
                             }
                             else{
                                 array[indice].domingo.status = 1;
                                 array[indice].domingo.apertura = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaApertura.split(':')[0], arrayDias[indiceDias].pivot.horaApertura.split(':')[1], 0);
                                 array[indice].domingo.cierre = new Date(1970, 0, 1, arrayDias[indiceDias].pivot.horaCierre.split(':')[0], arrayDias[indiceDias].pivot.horaCierre.split(':')[1], 0);
+                                array[indice].domingo.minutosExtras = arrayDias[indiceDias].pivot.minutosExtras;                            
                             }
                         });
                     }
@@ -383,27 +397,6 @@ myApp
 
 
 
-                //$scope.editar(false, $scope.selectedLoteria);
-                // $scope.datos.ckbLoterias = [];
-                // jsonLoterias.forEach(function(valor, indice, array){
-                //         array[indice].existe = true;
-                //         $scope.datos.ckbLoterias.push(array[indice]);
-                //     });
-
-                
-
-
-                // $scope.datos.loteriasSeleccionadas = $scope.datos.ckbLoterias;
-                // $scope.datos.comisiones.loterias = $scope.datos.loteriasSeleccionadas;
-                // $scope.datos.pagosCombinaciones.loterias = $scope.datos.loteriasSeleccionadas;
-
-
-
-              
-                
-                
-
-              
                 
 
                 $timeout(function() {
@@ -434,94 +427,6 @@ myApp
         
 
 
-        $scope.editar = function(esNuevo, d){
-            
-            $scope.datos.mostrarFormEditar = true;
-
-            if(esNuevo){
-                $scope.inicializarDatos(true);
-
-                $scope.datos.ckbLoterias.forEach(function(valor, indice, array){
-
-                    array[indice].existe = true;
-
-                 });
-            }
-            else{
-                //$scope.inicializarDatos();
-                //$scope.datos.mostrarFormEditar = true;
-
-                $('.form-group').addClass('is-filled');
-
-
-                $scope.rbxLoteriasChanged(d);
-                $scope.selectedLoteria.lunes.status = 0;
-                $scope.selectedLoteria.martes.status = 0;
-                $scope.selectedLoteria.miercoles.status = 0;
-                $scope.selectedLoteria.jueves.status = 0;
-                $scope.selectedLoteria.viernes.status = 0;
-                $scope.selectedLoteria.sabado.status = 0;
-                $scope.selectedLoteria.domingo.status = 0;
-
-                
-                d.dias.forEach(function(valor, indice, array){
-                    if(array[indice].descripcion == "Lunes"){
-                        $scope.selectedLoteria.lunes.status = 1;
-                        $scope.selectedLoteria.lunes.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.lunes.apertura = array[indice].pivot.horaCierre;
-                    }
-                    else if(array[indice].descripcion == "Martes"){
-                        $scope.selectedLoteria.martes.status = 1;
-                        $scope.selectedLoteria.martes.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.martes.apertura = array[indice].pivot.horaCierre;
-                    }
-                    else if(array[indice].descripcion == "Miercoles"){
-                        $scope.selectedLoteria.miercoles.status = 1;
-                        $scope.selectedLoteria.miercoles.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.miercoles.apertura = array[indice].pivot.horaCierre;
-                    }
-                    else if(array[indice].descripcion == "Jueves"){
-                        $scope.selectedLoteria.jueves.status = 1;
-                        $scope.selectedLoteria.jueves.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.jueves.apertura = array[indice].pivot.horaCierre;
-                    }
-                    else if(array[indice].descripcion == "Viernes"){
-                        $scope.selectedLoteria.viernes.status = 1;
-                        $scope.selectedLoteria.viernes.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.viernes.apertura = array[indice].pivot.horaCierre;
-                    }
-                    else if(array[indice].descripcion == "Sabado"){
-                        $scope.selectedLoteria.sabado.status = 1;
-                        $scope.selectedLoteria.sabado.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.sabado.apertura = array[indice].pivot.horaCierre;
-                    }
-                    else{
-                        $scope.selectedLoteria.domingo.status = 1;
-                        $scope.selectedLoteria.domingo.apertura = array[indice].pivot.horaApertura;
-                        $scope.selectedLoteria.domingo.apertura = array[indice].pivot.horaCierre;
-                    }
-                });
-
-               
-                
-
-                $scope.datos.ckbDias.forEach(function(valor, indice, array){
-
-                    if(d.dias.find(x => x.id == array[indice].id) == undefined)
-                        array[indice].existe = false;
-
-                 });
-
-
-                
-
-
-                $timeout(function() {
-                    // anything you want can go here and will safely be run on the next digest.
-                    $('.selectpicker').selectpicker("refresh");
-                  });
-            }
-        }
 
        
         hayHorasVacias = function(){
@@ -590,19 +495,6 @@ myApp
         }
 
 
-        $scope.eliminar = function(d){
-            console.log('bancas eliminar: ',d);
-            $http.post(rutaGlobal+"/api/bancas/eliminar", {'action':'sp_bancas_elimnar', 'datos': d})
-             .then(function(response){
-                console.log(response.data);
-                if(response.data.errores == 0)
-                {
-                    $scope.inicializarDatos(true);
-                    alert(response.data.mensaje);
-                }
-                
-            });
-        }
        
 
 
@@ -732,12 +624,7 @@ myApp
 
     
 
-        $scope.comisionSorteo = function(monto, idLoteria, idSorteo){
-            let idx = $scope.datos.comisiones.selectedLoteria.sorteos.findIndex(x => x.id == idSorteo && x.pivot.idLoteria == idLoteria);
-            $scope.datos.comisiones.selectedLoteria.sorteos[idx].monto = monto;
-            console.log($scope.datos.comisiones.selectedLoteria.sorteos[idx]);
-        }
-
+    
 
         $scope.existeSorteo = function(sorteo, es_comisiones = true){
             //console.log('existesorteo: ', $scope.datos.comisiones.selectedLoteria);

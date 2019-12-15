@@ -243,12 +243,26 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 			-- END LOTERIA ABRE HOY
 			
 			-- VERIFICAMOS SI LA LOTERIA ESTA CERRADA
-			if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria)
+            -- DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria)
+            set @horaCierre = null;
+            set @minutosExtras = null;
+            select dl.horaCierre, dl.minutosExtras from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria into @horaCierre, @minutosExtras;
+			if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', @horaCierre),'%H:%i:%s'))
 			then
 				 if not exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar fuera de horario')
 				then
-					set @errores = 1;
-					select 1 as errores, concat('Error: la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado') as mensaje;
+					if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar minutos extras')
+					then
+						-- verificamos si la hora actual es mayor que la hora de cierre con los minutos extras sumados
+						if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(date_add(concat(date(now()), ' ', @horaCierre), INTERVAL @minutosExtras MINUTE),'%H:%i:%s'))
+						then
+							set @errores = 1;
+							select 1 as errores, concat('Error: minutos extras han pasado, la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado') as mensaje;
+						end if;
+                    else
+						set @errores = 1;
+						select 1 as errores, concat('Error: la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado') as mensaje;
+                    end if;
 				end if;
 			end if;
 			-- END VERIFICAMOS SI LA LOTERIA ESTA CERRADA
@@ -582,8 +596,8 @@ select JSON_ARRAYAGG(JSON_OBJECT(
            if wday = 7 then
 				set wday = 0;
             end if;
-     
-     if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar fuera de horario')
+     --  or exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar minutos extras')
+     if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and (p.descripcion = 'Jugar fuera de horario' or p.descripcion = 'Jugar minutos extras'))
 			then
 				INSERT INTO TempTable(loterias) select JSON_OBJECT(
 					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre

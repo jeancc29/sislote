@@ -20,7 +20,7 @@ class Lotteries extends Model
 
     public function dias()
     {
-        return $this->belongsToMany('App\Days', 'day_lottery', 'idLoteria', 'idDia')->withPivot('horaApertura','horaCierre');
+        return $this->belongsToMany('App\Days', 'day_lottery', 'idLoteria', 'idDia')->withPivot('horaApertura','horaCierre', 'minutosExtras');
     }
 
     public function sorteos()

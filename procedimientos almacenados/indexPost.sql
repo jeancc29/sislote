@@ -101,7 +101,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				set wday = 0;
             end if;
      
-     if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar fuera de horario')
+     if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and (p.descripcion = 'Jugar fuera de horario' or p.descripcion = 'Jugar minutos extras'))
 			then
 				INSERT INTO TempTable(loterias) select JSON_OBJECT(
 					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre

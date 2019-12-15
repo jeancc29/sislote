@@ -115,6 +115,12 @@ class PermissionSeeder extends Seeder
             'idTipo' => 4
         ]);
 
+        p::create([
+            'descripcion' => 'Jugar minutos extras',
+            'status' => 1,
+            'idTipo' => 4
+        ]);
+
 
 
 
