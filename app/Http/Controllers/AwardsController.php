@@ -501,7 +501,9 @@ class AwardsController extends Controller
             if($fechaRequest->greaterThan($fechaActual)){
                 return Response::json(['errores' => 1,'mensaje' => 'No está permitido actualizar resultados para fechas en el futuro'], 201);
             }else{
-                $fecha = getdate(strtotime($datos['fecha']));
+                if(isset($datos['fecha'])){
+                    $fecha = getdate(strtotime($datos['fecha']));
+                }
             }
 
         $errores = 0;
