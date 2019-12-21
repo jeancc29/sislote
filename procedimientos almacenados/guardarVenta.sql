@@ -45,9 +45,14 @@ BEGIN
     select id from sales where id = idVenta and sales.idBanca = idBanca into idTicket;
     if idTicket is not null
 	then
-		delete from salesdetails where salesdetails.idVenta = idVenta;
-        delete from sales where sales.id = idVenta;
-		delete from tickets where id = idTicket;
+		-- delete from salesdetails where salesdetails.idVenta = idVenta;
+        -- delete from sales where sales.id = idVenta;
+		-- delete from tickets where id = idTicket;
+        
+        -- eliminamos el ticket asignandole el status = 5
+        update sales set status = 5 where sales.id = idVenta;
+        select idVenta(idBanca) into idVentaHash;
+        set idVenta = (select idventatemporals.idVenta from idventatemporals where idventatemporals.idVentaHash = idVentaHash COLLATE utf8mb4_unicode_ci and idventatemporals.idBanca = idBanca);
     end if;
     -- END BORRAR VENTA ERRONEA
     
@@ -633,37 +638,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
     
     
     -- 				CREAR IDVENTA TEMPORAL 
-		set idVentaHash = null;
-		select max(id) from sales into siguienteIdVenta;
-        if siguienteIdVenta is null then
-			set siguienteIdVenta = 0;
-		end if;
-		set siguienteIdVenta = siguienteIdVenta + 1;
-        
-        select idventatemporals.idBanca from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idBancaIdVentaTemporal;
-        if idBancaIdVentaTemporal is not null then
-			if idBanca = idBancaIdVentaTemporal then
-				 select idventatemporals.idVentaHash from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idVentaHash;
-            else 
-				select max(idventatemporals.idVenta) from idventatemporals into siguienteIdVenta;
-                if siguienteIdVenta is null then
-					set siguienteIdVenta = 0;
-				end if;
-				set siguienteIdVenta = siguienteIdVenta + 1;
-            end if;
-		end if;
-        
-        if idVentaHash is null then
-			set @idVentaHash = AES_ENCRYPT(siguienteIdVenta, 'Sistema de loteria jean y valentin');
-           -- AES_ENCRYPT retorna BLOB entonces lo convertimos a hex
-           set @idVentaHash = HEX(@idVentaHash);
-           set idVentaHash = @idVentaHash;
-           -- para desencriptar le quitamos el HEX con la funcion UNHEX  
-           -- select CAST(AES_DECRYPT(UNHEX(@j), 'hola') AS CHAR(50)) as desencriptado;
-			-- select CAST(AES_DECRYPT(@j, 'Sistema de loteria jean y valentin') AS CHAR(50)) as desencriptado;
-            -- select 'dentro insert idVentaHash';
-			 insert into idventatemporals(idventatemporals.idBanca, idventatemporals.idVenta, idventatemporals.idVentaHash) values(idBanca, siguienteIdVenta, idVentaHash);
-		end if;
+		select idVenta(idBanca) into idVentaHash;
          
 	if @errores = 0 then
 		select  0 as errores, 'Se ha guardado correctamente' as mensaje, venta, ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
