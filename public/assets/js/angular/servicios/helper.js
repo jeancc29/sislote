@@ -187,4 +187,11 @@ myApp.service('helperService', function(){
         $('.main-panel').perfectScrollbar('destroy');
     }
 
+    this.to2Digitos = function(digito){
+        var str = "" + digito;
+        var pad = "00";
+        var ans = pad.substring(0, pad.length - str.length) + str;
+        return ans;
+    }
+
 });

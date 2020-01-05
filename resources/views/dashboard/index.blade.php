@@ -41,18 +41,30 @@
 
 
 <div class="container-fluid ">
+
+<div ng-show="cargando" class="row justify-content-center ">
+  <div class="spinner-border mt-5" style="width: 3rem; height: 3rem;" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
   
-  <div class="col-md-12 col-12 mr-auto mx-0 px-0">
+  <div ng-cloak ng-hide="cargando" class="col-md-12 col-12 mr-auto mx-0 px-0">
 
       <div class="row">
-      <div class="col-lg-4 col-md-6 col-sm-6 ">
+                  <div class="d-sm-none col-lg-4 col-md-4 col-sm-4 d-flex align-items-center mt-4">
+                      <div id="input-fecha" class="">
+                      <!-- <label for="fechaBusqueda" style="font-size: 40px;" class="bmd-label-floating font-weight-bold" style="color: black;">Numero</label> -->
+                      <input ng-change="onFechaChanged()" style="font-size: 40px;" placeholder="Fecha" ng-model="datos.fecha" id="fechaBusqueda" type="date" class="form-control vcenter" required>
+                      </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4 ">
                     <div class="card card-stats py-0 mb-0">
                       <div class="card-header card-header-success card-header-icon">
                         <div class="card-icon">
                           <i class="material-icons">store</i>
                         </div>
                         <p class="card-category">Bancas con ventas</p>
-                        <h3 class="card-title">{{$bancasConVentas}}</h3>
+                        <h3 class="card-title">@{{bancasConVentas}}</h3>
                       </div>
                       <div class="card-footer">
                         <div class="stats">
@@ -61,14 +73,14 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-lg-4 col-md-6 col-sm-6">
+                  <div class="col-lg-4 col-md-4 col-sm-4">
                     <div class="card card-stats py-0 mb-0">
                       <div class="card-header card-header-rose card-header-icon">
                         <div class="card-icon">
                           <i class="material-icons">cancel_presentation</i>
                         </div>
                         <p class="card-category">Bancas sin ventas</p>
-                        <h3 class="card-title">{{$bancasSinVentas}}</h3>
+                        <h3 class="card-title">@{{bancasSinVentas}}</h3>
                       </div>
                       <div class="card-footer">
                         <div class="stats">
@@ -76,6 +88,37 @@
                         </div>
                       </div>
                     </div>
+                  </div>
+                  <style>
+                    .vcenter {
+                        display: inline-block;
+                        vertical-align: middle;
+                        float: none;
+                    }
+
+                    #input-fecha > input::placeholder{
+
+                      font-size: 1.2em;
+                      font-style: italic;
+                    }
+
+                    /* #input-fecha input[type=date]::-webkit-inner-spin-button, 
+                    input[type=date]::-webkit-outer-spin-button { 
+                      -webkit-appearance: none; 
+                      margin: 0; 
+                    }
+
+                    #input-fecha input[type=date] { -moz-appearance:textfield; } */
+
+                    #input-fecha input[type="date"]::-webkit-inner-spin-button{
+                      display: none;
+                  }
+                  </style>
+                  <div class="d-none col-lg-4 col-md-4 col-sm-4 d-sm-flex align-items-center">
+                      <div id="input-fecha" class="">
+                      <!-- <label for="fechaBusqueda" style="font-size: 40px;" class="bmd-label-floating font-weight-bold" style="color: black;">Numero</label> -->
+                      <input ng-change="onFechaChanged()" style="font-size: 40px;" placeholder="Fecha" ng-model="datos.fecha" id="fechaBusqueda" type="date" class="form-control vcenter w-75" required>
+                      </div>
                   </div>
       </div>
       <div class="row py-0 mb-0">
@@ -123,13 +166,13 @@
                                     </tr>
                                 </thead>
                                 <tbody class="">
-                                @foreach ($loterias as $l)
-                                <tr>
-                                    <td class="col-5  text-center">{{$l->descripcion}}</td>
-                                    <td class="col-4 text-center">{{($l->ventas) ? $l->ventas : 0}}</td>
-                                    <td class="col-3 text-center">{{($l->premios) ? $l->premios : 0}}</td>
+                                 <!-- ($loterias as $l) -->
+                                <tr ng-repeat="l in loterias">
+                                    <td class="col-5  text-center">@{{l.descripcion}}</td>
+                                    <td class="col-4 text-center">@{{(l.ventas) ? l.ventas : 0}}</td>
+                                    <td class="col-3 text-center">@{{(l.premios) ? l.premios : 0}}</td>
                                   </tr>
-                                @endforeach
+                                
                                     <!-- <tr>
                                     <td class="font-weight-bold col-5  text-center" style="font-size: 18px;">Total</td>
                                     <td class="font-weight-bold col-4 text-center" style="font-size: 18px;">200</td>
@@ -150,8 +193,8 @@
                         </div><!-- END ROW CONTENEDOR TABLA -->
                         <div class="row mt-2">
                           <h4 class="font-weight-bold col-5  text-center" style="font-size: 18px;">Total</h4>
-                          <h4 class="font-weight-bold col-4 text-center" style="font-size: 18px;">{{($totalVentasLoterias) ? $totalVentasLoterias : 0}}</h4>
-                          <h4 class="font-weight-bold col-3 text-center" style="font-size: 18px;">{{($totalPremiosLoterias) ? $totalPremiosLoterias : 0}}</h4>
+                          <h4 class="font-weight-bold col-4 text-center" style="font-size: 18px;">@{{(totalVentasLoterias) ? totalVentasLoterias : 0}}</h4>
+                          <h4 class="font-weight-bold col-3 text-center" style="font-size: 18px;">@{{(totalPremiosLoterias) ? totalPremiosLoterias : 0}}</h4>
                         </div>
                          <!-- <h4 class="text-right">Total: @{{datos.total_palet | currency}}</h4> -->
                     </div> <!-- COL-3 -->
@@ -179,7 +222,7 @@
         </div> -->
         <div class="card-body ">
           <ul class="nav nav-pills nav-pills-primary" role="tablist">
-            <li ng-click="cambiarLoteria(l)" ng-init="cambiarLoteria(l, $first)" ng-repeat="l in datos.loteriasJugadasDashboard track by l.id" class="nav-item">
+            <li ng-click="cambiarLoteria(l)" ng-init="cambiarLoteria(l, $first)" ng-repeat="l in loteriasJugadasDashboard track by l.id" class="nav-item">
               <a  ng-class="{'active': $first}" class="nav-link" data-toggle="tab" href="#link1" role="tablist">
                 @{{l.descripcion}}
               </a>
@@ -263,16 +306,46 @@
                 </div>
             </div> <!-- END CARD -->
      
-          
-        <!-- <tr>
-                        <td  style="font-size: 11px;">LN PM</td>
-                        <td  style="font-size: 11px;">23-22-22</td>
-                        <td class="text-center" style="font-size: 12px;">
-                            20
-                           
-                        </td>
-                        
-                        </tr> -->
+            <div id="modal-cargando" class="modal fade modal-cancelar-eliminar" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                 <div class="modal-header">
+                    <h3 class="modal-title" id="exampleModalLabel">Cargando</h3>
+                    <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                    </div> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                   
+
+                    <div class="row justify-content-center">
+                    <div class="spinner-border" role="status">
+                      <span class="sr-only">Loading...</span>
+                    </div>
+                    </div>
+
+
+
+                    
+
+                    <div class="container">
+
+                        <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                        </div> -->
+                    </div>
+
+                </div> <!-- END MODAL-BODY -->
+                
+            </div> <!-- END MODAL-CONTENT-->
+        </div>
+    </div>
 
             
 
@@ -391,49 +464,53 @@
 
 
 <script>
-    new Morris.Bar({
-  // ID of the element in which to draw the chart.
-  element: 'myfirstchart',
-  // Chart data records -- each entry in this array corresponds to a point on
-  // the chart.
+//     new Morris.Bar({
+//   // ID of the element in which to draw the chart.
+//   element: 'myfirstchart',
+//   // Chart data records -- each entry in this array corresponds to a point on
+//   // the chart.
 
-  // data: [
-  //   { year: '2008', sales: 200, value: 20 },
-  //   { year: '2009', sales: 100, value: 10 },
-  //   { year: '2010', sales: 70, value: 5 },
-  //   { year: '2011', sales: 50, value: 5 },
-  //   { year: '2012', sales: 200, value: 20 }
-  // ],
-  data: <?php echo $ventasGrafica ?>,
-  // The name of the data record attribute that contains x-values.
-  xkey: 'dia',
-  // A list of names of data record attributes that contain y-values.
-  ykeys: ['total', 'neto'],
-  // Labels for the ykeys -- will be displayed when you hover over the
-  // chart.
-  labels: ['total', 'neto'],
-  // stacked: true,
-  barSize: 30,
-  resize: true,
-  fillOpacity: 0.1,
-  hideHover: true,
-  behaveLikeLine: true,
+//   // data: [
+//   //   { year: '2008', sales: 200, value: 20 },
+//   //   { year: '2009', sales: 100, value: 10 },
+//   //   { year: '2010', sales: 70, value: 5 },
+//   //   { year: '2011', sales: 50, value: 5 },
+//   //   { year: '2012', sales: 200, value: 20 }
+//   // ],
+//   data: <?php echo $ventasGrafica ?>,
+//   // The name of the data record attribute that contains x-values.
+//   xkey: 'dia',
+//   // A list of names of data record attributes that contain y-values.
+//   ykeys: ['total', 'neto'],
+//   // Labels for the ykeys -- will be displayed when you hover over the
+//   // chart.
+//   labels: ['total', 'neto'],
+//   // stacked: true,
+//   barSize: 30,
+//   resize: true,
+//   fillOpacity: 0.1,
+//   hideHover: true,
+//   behaveLikeLine: true,
 
-  pointFillColors: ['#ffffff'],
-  pointStrokeColors: ['black'],
-  lineColors: ['red', 'blue'],
+//   pointFillColors: ['#ffffff'],
+//   pointStrokeColors: ['black'],
+//   lineColors: ['red', 'blue'],
 
-  barColors: function (row, series, type) {
-    console.log('row: ', row.y);
-    if(series.key == "neto" && row.y > 0)
-        return "#75b281";
-    if(series.key == "neto" && row.y < 0)
-      return "#dc2365";
-    else
-      // return "#c2c2d6";
-      return "#95999e";
-    }
-});
+//   barColors: function (row, series, type) {
+//     console.log('row: ', row.y);
+//     if(series.key == "neto" && row.y > 0)
+//         return "#75b281";
+//     if(series.key == "neto" && row.y < 0)
+//       return "#dc2365";
+//     else
+//       // return "#c2c2d6";
+//       return "#95999e";
+//     }
+// });
+
+
+
+
 
 // var data = 
 //     // [

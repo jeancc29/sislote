@@ -55,6 +55,8 @@ date_default_timezone_set("America/Santiago");
 //Route::apiResource('principal', 'PrincipalController');
 Route::post('/acceder', 'LoginController@accederApi');
 
+Route::get('/dashboard', 'DashboardController@index');
+
 Route::get('/principal', 'PrincipalController@index');
 Route::post('/principal/indexPost', 'PrincipalController@indexPost');
 // Route::post('/principal/indexPostPrueba', 'PrincipalController@indexPostPrueba');
