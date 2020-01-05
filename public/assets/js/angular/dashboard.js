@@ -61,7 +61,7 @@ myApp
             $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
              .then(function(response){
                  $scope.ventasGrafica = response.data.ventasGrafica;
-                 crearGrafica();
+                 
 
                  $scope.loterias = response.data.loterias;
                  $scope.sorteos = response.data.sorteos;
@@ -73,6 +73,13 @@ myApp
                  
                 console.log('Bancas: ', $scope.ventasGrafica);
                 $scope.cargando = false;
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    //$('#multiselect').selectpicker('val', []);
+                    crearGrafica();
+                  })
+                
+                
                 // $("#modal-cargando").modal("hide");
             });
         }
