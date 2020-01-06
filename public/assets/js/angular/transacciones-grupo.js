@@ -328,7 +328,7 @@ myApp
                 limpiar();
                 $scope.datos.addTransaccion = [];
                 $scope.datos.btnCargando = false;
-                alert(response.data.mensajes);
+                alert(response.data.mensaje);
                }
                
                

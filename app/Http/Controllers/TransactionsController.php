@@ -376,7 +376,17 @@ class TransactionsController extends Controller
                 if($colleccionProgramada == null){
                     $grupoProgramada = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);                    
                 }
+                
                 $fecha = new Carbon($t['fecha']);
+                $fechaCarbon = Carbon::now();
+                if($fecha->gt($fechaCarbon) == false){
+                    Transactionsgroups::whereId($grupoProgramada->id)->delete();
+                    return Response::json([
+                        'errores' => 1,
+                        'mensaje' => "La fecha debe ser mayor que el dia actual"
+                    ], 201);
+                }
+
                 $transaccionProgramada = Transactionscheduled::create([
                     'fecha' => $fecha->toDateString(),
                     'idUsuario' => $datos['idUsuario'],

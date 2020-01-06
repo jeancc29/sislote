@@ -314,7 +314,7 @@
                                     ng-keyup="addTransaccion($event)"
                                     ng-blur="saldoFinal(true)" 
                                     
-                                    ng-disabled="datos.selectedTipo.descripcion == 'Cobro' || datos.selectedTipo.descripcion == 'Descuento dias no laborados'" ng-model="datos.debito" type="number" class="form-control" id="debito" name="debito">
+                                    ng-disabled="datos.selectedTipo.descripcion == 'Cobro'" ng-model="datos.debito" type="number" class="form-control" id="debito" name="debito">
                                 </div>
                             </div>
 
@@ -326,7 +326,7 @@
                                     select-all-on-click
                                     ng-keyup="addTransaccion($event)"
                                     ng-blur="saldoFinal(false)" 
-                                    ng-disabled="datos.selectedTipo.descripcion == 'Pago'" ng-model="datos.credito" type="text" class="form-control" id="credito" name="credito">
+                                    ng-disabled="datos.selectedTipo.descripcion == 'Pago' || datos.selectedTipo.descripcion == 'Descuento dias no laborados'" ng-model="datos.credito" type="text" class="form-control" id="credito" name="credito">
                                 </div>
                             </div>
 
