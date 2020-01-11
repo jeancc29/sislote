@@ -190,6 +190,7 @@ class ReportesController extends Controller
         }
 
         
+        
         $datos = request()->validate([
             'datos.idUsuario' => 'required',
             'datos.fechaDesde' => '',

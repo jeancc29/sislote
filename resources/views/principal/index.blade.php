@@ -597,7 +597,7 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12 d-none d-sm-none d-md-block text-center">
-            <div class="card my-0 mx-0 d-inline-block " style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; ultima modificacion min-height: 370px; max-height: 370px; width: 24.7%;-->
+            <div class="card my-0 mx-0 d-inline-block " style="min-height: 350px; max-height: 350px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; ultima modificacion min-height: 370px; max-height: 370px; width: 24.7%;-->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
@@ -664,7 +664,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 350px; max-height: 350px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
@@ -720,7 +720,7 @@
                 </div>
             </div>
 
-            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 350px; max-height: 350px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
@@ -791,7 +791,7 @@
                 </div>
             </div>
 
-            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 370px; max-height: 370px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
+            <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 350px; max-height: 350px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon">
                 <div class="card-icon">
                     <i class="material-icons">assignment</i>
