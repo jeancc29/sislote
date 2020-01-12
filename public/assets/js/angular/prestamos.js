@@ -140,6 +140,7 @@ myApp
         }
 
         $scope.editar = function(esNuevo, d){
+            helperService.destruirScrollBar();
             
             
             console.log('editar: ', d, ' es nuevo: ', esNuevo);

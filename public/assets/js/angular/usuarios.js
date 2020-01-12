@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -93,6 +93,8 @@ myApp
 
 
         $scope.editar = function(esNuevo, d){
+            helperService.destruirScrollBar();
+
             
             $scope.datos.mostrarFormEditar = true;
 

@@ -517,7 +517,7 @@ class MonitoreoController extends Controller
             return $d['idVenta'];
         });
 
-        $monitoreo = Sales::whereIn('id', $idVentas)->get();
+        $monitoreo = Sales::whereIn('id', $idVentas)->orderBy('id', 'desc')->get();
         
     
         return Response::json([
