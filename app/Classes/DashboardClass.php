@@ -125,6 +125,7 @@ class DashboardClass{
         $sorteos = Draws::all();
         $totalVentasLoterias = 0;
         $totalPremiosLoterias = 0;
+        $loteriasJugadasDashboard = null;
         
         // return $loteriasOrdenadasPorHoraCierre;
         if($loteriasOrdenadasPorHoraCierre != null && count($loteriasOrdenadasPorHoraCierre) > 0){
