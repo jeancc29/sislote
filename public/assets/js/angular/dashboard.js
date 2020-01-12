@@ -60,6 +60,7 @@ myApp
             $scope.cargando = true;
             $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
              .then(function(response){
+                $scope.cargando = false;
                  $scope.ventasGrafica = response.data.ventasGrafica;
                  
 
@@ -71,8 +72,8 @@ myApp
                  $scope.totalPremiosLoterias = response.data.totalPremiosLoterias;
                  $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
                  
-                console.log('Bancas: ', $scope.ventasGrafica);
-                $scope.cargando = false;
+                // console.log('Bancas: ', $scope.ventasGrafica);
+                
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
                     //$('#multiselect').selectpicker('val', []);
