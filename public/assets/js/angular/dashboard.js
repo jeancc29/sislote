@@ -55,38 +55,39 @@ myApp
         
 
         $scope.load = function(codigo_usuario){
-            $(document).ready(function(){
-                $scope.onFechaChanged();
-              });
+            // $(document).ready(function(){
+            //     $scope.onFechaChanged();
+            //   });
             
-            // var fecha = $scope.datos.fecha.getFullYear() + '-' + helperService.to2Digitos($scope.datos.fecha.getMonth() + 1) + '-' + helperService.to2Digitos($scope.datos.fecha.getDate());
-            // // console.log('Bancas: ', $scope.datos.fecha.getDate(), ' completa:', $scope.datos.fecha);
-            // $scope.cargando = true;
-            // $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
-            //  .then(function(response){
-            //     $scope.cargando = false;
-            //      $scope.ventasGrafica = response.data.ventasGrafica;
+            var fecha = $scope.datos.fecha.getFullYear() + '-' + helperService.to2Digitos($scope.datos.fecha.getMonth() + 1) + '-' + helperService.to2Digitos($scope.datos.fecha.getDate());
+            // console.log('Bancas: ', $scope.datos.fecha.getDate(), ' completa:', $scope.datos.fecha);
+            $scope.cargando = true;
+            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
+             .then(function(response){
+                $scope.cargando = false;
+                 $scope.ventasGrafica = response.data.ventasGrafica;
+                 console.log($scope.ventasGrafica);
                  
 
-            //      $scope.loterias = response.data.loterias;
-            //      $scope.sorteos = response.data.sorteos;
-            //      $scope.bancasConVentas = response.data.bancasConVentas;
-            //      $scope.bancasSinVentas = response.data.bancasSinVentas;
-            //      $scope.totalVentasLoterias = response.data.totalVentasLoterias;
-            //      $scope.totalPremiosLoterias = response.data.totalPremiosLoterias;
-            //      $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
+                 $scope.loterias = response.data.loterias;
+                 $scope.sorteos = response.data.sorteos;
+                 $scope.bancasConVentas = response.data.bancasConVentas;
+                 $scope.bancasSinVentas = response.data.bancasSinVentas;
+                 $scope.totalVentasLoterias = response.data.totalVentasLoterias;
+                 $scope.totalPremiosLoterias = response.data.totalPremiosLoterias;
+                 $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
                  
-            //     // console.log('Bancas: ', $scope.ventasGrafica);
+                // console.log('Bancas: ', $scope.ventasGrafica);
                 
-            //     $timeout(function() {
-            //         // anything you want can go here and will safely be run on the next digest.
-            //         //$('#multiselect').selectpicker('val', []);
-            //         crearGrafica();
-            //       })
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    //$('#multiselect').selectpicker('val', []);
+                    crearGrafica();
+                  })
                 
                 
-            //     // $("#modal-cargando").modal("hide");
-            // });
+                // $("#modal-cargando").modal("hide");
+            });
         }
 
 

@@ -1236,7 +1236,7 @@
                     <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
                         @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
                     </div> -->
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button id="btnCloseModalGasto" type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     </div>

@@ -42,11 +42,15 @@
 
 <div class="container-fluid ">
 
-
+<div ng-show="cargando" class="row justify-content-center ">
+  <div class="spinner-border mt-5" style="width: 3rem; height: 3rem;" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
   
-  <div class="col-md-12 col-12 mr-auto mx-0 px-0">
-
-      <div class="row">
+  <div ng-cloak ng-show="cargando == false" class="col-md-12 col-12 mr-auto mx-0 px-0">
+      
+      <div  class="row">
                   <div class="d-sm-none col-lg-4 col-md-4 col-sm-4 d-flex align-items-center mt-4">
                       <div id="input-fecha" class="">
                       <!-- <label for="fechaBusqueda" style="font-size: 40px;" class="bmd-label-floating font-weight-bold" style="color: black;">Numero</label> -->

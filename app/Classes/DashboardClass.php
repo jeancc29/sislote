@@ -83,11 +83,43 @@ class DashboardClass{
             //->orderBy('created_at', 'asc')
             ->get();
     
+        
         $ventasGrafica = collect($ventasGrafica)->map(function($d) use($daysSpanish){
             $fecha = new Carbon($d['date']);
             $dia = $daysSpanish[$fecha->dayOfWeek] . ' ' . $fecha->day;
+
             return ["total" => $d['total'], "neto" => $d['total'] - ($d['premios'] + $d['descuentoMonto']), "dia" => $dia];
         });
+
+        //VERIFICAMOS SI LA FECHA ES IGUAL A LA FECHA DE HOY, SI ES ASI, ENTONCES 
+        //VERIFICAMOS SI ESTA INCLUIDA, YA QUE, SI NO HAY VENTAS EN LA FECHA DE HOY 
+        //ENTONCES HOY NO SE INCLUYE EN LA BUSQUEDA SQL QUE SE HIZO ARRIBA, 
+        //POR ESO SI NO ESTA ENTONCES LA INCLUIMOS EN EL CODIGO DEBAJO
+        // $incluyeVentasDeHoy = false;
+        // $fechaHoy = Carbon::now();
+        // if($this->fecha->toDateString() == $fechaHoy->toDateString())
+        // {
+        //     $dia = $daysSpanish[$fechaHoy->dayOfWeek] . ' ' . $fechaHoy->day;
+        //     foreach($ventasGrafica as $v)
+        //     {
+        //         if($v["dia"] == $dia){
+        //             $incluyeVentasDeHoy = true;
+        //         }
+        //     }
+
+            
+        //     if($incluyeVentasDeHoy == false){
+                
+        //         $ventasGrafica->push([
+        //             "total" => 0, 
+        //             "neto" => 0,
+        //             "dia" => $dia
+        //         ]);
+        //     }
+        // }
+        
+
+        
 
         return $ventasGrafica;
     }

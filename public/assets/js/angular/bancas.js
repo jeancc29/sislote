@@ -1525,7 +1525,7 @@ myApp
                 $scope.datos.gastos[$scope.datos.gasto.index].frecuencia = $scope.datos.gasto.frecuencia;
                 if($scope.datos.gasto.frecuencia.descripcion.toLowerCase() == "semanal"){
                     $scope.datos.gastos[$scope.datos.gasto.index].idDia = $scope.datos.selectedDia.id;
-                    $('#modal-gasto').modal('toggle');
+                    $('#btnCloseModalGasto').click();
                     // alert('Dentro:' + $scope.datos.selectedDia.id);
                 }else{
                     $scope.datos.gastos[$scope.datos.gasto.index].idDia = null;
@@ -1553,7 +1553,7 @@ myApp
                     $scope.datos.gasto.index = null;
                     $scope.datos.gasto.descripcion = null;
                     $scope.datos.gasto.fecha = moment().format('YYYY/MM/DD');
-                    
+                    $('#btnCloseModalGasto').click();
             }
             
            
@@ -1572,7 +1572,7 @@ myApp
         $scope.gastoEditar = function(esNuevo, d){
             $('#fechaGasto').addClass('is-filled');
             
-            $('#modal-gasto').modal('show')
+            $('#modal-gasto').modal('show');
 
             if(esNuevo){
                 $scope.rbxFrecuenciasChanged($scope.datos.radioFrecuencias[0]);

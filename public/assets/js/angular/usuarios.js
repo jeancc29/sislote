@@ -221,6 +221,8 @@ myApp
                     else{
                         $scope.inicializarDatos(false);
                         $scope.datos.estado = ($scope.datos.estado == 1) ? true : false;
+                        $scope.datos.mostrarFormEditar = false;
+                        
                         alert("Se ha guardado correctamente");
                     }
                 }else{
