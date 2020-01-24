@@ -204,7 +204,6 @@ class DashboardClass{
 
                 $sorteos = collect($sorteos)->map(function($d) use($ventas){
                   
-
                     // ->values() es para resetear los indices y estos empiecen desde cero
                     $jugadas = $ventas->filter(function ($item) use($d){
                         return $item["idSorteo"] == $d['id'];
