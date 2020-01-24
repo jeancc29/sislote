@@ -203,15 +203,19 @@ class DashboardClass{
                 ->get();
 
                 $sorteos = collect($sorteos)->map(function($d) use($ventas){
-                    list($jugadas, $no) = $ventas->partition(function($v) use($d){
-                    return $v['idSorteo'] == $d['id'];
-                    });
-        
-                    $jugadas = collect($jugadas)->map(function($j){
+                  
+
+                    // ->values() es para resetear los indices y estos empiecen desde cero
+                    $jugadas = $ventas->filter(function ($item) use($d){
+                        return $item["idSorteo"] == $d['id'];
+                    })->values();
+
+                    $j = collect($jugadas)->map(function($j){
                         $loteria = Lotteries::whereId($j['idLoteria'])->first();
                         return ['descripcion' => $loteria['descripcion'], 'abreviatura' => $loteria['abreviatura'], 'jugada' => Helper::agregarGuion($j['jugada'], $j['idSorteo']), 'monto' => $j['monto']];
                     });
-                    return ['descripcion' => $d['descripcion'], 'jugadas' => $jugadas];
+                    $j->values();
+                    return ['descripcion' => $d['descripcion'], 'jugadas' => $j->all()];
                 });
 
                 return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'sorteos' => $sorteos];

@@ -77,7 +77,7 @@ myApp
                  $scope.totalPremiosLoterias = response.data.totalPremiosLoterias;
                  $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
                  
-                // console.log('Bancas: ', $scope.ventasGrafica);
+                console.log('Bancas: ', $scope.loteriasJugadasDashboard);
                 
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
