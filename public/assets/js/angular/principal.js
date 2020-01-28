@@ -211,7 +211,7 @@ myApp
                 $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas)];                
                 $scope.datos.idBanca = response.data.idBanca;
 
-                
+                $scope.seleccionarPrimeraLoteria();
 
                 // $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
                 // $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
@@ -279,6 +279,7 @@ myApp
                 // $scope.datos.estadisticas_ventas.total = (estadisticas_ventas[0].total != undefined) ? estadisticas_ventas[0].total : 0;
                 // $scope.datos.estadisticas_ventas.total_jugadas = (estadisticas_ventas[0].total_jugadas != undefined) ? estadisticas_ventas[0].total_jugadas : 0;
 
+                $scope.seleccionarPrimeraLoteria();
 
                 
                 $timeout(function() {
@@ -1132,9 +1133,24 @@ myApp
                     $scope.datos.monitoreo.datosBusqueda.status = estado;
                 }
             }
-           
+        }
 
+        $scope.seleccionarPrimeraLoteria = function(){
+            
+            if($scope.datos.optionsLoterias.length == 0){
+                return;
+            }
 
+            $scope.datos.loterias.push($scope.datos.optionsLoterias[0]);
+            var arregloNombreLoteria = [];
+            arregloNombreLoteria.push($scope.datos.optionsLoterias[0].id);
+
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                ////Aqui se seleccionan las loterias
+                $('#multiselect').selectpicker('val', arregloNombreLoteria);
+                $('#multiselect').selectpicker("refresh");
+              })
         }
 
 

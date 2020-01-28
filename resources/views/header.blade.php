@@ -1127,7 +1127,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                                   <label for="exampleInput1" class="bmd-label-floating">3era</label>
                                   <input 
                                   ng-disabled="existeSorteoPremiosModal('Pick 4 Box', datosPremiosModal.selectedLoteriaPremiosModal) || existeSorteoPremiosModal('Pick 4 Straight', datosPremiosModal.selectedLoteriaPremiosModal)"
-                                  select-all-on-click id="datosPremiosModal-tercera" ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-pick3', 2, datosPremiosModal.tercera)" ng-model="datosPremiosModal.tercera" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
+                                  select-all-on-click id="datosPremiosModal-tercera" ng-keyup="changeFocusPremiosModal($event, 'datosPremiosModal-pick3', 2, datosPremiosModal.tercera)" ng-model="datosPremiosModal.tercera" maxlength="2" autocomplete="off" type="text" class="form-control" id="exampleInput1" name="monto">
                                 </div>
                               </div>
                             </div> <!-- END COL-2 -->
