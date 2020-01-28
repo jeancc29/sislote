@@ -203,19 +203,27 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				set @monto = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].monto'));
                 set @monto = JSON_UNQUOTE(@monto);
 				if instr(@monto, '.') != 0 then
-					set @sorteo = (select draws.descripcion from draws where draws.id = @idSorteo);
-					if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 3 Straight' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
-					then
+					-- set @sorteo = (select draws.descripcion from draws where draws.id = @idSorteo);
+					-- if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 3 Straight' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
+					-- then
 					-- si el monto redondeado es igual al monto normal eso quiere decir que le monto tiene cero como decimales por lo tanto es correcto, ejemplo 1 == 1.00
 						
-							if @monto = 0.50 or round(@monto) = @monto then
-								set @montoValido = true;
-							end if;
+							-- if @monto = 0.50 or round(@monto) = @monto then
+								-- set @montoValido = true;
+							-- end if;
+					-- else
+						-- if round(@monto) = @monto then
+								-- set @montoValido = true;
+							-- end if;
+					-- end if;
+                    
+                    if(@monto REGEXP '^(-|\\+){0,1}([0-9]+\\.[0-9]*|[0-9]*\\.[0-9]+|[0-9]+)$') = 1
+                    then
+						set @montoValido = true;
 					else
-						if round(@monto) = @monto then
-								set @montoValido = true;
-							end if;
-					end if;
+						set @montoValido = false;
+                    end if;
+                    
 				else
 					set @montoValido = true;
 				end if;
