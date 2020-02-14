@@ -45,7 +45,7 @@ class AndroidversionsController extends Controller
         //Intalacion == 2
         //Activo == 1
         //Elimnado == 0
-        $versiones = Androidversions::where('status', '!=', 2)->get();
+        $versiones = Androidversions::where('status', '!=', 2)->orderBy('id', 'desc')->get();
 
 
         return Response::json([
