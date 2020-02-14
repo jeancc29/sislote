@@ -28,6 +28,7 @@ myApp
 
 
         $scope.cargando = false;
+        $scope.cargandoOnFechaChanged = false;
          $scope.optionsTipoCliente = [];
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
@@ -108,9 +109,13 @@ myApp
         $scope.onFechaChanged = function(){
             var fecha = $scope.datos.fecha.getFullYear() + '-' + helperService.to2Digitos($scope.datos.fecha.getMonth() + 1) + '-' + helperService.to2Digitos($scope.datos.fecha.getDate());
             // console.log('Bancas: ', $scope.datos.fecha.getDate(), ' completa:', $scope.datos.fecha);
-            $("#modal-cargando").modal("toggle");
+            // $("#modal-cargando").modal("toggle");
+           $scope.cargandoOnFechaChanged = true;
             $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
              .then(function(response){
+                
+                
+
                  $scope.ventasGrafica = response.data.ventasGrafica;
                  crearGrafica();
 
@@ -123,7 +128,7 @@ myApp
                  $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
 
                 console.log('Bancas: ', $scope.ventasGrafica);
-                $("#modal-cargando").modal("toggle");
+                $scope.cargandoOnFechaChanged = false;
             });
         }
        

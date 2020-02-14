@@ -135,6 +135,9 @@ if($controlador != "login"){
 <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
 <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/helper.js'). '?'.rand(1,50)}}" ></script>
+    <?php if($controlador == "dashboard"):?>
+        <link href="{!!asset('assets/css/loading-bouncing.css') !!}" rel="stylesheet" />
+    <?php endif; ?>
     <?php if($controlador == "principal"):?>
         <script src="{{asset('assets/js/angular/principal.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
