@@ -318,9 +318,9 @@ class PrincipalController extends Controller
             if(!(new Helper)->isNumber($codigoBarra['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Numero de ticket incorrecto"], 201);
             }
-            if(strlen($codigoBarra['codigoBarra']) != 9){
-                return Response::json(['errores' => 1, 'mensaje' => "Numero de ticket incorrecto"], 201);
-            }
+            // if(strlen($codigoBarra['codigoBarra']) != 9){
+            //     return Response::json(['errores' => 1, 'mensaje' => "Numero de ticket incorrecto"], 201);
+            // }
 
             //Quitamos todos los ceros de la izquierda
             $idTicket = ltrim($codigoBarra['codigoBarra'], "0");
