@@ -871,6 +871,7 @@ class ReportesController extends Controller
             'loterias' => $loterias,
             'ticketsGanadores' => SalesResource::collection($ticketsGanadores),
             'banca' => Branches::whereId($datos['idBanca'])->first(),
+            'bancas' => Branches::select('id', 'descripcion')->whereStatus(1)->get(),
             'premios' => $premios,
             'balanceActual' => round(($balanceHastaLaFecha + $neto)),
             'comisiones' => round($comisionesMonto)

@@ -90,7 +90,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
                 'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
 			)) as bancas from branches b
-            inner join users u on u.id = b.idUsuario into bancas;
+            inner join users u on u.id = b.idUsuario where b.status = 1 into bancas;
             
 			-- Convert wday to wday laravel
            set wday =  weekday(now());

@@ -69,6 +69,12 @@ BEGIN
 		select 1 as errores, 'Error: No tiene permiso para realizar esta accion' as mensaje;
     end if;
     
+    if not exists(select id from branches where branches.status = 1 and branches.id = idBanca)
+    then
+		set @errores = 1;
+		select 1 as errores, 'Error: Esta banca esta desactivada' as mensaje;
+    end if;
+    
     if (select id from branches where branches.idUsuario = pidUsuario) != idBanca
     then
 		if not exists(select count(p.descripcion) from users u inner join permission_user pu on u.id = pu.idUsuario inner join permissions p on p.id = pu.idPermiso where p.descripcion = 'Jugar como cualquier banca' and u.id = pidUsuario)
@@ -599,7 +605,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
                 'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
 			)) as bancas from branches b
-            inner join users u on u.id = b.idUsuario into bancas;
+            inner join users u on u.id = b.idUsuario where b.status = 1 into bancas;
             
 			-- Convert wday to wday laravel
            set wday =  weekday(now());
