@@ -28,6 +28,12 @@ BEGIN
 	set @errores = 0;
      set sql_safe_updates = 0;
      
+      if not exists(select id from branches where branches.status = 1 and branches.id = idBanca)
+    then
+		set @errores = 1;
+		select 1 as errores, 'Error: Esta banca esta desactivada' as mensaje;
+    end if;
+     
     -- getIdVentaTemporal
     -- select idVenta from idventatemporals where idventatemporals.idVentaHash = idVentaHash COLLATE utf8mb4_unicode_ci and idventatemporals.idBanca = idBanca into idVenta;
    set idVenta = (select idventatemporals.idVenta from idventatemporals where idventatemporals.idVentaHash = idVentaHash COLLATE utf8mb4_unicode_ci and idventatemporals.idBanca = idBanca);
@@ -69,11 +75,7 @@ BEGIN
 		select 1 as errores, 'Error: No tiene permiso para realizar esta accion' as mensaje;
     end if;
     
-    if not exists(select id from branches where branches.status = 1 and branches.id = idBanca)
-    then
-		set @errores = 1;
-		select 1 as errores, 'Error: Esta banca esta desactivada' as mensaje;
-    end if;
+   
     
     if (select id from branches where branches.idUsuario = pidUsuario) != idBanca
     then
