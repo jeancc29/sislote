@@ -796,57 +796,58 @@ class ReportesController extends Controller
 
             $ticketsGanadores = Sales::whereIn('id', $ticketsGanadores)->get();
     
-            $comisionesMonto = 0;
-            $datosComisiones = Commissions::where('idBanca', $datos['idBanca'])->get();
-            $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->whereNotIn('status', [0,5])->get();
-            $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
-                return $id->id;
-            });
-            foreach($datosComisiones as $d){
-                if($d['directo'] > 0){
-                    $sorteo = Draws::whereDescripcion('Directo')->first();
-                    if($sorteo != null){
-                        //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                            ->whereIn('idVenta', $idVentasDeEstaBanca)
-                            ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
-                            ->sum('monto');
-                    }
-                }
+            $comisionesMonto = (new Helper)->comisionesPorBanca($datos['idBanca'], $fechaInicial, $fechaFinal);;
+            // $datosComisiones = Commissions::where('idBanca', $datos['idBanca'])->get();
 
-                if($d['pale'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pale')->first();
-                    if($sorteo != null){
-                        //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                            ->whereIn('idVenta', $idVentasDeEstaBanca)
-                            ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
-                            ->sum('monto');
-                    }
-                }
+            // $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->whereNotIn('status', [0,5])->get();
+            // $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
+            //     return $id->id;
+            // });
+            // foreach($datosComisiones as $d){
+            //     if($d['directo'] > 0){
+            //         $sorteo = Draws::whereDescripcion('Directo')->first();
+            //         if($sorteo != null){
+            //             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+            //             $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            //                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+            //                 ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
+            //                 ->sum('monto');
+            //         }
+            //     }
 
-                if($d['tripleta'] > 0){
-                    $sorteo = Draws::whereDescripcion('Tripleta')->first();
-                    if($sorteo != null){
-                        //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                            ->whereIn('idVenta', $idVentasDeEstaBanca)
-                            ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
-                            ->sum('monto');
-                    }
-                }
+            //     if($d['pale'] > 0){
+            //         $sorteo = Draws::whereDescripcion('Pale')->first();
+            //         if($sorteo != null){
+            //             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+            //             $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            //                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+            //                 ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
+            //                 ->sum('monto');
+            //         }
+            //     }
 
-                if($d['superPale'] > 0){
-                    $sorteo = Draws::whereDescripcion('Super pale')->first();
-                    if($sorteo != null){
-                        //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                            ->whereIn('idVenta', $idVentasDeEstaBanca)
-                            ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
-                            ->sum('monto');
-                    }
-                }
-            }
+            //     if($d['tripleta'] > 0){
+            //         $sorteo = Draws::whereDescripcion('Tripleta')->first();
+            //         if($sorteo != null){
+            //             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+            //             $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            //                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+            //                 ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
+            //                 ->sum('monto');
+            //         }
+            //     }
+
+            //     if($d['superPale'] > 0){
+            //         $sorteo = Draws::whereDescripcion('Super pale')->first();
+            //         if($sorteo != null){
+            //             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+            //             $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            //                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+            //                 ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
+            //                 ->sum('monto');
+            //         }
+            //     }
+            // }
 
             $fechaFinalSinHora = explode(' ', $fechaFinal);
             $fechaFinalSinHora = new Carbon($fechaFinalSinHora[0]);
@@ -867,14 +868,14 @@ class ReportesController extends Controller
             'ventas' => $ventas,
             'descuentos' => $descuentos,
             'premios' => $premios,
-            'neto' => round($neto),
+            'neto' => round($neto, 2),
             'loterias' => $loterias,
             'ticketsGanadores' => SalesResource::collection($ticketsGanadores),
             'banca' => Branches::whereId($datos['idBanca'])->first(),
             'bancas' => Branches::select('id', 'descripcion')->whereStatus(1)->get(),
             'premios' => $premios,
-            'balanceActual' => round(($balanceHastaLaFecha + $neto)),
-            'comisiones' => round($comisionesMonto)
+            'balanceActual' => round(($balanceHastaLaFecha + $neto), 2),
+            'comisiones' => round($comisionesMonto, 2)
         ], 201);
     }
 
