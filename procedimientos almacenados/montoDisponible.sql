@@ -96,7 +96,7 @@ BEGIN
 						set @montoDisponibleStockGeneral = null;
 						
 						-- Ahora nos aseguramos de que el bloqueo general existe y el valor de ignorarDemasBloqueos sea = 1
-						select b.monto, b.ignorarDemasBloqueos from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 into @montoDisponibleGeneral, @ignorarDemasBloqueos;
+						select b.monto, b.ignorarDemasBloqueos from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 order by b.id desc limit 1 into @montoDisponibleGeneral, @ignorarDemasBloqueos;
 						 if @montoDisponibleGeneral is not null then
 							if @ignorarDemasBloqueos = 1 then
 								set montoDisponible = @montoDisponibleGeneral;
@@ -116,7 +116,7 @@ BEGIN
                    then
 						if @ignorarDemasBloqueos != 1 then
 							set montoDisponible = null;
-							select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 into montoDisponible;
+							select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 order by b.id desc limit 1 into montoDisponible;
                             if montoDisponible is null then
 								select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = idLoteria and b.idDia = idDia and b.idSorteo = idSorteo into montoDisponible;
 							end if;
@@ -129,7 +129,7 @@ BEGIN
                 if montoDisponible is null 
 				then
 					set @ignorarDemasBloqueos = null;
-					select b.monto, b.ignorarDemasBloqueos from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 into montoDisponible, @ignorarDemasBloqueos;
+					select b.monto, b.ignorarDemasBloqueos from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 order by b.id desc limit 1 into montoDisponible, @ignorarDemasBloqueos;
                     if montoDisponible is not null
                     then
 						if @ignorarDemasBloqueos != 1
@@ -139,9 +139,9 @@ BEGIN
                     end if;
 					if montoDisponible is null
                     then
-						select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 into montoDisponible;
+						select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 order by b.id desc limit 1 into montoDisponible;
 						if montoDisponible is null then
-							select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 into montoDisponible;
+							select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = idLoteria and b.jugada = jugada COLLATE utf8mb4_unicode_ci and b.idSorteo = idSorteo and b.status = 1 order by b.id desc limit 1 into montoDisponible;
 						end if;
 						if montoDisponible is null then
 							select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = idLoteria and b.idDia = idDia and b.idSorteo = idSorteo into montoDisponible;
