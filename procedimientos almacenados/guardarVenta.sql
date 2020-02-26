@@ -499,6 +499,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					set @comision = 0;
 				end if;
                 -- select @sorteo, @monto, @comision, JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo')));
+                insert into realtimes(idAfectado, tabla) values(@idStock, 'stocks');
                 insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.idStock, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, @idStock, now(), now()); 
 			end if;
             /************** END IDLOTERIA = IDLOTERIAJUGADAS ***************/
