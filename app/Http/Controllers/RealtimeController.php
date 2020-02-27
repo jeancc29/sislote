@@ -123,6 +123,7 @@ class RealtimeController extends Controller
        return Response::json([
         'errores' => 0,
         'mensaje' => '',
+        'maximoIdRealtime' => Realtime::max('id'),
         'hayCambios' => count($realtime) > 0 ? true : false,
         'stocks' => count($stocks) > 0 ? $stocks : null,
         'blockslotteries' => count($blockslotteries) > 0 ? $blockslotteries : null,
