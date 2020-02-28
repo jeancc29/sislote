@@ -164,7 +164,7 @@ class RealtimeController extends Controller
         
 
         $maxId = Realtime::max('id');
-        $stocks = Stock::get();
+        $stocks = Stock::whereBetween('created_at', array($fechaInicial, $fechaFinal))->get();
         $blockslotteries = Blockslotteries::all();
         $Blocksgenerals = Blocksgenerals::all();
         $blocksplays = Blocksplays::whereStatus(1)
