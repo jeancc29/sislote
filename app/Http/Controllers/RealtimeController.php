@@ -133,6 +133,63 @@ class RealtimeController extends Controller
         ], 201);
     }
 
+    public function todos()
+    {
+        $datos = request()->validate([
+            'datos.idUsuario' => 'required',
+            'datos.maximoIdRealtime' => 'required',
+        ])['datos'];
+       // dd($data);
+
+        
+
+        $u = Users::where(['id' => $datos['idUsuario'], 'status' => 1])->first();
+
+
+        if($u == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Usuario o contraseña incorrectos'
+            ], 201);
+            // return redirect('login')->withErrors([
+            //     'usuario' => 'Usuario o contraseña incorrectos'
+            // ]);
+        }
+
+            $fecha = getdate();
+  
+       
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        
+
+        $maxId = Realtime::max('id');
+        $stocks = Stock::get();
+        $blockslotteries = Blockslotteries::all();
+        $Blocksgenerals = Blocksgenerals::all();
+        $blocksplays = Blocksplays::whereStatus(1)
+        ->where('fechaDesde', '<=', $fechaInicial)
+        ->where('fechaHasta', '>=', $fechaFinal)
+        ->get();
+        $blocksplaysgenerals = Blocksplaysgenerals::whereStatus(1)
+        ->where('fechaDesde', '<=', $fechaInicial)
+        ->where('fechaHasta', '>=', $fechaFinal)
+        ->get();
+        
+      
+       return Response::json([
+        'errores' => 0,
+        'mensaje' => '',
+        'hayCambios' => true,
+        'maximoIdRealtime' => $maxId,
+        'stocks' => count($stocks) > 0 ? $stocks : null,
+        'blockslotteries' => count($blockslotteries) > 0 ? $blockslotteries : null,
+        'Blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
+        'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
+        'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
+        ], 201);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
