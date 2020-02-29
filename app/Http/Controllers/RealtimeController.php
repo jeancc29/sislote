@@ -101,11 +101,19 @@ class RealtimeController extends Controller
             $blocksplays = (count($blocksplays) > 0) ? $blocksplays->map(function($s){return $s['idAfectado'];}) : $blocksplays;
             $blocksplaysgenerals = (count($blocksplaysgenerals) > 0) ? $blocksplaysgenerals->map(function($s){return $s['idAfectado'];}) : $blocksplaysgenerals;
 
-            $stocks = Stock::whereIn('id', $stocks)->get();
+            $fecha = getdate();
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+            $stocks = Stock::whereIn('id', $stocks)->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get();
             $blockslotteries = Blockslotteries::whereIn('id', $blockslotteries)->get();
             $Blocksgenerals = Blocksgenerals::whereIn('id', $Blocksgenerals)->get();
-            $blocksplays = Blocksplays::whereIn('id', $blocksplays)->get();
-            $blocksplaysgenerals = Blocksplaysgenerals::whereIn('id', $blocksplaysgenerals)->get();
+            $blocksplays = Blocksplays::whereIn('id', $blocksplays)
+            ->where('fechaDesde', '<=', $fechaInicial)
+            ->where('fechaHasta', '>=', $fechaFinal)->get();
+            $blocksplaysgenerals = Blocksplaysgenerals::whereIn('id', $blocksplaysgenerals)
+            ->where('fechaDesde', '<=', $fechaInicial)
+            ->where('fechaHasta', '>=', $fechaFinal)->get();
         }
 
         // if(Crypt::decryptString($u->password) != $datos['password']){
