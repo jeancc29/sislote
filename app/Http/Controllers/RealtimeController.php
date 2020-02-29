@@ -85,7 +85,7 @@ class RealtimeController extends Controller
                      return $r['tabla'] == 'blockslotteries'; 
              });
              list($Blocksgenerals, $noBlocksgenerals) = $realtime->partition(function($r){
-                     return $r['tabla'] == 'Blocksgenerals'; 
+                     return $r['tabla'] == 'blocksgenerals'; 
              });
              list($blocksplays, $noBlocksplays) = $realtime->partition(function($r){
                 return $r['tabla'] == 'blocksplays'; 
@@ -127,7 +127,7 @@ class RealtimeController extends Controller
         'hayCambios' => count($realtime) > 0 ? true : false,
         'stocks' => count($stocks) > 0 ? $stocks : null,
         'blockslotteries' => count($blockslotteries) > 0 ? $blockslotteries : null,
-        'Blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
+        'blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
         'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
         'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
         ], 201);
@@ -184,7 +184,7 @@ class RealtimeController extends Controller
         'maximoIdRealtime' => $maxId,
         'stocks' => count($stocks) > 0 ? $stocks : null,
         'blockslotteries' => count($blockslotteries) > 0 ? $blockslotteries : null,
-        'Blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
+        'blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
         'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
         'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
         ], 201);

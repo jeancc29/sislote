@@ -27,6 +27,7 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Realtime;
 use App\Classes\Helper;
 
 use App\Http\Resources\LotteriesResource;
@@ -132,6 +133,11 @@ class BlocksplaysController extends Controller
                         $bloqueo['fechaHasta'] = $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00';
                         $bloqueo->save();
 
+                        Realtime::create([
+                            'idAfectado' => $bloqueo['id'],
+                            'tabla' => 'blocksplays'
+                        ]);
+
                         // return Response::json([
                         //     'errores' => 1,
                         //     'mensaje' => 'Monto vendido ',
@@ -171,10 +177,15 @@ class BlocksplaysController extends Controller
                                     $s['monto'] = $j['monto'] - $montoVendido;
                                     $s['esBloqueoJugada'] = 1;
                                     $s->save();
+
+                                    Realtime::create([
+                                        'idAfectado' => $s['id'],
+                                        'tabla' => 'stocks'
+                                    ]);
                                 }
                         }
                     }else{
-                        Blocksplays::create([
+                        $b = Blocksplays::create([
                             'idBanca' => $banca['id'],
                             'idLoteria' => $l['id'],
                             'idSorteo' => $j['idSorteo'],
@@ -185,6 +196,11 @@ class BlocksplaysController extends Controller
                             'fechaHasta' => $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00',
                             'idUsuario' => $datos['idUsuario'],
                             'status' => 1
+                        ]);
+
+                        Realtime::create([
+                            'idAfectado' => $b['id'],
+                            'tabla' => 'blocksplays'
                         ]);
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
@@ -219,6 +235,11 @@ class BlocksplaysController extends Controller
                                     $s['monto'] = $j['monto'] - $montoVendido;
                                     $s['esBloqueoJugada'] = 1;
                                     $s->save();
+
+                                    Realtime::create([
+                                        'idAfectado' => $s['id'],
+                                        'tabla' => 'stocks'
+                                    ]);
                                 }
                         }
                     }
@@ -306,41 +327,9 @@ class BlocksplaysController extends Controller
                         $bloqueo['fechaHasta'] = $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00';
                         $bloqueo->save();
 
-                        if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
-                        {
-                            $stocksJugadasDelDiaActual = Stock::where(
-                                [
-                                    'idLoteria' => $l['id'], 
-                                    'jugada' => $j['jugada'],
-                                    'idSorteo' => $j['idSorteo'],
-                                    'esGeneral' => 1
-                                ])
-                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
-                                ->get();
-
-                                foreach($stocksJugadasDelDiaActual as $s)
-                                {
-                                    $montoVendido = $s['montoInicial'] - $s['monto'];
-                                    $s['montoInicial'] = $j['monto'];
-                                    $s['monto'] = $j['monto'] - $montoVendido;
-                                    $s['esBloqueoJugada'] = 1;
-                                    $s['esGeneral'] = 1;
-                                    $s['ignorarDemasBloqueos'] = $datos['ignorarDemasBloqueos'];
-                                    $s->save();
-                                }
-                        }
-                    }else{
-                        Blocksplaysgenerals::create([
-                            'idLoteria' => $l['id'],
-                            'idSorteo' => $j['idSorteo'],
-                            'jugada' => $j['jugada'],
-                            'montoInicial' => $j['monto'],
-                            'monto' => $j['monto'],
-                            'fechaDesde' => $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00',
-                            'fechaHasta' => $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00',
-                            'idUsuario' => $datos['idUsuario'],
-                            'status' => 1,
-                            'ignorarDemasBloqueos' => $datos['ignorarDemasBloqueos']
+                        Realtime::create([
+                            'idAfectado' => $bloqueo['id'],
+                            'tabla' => 'blocksplaysgenerals'
                         ]);
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
@@ -364,6 +353,58 @@ class BlocksplaysController extends Controller
                                     $s['esGeneral'] = 1;
                                     $s['ignorarDemasBloqueos'] = $datos['ignorarDemasBloqueos'];
                                     $s->save();
+
+                                    Realtime::create([
+                                        'idAfectado' => $s['id'],
+                                        'tabla' => 'stocks'
+                                    ]);
+                                }
+                        }
+                    }else{
+                        $b = Blocksplaysgenerals::create([
+                            'idLoteria' => $l['id'],
+                            'idSorteo' => $j['idSorteo'],
+                            'jugada' => $j['jugada'],
+                            'montoInicial' => $j['monto'],
+                            'monto' => $j['monto'],
+                            'fechaDesde' => $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00',
+                            'fechaHasta' => $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00',
+                            'idUsuario' => $datos['idUsuario'],
+                            'status' => 1,
+                            'ignorarDemasBloqueos' => $datos['ignorarDemasBloqueos']
+                        ]);
+
+                        Realtime::create([
+                            'idAfectado' => $b['id'],
+                            'tabla' => 'blocksplaysgenerals'
+                        ]);
+
+                        if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
+                        {
+                            $stocksJugadasDelDiaActual = Stock::where(
+                                [
+                                    'idLoteria' => $l['id'], 
+                                    'jugada' => $j['jugada'],
+                                    'idSorteo' => $j['idSorteo'],
+                                    'esGeneral' => 1
+                                ])
+                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
+                                ->get();
+
+                                foreach($stocksJugadasDelDiaActual as $s)
+                                {
+                                    $montoVendido = $s['montoInicial'] - $s['monto'];
+                                    $s['montoInicial'] = $j['monto'];
+                                    $s['monto'] = $j['monto'] - $montoVendido;
+                                    $s['esBloqueoJugada'] = 1;
+                                    $s['esGeneral'] = 1;
+                                    $s['ignorarDemasBloqueos'] = $datos['ignorarDemasBloqueos'];
+                                    $s->save();
+
+                                    Realtime::create([
+                                        'idAfectado' => $s['id'],
+                                        'tabla' => 'stocks'
+                                    ]);
                                 }
                         }
                     }

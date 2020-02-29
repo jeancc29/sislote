@@ -32,6 +32,7 @@ use App\Commissions;
 use App\Permissions;
 use App\Blocksgenerals;
 use App\Blocksplaysgenerals;
+use App\Realtime;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -292,6 +293,10 @@ class BlockslotteriesController extends Controller
                         $bloqueo['monto'] = $s['monto'];
                         $bloqueo->save();
 
+                        Realtime::create([
+                            'idAfectado' => $bloqueo['id'],
+                            'tabla' => 'blockslotteries'
+                        ]);
                         
                             $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                             if($dia != null){
@@ -312,18 +317,28 @@ class BlockslotteriesController extends Controller
                                     $sj['montoInicial'] = $s['monto'];
                                     $sj['monto'] = $s['monto'] - $montoVendido;
                                     $sj->save();
+
+                                    Realtime::create([
+                                        'idAfectado' => $sj['id'],
+                                        'tabla' => 'stocks'
+                                    ]);
                                 }
                             }
                             
                         
                     }else{
                         //CREAR BLOQUEO
-                        Blockslotteries::create([
+                        $b = Blockslotteries::create([
                             'idBanca' => $banca['id'],
                             'idLoteria' => $l['id'],
                             'idSorteo' => $s['id'],
                             'idDia' => $d['id'],
                             'monto' => $s['monto']
+                        ]);
+
+                        Realtime::create([
+                            'idAfectado' => $b['id'],
+                            'tabla' => 'blockslotteries'
                         ]);
 
                         $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
@@ -345,6 +360,11 @@ class BlockslotteriesController extends Controller
                                 $sj['montoInicial'] = $s['monto'];
                                 $sj['monto'] = $s['monto'] - $montoVendido;
                                 $sj->save();
+
+                                Realtime::create([
+                                    'idAfectado' => $sj['id'],
+                                    'tabla' => 'stocks'
+                                ]);
                             }
                         }
                     }
@@ -424,6 +444,11 @@ class BlockslotteriesController extends Controller
                         $bloqueo['monto'] = $s['monto'];
                         $bloqueo->save();
 
+                        Realtime::create([
+                            'idAfectado' => $bloqueo['id'],
+                            'tabla' => 'blocksgenerals'
+                        ]);
+
                         
                             $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                             if($dia != null){
@@ -443,17 +468,27 @@ class BlockslotteriesController extends Controller
                                     $sj['montoInicial'] = $s['monto'];
                                     $sj['monto'] = $s['monto'] - $montoVendido;
                                     $sj->save();
+
+                                    Realtime::create([
+                                        'idAfectado' => $sj['id'],
+                                        'tabla' => 'stocks'
+                                    ]);
                                 }
                             }
                             
                         
                     }else{
                         //CREAR BLOQUEO
-                        Blocksgenerals::create([
+                        $b = Blocksgenerals::create([
                             'idLoteria' => $l['id'],
                             'idSorteo' => $s['id'],
                             'idDia' => $d['id'],
                             'monto' => $s['monto']
+                        ]);
+
+                        Realtime::create([
+                            'idAfectado' => $b['id'],
+                            'tabla' => 'blocksgenerals'
                         ]);
 
                         $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
@@ -474,6 +509,11 @@ class BlockslotteriesController extends Controller
                                 $sj['montoInicial'] = $s['monto'];
                                 $sj['monto'] = $s['monto'] - $montoVendido;
                                 $sj->save();
+
+                                Realtime::create([
+                                    'idAfectado' => $sj['id'],
+                                    'tabla' => 'stocks'
+                                ]);
                             }
                         }
                     }
