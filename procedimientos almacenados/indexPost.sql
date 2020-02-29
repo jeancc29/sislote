@@ -104,14 +104,18 @@ select JSON_ARRAYAGG(JSON_OBJECT(
      if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and (p.descripcion = 'Jugar fuera de horario' or p.descripcion = 'Jugar minutos extras'))
 			then
 				INSERT INTO TempTable(loterias) select JSON_OBJECT(
-					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre
+					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', 
+                    l.abreviatura, 'horaCierre', dl.horaCierre, 
+                    'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
 				inner join days d on d.id = dl.idDia
 				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
-				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre
+				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 
+                'horaCierre', dl.horaCierre,
+                'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id
             inner join days d on d.id = dl.idDia
