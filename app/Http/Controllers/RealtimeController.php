@@ -175,6 +175,7 @@ class RealtimeController extends Controller
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->get();
+        $draws = Draws::whereStatus(1)->get();
         
       
        return Response::json([
@@ -187,6 +188,7 @@ class RealtimeController extends Controller
         'blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
         'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
         'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
+        'draws' => count($draws) > 0 ? $draws : null,
         ], 201);
     }
 
