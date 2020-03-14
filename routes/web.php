@@ -55,6 +55,7 @@ Route::get('/balance/bancas', 'BalancesController@index')->name('balance.bancas'
 Route::get('/balance/bancos', 'BalancesController@bancos')->name('balance.bancos');
 Route::get('/prestamos', 'LoansController@index')->name('prestamos');
 Route::get('/versiones', 'AndroidversionsController@index')->name('versiones');
+Route::get('/monedas', 'CoinsController@index')->name('monedas');
 
 Route::get('/test1', 'DaysController@test1')->name('prueba1');
 Route::get('/test2', 'DaysController@test2')->name('prueba2');

@@ -3,9 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Coins;
 
-class EntityResource extends JsonResource
+class BranchesResourceSmall extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,14 +14,15 @@ class EntityResource extends JsonResource
      */
     public function toArray($request)
     {
-        $moneda = Coins::whereId($this->idMoneda)->first();
+        $moneda = $this->moneda;
         return [
             'id' => $this->id,
-            'nombre' => $this->nombre,
-            'status' => $this->status,
-            'idMoneda' => $this->status,
+            'descripcion' => $this->descripcion,
+            'codigo' => $this->codigo,
+            'idMoneda' => $this->idMoneda,
             'moneda' => ($moneda != null) ? $moneda->descripcion : null,
-            'tipo' => $this->tipo
+            'monedaAbreviatura' => ($moneda != null) ? $moneda->abreviatura : null,
+            'monedaColor' => ($moneda != null) ? $moneda->color : null,
         ];
     }
 }

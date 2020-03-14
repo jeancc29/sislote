@@ -97,12 +97,29 @@
 
                     <div class="col-12">
                        <div class="row">
-                       <div class="col-sm-3">
-                            <div class="form-group">
-                            <label for="numeroTicketBusqueda" class="bmd-label-floating">Filtrar</label>
-                            <input autocomplete="off" ng-keyup="inputDescripcionBancaKeyUp()" ng-model="datos.descripcionBancaFiltro" id="numeroTicketBusqueda" type="text" class="form-control">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="numeroTicketBusqueda" class="bmd-label-floating">Filtrar</label>
+                                    <input autocomplete="off" ng-keyup="inputDescripcionBancaKeyUp()" ng-model="datos.descripcionBancaFiltro" id="numeroTicketBusqueda" type="text" class="form-control">
+                                </div>
                             </div>
-                        </div>
+
+                            <div class="col-5 ">
+                                <div class="input-group ">
+                                <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                               -->
+                                    <div  class=" col-sm-12 col-10">
+                                        <select 
+                                            ng-change="cbxTipoBloqueosJugadaChanged()"
+                                            ng-model="selectedMoneda"
+                                            ng-options="o.descripcion for o in optionsMonedas"
+                                            class="selectpicker col-12" 
+                                            data-style="select-with-transition" 
+                                            title="Seleccionar moneda">
+                                        </select>
+                                    </div>
+                                </div> <!-- END INPUT GROUP -->
+                            </div>
+
                        </div>
                         
                     </div>
@@ -130,7 +147,7 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.usuario}}</td>
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.dueno}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" scope="col" class="text-center" style="font-size: 13px">@{{c.balance | currency}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" scope="col" class="text-center" style="font-size: 13px">@{{c.balance | currency:selectedMoneda.abreviatura}}</td>
                                 <td  scope="col" class="text-center" style="font-size: 13px">@{{c.prestamo}}</td>
                                 <!-- <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto}}</td> -->
                             </tr>

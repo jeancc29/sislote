@@ -32,6 +32,7 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Coins;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -44,10 +45,12 @@ use Illuminate\Support\Facades\Crypt;
 class DashboardClass{
     public $idUsuario;
     public $fecha;
+    public $idMoneda;
+    public $bancas;
     public $fechaActual;
     public $fecha6DiasAtras;
 
-    function __construct($fecha = null, $idUsuario){
+    function __construct($fecha = null, $idUsuario, $idMoneda){
         if($fecha == null){
             $this->fecha = Carbon::now();
             $this->fechaActual = Carbon::now();
@@ -60,6 +63,21 @@ class DashboardClass{
         $this->fechaActual = $this->fechaActual->toDateString() . ' 23:00:00';
         $this->fecha6DiasAtras = $this->fecha6DiasAtras->toDateString() . ' 00:00:00';
         $this->idUsuario = $idUsuario;
+        $idMoneda = Coins::whereId($idMoneda)->first();
+
+        if($idMoneda == null){
+            $idMoneda = Coins::wherePordefecto(1)->first();
+            if($idMoneda == null){
+                $idMoneda = Coins::first();
+            }
+        }
+        $this->idMoneda = $idMoneda->id;
+        
+        //Aqui se seleccionan las bancas correspondiente a cada moneda
+        $this->bancas = $bancas = Branches::where(['idMoneda' => $this->idMoneda, 'status' => 1])->get();
+        // $this->bancas = collect($bancas)->map(function($d){
+        //     return $d->id;
+        // });
     }
     
 
@@ -75,14 +93,22 @@ class DashboardClass{
             0 => 'dom',
         ];
 
+        
+        
+
+        $bancas = collect($this->bancas)->map(function($d){
+            return $d->id;
+        });
         //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
         $ventasGrafica = Sales::select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios, sum(descuentoMonto)  as descuentoMonto'))
             ->whereBetween('created_at', array($this->fecha6DiasAtras, $this->fechaActual))
             ->whereNotIn('status', [0,5])
+            ->whereIn('idBanca', $bancas)
             ->groupBy('date')
             //->orderBy('created_at', 'asc')
             ->get();
     
+            
         
         $ventasGrafica = collect($ventasGrafica)->map(function($d) use($daysSpanish){
             $fecha = new Carbon($d['date']);
@@ -129,17 +155,21 @@ class DashboardClass{
         $fechaInicial = $this->fecha;
         $fechaFinal = $fechaInicial->toDateString() . ' 23:00:00';
         $fechaInicial = $fechaInicial->toDateString() . ' 00:00:00';
+        $idBancaToString = collect($this->bancas)->implode("id", ',');
         $loterias = Lotteries::
             selectRaw('
                 id, 
                 descripcion, 
-                (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status not in(0,5) and sd.idLoteria = lotteries.id and s.created_at between ? and ?) as ventas,
-                (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status not in(0,5) and sd.idLoteria = lotteries.id and s.created_at between ? and ?) as premios
-                ', [$fechaInicial, $fechaFinal, //Parametros para ventas
-                    $fechaInicial, $fechaFinal //Parametros para premios
+                (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status not in(0,5) and sd.idLoteria = lotteries.id and s.created_at between ? and ? and FIND_IN_SET(s.idBanca, ?)) as ventas,
+                (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status not in(0,5) and sd.idLoteria = lotteries.id and s.created_at between ? and ? and FIND_IN_SET(s.idBanca, ?)) as premios
+                ', [$fechaInicial, $fechaFinal, $idBancaToString, //Parametros para ventas
+                    $fechaInicial, $fechaFinal, $idBancaToString //Parametros para premios
                     ])
             ->where('lotteries.status', '=', '1')
             ->get();
+
+            // [$fechaInicial, $fechaFinal, $this->bancas, //Parametros para ventas
+            //         $fechaInicial, $fechaFinal, $this->bancas,//Parametros para premios
 
         return $loterias;
     }
@@ -192,11 +222,16 @@ class DashboardClass{
 
             
 
+            
             $loteriasJugadasDashboard = collect($loteriasValidadas)->map(function($l) use($fecha, $sorteos){
+                $bancas = collect($this->bancas)->map(function($d){
+                    return $d->id;
+                });
                 $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
                 idLoteria')->join('sales', 'sales.id', 'salesdetails.idVenta')
                 ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                 ->whereNotIn('sales.status', [0,5])
+                ->whereIn('sales.idBanca', $bancas)
                 ->where('salesdetails.idLoteria', $l['id'])
                 ->groupBy('salesdetails.jugada', 'salesdetails.idSorteo', 'salesdetails.idLoteria')
                 ->orderBy('monto', 'desc')

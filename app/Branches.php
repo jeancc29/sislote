@@ -11,6 +11,7 @@ class Branches extends Model
         'ip', 
         'codigo', 
         'idUsuario',
+        'idMoneda',
         'dueno',
         'localidad',
         'balanceDesactivacion',
@@ -45,6 +46,11 @@ class Branches extends Model
         return $this->hasOne('App\Users', 'id', 'idUsuario');
     }
 
+    public function moneda()
+    {
+        //Modelo, foreign key, local key
+        return $this->hasOne('App\Coins', 'id', 'idMoneda');
+    }
     // public function pagosCombinaciones()
     // {
     //     //Modelo, foreign key, foreign key, local key, local key

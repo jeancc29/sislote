@@ -1632,6 +1632,10 @@ myApp
 
         }
 
+        $scope.getBancaMoneda = function(banca){
+           return helperService.getBancaMoneda(banca);
+        }
+
 
     })
 

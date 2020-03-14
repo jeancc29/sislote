@@ -25,6 +25,8 @@ class BranchesResource extends JsonResource
             'imprimirCodigoQr' => $this->imprimirCodigoQr,
             'idUsuario' => $this->idUsuario,
             'usuario' => $this->usuario->usuario,
+            'idMoneda' => $this->idMoneda,
+            'moneda' => $this->moneda->descripcion,
             'dueno' => $this->dueno,
             'localidad' => $this->localidad,
 

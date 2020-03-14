@@ -70,6 +70,7 @@ if($controlador != "login"){
     window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
+    window.monedasGlobal = <?php if(isset($monedas)) echo $monedas; else echo 'null'; ?>;
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
     window.bancosGlobal = <?php if(isset($bancos)) echo $bancos; else echo 'null'; ?>;
     window.loteriasGlobal = <?php if(isset($loterias)) echo $loterias; else echo 'null'; ?>;
@@ -193,6 +194,9 @@ if($controlador != "login"){
     <?php endif; ?>
     <?php if($controlador == "entidades"):?>
         <script src="{{asset('assets/js/angular/entidades.js'). '?'.rand(1,50)}}" ></script>
+    <?php endif; ?>
+    <?php if($controlador == "monedas"):?>
+        <script src="{{asset('assets/js/angular/monedas.js'). '?'.rand(1,50)}}" ></script>
     <?php endif; ?>
     <?php if($controlador == "transacciones" || $controlador == "transacciones"):?>
         <script src="{{asset('assets/js/angular/transacciones.js'). '?'.rand(1,50)}}" ></script>
@@ -1060,30 +1064,14 @@ if(session('idUsuario') == null && $controlador != 'login'){
                           <div class="row">
                             <div class="col-4 mt-1">
                               <div class="form-group">
-                              <select 
-                                ng-model="datosPremiosModal.selectedLoteriaPremiosModal"
-                                ng-change="cbxLoteriasPremiosModalChanged()"
-                                      ng-options="o.descripcion for o in datosPremiosModal.optionsLoteriasPremiosModal"
-                                class="selectpicker col-12 mx-0 px-0" 
-                                data-style="select-with-transition" 
-                                title="Select loteria">
-                                <!-- <option value="Afghanistan"> Afghanistan </option>
-                                <option value="Albania"> Albania </option>
-                                <option value="Algeria"> Algeria </option>
-                                <option value="American Samoa"> American Samoa </option>
-                                <option value="Andorra"> Andorra </option>
-                                <option value="Angola"> Angola </option>
-                                <option value="Anguilla"> Anguilla </option>
-                                <option value="Antarctica"> Antarctica </option> -->
-                              </select>
-                                  <!-- <select 
-                                      ng-model="datosPremiosModal.selectedLoteriaPremiosModal"
-                                      ng-change="cbxLoteriasPremiosModalChanged()"
-                                      ng-options="o.descripcion for o in datosPremiosModal.optionsLoteriasPremiosModal"
-                                      class="selectpicker w-100" 
-                                      data-style="select-with-transition" 
-                                      title="Select loteria">
-                                </select> -->
+                                <select 
+                                    ng-model="datosPremiosModal.selectedLoteriaPremiosModal"
+                                    ng-change="cbxLoteriasPremiosModalChanged()"
+                                        ng-options="o.descripcion for o in datosPremiosModal.optionsLoteriasPremiosModal"
+                                    class="selectpicker col-12 mx-0 px-0" 
+                                    data-style="select-with-transition" 
+                                    title="Select loteria">
+                                </select>
                               </div>
                             </div>
                             <div ng-class="{'col-2 col-sm-2': existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) == true, 'col-2 col-sm-1' : existeSorteoPremiosModal('Super pale', datosPremiosModal.selectedLoteriaPremiosModal) == false}" class="" ng-show="existeSorteoPremiosModal('Pale', datosPremiosModal.selectedLoteriaPremiosModal) 
@@ -1516,6 +1504,12 @@ if(session('idUsuario') == null && $controlador != 'login'){
                         </li>
                     </ul>
                 </div>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="{{route('monedas')}}">
+                    <i class="material-icons">attach_money</i>
+                    <p> Monedas </p>
+                </a>
             </li>
 
             

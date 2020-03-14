@@ -183,12 +183,12 @@
                                 <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1.descripcion}}</td>
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">@{{Cerrado}}</td> -->
                                 <td scope="col" class="text-center" style="font-size: 12px">@{{(c.tipoEntidad2 == 'Banco') ? c.entidad2.nombre : c.entidad2.descripcion}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1_saldo_inicial | currency}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad2_saldo_inicial | currency}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.debito | currency}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.credito | currency}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad1_saldo_final | currency}}</td>
-                                <td scope="col" class="text-center" style="font-size: 12px">@{{c.entidad2_saldo_final | currency}}</td>
+                                <td scope="col" class="text-center font-weight-bold" style="font-size: 14px; color: @{{c.entidad1.monedaColor}}">@{{c.entidad1_saldo_inicial | currency:c.entidad1.monedaAbreviatura}}</td>
+                                <td scope="col" class="text-center font-weight-bold" style="font-size: 14px; color: @{{c.entidad1.monedaColor}}">@{{c.entidad2_saldo_inicial | currency:c.entidad1.monedaAbreviatura}}</td>
+                                <td scope="col" class="text-center font-weight-bold" style="font-size: 14px; color: @{{c.entidad1.monedaColor}}">@{{c.debito | currency:c.entidad1.monedaAbreviatura}}</td>
+                                <td scope="col" class="text-center font-weight-bold" style="font-size: 14px; color: @{{c.entidad1.monedaColor}}">@{{c.credito | currency:c.entidad1.monedaAbreviatura}}</td>
+                                <td scope="col" class="text-center font-weight-bold" style="font-size: 14px; color: @{{c.entidad1.monedaColor}}">@{{c.entidad1_saldo_final | currency:c.entidad1.monedaAbreviatura}}</td>
+                                <td scope="col" class="text-center font-weight-bold" style="font-size: 14px; color: @{{c.entidad1.monedaColor}}">@{{c.entidad2_saldo_final | currency:c.entidad1.monedaAbreviatura}}</td>
                                 <td scope="col" class="text-center" style="font-size: 12px"> @{{c.nota}}</td>
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">Marcar pago</td> -->
                                 <!-- <td scope="col" class="text-center" style="font-size: 12px">

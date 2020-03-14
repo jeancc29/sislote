@@ -72,12 +72,16 @@ myApp
            //console.log('bancasGlobal', bancasGlobal);
             
             $scope.datos.objetoBancas = bancasGlobal;
-            $scope.datos.optionsBancas = helperService.copiarObjecto(bancasGlobal);
+            // $scope.datos.optionsBancas = helperService.copiarObjecto(bancasGlobal);
             $scope.datos.optionsSorteos = sorteosGlobal;
             
             $scope.datos.ventas = vGlobal;
 
-            $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
+
+            $scope.optionsMonedas = monedasGlobal;
+            $scope.selectedMoneda = $scope.optionsMonedas[0];
+            $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
+            $scope.cbxMonedasChanged();
 
             // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
             
@@ -206,7 +210,7 @@ myApp
             
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.layout = 'Principal';
-
+            $scope.datos.idMoneda = $scope.selectedMoneda.id;
 
             if(Object.keys($scope.datos.selectedBancas).length > 0){
                 $scope.datos.bancas = null;
@@ -220,7 +224,12 @@ myApp
                     }
     
                 });
+            }else{
+                $scope.datos.bancas = null;
             }
+
+            // console.log($scope.datos.bancas);
+            // return;
 
           $http.post(rutaGlobal+"/api/reportes/ventasporfecha", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
              .then(function(response){
@@ -228,6 +237,7 @@ myApp
                 // if(response.data.errores == 0){
 
                     $scope.datos.ventas = response.data.ventas;
+                    $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
                     
                 // }else{
                 //     alert(response.data.mensaje);
@@ -247,6 +257,23 @@ myApp
                 if(array[indice].ticketsPendientes > 0) $scope.datos.total_cont_tickets_pendientes ++;
 
             });
+        }
+
+        $scope.cbxMonedasChanged = function(){
+            $scope.datos.bancas = [];
+            $scope.datos.selectedBancas = [];
+            $scope.datos.optionsBancas = [];
+            // $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.objetoBancas.forEach(function(valor, indice, array){
+                if(array[indice].idMoneda == $scope.selectedMoneda.id)
+                    $scope.datos.optionsBancas.push(array[indice]);
+            });
+
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                $('#multiselect').selectpicker("refresh");
+                $('.selectpicker').selectpicker("refresh");
+              })
         }
 
 

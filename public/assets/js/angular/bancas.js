@@ -348,18 +348,13 @@ myApp
                 if(idUsuarioBanca > 0)
                     idx = $scope.datos.optionsUsuarios.findIndex(x => x.id == idUsuarioBanca);
 
-
                 $scope.datos.selectedUsuario = $scope.datos.optionsUsuarios[idx];
                 $scope.datos.optionsUsuariosTipos = response.data.usuariosTipos;
-
+                $scope.datos.optionsMonedas = response.data.monedas;
+                $scope.datos.selectedMoneda = $scope.datos.optionsMonedas[0];
 
                 $scope.datos.bancas =response.data.bancas;
                 
-                
-
-              
-             
-
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
                     //$('#multiselect').selectpicker('val', []);
@@ -370,15 +365,14 @@ myApp
                
                 
                 
-            },
-            function(response) {
-                // Handle error here
-                //console.log('Error jean: ', response);
-                alert("Error");
-            });
-
-           
-           
+            }
+            // ,
+            // function(response) {
+            //     // Handle error here
+            //     //console.log('Error jean: ', response);
+            //     alert("Error");
+            // }
+            );
        
         }
         
@@ -728,7 +722,10 @@ myApp
                     idx = $scope.datos.optionsUsuarios.findIndex(x => x.id == d.idUsuario);
                     $scope.datos.selectedUsuario = $scope.datos.optionsUsuarios[idx];
     
-    
+                    idx = $scope.datos.optionsMonedas.findIndex(x => x.id == d.idMoneda);
+                    $scope.datos.selectedMoneda = $scope.datos.optionsMonedas[idx];
+                    
+                    console.log('monedaa: ' , d.idMoneda);
     
                     $scope.datos.gastos = d.gastos;
     
@@ -1029,6 +1026,11 @@ myApp
                 return;
             }
 
+            if($scope.datos.optionsMonedas.length == 0){
+                alert('No hay monedas, vuelva a actualizar la pagina');
+                return;
+            }
+
             var errores = false;
 
             $scope.datos.ckbLoterias.forEach(function(valor, indice, array){
@@ -1114,14 +1116,17 @@ myApp
             $scope.datos.status = ($scope.datos.estado) ? 1 : 0;
             $scope.datos.idUsuario = idUsuario;
             $scope.datos.idUsuarioBanca = $scope.datos.selectedUsuario.id;
+            $scope.datos.idMoneda = $scope.datos.selectedMoneda.id;
             $scope.datos.loteriasSeleccionadas = $scope.datos.ckbLoterias;
 
-            console.log('gastos bancas: ', $scope.datos.gastos);
-           
-   
+            var datos = $scope.datos;
+            delete datos['monedas'];
+            delete datos['frecuencias'];
+            delete datos['dias'];
+
             _convertir_apertura_y_cierre(true);
             $scope.datos.btnCargando = true;
-          $http.post(rutaGlobal+"/api/bancas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+          $http.post(rutaGlobal+"/api/bancas/guardar", {'action':'sp_bancas_actualizar', 'datos': datos})
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0){

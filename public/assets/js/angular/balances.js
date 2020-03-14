@@ -81,6 +81,8 @@ myApp
             // // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
 
             $scope.buscar();
+            $scope.optionsMonedas = monedasGlobal;
+            $scope.selectedMoneda = $scope.optionsMonedas[0];
             
             $timeout(function() {
                 // anything you want can go here and will safely be run on the next digest.
@@ -103,6 +105,7 @@ myApp
 
           $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
           $scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
+          
 
           var a = new Hola("Jean", "Contreras");
           console.log('clase: ', ruta);
@@ -132,12 +135,6 @@ myApp
         }
 
 
-
-
-        
-
-
-  
 
        
         $scope.buscar = function(){
@@ -192,9 +189,9 @@ myApp
             return function(item){
                 console.log('greaterThan:');
                 if(helperService.empty($scope.datos.descripcionBancaFiltro, 'string') == true){
-                        return true;
+                        return true && item['idMoneda'] == $scope.selectedMoneda.id;
                 }else{
-                        return item['descripcion'].toUpperCase().indexOf($scope.datos.descripcionBancaFiltro.toUpperCase()) != -1;
+                        return item['descripcion'].toUpperCase().indexOf($scope.datos.descripcionBancaFiltro.toUpperCase()) != -1 && item['idMoneda'] == $scope.selectedMoneda.id;
                 }
                 
             }

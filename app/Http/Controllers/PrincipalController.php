@@ -640,8 +640,13 @@ class PrincipalController extends Controller
                         if($stock != null){
                             $stock->monto = $stock->monto + $v["monto"];
                             $stock->save();
+                            Realtime::create([
+                                'idAfectado' => $stock['id'],
+                                'tabla' => 'stocks'
+                            ]);
                         }
                         $v->save();
+
                     }
     
                     Cancellations::create([

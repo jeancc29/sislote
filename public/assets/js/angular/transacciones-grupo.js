@@ -85,7 +85,7 @@ myApp
                         $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
                         $scope.datos.optionsEntidades = response.data.entidades;
                         $scope.datos.selectedEntidad = $scope.datos.optionsEntidades[0];
-                        
+                        $scope.datos.optionsEntidadesTmp = response.data.entidades;
 
 
                         $timeout(function() {
@@ -123,22 +123,39 @@ myApp
             console.log('cbxBancas: ', $scope.datos.selectedBanca);
             if($scope.datos.selectedBanca == null || $scope.datos.selectedBanca == undefined)
                 return;
+
+            $scope.datos.optionsEntidades = [];
+            $scope.datos.optionsEntidadesTmp.forEach(function(valor, indice, array){
+                if($scope.datos.selectedBanca.idMoneda == array[indice].idMoneda)
+                    $scope.datos.optionsEntidades.push(array[indice]);
+            });
+
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                $('#entidad2').selectpicker('val', []);
+                $('.selectpicker').selectpicker("refresh");
+              })
+
+            if($scope.datos.optionsEntidades.length == 0){
+                alert('No hay bancos registrados con la moneda ' + $scope.datos.selectedBanca.moneda + ' debe registrar uno para hacer transacciones a esta banca');
+                return;
+            }
             
             $scope.datos.id = $scope.datos.selectedBanca.id;
             $scope.datos.es_banca = true;
             $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
-                    .then(function(response){
-                       console.log(response.data);
-                       $('#entidad1_saldo_inicial').addClass('is-filled');
-                       var credito = 0, debito = 0;
-                       $scope.datos.addTransaccion.forEach(function(valor, indice, array){
-                            if(array[indice].entidad1.id == $scope.datos.id){
-                                debito += array[indice].debito;
-                                credito += array[indice].credito;
-                            }
-                       });
-                       $scope.datos.entidad1_saldo_inicial = response.data.saldo_inicial + (debito - credito);
+                .then(function(response){
+                    console.log(response.data);
+                    $('#entidad1_saldo_inicial').addClass('is-filled');
+                    var credito = 0, debito = 0;
+                    $scope.datos.addTransaccion.forEach(function(valor, indice, array){
+                        if(array[indice].entidad1.id == $scope.datos.id){
+                            debito += array[indice].debito;
+                            credito += array[indice].credito;
+                        }
                     });
+                    $scope.datos.entidad1_saldo_inicial = response.data.saldo_inicial + (debito - credito);
+            });
         }
 
         $scope.cbxEntidadesChange = function(Entidad){
@@ -440,6 +457,10 @@ myApp
         $scope.verTransacciones = function(grupo){
             $scope.datos.selectedGrupo = grupo;
             console.log('verTransacciones: ', $scope.datos.selectedGrupo);
+        }
+
+        $scope.getBancaMoneda = function(banca){
+            return helperService.getBancaMoneda(banca);
         }
 
 

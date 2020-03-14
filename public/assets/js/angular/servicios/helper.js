@@ -194,4 +194,8 @@ myApp.service('helperService', function(){
         return ans;
     }
 
+    this.getBancaMoneda = function(banca){
+        return banca.descripcion + ' (' + banca.monedaAbreviatura + ')';
+    }
+
 });

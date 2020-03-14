@@ -30,10 +30,12 @@ use App\Commissions;
 use App\Permissions;
 use App\Frecuency;
 use App\Automaticexpenses;
+use App\Coins;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
 use App\Http\Resources\BranchesResource;
+use App\Http\Resources\BranchesResourceSmall;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 
@@ -53,35 +55,19 @@ class BranchesController extends Controller
         if(!strpos(Request::url(), '/api/')){
             return view('bancas.index', compact('controlador'));
         }
-        
        
-
-
-        
-        $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
-        // $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
-        // $loterias = collect($loterias)->map(function($l){
-        //     $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria')->get();
-        //     return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
-        // });
-
+        // $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
+        $bancas = Branches::whereIn('status', array(0, 1))->get();
 
         return Response::json([
-            'bancas' => $bancas,
+            'bancas' => BranchesResourceSmall::collection($bancas),
             'usuarios' => Users::whereIn('status', array(0, 1))->get(),
+            'monedas' => Coins::all(),
             'loterias' => [],
             'frecuencias' => Frecuency::all(),
             'dias' => Days::all()
         ], 201);
 
-        
-        // return Response::json([
-        //     'bancas' => BranchesResource::collection($bancas),
-        //     'usuarios' => Users::whereIn('status', array(0, 1))->get(),
-        //     'loterias' => LotteriesResource::collection(Lotteries::whereStatus(1)->has('sorteos')->get()),
-        //     'frecuencias' => Frecuency::all(),
-        //     'dias' => Days::all()
-        // ], 201);
     }
 
     /**
@@ -109,9 +95,9 @@ class BranchesController extends Controller
             'datos.codigo' => 'required',
             'datos.idUsuario' => 'required',
             'datos.idUsuarioBanca' => 'required',
+            'datos.idMoneda' => 'required',
             'datos.dueno' => 'required',
             'datos.localidad' => 'required',
-    
     
             'datos.balanceDesactivacion' => '',
             'datos.limiteVenta' => 'required',
@@ -169,6 +155,7 @@ class BranchesController extends Controller
             $banca['ip'] = $datos['ip'];
             $banca['codigo'] = $datos['codigo'];
             $banca['idUsuario'] = $datos['idUsuarioBanca'];
+            $banca['idMoneda'] = $datos['idMoneda'];
             $banca['dueno'] = $datos['dueno'];
             $banca['localidad'] = $datos['localidad'];
             $banca['limiteVenta'] = $datos['limiteVenta'];
@@ -197,6 +184,7 @@ class BranchesController extends Controller
                 'ip' => $datos['ip'],
                 'codigo' => $datos['codigo'],
                 'idUsuario' => $datos['idUsuarioBanca'],
+                'idMoneda' => $datos['idMoneda'],
                 'dueno' => $datos['dueno'],
                 'localidad' => $datos['localidad'],
                 'limiteVenta' => $datos['limiteVenta'],
@@ -515,7 +503,7 @@ class BranchesController extends Controller
             'mensaje' => '',
             'loterias' => $loterias,
             'frecuencias' => Frecuency::all(),
-            'dias' => Days::all()
+            'dias' => Days::all(),
         ], 201);
     }
 

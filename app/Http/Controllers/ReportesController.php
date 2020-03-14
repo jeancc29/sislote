@@ -28,6 +28,7 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Coins;
 use App\Classes\Helper;
 
 use App\Http\Resources\LotteriesResource;
@@ -174,7 +175,8 @@ class ReportesController extends Controller
                             ->where('idBanca', $d['id'])
                             ->count();
 
-                return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
+                return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 
+                    'idMoneda' => $d['idMoneda'], 'ventas' => $ventas, 
                     'descuentos' => $descuentos, 
                     'premios' => $premios, 
                     'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
@@ -186,7 +188,9 @@ class ReportesController extends Controller
                 ];
             });
 
-           return view('reportes.historico', compact('controlador', 'bancas'));
+            $monedas = Coins::orderBy('pordefecto', 1)->get();
+
+           return view('reportes.historico', compact('controlador', 'bancas', 'monedas'));
         }
 
         
@@ -257,7 +261,9 @@ class ReportesController extends Controller
                             ->where('idBanca', $d['id'])
                             ->count();
 
-            return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 'codigo' => $d['codigo'], 'ventas' => $ventas, 
+            return ['id' => $d['id'], 'descripcion' => strtoupper ($d['descripcion']), 
+                'idMoneda' => $d['idMoneda'],
+                'codigo' => $d['codigo'], 'ventas' => $ventas, 
                 'descuentos' => $descuentos, 
                 'premios' => $premios, 
                 'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
@@ -265,7 +271,8 @@ class ReportesController extends Controller
                 'balanceActual' => round(($balance + $totalNeto), 2),
                 'pendientes' => $pendientes,
                 'ganadores' => $ganadores,
-                'perdedores' => $perdedores
+                'perdedores' => $perdedores,
+                'monedas' => Coins::orderBy('pordefecto', 1)->get()
             ];
         });
         
@@ -294,25 +301,25 @@ class ReportesController extends Controller
             $fecha = getdate();
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
-            
-            $bancas = Branches::whereStatus(1)->get();
-           
+
+            $idMonedaPordefecto = Coins::wherePordefecto(1)->first()->id;
+            $idBancas = Branches::where(['status' => 1, 'idMoneda' => $idMonedaPordefecto])->get();
+            $idBancas = collect($idBancas)->map(function($b){
+                return $b->id;
+            });
 
             $idVentas = Sales::select(DB::raw('sales.id'))
             ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
             ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('sales.status', [0,5])
+            ->whereIn('sales.idBanca', $idBancas)
             // ->groupBy('fecha')
             //->orderBy('created_at', 'asc')
             ->get();
-
             
             $idVentas = collect($idVentas)->map(function($v){
                 return $v['id'];
             });
-
-
-            
 
             $fechasVentas = Sales::select(DB::raw('DATE(sales.created_at) as fecha, 
             sum(sales.subTotal) subTotal, 
@@ -346,7 +353,6 @@ class ReportesController extends Controller
 
                 return ['fecha' => $f['fecha'], 'total' => $ventas[0]->total, 'premios' => $ventas[0]->premios, 'descuentoMonto' => $ventas[0]->descuentoMonto, 'comisiones' => $comision, ];
             });
-
        
             $ventas = collect($ventas)->map(function($d){
               
@@ -359,13 +365,16 @@ class ReportesController extends Controller
                     'totalNeto' => round($totalNeto, 2)];
             });
 
+            $monedas = Coins::orderBy('pordefecto', 1)->get();
+            $bancas = Branches::select('id', 'descripcion', 'idMoneda')->whereStatus(1)->get();
 
-           return view('reportes.ventasporfecha', compact('controlador', 'bancas', 'ventas'));
+           return view('reportes.ventasporfecha', compact('controlador', 'bancas', 'ventas', 'monedas'));
         }
 
         
         $datos = request()->validate([
             'datos.idUsuario' => 'required',
+            'datos.idMoneda' => 'required',
             'datos.bancas' => '',
             'datos.fechaDesde' => '',
             'datos.fechaHasta' => ''
@@ -500,10 +509,16 @@ class ReportesController extends Controller
             // //->orderBy('created_at', 'asc')
             // ->get();
 
+            $idBancas = Branches::where(['status' => 1, 'idMoneda' => $datos['idMoneda']])->get();
+            $idBancas = collect($idBancas)->map(function($b){
+                return $b->id;
+            });
+
             $idVentas = Sales::select(DB::raw('sales.id'))
             ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
             ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('sales.status', [0,5])
+            ->whereIn('sales.idBanca', $idBancas)
             // ->groupBy('fecha')
             //->orderBy('created_at', 'asc')
             ->get();

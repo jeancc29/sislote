@@ -7,112 +7,65 @@
 
 
 <!-- Navbar  bg-info -->
-<nav class="navbar navbar-expand-lg mx-2 mb-2 d-none d-md-flex" id="navigation-example">
-        <div class="container-fluid">
-        <div class="navbar-wrapper">
-          
-            
-            <!-- <div class="navbar-minimize">
-              <button id="minimizeSidebar" class="btn btn-just-icon btn-white btn-fab btn-round">
-                  <i class="material-icons text_align-center visible-on-sidebar-regular">more_vert</i>
-                  <i class="material-icons design_bullet-list-67 visible-on-sidebar-mini">view_list</i>
-              </button>
-            </div> -->
-          
-            @if($usuario->tienePermiso("Jugar como cualquier banca"))
-              <div  class="col-5 m-0 p-0">
-                    <!-- o.descripcion disable when validarHora(o.horaCierre, o.descripcion) for o in datos.optionsLoterias track by o.id -->
-                            <select 
-                            id="multiselect2"
-                            ng-change="bancasChanged(datos.selectedBancas)"
-                                ng-model="datos.selectedBancas"
-                                ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
-                                class="selectpicker col-12" 
-                                data-style="select-with-transition" 
-                                title="Seleccionar loteria"
-                                data-size="7" aria-setsize="2">
-                            </select>
-                    </div>
-                @endif
 
-            <a href="#" class="navbar-brand font-weight-bold">
-                Ventas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.selectedBancas.ventasDelDia | currency}}</span>
-            </a>
-
-            <a href="#" class="navbar-brand font-weight-bold">
-                Tickets del dia: <span class="bg-info p-2 text-white rounded">@{{datos.selectedBancas.ticketsDelDia}}</span>
-            </a>
-
-                <!-- <a href="#" class="navbar-brand font-weight-bold">
-                   Ventas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.estadisticas_ventas.total | currency}}</span>
-                </a>
-                <a href="#" class="navbar-brand font-weight-bold">
-                   Jugadas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.estadisticas_ventas.total_jugadas | number:2}}</span>
-                </a> -->
-                <a href="#" class="navbar-brand font-weight-bold">
-                   Fecha: <span class="bg-secondary p-2 text-white rounded">@{{datos.fecha}}</span>
-                </a>
-
-                <!-- <a href="#" class="navbar-brand font-weight-bold">
-                    <small>Total jugadas</small>: 20000
-                </a> -->
-
-                <!-- <ul class="navbar-nav float-right">
-                <li class="nav-item">
-                    General
-                  </li>
-                  <li class="nav-item">
-                    General
-                  </li>
-                </ul> -->
-                
-            <!--            AQUI EMPIEZA          -->
-                     
-
-
-
-            <!--            AQUI TERMINA          -->
-
-
-
-            </div>
-
-            
-
-            <!-- <div class="navbar-toggle w-25">
-            <ul class="nav nav-pills float-right">
-                <li class="nav-item">
-                    General
-                  </li>
-                  <li class="nav-item ml-5">
-                    General
-                  </li>
-                </ul>
-            </div> -->
-
-           
-            <button style="display: block;" class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navigation-example">
-          <span class="sr-only">Toggle navigation</span>
-                <span class="navbar-toggler-icon icon-bar"></span>
-                <span class="navbar-toggler-icon icon-bar"></span>
-                <span class="navbar-toggler-icon icon-bar"></span>
-            </button>
-
-
-<!--             
-            <div class="collapse navbar-collapse justify-content-end">
-                
-            </div> -->
-        </div>
-    </nav>
-    <!-- End Navbar -->
     
 <!-- End Navbar -->
+
 
 
               
 
 <div class="content">
+<div class="row d-none d-md-flex">
+    <div class="col-md-12">
+        <div class="card mt-0 mb-2 p-0">
+            <div class="card-body">
+                <div class="row">
+                
+                    @if($usuario->tienePermiso("Jugar como cualquier banca"))
+                        <div   class="col-3 m-0 p-0">
+                        <!-- o.descripcion disable when validarHora(o.horaCierre, o.descripcion) for o in datos.optionsLoterias track by o.id -->
+                                <select 
+                                style="width:auto;"
+                                id="multiselect2"
+                                ng-change="bancasChanged(datos.selectedBancas)"
+                                    ng-model="datos.selectedBancas"
+                                    ng-options="getBancaMoneda(o) for o in datos.optionsBancas track by o.id"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Seleccionar loteria"
+                                    data-size="7" aria-setsize="2">
+                                </select>
+                        </div>
+                    @endif
+
+                    <a href="#" class="navbar-brand font-weight-bold" style="font-size: 16px; color: black">
+                        Ventas del dia: <span class="bg-info p-2 text-white rounded">@{{datos.selectedBancas.ventasDelDia | currency}}</span>
+                    </a>
+
+                    <a href="#" class="navbar-brand font-weight-bold" style="font-size: 16px; color: black">
+                        Tickets del dia: <span class="bg-info p-2 text-white rounded">@{{datos.selectedBancas.ticketsDelDia}}</span>
+                    </a>
+
+               
+                    <a href="#" class="navbar-brand font-weight-bold" style="font-size: 16px; color: black">
+                    Fecha: <span class="bg-secondary p-2 text-white rounded">@{{datos.fecha}}</span>
+                    </a>
+
+                    <button style="display: block;" class="navbar-toggler ml-auto" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navigation-example">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="navbar-toggler-icon icon-bar"></span>
+                        <span class="navbar-toggler-icon icon-bar mt-1"></span>
+                        <span class="navbar-toggler-icon icon-bar mt-1"></span>
+                    </button>
+                    
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+</div>
                       <!-- <div class="container-fluid"> -->
 <div class="">
     <div class="row d-none d-md-flex">
@@ -793,55 +746,42 @@
 
             <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 350px; max-height: 350px; width: 24.7%;"> <!-- min-height: 455px; max-height: 455px; -->
                 <div class="card-header card-header-info card-header-icon">
-                <div class="card-icon">
-                    <i class="material-icons">assignment</i>
-                </div>
-                <h4 class="card-title">Pick4</h4>
+                    <div class="card-icon">
+                        <i class="material-icons">assignment</i>
+                    </div>
+                    <h4 class="card-title">Pick4</h4>
                 </div>
                 <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
-                <div class="table-responsive">
-                    <table class="table table-fixed">
-                    <thead>
-                        <tr>
-                        <th class="font-weight-bold col-2 col-sm-3" style="font-size: 14px">LOT</th>
-                        <th class="font-weight-bold col-4" style="font-size: 14px">NUM</th>
-                        <th class="text-right font-weight-bold col-4 d-md-none d-lg-block" style="font-size: 14px">MONTO</th>
-                        <th class="text-right font-weight-bold col-4 d-md-block d-lg-none" style="font-size: 14px">MONT</th>
-                        <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
-                        </tr>
-                    </thead>
-                    <tbody class="">
-                        <tr ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight' || esPick3Pick4UOtro(c.jugada) == 'pick4Box'" ng-repeat="c in datos.jugadas ">
-                        <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
-                        <td class="col-4">
-                            @{{agregar_guion(c.jugada)}}
-                            <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Box'" class="text-danger font-weight-bold">B</small>
-                            <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight'" class="text-primary font-weight-bold">S</small>
-                        </td>
-                        <td class="text-right col-4">
-                            @{{c.monto}}
-                            <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
-                                    <i class="material-icons">close</i>
-                            </button>
-                        </td>
-                        <!-- <td class="td-actions text-center col-1">
-                            <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
-                                <i class="material-icons">close</i>
-                            </button>
-                            </td> -->
-                        </tr>
-                        
-                    </tbody>
-                    </table>
-                    <hr class="mb-0">
-                    
-                    <!-- <div class="float-right">
-                            <div style="font-size: 16px;" class="font-weight-bold">
-                                Total
-                                <small class="">&euro;0</small>
-                            </div>   
-                    </div> -->
-                </div>
+                    <div class="table-responsive">
+                        <table class="table table-fixed">
+                            <thead>
+                                <tr>
+                                <th class="font-weight-bold col-2 col-sm-3" style="font-size: 14px">LOT</th>
+                                <th class="font-weight-bold col-4" style="font-size: 14px">NUM</th>
+                                <th class="text-right font-weight-bold col-4 d-md-none d-lg-block" style="font-size: 14px">MONTO</th>
+                                <th class="text-right font-weight-bold col-4 d-md-block d-lg-none" style="font-size: 14px">MONT</th>
+                                <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
+                                </tr>
+                            </thead>
+                            <tbody class="">
+                                <tr ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight' || esPick3Pick4UOtro(c.jugada) == 'pick4Box'" ng-repeat="c in datos.jugadas ">
+                                    <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
+                                    <td class="col-4">
+                                        @{{agregar_guion(c.jugada)}}
+                                        <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Box'" class="text-danger font-weight-bold">B</small>
+                                        <small ng-if="esPick3Pick4UOtro(c.jugada) == 'pick4Straight'" class="text-primary font-weight-bold">S</small>
+                                    </td>
+                                    <td class="text-right col-4">
+                                        @{{c.monto}}
+                                        <button ng-click="jugada_eliminar(c.jugada, c.idLoteria)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link m-0 p-0 d-inline ">
+                                                <i class="material-icons">close</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <hr class="mb-0">
+                    </div>
                     <div class="float-right">
                             <div style="font-size: 16px;" class="font-weight-bold">
                                 Total

@@ -29,6 +29,7 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Coins;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -66,7 +67,8 @@ class EntityController extends Controller
     
         return Response::json([
             'entidades' => EntityResource::collection(Entity::whereIn('status', [1,0])->get()),
-            'tipos' => Types::whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
+            'tipos' => Types::whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get(),
+            'monedas' => Coins::all()
         ], 201);
     }
 
@@ -92,7 +94,8 @@ class EntityController extends Controller
             'datos.id' => 'required',
             'datos.nombre' => 'required',
             'datos.status' => 'required',
-            'datos.idTipo' => 'required'
+            'datos.idTipo' => 'required',
+            'datos.idMoneda' => '',
     
         ])['datos'];
 
@@ -103,12 +106,14 @@ class EntityController extends Controller
             $entidad->nombre = $datos['nombre'];
             $entidad->status = $datos['status'];
             $entidad->idTipo = $datos['idTipo'];
+            $entidad->idMoneda = $datos['idMoneda'];
             $entidad->save();
         }else{
             Entity::create([
                 'nombre' => $datos['nombre'],
                 'status' => $datos['status'],
-                'idTipo' => $datos['idTipo']
+                'idTipo' => $datos['idTipo'],
+                'idMoneda' => $datos['idMoneda']
             ]);
         }
     

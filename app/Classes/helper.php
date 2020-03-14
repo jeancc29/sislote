@@ -1806,4 +1806,14 @@ class Helper{
         return DB::select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
     }
 
+    public static function getEquivalenciaDeUnDolar($idBanca){
+        $idMoneda = Branches::whereId($idBanca)->first();
+        if($idMoneda == null){
+            return 1; //porque cantidad / 1 == cantidad...
+        }else{
+            $moneda = Coins::whereId($idMoneda)->first();
+            return ($moneda != null) ? $moneda->equivalenciaDeUnDolar : 1;
+        }
+    }
+
 }

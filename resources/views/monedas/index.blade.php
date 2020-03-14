@@ -60,7 +60,7 @@
 
              <div class="col-6">
               <h3 class="card-title">
-                Entidades
+                Monedas
               </h3>
             </div>
             </div>
@@ -87,111 +87,83 @@
                 <div class="row justify-content-center">
   
                 <form novalidate>
-
-                
-
                   <div class="col-12 col-md-10 mt-5">
-
-                  <div class="row">
+                    <div class="row">
                       
-                      <div class="col-9">
-                      <div class="input-group form-control-lg">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i class="material-icons">face</i>
-                        </span>
-                      </div>
-                      <div class="form-group">
-                        <label for="descripcion" class="bmd-label-floating">Nombre</label>
-                        <input ng-model="datos.nombre" class="form-control" id="nombre" name="nombre">
-                      </div>
-                    </div>
-
-                      </div>
-
-                      <div class="col-2">
-                        <div class="input-group form-control-lg">
-                            <div class="form-group">
-                              <div class="form-check">
-                                <label class="form-check-label">
-                                  <input ng-model="datos.status" class="form-check-input" type="checkbox" value="" checked> Activa
-                                  <span class="form-check-sign">
-                                    <span class="check"></span>
-                                  </span>
-                                </label>
-                              </div>
+                        <div class="col-12">
+                            <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                    <i class="material-icons">face</i>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descripcion" class="bmd-label-floating">Moneda</label>
+                                    <input ng-model="datos.descripcion" class="form-control" id="descripcion" name="descripcion">
+                                </div>
                             </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                    <i class="material-icons">face</i>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descripcion" class="bmd-label-floating">Abreviatura</label>
+                                    <input ng-model="datos.abreviatura" class="form-control" id="abreviatura" name="abreviatura">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                    <i class="material-icons">face</i>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descripcion" class="bmd-label-floating">Equivalencia de un dolar</label>
+                                    <input type="number" ng-model="datos.equivalenciaDeUnDolar" class="form-control" id="equivalenciaDeUnDolar" name="equivalenciaDeUnDolar">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="input-group form-control-lg">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                    <i class="material-icons">face</i>
+                                    </span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descripcion" class="bmd-label-floating font-weight-bold" style="color: black;">Color</label>
+                                    <input type="color" ng-model="datos.color" class="form-control" id="color" name="color">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div class="input-group form-control-lg">
+                                <div class="form-group">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input ng-model="datos.permiteDecimales" class="form-check-input" type="checkbox" value="" checked> Permite decimales
+                                            <span class="form-check-sign">
+                                                <span class="check"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
                           </div>
-                      </div>
+                        </div>
 
                     </div> <!-- END ROW DESCRIPCION Y ESTATUS -->
 
-                    
-                   
-
-                    
-
-
-                    <div class="row">
-                      <div class="col-12">
-                        <style>
-                            .dropdown-menu{
-                                width: 100%;
-                            }
-                        </style>
-                            
-                        <div class="input-group form-control-lg">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                  <i class="">Tipo</i>
-                                </span>
-                            </div>
-                            <div class="form-group">
-                                <select 
-                                    ng-model="datos.selectedTipo"
-                                    ng-options="o.descripcion for o in datos.optionsTipos"
-                                    class="selectpicker w-100" 
-                                    data-style="select-with-transition" 
-                                    title="Select Usuario">
-                              </select>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div ng-show="datos.selectedTipo.descripcion == 'Banco'" class="row">
-                      <div class="col-12">
-                        <style>
-                            .dropdown-menu{
-                                width: 100%;
-                            }
-                        </style>
-                            
-                        <div class="input-group form-control-lg">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                  <i class="">Moneda</i>
-                                </span>
-                            </div>
-                            <div class="form-group">
-                                <select 
-                                    ng-model="datos.selectedMoneda"
-                                    ng-options="o.descripcion for o in datos.optionsMonedas"
-                                    class="selectpicker w-100" 
-                                    data-style="select-with-transition" 
-                                    title="Select Usuario">
-                              </select>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-
-
                   </div>
-                 
-               
-
-
                 </form>
                  
                 </div>
@@ -201,16 +173,8 @@
           </div>
           <div class="card-footer">
             <div ng-show="!mostrarBloqueosJugadas" class="row justify-content-end w-100">
-              <input ng-click="actualizar()" type="button" class="btn btn-info " name="guardar" value="Guardar">
+                <input ng-click="actualizar()" type="button" class="btn btn-info " name="guardar" value="Guardar">
             </div>
-            <!-- <div class="mr-auto">
-              <input type="button" class="btn btn-previous btn-fill btn-default btn-wd disabled" name="previous" value="Previous">
-            </div>
-            <div class="ml-auto">
-              <input type="button" class="btn btn-next btn-fill btn-rose btn-wd" name="next" value="Next">
-              <input type="button" class="btn btn-finish btn-fill btn-rose btn-wd" name="finish" value="Finish" style="display: none;">
-            </div>
-            <div class="clearfix"></div> -->
           </div>
         </form>
       </div>
@@ -238,25 +202,32 @@
         <div class="card-body ">
           <div class="row justify-content-end">
             <!-- .abrir-wizard la uso en el archivo demo.js para obtener los datos reales del wizard al momento de quitarle el display none -->
-            <a ng-click="editar(true, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva loteria</a>
+            <a ng-click="editar(true, {})" id="abrir-wizard-nuevo" class="btn btn-success text-white">Nueva moneda</a>
           </div>
           <table class="table table-sm table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Entidad</th>
-                <th scope="col">Tipo</th>
-                <!-- <th scope="col">Hora cierre</th> -->
-                <th scope="col">Editar</th>
+                <th class="text-center" scope="col">Moneda</th>
+                <th class="text-center" scope="col">Abreviatura</th>
+                <!-- <th class="text-center" scope="col">Hora cierre</th> -->
+                <th class="text-center" scope="col">Equivalencia USD</th>
+                <th class="text-center" scope="col">Por defecto</th>
+                <th class="text-center" scope="col">Editar</th>
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="l in datos.entidades">
+              <tr ng-repeat="l in datos.monedas">
                 <th scope="row">@{{$index + 1}}</th>
-                <td>@{{l.nombre}}</td>
-                <td>@{{l.tipo.descripcion}}</td>
-                <!-- <td>@{{l.horaCierre}}</td> -->
-                <td>
+                <td class="text-center">@{{l.descripcion}}</td>
+                <td class="text-center font-weight-bold" style="color: @{{l.color}}">@{{l.abreviatura}}</td>
+                <td class="text-center">@{{l.equivalenciaDeUnDolar}}</td>
+                <td class="text-center">
+                  <a ng-if="l.pordefecto == 1" style="cursor: pointer" class="d-inline ml-2 py-1  rounded abrir-wizard-editar"><i class="material-icons">radio_button_checked</i></a>
+                  <a ng-if="l.pordefecto == 0" style="cursor: pointer" ng-click="pordefecto(l)" class="ion-android-delete d-inline  ml-2  py-1  rounded"><i class="material-icons">radio_button_unchecked</i></a>
+                </td>
+                <!-- <td class="text-center">@{{l.horaCierre}}</td> -->
+                <td class="text-center">
                   <a style="cursor: pointer" ng-click="editar(false, l)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
                   <a style="cursor: pointer" ng-click="eliminar(l)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
                 </td>

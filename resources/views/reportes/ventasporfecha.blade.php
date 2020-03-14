@@ -66,13 +66,13 @@
 
                     <div class="col-12 ">
                         <div class="row">
-                        <div class="col-sm-3 mt-4">
+                        <div class="col-sm-2 mt-4">
                             <div id="fechaBusqueda" class="form-group">
                             <label for="fechaBusqueda" class="bmd-label-floating font-weight-bold" style="color: black;">Desde</label>
                             <input ng-model="datos.fechaDesde" id="fechaBusquedaDesde" type="date" class="form-control" required>
                             </div>
                         </div>
-                        <div class="col-sm-3 mt-4">
+                        <div class="col-sm-2 mt-4">
                             <div id="fechaBusqueda" class="form-group">
                             <label for="fechaBusqueda" class="bmd-label-floating font-weight-bold" style="color: black;">Hasta</label>
                             <input ng-model="datos.fechaHasta" id="fechaBusquedaHasta" type="date" class="form-control" required>
@@ -95,7 +95,7 @@
                                       ng-options="o.descripcion for o in datos.optionsBancas track by o.id"
                                       class="selectpicker col-12" 
                                       data-style="select-with-transition" 
-                                       title="Seleccionar dias"
+                                       title="Seleccionar banca"
                                        multiple
                                        id="multiselect"
                                       data-size="7" aria-setsize="2">
@@ -103,6 +103,23 @@
                               <!-- </div> -->
                             </div> <!-- END INPUT GROUP -->
                           </div>
+
+                          <div class="col-3">
+                                <div class="input-group ">
+                                <label  for="jugada" class="bmd-label-floating font-weight-bold ml-4" style="color: black;">Moneda</label>
+                                <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                               -->
+                                    <div  class=" col-sm-12 col-12">
+                                        <select 
+                                            ng-change="cbxMonedasChanged()"
+                                            ng-model="selectedMoneda"
+                                            ng-options="o.descripcion for o in optionsMonedas"
+                                            class="selectpicker col-12" 
+                                            data-style="select-with-transition" 
+                                            title="Seleccionar moneda">
+                                        </select>
+                                    </div>
+                                </div> <!-- END INPUT GROUP -->
+                            </div>
 
                           <div class="col-2 text-center mt-4">
                           <style>
@@ -194,11 +211,11 @@
                             <tr>
                                 
                                 <td class="text-center font-weight-bold">TOTAL:</td>
-                                <td class="text-center font-weight-bold">@{{totalVentas | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalPremios | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalComisiones | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalDescuentos | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalNeto | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalVentas | currency:monedaAbreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalPremios | currency:monedaAbreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalComisiones | currency:monedaAbreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalDescuentos | currency:monedaAbreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalNeto | currency:monedaAbreviatura}}</td>
                             </tr>
                             
                         </tbody>

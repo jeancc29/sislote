@@ -80,8 +80,6 @@ myApp
                         $scope.datos.optionsTipoEntidad = response.data.entidades;
                         $scope.datos.optionsTipos = response.data.tipos;
                         $scope.datos.optionsUsuarios = response.data.usuarios;
-                        
-                        
 
                         var na = {};
                         na.id = 0;

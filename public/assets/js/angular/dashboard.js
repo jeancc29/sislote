@@ -35,7 +35,8 @@ myApp
         $scope.datos =  {
             "loteriasJugadasDashboard":[],
             "selectedLoteria" : {},
-            'fecha' : new Date()
+            'fecha' : new Date(),
+            'idMoneda' : 0
         }
 
         
@@ -63,7 +64,7 @@ myApp
             var fecha = $scope.datos.fecha.getFullYear() + '-' + helperService.to2Digitos($scope.datos.fecha.getMonth() + 1) + '-' + helperService.to2Digitos($scope.datos.fecha.getDate());
             // console.log('Bancas: ', $scope.datos.fecha.getDate(), ' completa:', $scope.datos.fecha);
             $scope.cargando = true;
-            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
+            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal + "&idMoneda=" + $scope.datos.idMoneda)
              .then(function(response){
                 $scope.cargando = false;
                  $scope.ventasGrafica = response.data.ventasGrafica;
@@ -77,12 +78,17 @@ myApp
                  $scope.totalVentasLoterias = response.data.totalVentasLoterias;
                  $scope.totalPremiosLoterias = response.data.totalPremiosLoterias;
                  $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
+                 $scope.optionsMonedas = response.data.monedas;
+                 $scope.selectedMoneda = $scope.optionsMonedas[0];
+                 $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
+                 $scope.monedaColor = $scope.selectedMoneda.color;
                  
-                console.log('Bancas: ', $scope.loteriasJugadasDashboard);
+                console.log('Bancas: ', $scope.optionsMonedas);
                 
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
                     //$('#multiselect').selectpicker('val', []);
+                    $('.selectpicker').selectpicker("refresh");
                     crearGrafica();
                   })
                 
@@ -110,8 +116,10 @@ myApp
             var fecha = $scope.datos.fecha.getFullYear() + '-' + helperService.to2Digitos($scope.datos.fecha.getMonth() + 1) + '-' + helperService.to2Digitos($scope.datos.fecha.getDate());
             // console.log('Bancas: ', $scope.datos.fecha.getDate(), ' completa:', $scope.datos.fecha);
             // $("#modal-cargando").modal("toggle");
+            $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
+            $scope.monedaColor = $scope.selectedMoneda.color;
            $scope.cargandoOnFechaChanged = true;
-            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal)
+            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal + "&idMoneda=" + $scope.selectedMoneda.id)
              .then(function(response){
                 
                 
@@ -127,7 +135,10 @@ myApp
                  $scope.totalPremiosLoterias = response.data.totalPremiosLoterias;
                  $scope.loteriasJugadasDashboard = response.data.loteriasJugadasDashboard;
 
-                console.log('Bancas: ', $scope.ventasGrafica);
+                 if(!helperService.empty($scope.loteriasJugadasDashboard, "object"))
+                    $scope.cambiarLoteria($scope.loteriasJugadasDashboard[0])
+
+                console.log('Bancas: ', $scope.loteriasJugadasDashboard);
                 $scope.cargandoOnFechaChanged = false;
             });
         }

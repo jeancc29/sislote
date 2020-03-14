@@ -31,6 +31,7 @@ use App\Roles;
 use App\Commissions;
 use App\Permissions;
 use App\Types;
+use App\Coins;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -62,7 +63,9 @@ class BalancesController extends Controller
             if(!$usuario->tienePermiso("Ver lista de balances de bancas") == true){
                 return redirect()->route('principal');
             }
-            return view('balances.index', compact('controlador', 'usuario'));
+
+            $monedas = Coins::orderBy('pordefecto', 1)->get();
+            return view('balances.index', compact('controlador', 'usuario', 'monedas'));
         }
 
 
@@ -80,17 +83,20 @@ class BalancesController extends Controller
         }
 
         $bancas = DB::table('branches')
-            ->select('branches.id', 'branches.descripcion', 'branches.dueno', 'users.usuario')
+            ->select('branches.id', 'branches.descripcion', 'branches.idMoneda', 'branches.dueno', 'users.usuario')
             ->join('users', 'branches.idUsuario', '=', 'users.id')
             ->where('branches.status', 1)->get();
         
         $bancas = collect($bancas)->map(function($b) use($datos){
-            return ['descripcion' => $b->descripcion, 'dueno' => $b->dueno, 'usuario' => $b->usuario, 'balance' => Helper::saldoPorFecha($b->id, 1, $datos['fechaHasta']), 'prestamo' => 0];
+            return ['descripcion' => $b->descripcion, 'idMoneda' => $b->idMoneda, 'dueno' => $b->dueno, 'usuario' => $b->usuario, 'balance' => Helper::saldoPorFecha($b->id, 1, $datos['fechaHasta']), 'prestamo' => 0];
         });
+
+        $monedas = Coins::orderBy('pordefecto', 1)->get();
 
         return Response::json([
             'errores' => 0,
-            'bancas' => $bancas
+            'bancas' => $bancas,
+            'monedas' => $monedas,
         ], 201);
     }
 

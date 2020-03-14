@@ -35,6 +35,7 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Coins;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -224,7 +225,7 @@ class DashboardController extends Controller
             $sorteos = Draws::all();
 
             //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
-            $dashboard = new DashboardClass(null, session("idUsuario"));
+            $dashboard = new DashboardClass(null, session("idUsuario"), null);
             $ventasGrafica = $dashboard->ventasGrafica();
             
             //VENTAS Y PREMIOS AGRUPADOS POR LOTERIA
@@ -255,14 +256,15 @@ class DashboardController extends Controller
         else{
             $datos = request()->validate([
                 'fecha' => 'required',
-                'idUsuario' => 'required'
+                'idUsuario' => 'required',
+                'idMoneda' => 'required'
             ]);
 
             
             $sorteos = Draws::all();
 
             //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
-            $dashboard = new DashboardClass($datos['fecha'], $datos['idUsuario']);
+            $dashboard = new DashboardClass($datos['fecha'], $datos['idUsuario'], $datos['idMoneda']);
             $ventasGrafica = $dashboard->ventasGrafica();
             
             //VENTAS Y PREMIOS AGRUPADOS POR LOTERIA
@@ -299,6 +301,7 @@ class DashboardController extends Controller
                 'totalVentasLoterias' => $totalVentasLoterias,
                 'totalPremiosLoterias' => $totalPremiosLoterias,
                 'loteriasJugadasDashboard' => $loteriasJugadasDashboard,
+                'monedas' => Coins::orderBy('pordefecto', 1)->get()
             ], 201);
         }
     }

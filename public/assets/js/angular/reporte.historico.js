@@ -67,16 +67,14 @@ myApp
         
     }
         $scope.inicializarDatos = function(response = null){
-
-            
-           //console.log('bancasGlobal', bancasGlobal);
             
             $scope.datos.bancas = bancasGlobal;
             $scope.datos.optionsLoterias = loteriasGlobal;
             $scope.datos.optionsSorteos = sorteosGlobal;
             
-
             $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
+            $scope.optionsMonedas = monedasGlobal;
+            $scope.selectedMoneda = $scope.optionsMonedas[0];
             // $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
             // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
             
@@ -87,34 +85,21 @@ myApp
                 $('.selectpicker').selectpicker("refresh");
                 //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
               })
-
-           
        
         }
         
-
         $scope.load = function(codigo_usuario, ROOT_PATH, idBanca = 1){
             
             ruta = ROOT_PATH;
             console.log('ROOT_PATH: ', ruta);
             $scope.inicializarDatos();
 
-          $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
-          $scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
+            $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
+            $scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
 
-          var a = new Hola("Jean", "Contreras");
-          console.log('clase: ', ruta);
+            var a = new Hola("Jean", "Contreras");
+            console.log('clase: ', monedasGlobal);
         }
-
-
-
-      
-     
-
-
-  
-  
-     
 
       
         $scope.calcularTotal = function(){
@@ -133,7 +118,6 @@ myApp
                
              });
 
-
             $scope.datos.totalTickets = totalTickets;
             $scope.datos.totalVentas = totalVentas;
             $scope.datos.totalComisiones = totalComisiones;
@@ -143,8 +127,6 @@ myApp
             $scope.datos.totalBalance = totalBalance;
             $scope.datos.totalBalanceActual = totalBalanceActual;
             $scope.datos.totalcaidaAcumulada = totalcaidaAcumulada;
-
-           
         
         }
 
@@ -184,29 +166,24 @@ myApp
 
        
         $scope.buscar = function(){
-
-           
             
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.layout = 'Principal';
 
+            $http.post(rutaGlobal+"/api/reportes/historico", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
+                .then(function(response){
+                    console.log('monitoreo ',response);
+                    // if(response.data.errores == 0){
 
-            
+                        $scope.datos.bancas = response.data.bancas;
+                        $scope.calcularTotal();
+                        
+                    // }else{
+                    //     alert(response.data.mensaje);
+                    //     return;
+                    // }
 
-          $http.post(rutaGlobal+"/api/reportes/historico", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
-             .then(function(response){
-                console.log('monitoreo ',response);
-                // if(response.data.errores == 0){
-
-                    $scope.datos.bancas = response.data.bancas;
-                    $scope.calcularTotal();
-                    
-                // }else{
-                //     alert(response.data.mensaje);
-                //     return;
-                // }
-
-            });
+                });
 
         }
 
@@ -292,16 +269,16 @@ myApp
                 if(helperService.empty($scope.datos.descripcionBanca, 'string') == true){
                     var mostrar = false;
                     if($scope.datos.accionBusqueda == "con premios"){
-                        mostrar = item['premios'] > 0;
+                        mostrar = item['premios'] > 0 && item['idMoneda'] == $scope.selectedMoneda.id;
                     }
                     else if($scope.datos.accionBusqueda == "con ventas"){
-                        mostrar = item['ventas'] > 0;
+                        mostrar = item['ventas'] > 0 && item['idMoneda'] == $scope.selectedMoneda.id;
                     }
                     else if($scope.datos.accionBusqueda == "con tickets pendientes"){
-                        mostrar = item['ticketsPendientes'] > 0;
+                        mostrar = item['ticketsPendientes'] > 0 && item['idMoneda'] == $scope.selectedMoneda.id;
                     }
                     else{
-                        mostrar = true;
+                        mostrar = item['idMoneda'] == $scope.selectedMoneda.id;
                     }
 
                     if(mostrar == true){
@@ -325,13 +302,13 @@ myApp
                     var mostrar = false;
 
                     if($scope.datos.accionBusqueda == "con premios")
-                        mostrar = item['premios'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['premios'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1 && item['idMoneda'] == $scope.selectedMoneda.id;
                     else if($scope.datos.accionBusqueda == "con ventas" )
-                        mostrar = item['ventas'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['ventas'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1 && item['idMoneda'] == $scope.selectedMoneda.id;
                     else if($scope.datos.accionBusqueda == "con tickets pendientes")
-                        mostrar = item['ticketsPendientes'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['ticketsPendientes'] > 0 && item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1 && item['idMoneda'] == $scope.selectedMoneda.id;
                     else
-                        mostrar = item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1;
+                        mostrar = item['descripcion'].indexOf($scope.datos.descripcionBanca.toUpperCase()) != -1 && item['idMoneda'] == $scope.selectedMoneda.id;
                     
                         if(mostrar == true){
                             $scope.totalGanadores += Number(item.ganadores);

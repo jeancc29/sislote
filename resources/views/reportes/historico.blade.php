@@ -80,7 +80,7 @@
                         </div>
                         
 
-                      
+                        
 
 
                         <div class="form-group col-sm-3">
@@ -103,12 +103,28 @@
 
                     <div class="col-12">
                        <div class="row">
-                       <div class="col-sm-3">
-                            <div class="form-group">
-                            <label for="numeroTicketBusqueda" class="bmd-label-floating">Filtrar</label>
-                            <input ng-keyup="inputDescripcionBancaKeyUp()" ng-model="datos.descripcionBanca" id="numeroTicketBusqueda" type="text" class="form-control" required>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="numeroTicketBusqueda" class="bmd-label-floating">Filtrar</label>
+                                    <input ng-keyup="inputDescripcionBancaKeyUp()" ng-model="datos.descripcionBanca" id="numeroTicketBusqueda" type="text" class="form-control" required>
+                                </div>
                             </div>
-                        </div>
+                            <div class="col-5 ">
+                                <div class="input-group ">
+                                <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                               -->
+                                    <div  class=" col-sm-12 col-10">
+                                        <select 
+                                            ng-change="cbxTipoBloqueosJugadaChanged()"
+                                            ng-model="selectedMoneda"
+                                            ng-options="o.descripcion for o in optionsMonedas"
+                                            class="selectpicker col-12" 
+                                            data-style="select-with-transition" 
+                                            title="Seleccionar moneda">
+                                        </select>
+                                    </div>
+                                </div> <!-- END INPUT GROUP -->
+                            </div>
+
                        </div>
                         
                     </div>
@@ -151,14 +167,14 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.perdedores}}</td>
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{Cerrado}}</td> -->
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.tickets}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.ventas | currency}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.comisiones | currency}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descuentos | currency}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.premios | currency}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto | currency}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balance | currency}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.balanceActual >= 0), 'bg-mal text-mal': (c.balanceActual < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balanceActual | currency}}</td>
-                                <td ng-class="{'bg-bien text-bien': (c.caidaAcumulada >= 0), 'bg-mal text-mal': (c.caidaAcumulada < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.caidaAcumulada | currency}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.ventas | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.comisiones | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.descuentos | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 13px">@{{c.premios | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.totalNeto >= 0), 'bg-mal text-mal': (c.totalNeto < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.totalNeto | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.balance >= 0), 'bg-mal text-mal': (c.balance < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balance | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.balanceActual >= 0), 'bg-mal text-mal': (c.balanceActual < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.balanceActual | currency:selectedMoneda.abreviatura}}</td>
+                                <td ng-class="{'bg-bien text-bien': (c.caidaAcumulada >= 0), 'bg-mal text-mal': (c.caidaAcumulada < 0)}" ng-click="seleccionarTicket(c)" scope="col" class="text-center font-weight-bold" style="font-size: 13px">@{{c.caidaAcumulada | currency:selectedMoneda.abreviatura}}</td>
                             </tr>
                             <tr>
                                 <td colspan="1"></td>
@@ -167,14 +183,14 @@
                                 <td class="text-center font-weight-bold">@{{totalGanadores}}</td>
                                 <td class="text-center font-weight-bold">@{{totalPerdedores}}</td>
                                 <td class="text-center font-weight-bold">@{{totalTickets}}</td>
-                                <td class="text-center font-weight-bold">@{{totalVentas | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalComisiones | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalDescuentos | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalPremios | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalTotalNeto | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalBalance | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalBalanceActual | currency}}</td>
-                                <td class="text-center font-weight-bold">@{{totalcaidaAcumulada | currency}}</td>
+                                <td class="text-center font-weight-bold">@{{totalVentas | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalComisiones | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalDescuentos | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalPremios | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalTotalNeto | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalBalance | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalBalanceActual | currency:selectedMoneda.abreviatura}}</td>
+                                <td class="text-center font-weight-bold">@{{totalcaidaAcumulada | currency:selectedMoneda.abreviatura}}</td>
                                 
                             </tr>
                             

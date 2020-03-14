@@ -39,6 +39,7 @@ use App\Transactionscheduled;
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
 use App\Http\Resources\BranchesResource;
+use App\Http\Resources\BranchesResourceSmall;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 use App\Http\Resources\EntityResource;
@@ -220,7 +221,7 @@ class TransactionsController extends Controller
         
     
         return Response::json([
-            'bancas' => Branches::whereStatus(1)->get(),
+            'bancas' => BranchesResourceSmall::collection(Branches::whereStatus(1)->get()),
             'entidades' => Entity::whereStatus(1)->get(),
             'tipos' => Types::whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago', 'Descuento dias no laborados'])->get(),
             'grupos' => TransactionsgroupsResource::collection($t)

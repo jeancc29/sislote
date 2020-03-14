@@ -16,13 +16,14 @@ myApp
             "horaCierre": moment().format('YYYY/MM/DD'),
             "optionsTipos": [],
             "selectedTipo" : {},
+            "optionsMonedas": [],
+            "selectedMoneda" : {},
             "mostrarFormEditar" : false
         }
 
         function limpiar(){
             $scope.datos.id = 0;
             $scope.datos.nombre = null;
-            $scope.datos.status = true;
             $scope.datos.status = true;
            // $scope.datos.selectedTipo = $scope.datos.optionsTipos[0];
         }
@@ -58,6 +59,8 @@ myApp
                         $scope.datos.entidades = response.data.entidades;
                         $scope.datos.optionsTipos = response.data.tipos;
                         $scope.datos.selectedTipo = $scope.datos.optionsTipos[0];
+                        $scope.datos.optionsMonedas = response.data.monedas;
+                        $scope.datos.selectedMoneda = $scope.datos.optionsMonedas[0];
                         console.log('entidad : ',  $scope.datos.optionsTipos);
 
                         limpiar();
@@ -67,7 +70,6 @@ myApp
                             $('.selectpicker').selectpicker("refresh");
                             
                           })
-
                         
                     });
             }
@@ -85,7 +87,6 @@ myApp
 
         $scope.editar = function(esNuevo, d){
             
-            
             console.log('editar: ', d, ' es nuevo: ', esNuevo);
 
             if(esNuevo){
@@ -100,14 +101,20 @@ myApp
                 if($scope.datos.optionsTipos.find(x => x.id == d.tipo.id) != undefined)
                     idx = $scope.datos.optionsTipos.findIndex(x => x.id == d.tipo.id);
                 $scope.datos.selectedTipo = $scope.datos.optionsTipos[idx];
+
+                console.log('idMoneda:', d);
+
+                if($scope.datos.optionsMonedas.find(x => x.id == d.idMoneda) != undefined){
+                    idx = $scope.datos.optionsMonedas.findIndex(x => x.id == d.idMoneda);
+                    $scope.datos.selectedMoneda = $scope.datos.optionsMonedas[idx];
+                }
+
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
                     $('.selectpicker').selectpicker("refresh");
                     
                   })
             }
-
-            
 
             $scope.datos.mostrarFormEditar = true;
         }
@@ -116,8 +123,6 @@ myApp
 
         $scope.actualizar = function(){
          
-            
-
             console.log('primera: ',Number($scope.datos.primera));
 
             if($scope.datos.nombre == undefined || $scope.datos.nombre == ""){
@@ -128,30 +133,26 @@ myApp
                 alert("Debe seleccionar un tipo de entidad");
                 return;
             }
-
-           
-            
-
-
+            if(Object.keys($scope.datos.optionsMonedas).length == 0){
+                alert("Debe seleccionar una moneda");
+                return;
+            }
 
             $scope.datos.status = ($scope.datos.status) ? 1 : 0;
             $scope.datos.idTipo = $scope.datos.selectedTipo.id; 
+            $scope.datos.idMoneda = $scope.datos.selectedMoneda.id; 
 
-          $http.post(rutaGlobal+"/api/entidades/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
-             .then(function(response){
-                 console.log(response.data);
-                if(response.data.errores == 0){
-                    alert("Se ha guardado correctamente");
-                    if($scope.datos.id == 0)
+            $http.post(rutaGlobal+"/api/entidades/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+                .then(function(response){
+                    console.log(response.data);
+                    if(response.data.errores == 0){
+                        alert("Se ha guardado correctamente");
                         $scope.inicializarDatos(response);
-                    else{
-                        $scope.inicializarDatos(response);
-                        $scope.datos.status = ($scope.datos.status == 1) ? true : false;
+                        $scope.datos.mostrarFormEditar = false;
+                    }else{
+                        alert(response.data.mensaje);
                     }
-                }else{
-                    alert(response.data.mensaje);
-                }
-            });
+                });
         
 
         }

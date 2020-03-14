@@ -601,6 +601,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
             
 	select JSON_ARRAYAGG(JSON_OBJECT(
 				'id', b.id, 'descripcion', b.descripcion,
+                'monedaAbreviatura', (select c.abreviatura from coins c where c.id = b.idMoneda),
                 'codigo', b.codigo,
                 'status', b.status,
                 'descontar', b.descontar,

@@ -170,20 +170,29 @@
                       </div>
                       <div class="form-group">
                         <select 
-                            ng-model="datos.selectedUsuario"
-                            ng-options="o.nombres for o in datos.optionsUsuarios"
-                            class="selectpicker col-12" 
-                            data-style="select-with-transition" 
-                            title="Select Usuario">
-                        <!-- <option value="Afghanistan"> Afghanistan </option>
-                        <option value="Albania"> Albania </option>
-                        <option value="Algeria"> Algeria </option>
-                        <option value="American Samoa"> American Samoa </option>
-                        <option value="Andorra"> Andorra </option>
-                        <option value="Angola"> Angola </option>
-                        <option value="Anguilla"> Anguilla </option>
-                        <option value="Antarctica"> Antarctica </option> -->
-                      </select>
+                              ng-model="datos.selectedUsuario"
+                              ng-options="o.nombres for o in datos.optionsUsuarios"
+                              class="selectpicker col-12" 
+                              data-style="select-with-transition" 
+                              title="Select Usuario">
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="input-group form-control-lg">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="material-icons">attach_money</i>
+                        </span>
+                      </div>
+                      <div class="form-group">
+                        <select 
+                              ng-model="datos.selectedMoneda"
+                              ng-options="o.descripcion for o in datos.optionsMonedas"
+                              class="selectpicker col-12" 
+                              data-style="select-with-transition" 
+                              title="Select moneda">
+                        </select>
                       </div>
                     </div>
 

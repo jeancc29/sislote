@@ -3,7 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Coins;
-use Illuminate\Http\Request;
+use Request;
+
+use Illuminate\Support\Facades\Route; 
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\DB;
+
+
+use Faker\Generator as Faker;
+use App\Generals;
+use App\Sales;
+use App\Salesdetails;
+use App\Blockslotteries;
+use App\Blocksplays;
+use App\Stock;
+use App\Tickets;
+use App\Cancellations;
+use App\Days;
+use App\Payscombinations;
+use App\Awards;
+use App\Draws;
+use App\Branches;
+use App\Users;
+use App\Roles;
+use App\Commissions;
+use App\Permissions;
+
+use App\Http\Resources\LotteriesResource;
+use App\Http\Resources\SalesResource;
+use App\Http\Resources\BranchesResource;
+use App\Http\Resources\RolesResource;
+use App\Http\Resources\UsersResource;
+use App\Http\Resources\EntityResource;
+
+use Illuminate\Support\Facades\Crypt;
 
 class CoinsController extends Controller
 {
@@ -14,7 +47,40 @@ class CoinsController extends Controller
      */
     public function index()
     {
-        //
+        $controlador = Route::getCurrentRoute()->getName(); 
+        if(!strpos(Request::url(), '/api/')){
+            return view('monedas.index', compact('controlador'));
+        }
+
+        $fechaActual = strtotime(date("d-m-Y H:i:00",time()));
+        // $fechaActual = strtotime($fechaActual['mday'] . ' ' . $fechaActual['month'].' '.$fechaActual['year'] . ' ' . time() );
+    
+        return Response::json([
+            'monedas' => Coins::all(),
+        ], 201);
+    }
+
+    public function pordefecto(Coins $coins)
+    {
+        $datos = request()->validate([
+            'datos.id' => 'required'
+        ])['datos'];
+
+        Coins::where('id', '>', 0)->update(['pordefecto' => 0]);
+        $coin = Coins::whereId($datos['id'])->first();
+        $coin->pordefecto = 1;
+        $coin->save();
+
+        // if($entidad != null){
+        //     $entidad->status = 2;
+        //     $entidad->save();
+        // }
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha establecido por defecto correctamente',
+            'monedas' => Coins::all(),
+        ], 201);
     }
 
     /**
@@ -35,7 +101,39 @@ class CoinsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $datos = request()->validate([
+            'datos.id' => 'required',
+            'datos.descripcion' => 'required',
+            'datos.abreviatura' => 'required',
+            'datos.permiteDecimales' => 'required',
+            'datos.equivalenciaDeUnDolar' => 'required',
+            'datos.color' => 'required',
+        ])['datos'];
+
+        $entidad = Coins::whereId($datos['id'])->first();
+
+        if($entidad != null){
+            $entidad->descripcion = $datos['descripcion'];
+            $entidad->abreviatura = $datos['abreviatura'];
+            $entidad->permiteDecimales = $datos['permiteDecimales'];
+            $entidad->equivalenciaDeUnDolar = $datos['equivalenciaDeUnDolar'];
+            $entidad->color = $datos['color'];
+            $entidad->save();
+        }else{
+            Coins::create([
+                'descripcion' => $datos['descripcion'],
+                'abreviatura' => $datos['abreviatura'],
+                'permiteDecimales' => $datos['permiteDecimales'],
+                'equivalenciaDeUnDolar' => $datos['equivalenciaDeUnDolar'],
+                'color' => $datos['color']
+            ]);
+        }
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'monedas' => Coins::all(),
+        ], 201);
     }
 
     /**
@@ -80,6 +178,21 @@ class CoinsController extends Controller
      */
     public function destroy(Coins $coins)
     {
-        //
+        $datos = request()->validate([
+            'datos.id' => 'required'
+        ])['datos'];
+
+        $entidad = Coins::whereId($datos['id'])->delete();
+
+        // if($entidad != null){
+        //     $entidad->status = 2;
+        //     $entidad->save();
+        // }
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha eliminado correctamente',
+            'monedas' => Coins::all(),
+        ], 201);
     }
 }

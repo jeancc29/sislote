@@ -9,7 +9,7 @@ class Coins extends Model
     //
 
     protected $fillable = [
-        'descripcion', 'permiteDecimales',
+        'descripcion', 'permiteDecimales', 'equivalenciaDeUnDolar', 'abreviatura', 'pordefecto', 'color'
     ];
    
 }

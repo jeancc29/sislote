@@ -234,12 +234,12 @@
                                 <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
                                 <select 
                                         ng-model="datos.selectedBanca"
-                                        ng-options="o.descripcion for o in datos.optionsBancas"
+                                        ng-options="getBancaMoneda(o) for o in datos.optionsBancas"
                                         ng-change="cbxBancasChange(o)"
                                         class="selectpicker col-12" 
                                         id="entidad1"
                                         data-style="select-with-transition" 
-                                        title="Select Usuario">
+                                        title="Select entidad #1">
                                 </select>
                                 </div>
                             </div>
@@ -250,13 +250,14 @@
                                 <label for="porcentajecaid" class="bmd-label-floating" style="color: black;">Entidad #2</label>
                                 <!-- <input ng-model="datos.porcentajeCaida" class="form-control" id="porcentajecaid" name="porcentajecaid"> -->
                                 <select 
+                                        
                                         ng-model="datos.selectedEntidad"
-                                        ng-options="o.nombre for o in datos.optionsEntidades"
+                                        ng-options="o.nombre for o in datos.optionsEntidades | filter:{idMoneda:datos.selectedBanca.idMoneda}"
                                         ng-change="cbxEntidadesChange(o)"
                                         class="selectpicker col-12" 
                                         id="entidad2"
                                         data-style="select-with-transition" 
-                                        title="Select Usuario">
+                                        title="Select banco">
                                 </select>
                                 </div>
                             </div>

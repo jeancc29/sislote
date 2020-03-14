@@ -234,7 +234,6 @@ myApp
                  
                 $scope.datos.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General'}, {'idTipoBloqueo': 2, 'descripcion' : 'General por banca'}];
                 $scope.datos.selectedTipoBloqueos = $scope.datos.optionsTipoBloqueos[0];
-                
 
                 var jsonLoterias = response.data.loterias;
                 $scope.datos.optionsBancas = [];
@@ -244,14 +243,11 @@ myApp
                 $scope.datos.buscar.optionsBancas = response.data.bancas;
                 $scope.datos.buscar.optionsDias = response.data.dias;
                 
-
-
                 $scope.datos.loterias= [];
                 jsonLoterias.forEach(function(valor, indice, array){
                     array[indice].seleccionado = false;
                     $scope.datos.loterias.push(array[indice]);
                 });
-
 
                 $scope.datos.ckbDias = [];
                 var jsonDias = response.data.dias;
@@ -269,11 +265,6 @@ myApp
                 $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
 
                 console.log('inicializarDatos bloqueo2.js: ', $scope.datos.optionsSorteos);
-
-
-
-              
-                
 
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.

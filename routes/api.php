@@ -76,7 +76,6 @@ Route::post('/principal/eliminar', 'PrincipalController@eliminar');
 Route::post('/imagen/guardar', 'PrincipalController@imagen');
 Route::post('/principal/sms', 'PrincipalController@sms');
 
-
 Route::get('/loterias', 'LotteriesController@index');
 Route::post('/loterias/guardar', 'LotteriesController@store');
 Route::post('/loterias/eliminar', 'LotteriesController@destroy');
@@ -95,7 +94,6 @@ Route::post('/usuarios/sesiones', 'UserssesionsController@buscar');
 Route::get('/horarios', 'HorariosController@index');
 Route::post('/horarios/normal/guardar', 'HorariosController@store');
 
-
 Route::get('/premios', 'AwardsController@index');
 Route::post('/premios/buscarPorFecha', 'AwardsController@buscarPorFecha');
 Route::post('/premios/erase', 'AwardsController@erase');
@@ -112,8 +110,6 @@ Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@eliminar')
 Route::post('/bloqueosgenerales/loterias/eliminar', 'BlocksgeneralsController@eliminar');
 Route::post('/bloqueosgenerales/jugadas/eliminar', 'BlocksplaysgeneralsController@eliminar');
 
-
-
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
 Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
@@ -123,7 +119,6 @@ Route::post('/reportes/historico/', 'ReportesController@historico');
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
 Route::post('/reportes/ticketsPendientesDePago/', 'ReportesController@ticketsPendientesDePago');
 Route::post('/reportes/ticketsPendientesDePagoIndex/', 'ReportesController@ticketsPendientesDePagoIndex');
-
 
 Route::get('/entidades', 'EntityController@index');
 Route::post('/entidades/guardar', 'EntityController@store');
@@ -135,7 +130,6 @@ Route::post('/transacciones/saldo', 'TransactionsController@saldo');
 Route::post('/transacciones/guardar', 'TransactionsController@store');
 Route::post('/transacciones/buscar', 'TransactionsController@buscar');
 Route::post('/transacciones/buscarTransaccion', 'TransactionsController@buscarTransaccion');
-
 
 Route::post('/monitoreo/tickets', 'MonitoreoController@monitoreo');
 Route::post('/balance/bancas', 'BalancesController@index');
@@ -150,3 +144,8 @@ Route::post('/prestamos/getPrestamo', 'LoansController@getPrestamo');
 Route::post('/prestamos/cobrar', 'LoansController@cobrar');
 Route::post('/prestamos/aplazarCuota', 'LoansController@aplazarCuota');
 Route::post('/prestamos/eliminar', 'LoansController@eliminar');
+
+Route::get('/monedas', 'CoinsController@index');
+Route::post('/monedas/guardar', 'CoinsController@store');
+Route::post('/monedas/eliminar', 'CoinsController@destroy');
+Route::post('/monedas/pordefecto', 'CoinsController@pordefecto');
