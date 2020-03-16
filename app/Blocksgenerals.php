@@ -10,6 +10,7 @@ class Blocksgenerals extends Model
         'idDia', 
         'idLoteria', 
         'monto', 
-        'idSorteo'
+        'idSorteo',
+        'idMoneda'
     ];
 }

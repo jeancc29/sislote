@@ -28,6 +28,7 @@ use App\Roles;
 use App\Commissions;
 use App\Permissions;
 use App\Realtime;
+use App\Coins;
 use App\Classes\Helper;
 
 use App\Http\Resources\LotteriesResource;
@@ -78,6 +79,7 @@ class BlocksplaysController extends Controller
             'datos.jugadas' => 'required',
             'datos.fechaDesde' => 'required',
             'datos.fechaHasta' => 'required',
+            'datos.idMoneda' => 'required',
         ])['datos'];
     
     
@@ -123,7 +125,8 @@ class BlocksplaysController extends Controller
                             'idLoteria' => $l['id'], 
                             'jugada' => $j['jugada'],
                             'idSorteo' => $j['idSorteo'],
-                            'status' => 1
+                            'status' => 1,
+                            'idMoneda' => $datos['idMoneda']
                         ])
                         ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
     
@@ -154,7 +157,8 @@ class BlocksplaysController extends Controller
                                     'idLoteria' => $l['id'], 
                                     'jugada' => $j['jugada'],
                                     'idSorteo' => $j['idSorteo'],
-                                    'esGeneral' => 0
+                                    'esGeneral' => 0,
+                                    'idMoneda' => $datos['idMoneda']
                                 ])
                                 ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
                                 ->get();
@@ -195,7 +199,8 @@ class BlocksplaysController extends Controller
                             'fechaDesde' => $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00',
                             'fechaHasta' => $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00',
                             'idUsuario' => $datos['idUsuario'],
-                            'status' => 1
+                            'status' => 1,
+                            'idMoneda' => $datos['idMoneda']
                         ]);
 
                         Realtime::create([
@@ -216,7 +221,8 @@ class BlocksplaysController extends Controller
                                     'idLoteria' => $l['id'], 
                                     'jugada' => $j['jugada'],
                                     'idSorteo' => $j['idSorteo'],
-                                    'esGeneral' => 0
+                                    'esGeneral' => 0,
+                                    'idMoneda' => $datos['idMoneda']
                                 ])
                                 ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
                                 ->get();
@@ -270,6 +276,7 @@ class BlocksplaysController extends Controller
         $datos = request()->validate([
             'datos.loterias' => 'required',
             'datos.idUsuario' => 'required',
+            'datos.idMoneda' => 'required',
             'datos.jugadas' => 'required',
             'datos.fechaDesde' => 'required',
             'datos.fechaHasta' => 'required',
@@ -316,7 +323,8 @@ class BlocksplaysController extends Controller
                             'idLoteria' => $l['id'], 
                             'jugada' => $j['jugada'],
                             'idSorteo' => $j['idSorteo'],
-                            'status' => 1
+                            'status' => 1,
+                            'idMoneda' => $datos['idMoneda']
                         ])
                         ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
     
@@ -339,7 +347,8 @@ class BlocksplaysController extends Controller
                                     'idLoteria' => $l['id'], 
                                     'jugada' => $j['jugada'],
                                     'idSorteo' => $j['idSorteo'],
-                                    'esGeneral' => 1
+                                    'esGeneral' => 1,
+                                    'idMoneda' => $datos['idMoneda']
                                 ])
                                 ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
                                 ->get();
@@ -371,7 +380,8 @@ class BlocksplaysController extends Controller
                             'fechaHasta' => $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00',
                             'idUsuario' => $datos['idUsuario'],
                             'status' => 1,
-                            'ignorarDemasBloqueos' => $datos['ignorarDemasBloqueos']
+                            'ignorarDemasBloqueos' => $datos['ignorarDemasBloqueos'],
+                            'idMoneda' => $datos['idMoneda']
                         ]);
 
                         Realtime::create([
@@ -386,7 +396,8 @@ class BlocksplaysController extends Controller
                                     'idLoteria' => $l['id'], 
                                     'jugada' => $j['jugada'],
                                     'idSorteo' => $j['idSorteo'],
-                                    'esGeneral' => 1
+                                    'esGeneral' => 1,
+                                    'idMoneda' => $datos['idMoneda']
                                 ])
                                 ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
                                 ->get();

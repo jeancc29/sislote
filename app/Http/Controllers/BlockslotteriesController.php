@@ -32,7 +32,8 @@ use App\Commissions;
 use App\Permissions;
 use App\Blocksgenerals;
 use App\Blocksplaysgenerals;
-use App\Realtime;
+use App\Realtime; 
+use App\Coins; 
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -65,7 +66,8 @@ class BlockslotteriesController extends Controller
             'loterias' => $loterias,
             'bancas' => $bancas,
             'sorteos' => Draws::all(),
-            'dias' => Days::all()
+            'dias' => Days::all(),
+            'monedas' => Coins::all(),
         ], 201);
     }
 
@@ -241,7 +243,8 @@ class BlockslotteriesController extends Controller
             'datos.sorteos' => 'required',
             'datos.idUsuario' => 'required',
             'datos.bancas' => 'required',
-            'datos.ckbDias' => 'required'
+            'datos.ckbDias' => 'required',
+            'datos.idMoneda' => 'required'
         ])['datos'];
     
     
@@ -285,7 +288,8 @@ class BlockslotteriesController extends Controller
                                 'idBanca' => $banca['id'], 
                                 'idLoteria' => $l['id'], 
                                 'idSorteo' => $s['id'],
-                                'idDia' => $d['id']
+                                'idDia' => $d['id'],
+                                'idMoneda' => $datos['idMoneda']
                             ])->get()->first();
     
                     //ACTUALIZAR BLOQUEO SI EXISTE
@@ -306,7 +310,8 @@ class BlockslotteriesController extends Controller
                                     'idLoteria' => $l['id'], 
                                     'idSorteo' => $s['id'],
                                     'esBloqueoJugada' => 0,
-                                    'esGeneral' => 0
+                                    'esGeneral' => 0,
+                                    'idMoneda' => $datos['idMoneda']
                                 ])
                                 ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaActualCarbon->toDateString() . ' 23:50:00'))
                                 ->get();
@@ -333,7 +338,8 @@ class BlockslotteriesController extends Controller
                             'idLoteria' => $l['id'],
                             'idSorteo' => $s['id'],
                             'idDia' => $d['id'],
-                            'monto' => $s['monto']
+                            'monto' => $s['monto'],
+                            'idMoneda' => $datos['idMoneda']
                         ]);
 
                         Realtime::create([
@@ -349,7 +355,8 @@ class BlockslotteriesController extends Controller
                                 'idLoteria' => $l['id'], 
                                 'idSorteo' => $s['id'],
                                 'esBloqueoJugada' => 0,
-                                'esGeneral' => 0
+                                'esGeneral' => 0,
+                                'idMoneda' => $datos['idMoneda']
                             ])
                             ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaActualCarbon->toDateString() . ' 23:50:00'))
                             ->get();
@@ -394,7 +401,8 @@ class BlockslotteriesController extends Controller
             'datos.loterias' => 'required',
             'datos.sorteos' => 'required',
             'datos.idUsuario' => 'required',
-            'datos.ckbDias' => 'required'
+            'datos.ckbDias' => 'required',
+            'datos.idMoneda' => 'required',
         ])['datos'];
     
     
@@ -436,7 +444,8 @@ class BlockslotteriesController extends Controller
                             [ 
                                 'idLoteria' => $l['id'], 
                                 'idSorteo' => $s['id'],
-                                'idDia' => $d['id']
+                                'idDia' => $d['id'],
+                                'idMoneda' => $datos['idMoneda']
                             ])->get()->first();
     
                     //ACTUALIZAR BLOQUEO SI EXISTE
@@ -458,6 +467,7 @@ class BlockslotteriesController extends Controller
                                     'idSorteo' => $s['id'],
                                     'esBloqueoJugada' => 0,
                                     'esGeneral' => 1,
+                                    'idMoneda' => $datos['idMoneda']
                                 ])
                                 ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaActualCarbon->toDateString() . ' 23:50:00'))
                                 ->get();
@@ -483,7 +493,8 @@ class BlockslotteriesController extends Controller
                             'idLoteria' => $l['id'],
                             'idSorteo' => $s['id'],
                             'idDia' => $d['id'],
-                            'monto' => $s['monto']
+                            'monto' => $s['monto'],
+                            'idMoneda' => $datos['idMoneda']
                         ]);
 
                         Realtime::create([
@@ -498,7 +509,8 @@ class BlockslotteriesController extends Controller
                                 'idLoteria' => $l['id'], 
                                 'idSorteo' => $s['id'],
                                 'esBloqueoJugada' => 0,
-                                'esGeneral' => 1
+                                'esGeneral' => 1,
+                                'idMoneda' => $datos['idMoneda']
                             ])
                             ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaActualCarbon->toDateString() . ' 23:50:00'))
                             ->get();

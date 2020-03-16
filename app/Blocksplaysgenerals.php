@@ -16,6 +16,7 @@ class Blocksplaysgenerals extends Model
         'fechaHasta',
         'idUsuario',
         'status',
-        'ignorarDemasBloqueos'
+        'ignorarDemasBloqueos',
+        'idMoneda'
     ];
 }

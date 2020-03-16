@@ -17,5 +17,6 @@ class Blocksplays extends Model
         'fechaHasta',
         'idUsuario',
         'status',
+        'idMoneda'
     ];
 }

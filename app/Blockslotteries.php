@@ -11,7 +11,8 @@ class Blockslotteries extends Model
         'idDia', 
         'idLoteria', 
         'monto', 
-        'idSorteo'
+        'idSorteo',
+        'idMoneda'
     ];
 
 

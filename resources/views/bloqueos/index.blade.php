@@ -548,7 +548,7 @@
                           
 
                             
-                            <div class="col-12 text-center">
+                          <div class="col-12 text-center">
                             <div class="input-group">
                               
                               <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                              
@@ -558,6 +558,24 @@
                                     ng-change="cbxTipoBloqueosChanged()"
                                     ng-model="datos.selectedTipoBloqueos"
                                     ng-options="o.descripcion for o in datos.optionsTipoBloqueos"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                          <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Moneda</label>                              
+
+                                <div  class=" col-sm-8 col-10">
+                                <select 
+                                    
+                                    ng-model="datos.selectedMoneda"
+                                    ng-options="o.descripcion for o in datos.optionsMonedas"
                                     class="selectpicker col-12" 
                                     data-style="select-with-transition" 
                                     title="Select tipo regla">
@@ -717,41 +735,51 @@
                           
 
                             
-                            <div class="col-12 text-center">
+                          <div class="col-12 text-center">
                             <div class="input-group">
-                              
                               <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                              
-
                                 <div  class=" col-sm-8 col-10">
-                                <select 
-                                    ng-change="cbxTipoBloqueosJugadaChanged()"
-                                    ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
-                                    ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
-                                    class="selectpicker col-12" 
-                                    data-style="select-with-transition" 
-                                    title="Select tipo regla">
-                              </select>
-                              </div>
+                                  <select 
+                                      ng-change="cbxTipoBloqueosJugadaChanged()"
+                                      ng-model="datos.bloqueoJugada.selectedTipoBloqueos"
+                                      ng-options="o.descripcion for o in datos.bloqueoJugada.optionsTipoBloqueos"
+                                      class="selectpicker col-12" 
+                                      data-style="select-with-transition" 
+                                      title="Select tipo regla">
+                                  </select>
+                                </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div>
+
+                          <div class="col-12 text-center">
+                            <div class="input-group">
+                              <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Moneda</label>                              
+                                <div  class=" col-sm-8 col-10">
+                                  <select 
+                                      ng-model="datos.bloqueoJugada.selectedMoneda"
+                                      ng-options="o.descripcion for o in datos.bloqueoJugada.optionsMonedas"
+                                      class="selectpicker col-12" 
+                                      data-style="select-with-transition" 
+                                      title="Select tipo regla">
+                                  </select>
+                                </div>
                             </div> <!-- END INPUT GROUP -->
                           </div>
                           
-
                           <div ng-show="datos.bloqueoJugada.selectedTipoBloqueos.idTipoBloqueo == 2" class="col-12 text-center">
                             <div class="input-group">
-                              
                               <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Bancas</label>                              
-
                                 <div  class=" col-sm-8 col-10">
-                                  <select 
-                                  id="multiselect"
-                                      ng-model="datos.bloqueoJugada.bancas"
-                                      ng-options="o.descripcion for o in datos.bloqueoJugada.optionsBancas track by o.id"
-                                      class="selectpicker col-12" 
-                                      data-style="select-with-transition" 
-                                      multiple title="Seleccionar bancas"
-                                      data-size="7" aria-setsize="2">
-                                  </select>
-                              </div>
+                                    <select 
+                                        id="multiselect"
+                                        ng-model="datos.bloqueoJugada.bancas"
+                                        ng-options="o.descripcion for o in datos.bloqueoJugada.optionsBancas track by o.id"
+                                        class="selectpicker col-12" 
+                                        data-style="select-with-transition" 
+                                        multiple title="Seleccionar bancas"
+                                        data-size="7" aria-setsize="2">
+                                    </select>
+                                </div>
                             </div> <!-- END INPUT GROUP -->
                           </div>
 
@@ -761,14 +789,11 @@
                               <div class="col-12 text-center">
                                 <h3>Opciones</h3>
                               </div>
-
                               <div class="col-12">
                               
                               </div>
 
                               <div class="col-sm-12 checkbox-radios">
-
-                              
                                 <div ng-show="datos.bloqueoJugada.selectedTipoBloqueos.idTipoBloqueo == 1" class="form-check form-check-inline">
                                   <label class="form-check-label">
                                     <input ng-model="datos.bloqueoJugada.ignorarDemasBloqueosTmp" class="form-check-input" type="checkbox" value=""> Ignorar demas bloqueos
@@ -777,7 +802,6 @@
                                     </span>
                                   </label>
                                 </div>
-
                                 <div  class="form-check form-check-inline">
                                   <label class="form-check-label">
                                     <input ng-change="seleccionarTodasChanged(seleccionarTodas)" ng-model="seleccionarTodas" class="form-check-input" type="checkbox" value=""> Todas las loterias
@@ -786,9 +810,6 @@
                                     </span>
                                   </label>
                                 </div>
-
-
-
                               </div>
 
                              
@@ -805,14 +826,13 @@
                             <h3>Datos</h3>
                           </div>
 
-                            <div class="row justify-content-center">
+                          <div class="row justify-content-center">
                               <div class="col-6">
                                   <div id="divInputFechaDesde" class="form-group">
                                       <label  for="jugada" class="bmd-label-floating">Fecha inicio</label>
                                       <input ng-model="datos.bloqueoJugada.fechaDesde" id="fechaDesde" type="date" class="form-control" value="10/06/2018" required>
                                   </div>
                               </div>
-
                               <div class="col-6">
                                   <div id="divInputFechaHasta" class="form-group">
                                       <label for="jugada" class="bmd-label-floating">Fecha fin</label>
@@ -821,10 +841,10 @@
                               </div>
 
                               <style>
-                            .dropdown-menu{
-                                width: 100%;
-                            }
-                        </style>
+                                .dropdown-menu{
+                                    width: 100%;
+                                }
+                              </style>
                           <!-- <div class="col-12">
 
                             <div class="input-group form-control-lg m-0 p-0">
