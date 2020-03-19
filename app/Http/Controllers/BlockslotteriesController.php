@@ -32,7 +32,6 @@ use App\Commissions;
 use App\Permissions;
 use App\Blocksgenerals;
 use App\Blocksplaysgenerals;
-use App\Realtime; 
 use App\Coins; 
 
 use App\Http\Resources\LotteriesResource;
@@ -296,11 +295,7 @@ class BlockslotteriesController extends Controller
                     if($bloqueo != null){
                         $bloqueo['monto'] = $s['monto'];
                         $bloqueo->save();
-
-                        Realtime::create([
-                            'idAfectado' => $bloqueo['id'],
-                            'tabla' => 'blockslotteries'
-                        ]);
+                        
                         
                             $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                             if($dia != null){
@@ -323,10 +318,7 @@ class BlockslotteriesController extends Controller
                                     $sj['monto'] = $s['monto'] - $montoVendido;
                                     $sj->save();
 
-                                    Realtime::create([
-                                        'idAfectado' => $sj['id'],
-                                        'tabla' => 'stocks'
-                                    ]);
+                                    
                                 }
                             }
                             
@@ -342,10 +334,7 @@ class BlockslotteriesController extends Controller
                             'idMoneda' => $datos['idMoneda']
                         ]);
 
-                        Realtime::create([
-                            'idAfectado' => $b['id'],
-                            'tabla' => 'blockslotteries'
-                        ]);
+                        
 
                         $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                         if($dia != null){
@@ -368,10 +357,7 @@ class BlockslotteriesController extends Controller
                                 $sj['monto'] = $s['monto'] - $montoVendido;
                                 $sj->save();
 
-                                Realtime::create([
-                                    'idAfectado' => $sj['id'],
-                                    'tabla' => 'stocks'
-                                ]);
+                                
                             }
                         }
                     }
@@ -453,10 +439,7 @@ class BlockslotteriesController extends Controller
                         $bloqueo['monto'] = $s['monto'];
                         $bloqueo->save();
 
-                        Realtime::create([
-                            'idAfectado' => $bloqueo['id'],
-                            'tabla' => 'blocksgenerals'
-                        ]);
+                        
 
                         
                             $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
@@ -479,10 +462,7 @@ class BlockslotteriesController extends Controller
                                     $sj['monto'] = $s['monto'] - $montoVendido;
                                     $sj->save();
 
-                                    Realtime::create([
-                                        'idAfectado' => $sj['id'],
-                                        'tabla' => 'stocks'
-                                    ]);
+                                   
                                 }
                             }
                             
@@ -497,10 +477,7 @@ class BlockslotteriesController extends Controller
                             'idMoneda' => $datos['idMoneda']
                         ]);
 
-                        Realtime::create([
-                            'idAfectado' => $b['id'],
-                            'tabla' => 'blocksgenerals'
-                        ]);
+                        
 
                         $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                         if($dia != null){
@@ -522,10 +499,7 @@ class BlockslotteriesController extends Controller
                                 $sj['monto'] = $s['monto'] - $montoVendido;
                                 $sj->save();
 
-                                Realtime::create([
-                                    'idAfectado' => $sj['id'],
-                                    'tabla' => 'stocks'
-                                ]);
+                                
                             }
                         }
                     }

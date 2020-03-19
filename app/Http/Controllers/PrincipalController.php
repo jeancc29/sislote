@@ -32,6 +32,7 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
+use App\Realtime;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -640,10 +641,6 @@ class PrincipalController extends Controller
                         if($stock != null){
                             $stock->monto = $stock->monto + $v["monto"];
                             $stock->save();
-                            Realtime::create([
-                                'idAfectado' => $stock['id'],
-                                'tabla' => 'stocks'
-                            ]);
                         }
                         $v->save();
 

@@ -27,7 +27,6 @@ use App\Users;
 use App\Roles;
 use App\Commissions;
 use App\Permissions;
-use App\Realtime;
 use App\Coins;
 use App\Classes\Helper;
 
@@ -136,10 +135,7 @@ class BlocksplaysController extends Controller
                         $bloqueo['fechaHasta'] = $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00';
                         $bloqueo->save();
 
-                        Realtime::create([
-                            'idAfectado' => $bloqueo['id'],
-                            'tabla' => 'blocksplays'
-                        ]);
+                       
 
                         // return Response::json([
                         //     'errores' => 1,
@@ -182,10 +178,7 @@ class BlocksplaysController extends Controller
                                     $s['esBloqueoJugada'] = 1;
                                     $s->save();
 
-                                    Realtime::create([
-                                        'idAfectado' => $s['id'],
-                                        'tabla' => 'stocks'
-                                    ]);
+                                    
                                 }
                         }
                     }else{
@@ -203,10 +196,7 @@ class BlocksplaysController extends Controller
                             'idMoneda' => $datos['idMoneda']
                         ]);
 
-                        Realtime::create([
-                            'idAfectado' => $b['id'],
-                            'tabla' => 'blocksplays'
-                        ]);
+                        
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
                         {
@@ -242,10 +232,7 @@ class BlocksplaysController extends Controller
                                     $s['esBloqueoJugada'] = 1;
                                     $s->save();
 
-                                    Realtime::create([
-                                        'idAfectado' => $s['id'],
-                                        'tabla' => 'stocks'
-                                    ]);
+                                    
                                 }
                         }
                     }
@@ -335,10 +322,7 @@ class BlocksplaysController extends Controller
                         $bloqueo['fechaHasta'] = $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00';
                         $bloqueo->save();
 
-                        Realtime::create([
-                            'idAfectado' => $bloqueo['id'],
-                            'tabla' => 'blocksplaysgenerals'
-                        ]);
+                        
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
                         {
@@ -363,10 +347,7 @@ class BlocksplaysController extends Controller
                                     $s['ignorarDemasBloqueos'] = $datos['ignorarDemasBloqueos'];
                                     $s->save();
 
-                                    Realtime::create([
-                                        'idAfectado' => $s['id'],
-                                        'tabla' => 'stocks'
-                                    ]);
+                                   
                                 }
                         }
                     }else{
@@ -384,10 +365,7 @@ class BlocksplaysController extends Controller
                             'idMoneda' => $datos['idMoneda']
                         ]);
 
-                        Realtime::create([
-                            'idAfectado' => $b['id'],
-                            'tabla' => 'blocksplaysgenerals'
-                        ]);
+                        
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
                         {
@@ -412,10 +390,7 @@ class BlocksplaysController extends Controller
                                     $s['ignorarDemasBloqueos'] = $datos['ignorarDemasBloqueos'];
                                     $s->save();
 
-                                    Realtime::create([
-                                        'idAfectado' => $s['id'],
-                                        'tabla' => 'stocks'
-                                    ]);
+                                    
                                 }
                         }
                     }
