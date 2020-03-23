@@ -17,6 +17,7 @@ class PruebaStockObserver
      */
     public function created(Stock $stock)
     {
+        event(new RealtimeStockEvent(false, $stock));
     }
 
     /**
@@ -27,8 +28,7 @@ class PruebaStockObserver
      */
     public function updated(Stock $stock)
     {
-        Realtime::create(['idAfectado' => $stock->id, 'tabla' => 'stock']);
-        event(RealtimeStockEvent());
+        event(new RealtimeStockEvent(false, $stock));
     }
 
     /**

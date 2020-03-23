@@ -10,6 +10,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
+use App\Realtime;
+use App\Stock;
+
 class RealtimeStockEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
@@ -20,14 +23,24 @@ class RealtimeStockEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($esGuardarVenta, $stock = null)
     {
-        $realtimeIdAfectado = Realtime::whereRetornado(0)->get();
-        $realtimeIdAfectado = collect($realtimeIdAfectado)->map(function($d){
-            return $d['idAfectado'];
-        });
-        Realtime::whereIn('idAfectado', $realtimeIdAfectado)->update(['retornado' => 1]);
-        $this->stocks = Stock::whereIn('id', $realtimeIdAfectado)->get();
+        //Cuando se dispara el evento desde guardarventa entonces debo retornar los stocks
+        //que estan en guardados en la tabla realtime, de lo contrario pues retorno el stock recibido
+        if($esGuardarVenta){
+            $realtime = Realtime::whereRetornado(0)->get();
+            $realtimeIdAfectado = collect($realtime)->map(function($d){
+                return $d['idAfectado'];
+            });
+            $realtimeId = collect($realtime)->map(function($d){
+                return $d['id'];
+            });
+            Realtime::whereIn('id', $realtimeId)->update(['retornado' => 1]);
+            $this->stocks = Stock::whereIn('id', $realtimeIdAfectado)->get();
+        }else{
+            $this->stocks = [$stock];
+        }
+
     }
 
     /**

@@ -33,6 +33,7 @@ use App\Roles;
 use App\Commissions;
 use App\Permissions;
 use App\Realtime;
+use App\Events\RealtimeStockEvent;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -999,6 +1000,7 @@ class PrincipalController extends Controller
         }
 
         $img = new TicketToHtmlClass($data);
+        event(new RealtimeStockEvent(true));
 
         
          return Response::json([

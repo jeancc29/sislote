@@ -607,6 +607,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'status', b.status,
                 'descontar', b.descontar,
                 'deCada', b.deCada,
+                'idMoneda', b.idMoneda,
                 'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
                 'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
 			)) as bancas from branches b

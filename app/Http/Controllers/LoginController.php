@@ -34,6 +34,7 @@ use App\Automaticexpenses;
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
 use App\Http\Resources\BranchesResource;
+use App\Http\Resources\BranchesResourceSmall;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 use App\Classes\Helper;
@@ -198,7 +199,9 @@ class LoginController extends Controller
         'permisos' => $u->permisos,
         'banca' => $banca->descripcion,
         'idBanca' => $banca->id,
-        'administrador' => $administrador
+        'administrador' => $administrador,
+        'usuario' => $u,
+        'bancaObject' => new BranchesResourceSmall($banca)
     ], 201);
     }
 

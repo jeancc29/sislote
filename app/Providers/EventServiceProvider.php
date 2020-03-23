@@ -8,6 +8,14 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Stock;
 use App\Observers\PruebaStockObserver;
+use App\Blockslotteries;
+use App\Observers\BlockslotteriesObserver;
+use App\Blocksplays;
+use App\Observers\BlocksplaysObserver;
+use App\Blocksgenerals;
+use App\Observers\BlocksgeneralsObserver;
+use App\Blocksplaysgenerals;
+use App\Observers\BlocksplaysgeneralsObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -32,5 +40,9 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         Stock::observe(PruebaStockObserver::class);
+        Blockslotteries::observe(BlockslotteriesObserver::class);
+        Blocksplays::observe(BlocksplaysObserver::class);
+        Blocksgenerals::observe(BlocksgeneralsObserver::class);
+        Blocksplaysgenerals::observe(BlocksplaysgeneralsObserver::class);
     }
 }
