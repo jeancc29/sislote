@@ -93,7 +93,7 @@ class BlocksgeneralsController extends Controller
     {
         
         $validated = $request->validated();
-        Blocksgenerals::whereId($validated["datos"]["idBloqueo"])->delete();
+        Blocksgenerals::whereId($validated["datos"]["idBloqueo"])->first()->delete();
 
     
         return Response::json([

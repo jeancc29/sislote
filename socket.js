@@ -13,6 +13,12 @@ redis.subscribe('realtime-stock', function(err, count) {
 });
 redis.subscribe('blocksgenerals', function(err, count) {
 });
+redis.subscribe('blockslotteries', function(err, count) {
+});
+redis.subscribe('blocksplays', function(err, count) {
+});
+redis.subscribe('blocksplaysgenerals', function(err, count) {
+});
 redis.on('message', function(channel, message) {
     console.log('Message Recieved: ' + message);
     message = JSON.parse(message);

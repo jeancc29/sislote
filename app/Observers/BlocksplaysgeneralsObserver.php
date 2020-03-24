@@ -2,61 +2,62 @@
 
 namespace App\Observers;
 
-use App\blocksplaysgenerals;
+use App\Blocksplaysgenerals;
+use App\Events\BlocksplaysgeneralsEvent;
 
 class BlocksplaysgeneralsObserver
 {
     /**
-     * Handle the blocksplaysgenerals "created" event.
+     * Handle the Blocksplaysgenerals "created" event.
      *
-     * @param  \App\blocksplaysgenerals  $blocksplaysgenerals
+     * @param  \App\Blocksplaysgenerals  $blocksplaysgenerals
      * @return void
      */
-    public function created(blocksplaysgenerals $blocksplaysgenerals)
+    public function created(Blocksplaysgenerals $blocksplaysgenerals)
+    {
+        event(new BlocksplaysgeneralsEvent($blocksplaysgenerals));
+    }
+
+    /**
+     * Handle the Blocksplaysgenerals "updated" event.
+     *
+     * @param  \App\Blocksplaysgenerals  $blocksplaysgenerals
+     * @return void
+     */
+    public function updated(Blocksplaysgenerals $blocksplaysgenerals)
+    {
+        event(new BlocksplaysgeneralsEvent($blocksplaysgenerals));
+    }
+
+    /**
+     * Handle the Blocksplaysgenerals "deleted" event.
+     *
+     * @param  \App\Blocksplaysgenerals  $blocksplaysgenerals
+     * @return void
+     */
+    public function deleted(Blocksplaysgenerals $blocksplaysgenerals)
+    {
+        event(new BlocksplaysgeneralsEvent($blocksplaysgenerals, true));
+    }
+
+    /**
+     * Handle the Blocksplaysgenerals "restored" event.
+     *
+     * @param  \App\Blocksplaysgenerals  $blocksplaysgenerals
+     * @return void
+     */
+    public function restored(Blocksplaysgenerals $blocksplaysgenerals)
     {
         //
     }
 
     /**
-     * Handle the blocksplaysgenerals "updated" event.
+     * Handle the Blocksplaysgenerals "force deleted" event.
      *
-     * @param  \App\blocksplaysgenerals  $blocksplaysgenerals
+     * @param  \App\Blocksplaysgenerals  $blocksplaysgenerals
      * @return void
      */
-    public function updated(blocksplaysgenerals $blocksplaysgenerals)
-    {
-        //
-    }
-
-    /**
-     * Handle the blocksplaysgenerals "deleted" event.
-     *
-     * @param  \App\blocksplaysgenerals  $blocksplaysgenerals
-     * @return void
-     */
-    public function deleted(blocksplaysgenerals $blocksplaysgenerals)
-    {
-        //
-    }
-
-    /**
-     * Handle the blocksplaysgenerals "restored" event.
-     *
-     * @param  \App\blocksplaysgenerals  $blocksplaysgenerals
-     * @return void
-     */
-    public function restored(blocksplaysgenerals $blocksplaysgenerals)
-    {
-        //
-    }
-
-    /**
-     * Handle the blocksplaysgenerals "force deleted" event.
-     *
-     * @param  \App\blocksplaysgenerals  $blocksplaysgenerals
-     * @return void
-     */
-    public function forceDeleted(blocksplaysgenerals $blocksplaysgenerals)
+    public function forceDeleted(Blocksplaysgenerals $blocksplaysgenerals)
     {
         //
     }

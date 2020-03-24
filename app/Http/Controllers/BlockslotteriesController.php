@@ -211,7 +211,7 @@ class BlockslotteriesController extends Controller
     {
         
         $validated = $request->validated();
-        Blockslotteries::whereId($validated["datos"]["idBloqueo"])->delete();
+        Blockslotteries::whereId($validated["datos"]["idBloqueo"])->first()->delete();
 
     
         return Response::json([

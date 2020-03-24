@@ -694,7 +694,7 @@ class BlocksplaysController extends Controller
     {
         
         $validated = $request->validated();
-        Blocksplays::whereId($validated["datos"]["idBloqueo"])->delete();
+        Blocksplays::whereId($validated["datos"]["idBloqueo"])->first()->delete();
 
     
         return Response::json([

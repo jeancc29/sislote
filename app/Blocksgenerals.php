@@ -13,4 +13,12 @@ class Blocksgenerals extends Model
         'idSorteo',
         'idMoneda'
     ];
+
+    // public static function boot(){
+    //     parent::boot();
+    
+    //     static::deleted(function($blocksgenerals){
+    //         event(new BlocksgeneralsEvent($blocksgenerals, true));
+    //     });
+    // }
 }

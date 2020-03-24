@@ -10,18 +10,24 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class BlocksplaysEvent
+class BlocksplaysEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
+    public $blocksplays;
+    public $action;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($blocksplays, $eliminar = false)
     {
-        //
+        if($eliminar){
+            $this->action = "delete";
+        }else{
+            $this->action = "add";
+        }
+        $this->blocksplays = [$blocksplays];
     }
 
     /**
@@ -31,6 +37,7 @@ class BlocksplaysEvent
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        // return new PrivateChannel('blocksplays');
+        return ['blocksplays'];
     }
 }
