@@ -39,7 +39,7 @@ class PruebaStockObserver
      */
     public function deleted(Stock $stock)
     {
-        //
+        event(new RealtimeStockEvent(false, $stock, true));
     }
 
     /**

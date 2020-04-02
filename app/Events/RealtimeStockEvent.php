@@ -17,14 +17,19 @@ class RealtimeStockEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $stocks;
-
+    public $action;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($esGuardarVenta, $stock = null)
+    public function __construct($esGuardarVenta, $stock = null, $eliminar = false)
     {
+        if($eliminar){
+            $this->action = "delete";
+        }else{
+            $this->action = "add";
+        }
         //Cuando se dispara el evento desde guardarventa entonces debo retornar los stocks
         //que estan en guardados en la tabla realtime, de lo contrario pues retorno el stock recibido
         if($esGuardarVenta){

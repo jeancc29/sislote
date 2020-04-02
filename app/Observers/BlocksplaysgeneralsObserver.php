@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Blocksplaysgenerals;
+use App\Stock;
 use App\Events\BlocksplaysgeneralsEvent;
 
 class BlocksplaysgeneralsObserver
@@ -15,7 +16,17 @@ class BlocksplaysgeneralsObserver
      */
     public function created(Blocksplaysgenerals $blocksplaysgenerals)
     {
-        event(new BlocksplaysgeneralsEvent($blocksplaysgenerals));
+        $fecha = getdate();
+        $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+        $blocksplaysgenerals = Blocksplaysgenerals::whereId($blocksplaysgenerals->id)
+        ->where('fechaDesde', '<=', $fechaInicial)
+        ->where('fechaHasta', '>=', $fechaFinal)
+        ->first();
+
+        if($blocksplaysgenerals != null)
+            event(new BlocksplaysgeneralsEvent($blocksplaysgenerals));
     }
 
     /**
@@ -26,7 +37,17 @@ class BlocksplaysgeneralsObserver
      */
     public function updated(Blocksplaysgenerals $blocksplaysgenerals)
     {
-        event(new BlocksplaysgeneralsEvent($blocksplaysgenerals));
+        $fecha = getdate();
+        $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+        $blocksplaysgenerals = Blocksplaysgenerals::whereId($blocksplaysgenerals->id)
+        ->where('fechaDesde', '<=', $fechaInicial)
+        ->where('fechaHasta', '>=', $fechaFinal)
+        ->first();
+
+        if($blocksplaysgenerals != null)
+            event(new BlocksplaysgeneralsEvent($blocksplaysgenerals));
     }
 
     /**
@@ -37,6 +58,23 @@ class BlocksplaysgeneralsObserver
      */
     public function deleted(Blocksplaysgenerals $blocksplaysgenerals)
     {
+        $fecha = getdate();
+        $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        $stock = Stock::
+            whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            ->where([
+                'jugada' => $blocksplaysgenerals->jugada, 
+                'esGeneral' => 1, 
+                'idLoteria' => $blocksplaysgenerals->idLoteria,
+                'idSorteo' => $blocksplaysgenerals->idSorteo,
+                'idMoneda' => $blocksplaysgenerals->idMoneda,
+                ])
+            ->first();
+
+        if($stock != null){
+            $stock->delete();
+        }
         event(new BlocksplaysgeneralsEvent($blocksplaysgenerals, true));
     }
 

@@ -145,7 +145,6 @@ class RealtimeController extends Controller
     {
         $datos = request()->validate([
             'datos.idUsuario' => 'required',
-            'datos.maximoIdRealtime' => 'required',
         ])['datos'];
        // dd($data);
 
@@ -190,7 +189,6 @@ class RealtimeController extends Controller
         'errores' => 0,
         'mensaje' => '',
         'hayCambios' => true,
-        'maximoIdRealtime' => $maxId,
         'stocks' => count($stocks) > 0 ? $stocks : null,
         'blockslotteries' => count($blockslotteries) > 0 ? $blockslotteries : null,
         'blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
