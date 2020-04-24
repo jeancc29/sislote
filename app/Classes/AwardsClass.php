@@ -743,4 +743,89 @@ class AwardsClass{
 
         return $premio;
     }
+
+    public static function getLoterias($layout = null){
+        $fecha = getdate();
+        $fechaDesde = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+
+        $loterias = Lotteries::whereStatus(1)->has('sorteos')->get();
+        // == "vistaPremiosModal"
+        if($layout != null){
+            
+
+            // if($layout != "vistaPremiosModal")
+                
+            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+                $primera = null;
+                $segunda = null;
+                $tercera = null;
+                $pick3 = null;
+                $pick4 = null;
+                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                                ->where('idLoteria', $l['id'])
+                                ->first();
+    
+                if($premios != null){
+                    $primera = $premios->primera;
+                    $segunda = $premios->segunda;
+                    $tercera = $premios->tercera;
+                    $pick3 = $premios->pick3;
+                    $pick4 = $premios->pick4;
+                }
+                return [
+                        'id' => $l['id'],
+                        'descripcion' => $l['descripcion'],
+                        'abreviatura' => $l['abreviatura'],
+                        'primera' => $primera,
+                        'segunda' => $segunda,
+                        'tercera' => $tercera,
+                        'pick3' => $pick3,
+                        'pick4' => $pick4,
+                        'sorteos' => $l->sorteos
+                    ];
+            });
+    
+            // $loterias = collect($loteri']);
+            list($loterias, $no) = $loterias->partition(function($l){
+                return Helper::loteriaTienePremiosRegistradosHoy($l['id']) != true;
+            });
+        }else{
+            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+                $primera = null;
+                $segunda = null;
+                $tercera = null;
+                $pick3 = null;
+                $pick4 = null;
+                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                                ->where('idLoteria', $l['id'])
+                                ->first();
+    
+                if($premios != null){
+                    $primera = $premios->primera;
+                    $segunda = $premios->segunda;
+                    $tercera = $premios->tercera;
+                    $pick3 = $premios->pick3;
+                    $pick4 = $premios->pick4;
+                }
+                return [
+                        'id' => $l['id'],
+                        'descripcion' => $l['descripcion'],
+                        'abreviatura' => $l['abreviatura'],
+                        'primera' => $primera,
+                        'segunda' => $segunda,
+                        'tercera' => $tercera,
+                        'pick3' => $pick3,
+                        'pick4' => $pick4,
+                        'sorteos' => $l->sorteos
+                    ];
+            });
+        }
+
+        //La funcion partition retorna los objetos que cumplan la condicion pero esta tambien retornara su mismo index, en algunos
+        //casos no se retorno el index cero porque el elemento en esta posicion no ha sido incluido, entonces lo que hace la funcion values()
+        //es empezar la collection desde su indice cero
+        return $loterias = $loterias->values();
+    }
 }
