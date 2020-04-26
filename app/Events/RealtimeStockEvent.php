@@ -18,6 +18,7 @@ class RealtimeStockEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $stocks;
     public $action;
+    public $room = "default";
     /**
      * Create a new event instance.
      *

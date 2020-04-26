@@ -15,6 +15,7 @@ class EventName implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $data;
+    public $room = "default";
 
     /**
      * Create a new event instance.

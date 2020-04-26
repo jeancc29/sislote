@@ -15,6 +15,7 @@ class BlockslotteriesEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $blockslotteries;
     public $action;
+    public $room = "default";
     /**
      * Create a new event instance.
      *

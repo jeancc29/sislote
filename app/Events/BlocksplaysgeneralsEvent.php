@@ -15,6 +15,7 @@ class BlocksplaysgeneralsEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $blocksplaysgenerals;
     public $action;
+    public $room = "default";
     /**
      * Create a new event instance.
      *

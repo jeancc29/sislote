@@ -55,9 +55,21 @@ redis.subscribe('blocksplays', function(err, count) {
 redis.subscribe('blocksplaysgenerals', function(err, count) {
 });
 redis.on('message', function(channel, message) {
-    console.log('Message Recieved: ' + message);
     message = JSON.parse(message);
-    io.emit(channel + ':' + message.event, message.data);
+    console.log('Message Recieved: ' + message.data.room);
+    var room = "valentin";
+    if(message.data.room != "default")
+      room = message.data.room;
+    
+    io.to(room).emit(channel + ':' + message.event, message.data);
+});
+
+io.on('connection', function(socket){
+  // console.log("socket var: ", socket.handshake.query);
+  //subscribe to the room or channel, en este caso uso 
+  //un room diferente para cada servidor de cada cliente, asi
+  //redusco el trabajo que deben hacer las aplicaciones moviles
+  socket.join(socket.handshake.query.room);
 });
 
 
