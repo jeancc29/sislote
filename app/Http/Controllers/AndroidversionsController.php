@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use App\Classes\Helper;
 use App\Classes\TicketPrintClass;
 use App\Users;
+use App\Events\VersionsEvent;
+
 
 class AndroidversionsController extends Controller
 {
@@ -76,6 +78,7 @@ class AndroidversionsController extends Controller
         if($version != null){
             $version->status = 3;
             $version->save();
+            event(new VersionsEvent($version));
         }
 
 

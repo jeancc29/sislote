@@ -35,6 +35,8 @@ use App\Http\Resources\UsersResource;
 use Illuminate\Support\Facades\Crypt;
 use App\Classes\Helper;
 
+use App\Events\UsersEvent;
+
 class UsersController extends Controller
 {
     /**
@@ -151,7 +153,6 @@ class UsersController extends Controller
     
     
             $usuario->save();
-    
         }else{
     
             if(empty($datos['password']) && empty($datos['confirmar'])){
@@ -203,7 +204,8 @@ class UsersController extends Controller
     
     
            
-            
+            $usuario = Users::whereId($usuario->id)->first();
+            event(new UsersEvent(new UsersResource($usuario)));
     
         return Response::json([
             'errores' => 0,
@@ -260,10 +262,11 @@ class UsersController extends Controller
             'datos.status' => 'required'
         ])['datos'];
 
-        $usuario = Users::whereId($datos['id'])->first();
+        $usuario = Users::whereId($datos['id'])->get()->first();
         if($usuario != null){
             $usuario->status = 2;
             $usuario->save();
+            event(new UsersEvent($usuario));
 
             return Response::json([
                 'errores' => 0,

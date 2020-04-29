@@ -16,6 +16,8 @@ use App\Blocksgenerals;
 use App\Observers\BlocksgeneralsObserver;
 use App\Blocksplaysgenerals;
 use App\Observers\BlocksplaysgeneralsObserver;
+use App\Users;
+// use App\Observers\UsersObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -44,5 +46,6 @@ class EventServiceProvider extends ServiceProvider
         Blocksplays::observe(BlocksplaysObserver::class);
         Blocksgenerals::observe(BlocksgeneralsObserver::class);
         Blocksplaysgenerals::observe(BlocksplaysgeneralsObserver::class);
+        // Users::observe(UsersObserver::class);
     }
 }

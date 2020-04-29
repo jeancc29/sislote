@@ -32,6 +32,7 @@ use App\Commissions;
 use App\Permissions;
 use App\Frecuency;
 use App\Automaticexpenses;
+use App\Androidversions;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -195,6 +196,8 @@ class RealtimeController extends Controller
         'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
         'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
         'draws' => count($draws) > 0 ? $draws : null,
+        'version' => Androidversions::whereStatus(3)->first(),
+        'usuario' => new UsersResource($u)
         ], 201);
     }
 

@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Events\UsersEvent;
 
 class Users extends Authenticatable
 {
@@ -54,4 +55,12 @@ class Users extends Authenticatable
         }
         return false;
     }
+
+    // public static function boot(){
+    //     parent::boot();
+
+    //     static::updated(function($user){
+    //         event(new UsersEvent($user));
+    //     });
+    // }
 }
