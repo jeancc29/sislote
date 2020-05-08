@@ -616,7 +616,7 @@ class ReportesController extends Controller
     
 
         $usuario = Users::whereId($datos['idUsuario'])->first();
-        if(!$usuario->tienePermiso("Monitorear ticket")){
+        if(!$usuario->tienePermiso("Ver ventas")){
             //Datos['layout'] es un parametro que me indicara si se esta accediendo 
             // desde la ventana principal o desde otra venta, si es de la ventana principal entonces
             // se verifica que la variable $datos['layout'] este definida y que su valor sea igual a 'Principal', 

@@ -136,10 +136,10 @@ myApp
                 $('.selectpicker').selectpicker("refresh");
               })
 
-            if($scope.datos.optionsEntidades.length == 0){
-                alert('No hay bancos registrados con la moneda ' + $scope.datos.selectedBanca.moneda + ' debe registrar uno para hacer transacciones a esta banca');
-                return;
-            }
+            // if($scope.datos.optionsEntidades.length == 0){
+            //     alert('No hay bancos registrados con la moneda ' + $scope.datos.selectedBanca.moneda + ' debe registrar uno para hacer transacciones a esta banca');
+            //     return;
+            // }
             
             $scope.datos.id = $scope.datos.selectedBanca.id;
             $scope.datos.es_banca = true;
