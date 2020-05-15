@@ -131,13 +131,7 @@ class LoginController extends Controller
         ])['datos'];
        // dd($data);
 
-        
-
         $u = Users::where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
-
-    
-        
-   
 
         if($u == null){
             return Response::json([
@@ -200,7 +194,7 @@ class LoginController extends Controller
         'banca' => $banca->descripcion,
         'idBanca' => $banca->id,
         'administrador' => $administrador,
-        'usuario' => $u,
+        'usuario' => new UsersResource($u),
         'bancaObject' => new BranchesResourceSmall($banca)
     ], 201);
     }

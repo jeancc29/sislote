@@ -30,5 +30,10 @@ class RolesSeeder extends Seeder
             'descripcion' => 'Banquero',
             'status' => 1
         ]);
+
+        r::create([
+            'descripcion' => 'Programador',
+            'status' => 1
+        ]);
     }
 }

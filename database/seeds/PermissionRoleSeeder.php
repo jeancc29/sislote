@@ -18,6 +18,7 @@ class PermissionRoleSeeder extends Seeder
         $administrador = r::where('descripcion', 'Administrador')->get()->first()->id;
         $supervisor = r::where('descripcion', 'Supervisor')->get()->first()->id;
         $banquero = r::where('descripcion', 'Banquero')->get()->first()->id;
+        $programador = r::where('descripcion', 'Programador')->get()->first()->id;
 
 
         // $principal = p::where('descripcion', 'Principal')->get()->first()->value('id');
@@ -36,6 +37,37 @@ class PermissionRoleSeeder extends Seeder
         // DB::table('permission_role')->insert(['idPermiso' => $dueño,'idRole' => $bancas]);
         // DB::table('permission_role')->insert(['idPermiso' => $dueño,'idRole' => $reportes]);
 
+
+         // PROGRAMADOR
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 1]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 2]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 3]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 4]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 5]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 6]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 7]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 8]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 9]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 10]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 11]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 12]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 13]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 14]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 15]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 16]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 17]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 18]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 19]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 20]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 21]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 22]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 23]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 24]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 25]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 26]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 27]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 28]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 29]);
 
          // ADMINISTRADOR
          DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 1]);
