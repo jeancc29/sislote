@@ -235,6 +235,7 @@ class TransactionsController extends Controller
             'datos.idTipoEntidad' => 'required',
             'datos.idEntidad' => 'required',
             'datos.idTipo' => 'required',
+            
             'datos.idUsuario' => 'required',
         ])['datos'];
 
