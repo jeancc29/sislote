@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Crypt;
 
 class UsersResource extends JsonResource
 {
@@ -18,7 +19,7 @@ class UsersResource extends JsonResource
             'id' => $this->id,
             'nombres' => $this->nombres,
             'email' => $this->email,
-            'servidor' => $this->email,
+            'servidor' => Crypt::encryptString($this->servidor),
             'usuario' => $this->usuario,
             'idTipoUsuario' => $this->idRole,
             'tipoUsuario' => $this->roles->descripcion,

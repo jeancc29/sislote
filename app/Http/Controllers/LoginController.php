@@ -110,6 +110,7 @@ class LoginController extends Controller
        session(['idBanca' => $idBanca]);
        session(['permisos' => $u->permisos]);
 
+       
       
        Userssesions::create([
            'idUsuario' => $u->id,
