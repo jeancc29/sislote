@@ -68,6 +68,8 @@ if($controlador != "login"){
     window.rutaGlobal = (false) ? "<?php echo url('') ?>" : '';
     window.idUsuario = "<?php echo session('idUsuario') ?>";
     window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
+    window.apiKeyGlobal = "<?php echo session('apiKey') ?>";
+    window.servidorGlobal = "<?php echo session('servidor') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
     window.monedasGlobal = <?php if(isset($monedas)) echo $monedas; else echo 'null'; ?>;
@@ -129,7 +131,7 @@ if($controlador != "login"){
 </script>
 
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular/angular-animate.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>

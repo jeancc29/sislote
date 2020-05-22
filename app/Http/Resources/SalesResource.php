@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use App\Salesdetails;
 use App\Draws;
 use App\Users;
@@ -15,6 +16,12 @@ use App\Logs;
 
 class SalesResource extends JsonResource
 {
+    protected $servidor;
+
+    public function servidor($value){
+        $this->servidor = $value;
+        return $this;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -42,24 +49,24 @@ class SalesResource extends JsonResource
             'status' => $this->status, 
             'created_at' => $this->created_at,
             'pagado' => $this->pagado,
-            'montoPagado' => Salesdetails::where(['idVenta' => $this->id, 'pagado' => 1])->sum('premio'),
-            'premio' => Salesdetails::where('idVenta', $this->id)->sum('premio'),
-            'montoAPagar' => Salesdetails::where(['idVenta' => $this->id, 'pagado' => 0])->sum('premio'),
-            'razon' => Cancellations::where('idTicket', $this->idTicket)->value('razon'),
-            'usuarioCancelacion' => Users::whereId(Cancellations::where('idTicket', $this->idTicket)->value('idUsuario'))->first(),
-            'fechaCancelacion' => Cancellations::where('idTicket', $this->idTicket)->value('created_at'),
-            'loterias' => Lotteries::whereIn(
+            'montoPagado' => Salesdetails::on($this->servidor)->where(['idVenta' => $this->id, 'pagado' => 1])->sum('premio'),
+            'premio' => Salesdetails::on($this->servidor)->where('idVenta', $this->id)->sum('premio'),
+            'montoAPagar' => Salesdetails::on($this->servidor)->where(['idVenta' => $this->id, 'pagado' => 0])->sum('premio'),
+            'razon' => Cancellations::on($this->servidor)->where('idTicket', $this->idTicket)->value('razon'),
+            'usuarioCancelacion' => Users::on($this->servidor)->whereId(Cancellations::on($this->servidor)->where('idTicket', $this->idTicket)->value('idUsuario'))->first(),
+            'fechaCancelacion' => Cancellations::on($this->servidor)->where('idTicket', $this->idTicket)->value('created_at'),
+            'loterias' => Lotteries::on($this->servidor)->whereIn(
                             'id',
-                            Salesdetails::distinct()->select('idLoteria')->where('idVenta', $this->id)->get()->map(function($id){
+                            Salesdetails::on($this->servidor)->distinct()->select('idLoteria')->where('idVenta', $this->id)->get()->map(function($id){
                                 return $id->idLoteria;
                             }) 
                         )->get(),
-            'jugadas' => collect(Salesdetails::where('idVenta', $this->id)->get())->map(function($d){
-                $sorteo = Draws::whereId($d['idSorteo'])->first()->descripcion;
+            'jugadas' => collect(Salesdetails::on($this->servidor)->where('idVenta', $this->id)->get())->map(function($d){
+                $sorteo = Draws::on($this->servidor)->whereId($d['idSorteo'])->first()->descripcion;
                 $pagadoPor = null;
                 $fechaPagado = null;
                 if($d['pagado'] == 1){
-                    $logs = Logs::where(['tabla' => 'salesdetails', 'idRegistroTablaAccion' => $d['id']])->first();
+                    $logs = Logs::on($this->servidor)->where(['tabla' => 'salesdetails', 'idRegistroTablaAccion' => $d['id']])->first();
                     if($logs != null){
                         $pagadoPor = $logs->usuario->usuario;
                         $fechaPagado = $logs->created_at;
@@ -68,7 +75,29 @@ class SalesResource extends JsonResource
                 return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'pagado' => $d['pagado'], 'status' => $d['status'], 'sorteo' => $sorteo, 'pagadoPor' => $pagadoPor, 'fechaPagado' => $fechaPagado];
             }),
             'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A'),
-            'img' =>  (new TicketPrintClass($this->id))->generate()
+            'img' =>  (new TicketPrintClass($this->servidor, $this->id))->generate(),
         ];
+    }
+
+    public static function collection($resource){
+        return new SalesResourceCollection($resource, get_called_class());
+    }
+    
+}
+
+class SalesResourceCollection extends ResourceCollection {
+
+    protected $servidor;
+
+    public function servidor($value){
+        $this->servidor = $value;
+        return $this;
+    }
+
+    public function toArray($request){
+        return $this->collection->map(function(SalesResource $resource) use($request){
+            return $resource->servidor($this->servidor)->toArray($request);
+    })->all();
+
     }
 }

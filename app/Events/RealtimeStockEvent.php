@@ -24,8 +24,9 @@ class RealtimeStockEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($esGuardarVenta, $stock = null, $eliminar = false)
+    public function __construct($servidor, $esGuardarVenta, $stock = null, $eliminar = false)
     {
+        $this->room = $servidor;
         if($eliminar){
             $this->action = "delete";
         }else{
@@ -34,15 +35,15 @@ class RealtimeStockEvent implements ShouldBroadcast
         //Cuando se dispara el evento desde guardarventa entonces debo retornar los stocks
         //que estan en guardados en la tabla realtime, de lo contrario pues retorno el stock recibido
         if($esGuardarVenta){
-            $realtime = Realtime::whereRetornado(0)->get();
+            $realtime = Realtime::on($servidor)->whereRetornado(0)->get();
             $realtimeIdAfectado = collect($realtime)->map(function($d){
                 return $d['idAfectado'];
             });
             $realtimeId = collect($realtime)->map(function($d){
                 return $d['id'];
             });
-            Realtime::whereIn('id', $realtimeId)->update(['retornado' => 1]);
-            $this->stocks = Stock::whereIn('id', $realtimeIdAfectado)->get();
+            Realtime::on($servidor)->whereIn('id', $realtimeId)->update(['retornado' => 1]);
+            $this->stocks = Stock::on($servidor)->whereIn('id', $realtimeIdAfectado)->get();
         }else{
             $this->stocks = [$stock];
         }

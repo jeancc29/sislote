@@ -40,20 +40,21 @@ class TicketToHtmlClass{
     private $html;
     private $banca;
     private $venta;
+    private $servidor;
     private $ventasDetalles;
     private $usuario;
     public $copia = false;
     private $contadorJugadas;
     private $codigoBarra;
 
-    function __construct($data){
+    function __construct($servidor, $data){
         if($data[0]->venta != null){
             $this->venta = json_decode($data[0]->venta);
             $this->venta = $this->venta[0];
         }
 
         
-       
+        $this->servidor = $servidor;
         $this->banca = $this->venta->banca;
         $this->ventasDetalles = $this->venta->jugadas;
         $this->ventasDetalles = collect($this->ventasDetalles);
@@ -134,7 +135,7 @@ class TicketToHtmlClass{
                             // $this->openTable();
                             //     $this->setTableHead();
                             //     $this->openTableBody();
-                                    $jugada = Helper::agregarGuion($d->jugada, $d->idSorteo);
+                                    $jugada = Helper::agregarGuion($this->servidor, $d->jugada, $d->idSorteo);
                                     $this->setJugada($jugada, $d->monto);
                         //         $this->closeTableBody();
                         //     $this->closeTable();

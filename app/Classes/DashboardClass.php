@@ -43,14 +43,15 @@ use App\Http\Resources\UsersResource;
 use Illuminate\Support\Facades\Crypt;
 
 class DashboardClass{
-    public $idUsuario;
+    public $idUsuario; 
+    public $servidor; 
     public $fecha;
     public $idMoneda;
     public $bancas;
     public $fechaActual;
     public $fecha6DiasAtras;
 
-    function __construct($fecha = null, $idUsuario, $idMoneda){
+    function __construct($fecha = null, $servidor, $idUsuario, $idMoneda){
         if($fecha == null){
             $this->fecha = Carbon::now();
             $this->fechaActual = Carbon::now();
@@ -63,18 +64,19 @@ class DashboardClass{
         $this->fechaActual = $this->fechaActual->toDateString() . ' 23:00:00';
         $this->fecha6DiasAtras = $this->fecha6DiasAtras->toDateString() . ' 00:00:00';
         $this->idUsuario = $idUsuario;
-        $idMoneda = Coins::whereId($idMoneda)->first();
+        $this->servidor = $servidor;
+        $idMoneda = Coins::on($this->servidor)->whereId($idMoneda)->first();
 
         if($idMoneda == null){
-            $idMoneda = Coins::wherePordefecto(1)->first();
+            $idMoneda = Coins::on($this->servidor)->wherePordefecto(1)->first();
             if($idMoneda == null){
-                $idMoneda = Coins::first();
+                $idMoneda = Coins::on($this->servidor)->first();
             }
         }
         $this->idMoneda = $idMoneda->id;
         
         //Aqui se seleccionan las bancas correspondiente a cada moneda
-        $this->bancas = $bancas = Branches::where(['idMoneda' => $this->idMoneda, 'status' => 1])->get();
+        $this->bancas = $bancas = Branches::on($this->servidor)->where(['idMoneda' => $this->idMoneda, 'status' => 1])->get();
         // $this->bancas = collect($bancas)->map(function($d){
         //     return $d->id;
         // });
@@ -100,7 +102,7 @@ class DashboardClass{
             return $d->id;
         });
         //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
-        $ventasGrafica = Sales::select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios, sum(descuentoMonto)  as descuentoMonto'))
+        $ventasGrafica = Sales::on($this->servidor)->select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios, sum(descuentoMonto)  as descuentoMonto'))
             ->whereBetween('created_at', array($this->fecha6DiasAtras, $this->fechaActual))
             ->whereNotIn('status', [0,5])
             ->whereIn('idBanca', $bancas)
@@ -157,6 +159,7 @@ class DashboardClass{
         $fechaInicial = $fechaInicial->toDateString() . ' 00:00:00';
         $idBancaToString = collect($this->bancas)->implode("id", ',');
         $loterias = Lotteries::
+            on($this->servidor)->
             selectRaw('
                 id, 
                 descripcion, 
@@ -182,9 +185,9 @@ class DashboardClass{
             return null;
         }
         $fecha = getdate();
-        $usuario = Users::whereId($this->idUsuario)->first();
-        $loteriasOrdenadasPorHoraCierre = helper::loteriasOrdenadasPorHoraCierre($usuario, false);
-        $sorteos = Draws::all();
+        $usuario = Users::on($this->servidor)->whereId($this->idUsuario)->first();
+        $loteriasOrdenadasPorHoraCierre = helper::loteriasOrdenadasPorHoraCierre($this->servidor, $usuario, false);
+        $sorteos = Draws::on($this->servidor)->get();
         $totalVentasLoterias = 0;
         $totalPremiosLoterias = 0;
         $loteriasJugadasDashboard = null;
@@ -227,7 +230,7 @@ class DashboardClass{
                 $bancas = collect($this->bancas)->map(function($d){
                     return $d->id;
                 });
-                $ventas = Salesdetails::selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
+                $ventas = Salesdetails::on($this->servidor)->selectRaw('salesdetails.jugada, sum(salesdetails.monto) as monto, salesdetails.idSorteo, salesdetails.
                 idLoteria')->join('sales', 'sales.id', 'salesdetails.idVenta')
                 ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                 ->whereNotIn('sales.status', [0,5])
@@ -245,8 +248,8 @@ class DashboardClass{
                     })->values();
 
                     $j = collect($jugadas)->map(function($j){
-                        $loteria = Lotteries::whereId($j['idLoteria'])->first();
-                        return ['descripcion' => $loteria['descripcion'], 'abreviatura' => $loteria['abreviatura'], 'jugada' => Helper::agregarGuion($j['jugada'], $j['idSorteo']), 'monto' => $j['monto']];
+                        $loteria = Lotteries::on($this->servidor)->whereId($j['idLoteria'])->first();
+                        return ['descripcion' => $loteria['descripcion'], 'abreviatura' => $loteria['abreviatura'], 'jugada' => Helper::agregarGuion($this->servidor, $j['jugada'], $j['idSorteo']), 'monto' => $j['monto']];
                     });
                     $j->values();
                     return ['descripcion' => $d['descripcion'], 'jugadas' => $j->all()];
@@ -263,7 +266,7 @@ class DashboardClass{
     function bancaConYSinVentas()
     {
         $fecha = getdate(\strtotime($this->fecha->toDateString()));
-        $idBancas = Sales::whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        $idBancas = Sales::on($this->servidor)->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
         ->whereNotIn('sales.status', [0,5])
         ->get();
         
@@ -271,8 +274,8 @@ class DashboardClass{
             return $id['idBanca'];
         });
         
-        $bancasConVentas = Branches::whereIn('id', $idBancas)->whereStatus(1)->count();
-        $bancasSinVentas = Branches::whereNotIn('id', $idBancas)->whereStatus(1)->count();
+        $bancasConVentas = Branches::on($this->servidor)->whereIn('id', $idBancas)->whereStatus(1)->count();
+        $bancasSinVentas = Branches::on($this->servidor)->whereNotIn('id', $idBancas)->whereStatus(1)->count();
         return array('bancasConVentas' => $bancasConVentas, 'bancasSinVentas' => $bancasSinVentas);
     }
 

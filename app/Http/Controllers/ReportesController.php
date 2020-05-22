@@ -896,14 +896,26 @@ class ReportesController extends Controller
 
     public function monitoreo()
     {
-        $datos = request()->validate([
-            'datos.fecha' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => '',
-            'datos.layout' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.fecha' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => '',
+        //     'datos.layout' => ''
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos['servidor'])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Monitorear ticket")){
             // return Response::json([
             //     'errores' => 1,
@@ -928,11 +940,11 @@ class ReportesController extends Controller
         }
 
         if(isset($datos['idBanca'])){
-            $datos['idBanca'] = Branches::where(['id' => $datos['idBanca'], 'status' => 1])->first();
+            $datos['idBanca'] = Branches::on($datos['servidor'])->where(['id' => $datos['idBanca'], 'status' => 1])->first();
             if($datos['idBanca'] != null)
                 $datos['idBanca'] = $datos['idBanca']->id;
         }else{
-            $datos['idBanca'] = Branches::where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
+            $datos['idBanca'] = Branches::on($datos['servidor'])->where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
         }
     
         $fecha = getdate(strtotime($datos['fecha']));
@@ -956,7 +968,7 @@ class ReportesController extends Controller
         //             ->get();
     
     
-        $monitoreo = Sales::whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        $monitoreo = Sales::on($datos['servidor'])->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                     ->where('idBanca', $datos['idBanca'])
                     ->where('status', '!=', '5')
                     ->orderBy('id', 'desc')
@@ -966,12 +978,12 @@ class ReportesController extends Controller
         
     
         return Response::json([
-            'monitoreo' => SalesResource::collection($monitoreo),
-            'loterias' => Lotteries::whereStatus(1)->get(),
-            'caracteristicasGenerales' =>  Generals::all(),
-            'total_ventas' => Sales::sum('total'),
-            'total_jugadas' => Salesdetails::count('jugada'),
-            'errores' => 0
+            'monitoreo' => SalesResource::collection($monitoreo)->servidor($datos['servidor']),
+            'loterias' => Lotteries::on($datos['servidor'])->whereStatus(1)->get(),
+            'caracteristicasGenerales' =>  Generals::on($datos['servidor'])->get(),
+            'total_ventas' => Sales::on($datos['servidor'])->sum('total'),
+            'total_jugadas' => Salesdetails::on($datos['servidor'])->count('jugada'),
+            'errores' => 0,
         ], 201);
     }
 

@@ -277,6 +277,8 @@ class Helper{
             session()->forget('idUsuario');
             session()->forget('idBanca');
             session()->forget('permisos');
+            session()->forget('servidor');
+            session()->forget('apiKey');
             
             redirect()->route('login');
         }
@@ -435,8 +437,8 @@ class Helper{
     }
 
 
-    static function agregarGuion($jugada, $idSorteo){
-        $sorteo = Draws::whereId($idSorteo)->first();
+    static function agregarGuion($servidor, $jugada, $idSorteo){
+        $sorteo = Draws::on($servidor)->whereId($idSorteo)->first();
         if($sorteo == null)
             return $jugada;
         
@@ -696,12 +698,12 @@ class Helper{
         return $c;
     }
 
-    static function loteriaTienePremiosRegistradosHoy($idLoteria){
+    static function loteriaTienePremiosRegistradosHoy($servidor, $idLoteria){
             $fechaActual = getdate();
             $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
             $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
             
-            $premios = Awards::where('idLoteria', $idLoteria)
+            $premios = Awards::on($servidor)->where('idLoteria', $idLoteria)
             ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
 
             return ($premios != null) ? true : false;
@@ -1299,18 +1301,18 @@ class Helper{
         return $montoValido;
     }
 
-    static function loteriasOrdenadasPorHoraCierre($usuario, $retornarSoloAbiertas = false){
-        $loterias = Lotteries::whereStatus(1)->get();
+    static function loteriasOrdenadasPorHoraCierre($servidor, $usuario, $retornarSoloAbiertas = false){
+        $loterias = Lotteries::on($servidor)->whereStatus(1)->get();
         $loterias = collect($loterias);
-        $idDia = Days::whereWday(getdate()['wday'])->first()->id;
-        list($loterias, $no) = $loterias->partition(function($l) use($usuario, $retornarSoloAbiertas){
-            $loteria = Lotteries::whereId($l['id'])->first();
+        $idDia = Days::on($servidor)->whereWday(getdate()['wday'])->first()->id;
+        list($loterias, $no) = $loterias->partition(function($l) use($usuario, $retornarSoloAbiertas, $servidor){
+            $loteria = Lotteries::on($servidor)->whereId($l['id'])->first();
             
             //Si puede jugar fuera de horario entonces solo nos retornamos las loterias que no tengan premios registrados
             if($usuario->tienePermiso('Jugar fuera de horario') && $retornarSoloAbiertas == false)
-                return Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
+                return Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
             else
-                return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
+                return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
         });
 
         $idLoteriasAbiertas = collect($loterias)->map(function($l){
@@ -1319,6 +1321,7 @@ class Helper{
 
          $loterias = 
             Lotteries::
+            on($servidor)->
             join('day_lottery', 'day_lottery.idLoteria', '=', 'lotteries.id')
             ->whereIn('lotteries.id', $idLoteriasAbiertas)
             ->where('day_lottery.idDia', $idDia)
@@ -1792,18 +1795,16 @@ class Helper{
     }
 
 
-    public static function indexPost($idUsuario, $idBanca){
-        return DB::select('call indexPost(?, ?)', array($idUsuario, $idBanca));
-
-        
+    public static function indexPost($servidor, $idUsuario, $idBanca){
+        return DB::connection($servidor)->select('call indexPost(?, ?)', array($idUsuario, $idBanca));
     }
 
-    public static function guardarVenta($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas){
-        return DB::select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
+    public static function guardarVenta($servidor, $idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas){
+        return DB::connection($servidor)->select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
     }
 
-    public static function montoDisponibleFuncion($jugada, $idLoteria, $idBanca){
-        return DB::select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
+    public static function montoDisponibleFuncion($servidor, $jugada, $idLoteria, $idBanca){
+        return DB::connection($servidor)->select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
     }
 
     public static function getEquivalenciaDeUnDolar($idBanca){
@@ -1814,6 +1815,18 @@ class Helper{
             $moneda = Coins::whereId($idMoneda)->first();
             return ($moneda != null) ? $moneda->equivalenciaDeUnDolar : 1;
         }
+    }
+
+    public static function jwtDecode($token)
+    {
+        $stdClass = \Firebase\JWT\JWT::decode($token, \config('data.apiKey'), array('HS256'));
+        $datos = Helper::stdClassToArray($stdClass);
+        return $datos;
+    }
+
+    public static function stdClassToArray($stdClass)
+    {
+        return json_decode(json_encode($stdClass), true);
     }
 
 }

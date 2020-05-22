@@ -6,8 +6,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Events\UsersEvent;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Users extends Authenticatable
+class Users extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
@@ -17,7 +18,7 @@ class Users extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'nombres', 'email', 'password', 'status', 'usuario', 'idRole'
+        'nombres', 'email', 'password', 'status', 'usuario', 'idRole', "servidor"
     ];
 
     /**
@@ -63,4 +64,14 @@ class Users extends Authenticatable
     //         event(new UsersEvent($user));
     //     });
     // }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }

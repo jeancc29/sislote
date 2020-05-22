@@ -38,6 +38,8 @@ use App\Http\Resources\BranchesResourceSmall;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 use App\Classes\Helper;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Firebase\JWT\JWT;
 
 
 class LoginController extends Controller
@@ -76,13 +78,19 @@ class LoginController extends Controller
                 'acceso' => 'Usuario no existe'
             ]);
         }
-        $idBanca = Branches::where('idUsuario', $u->id)->first();
+
+        $u = Users::on($u->servidor)->where(['usuario' => $data['usuario'], 'status' => 1])->get()->first();
+        $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
+        if($u == null){
+            return redirect('login')->withErrors([
+                'acceso' => 'Usuario no existe'
+            ]);
+        }
+        
         if($idBanca != null){
             $idBanca = $idBanca->id;
         }
         
-   
-
         if($u == null){
             return redirect('login')->withErrors([
                 'usuario' => 'Usuario o contraseña incorrectos'
@@ -106,7 +114,9 @@ class LoginController extends Controller
         
         //Session::put('idUsuario', $u->id);
 
-       session(['idUsuario' => $u->id]);
+        session(['apiKey' => \config("data.apiKey")]);
+        session(['servidor' => $u->servidor]);
+        session(['idUsuario' => $u->id]);
        session(['idBanca' => $idBanca]);
        session(['permisos' => $u->permisos]);
 
@@ -115,7 +125,7 @@ class LoginController extends Controller
            'idUsuario' => $u->id,
            'esCelular' => false
        ]);
-       $role = Roles::whereId($u->idRole)->first();
+       $role = Roles::on($u->servidor)->whereId($u->idRole)->first();
        if($role->descripcion == "Administrador" || $role->descripcion == "Supervisor")
             return redirect()->route('dashboard');
         else
@@ -127,9 +137,17 @@ class LoginController extends Controller
      
         $datos = request()->validate([
             'datos.usuario' => 'required',
-            'datos.password' => 'required'
+            'datos.password' => 'required',
+            'datos.token' => ''
         ])['datos'];
        // dd($data);
+
+       return Response::json([
+        'errores' => 1,
+        'mensaje' => 'Este usuario no tiene acceso al sistema',
+        'token' => JWT::decode($datos['token'], 'culo', array('HS256'))
+        // 'token' => $datos
+    ], 201);
 
         
 
@@ -191,6 +209,11 @@ class LoginController extends Controller
             $administrador = true;
         else
             $administrador = false;
+
+
+            $h = array('email' => $u->usuario, 'password' => $datos['password']);
+
+        
       
        return Response::json([
         'errores' => 0,
@@ -201,7 +224,8 @@ class LoginController extends Controller
         'idBanca' => $banca->id,
         'administrador' => $administrador,
         'usuario' => $u,
-        'bancaObject' => new BranchesResourceSmall($banca)
+        'bancaObject' => new BranchesResourceSmall($banca),
+        "token" => $token
     ], 201);
     }
 

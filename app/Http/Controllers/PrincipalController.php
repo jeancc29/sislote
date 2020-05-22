@@ -203,17 +203,36 @@ class PrincipalController extends Controller
         $idBanca = 0;
         
 
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => ''
+        // ])['datos'];
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
         $idBanca = 0;
         if(isset($datos['idBanca'])){
             $idBanca = $datos['idBanca'];
         }
 
-        $data = Helper::indexPost($datos['idUsuario'], $idBanca);
+        // return Response::json([
+        //     'errores' => 0,
+        //     'mensaje' => 'Token incorrecto',
+        //     'token' => $datos["idUsuario"],
+        //     'idBanca' => $idBanca,
+        // ], 201);
+
+        $data = Helper::indexPost($datos["servidor"], $datos['idUsuario'], $idBanca);
         
 
          return Response::json([
@@ -972,21 +991,32 @@ class PrincipalController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => 'required',
-            'datos.idVenta' => 'required',
-            'datos.compartido' => 'required',
-            'datos.descuentoMonto' => 'required',
-            'datos.hayDescuento' => 'required',
-            'datos.total' => 'required',
-            'datos.subTotal' => 'required',
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => 'required',
+        //     'datos.idVenta' => 'required',
+        //     'datos.compartido' => 'required',
+        //     'datos.descuentoMonto' => 'required',
+        //     'datos.hayDescuento' => 'required',
+        //     'datos.total' => 'required',
+        //     'datos.subTotal' => 'required',
     
-            'datos.loterias' => '',
-            'datos.jugadas' => 'required',
-        ])['datos'];
+        //     'datos.loterias' => '',
+        //     'datos.jugadas' => 'required',
+        // ])['datos'];
 
-        $data = Helper::guardarVenta($datos['idUsuario'], $datos['idBanca'], $datos['idVenta'], $datos['compartido'], $datos['descuentoMonto'], $datos['hayDescuento'], $datos['total'], json_encode($datos['jugadas']));
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+        $data = Helper::guardarVenta($datos['servidor'], $datos['idUsuario'], $datos['idBanca'], $datos['idVenta'], $datos['compartido'], $datos['descuentoMonto'], $datos['hayDescuento'], $datos['total'], json_encode($datos['jugadas']));
         
         // return Response::json([
         //     'jugadas' => $data
@@ -999,8 +1029,8 @@ class PrincipalController extends Controller
             ], 201);
         }
 
-        $img = new TicketToHtmlClass($data);
-        event(new RealtimeStockEvent(true));
+        $img = new TicketToHtmlClass($datos["servidor"], $data);
+        event(new RealtimeStockEvent($datos["servidor"], true));
 
         
          return Response::json([
@@ -1452,16 +1482,27 @@ class PrincipalController extends Controller
      */
     public function montodisponible(Request $request)
     {
-        $datos = request()->validate([
-            'datos.jugada' => 'required|min:2|max:6',
-            'datos.idLoteria' => 'required',
-            'datos.idBanca' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.jugada' => 'required|min:2|max:6',
+        //     'datos.idLoteria' => 'required',
+        //     'datos.idBanca' => 'required'
+        // ])['datos'];
     
-       
+    
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
        
 
-    $bloqueo = (new Helper)->montoDisponibleFuncion($datos['jugada'], $datos['idLoteria'], $datos['idBanca']);
+    $bloqueo = (new Helper)->montoDisponibleFuncion($datos['servidor'], $datos['jugada'], $datos['idLoteria'], $datos['idBanca']);
     
        
     
