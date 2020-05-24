@@ -57,7 +57,13 @@
       <div class="card " style="min-height: 1000px;">
         <div class="card-header card-header-info card-header-text">
           <div class="card-text">
-            <h4 class="card-title">Ventas por fecha</h4>
+            <h4 class="card-title">
+              Ventas por fecha
+              <div ng-show="cargando" class="ml-2 spinner-border" style="width: 1.7rem; height: 1.7rem;" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </h4>
+            
           </div>
         </div>
         <div class="card-body ">

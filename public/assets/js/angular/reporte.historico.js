@@ -5,6 +5,7 @@ myApp
         var bancasBusqueda = [];
         $scope.txtActive = 0;
         $scope.es_movil = false;
+        $scope.cargando = false;
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
 
@@ -165,25 +166,46 @@ myApp
         }
 
        
-        $scope.buscar = function(){
+        $scope.buscar = function(onCreate = false){
             
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.layout = 'Principal';
-
-            $http.post(rutaGlobal+"/api/reportes/historico", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $scope.cargando = true;
+            $http.post(rutaGlobal+"/api/reportes/historico", {'action':'sp_ventas_buscar', 'datos': jwt})
                 .then(function(response){
                     console.log('monitoreo ',response);
                     // if(response.data.errores == 0){
 
                         $scope.datos.bancas = response.data.bancas;
+                        if(onCreate){
+                            $scope.optionsMonedas = response.data.monedas;
+                            $scope.selectedMoneda = $scope.optionsMonedas[0];
+                        }
                         $scope.calcularTotal();
+                        $scope.cargando = false;
+                        $timeout(function() {
+                            // anything you want can go here and will safely be run on the next digest.
+                            //$('#multiselect').selectpicker('val', []);
+                            $('#multiselect').selectpicker("refresh");
+                            $('.selectpicker').selectpicker("refresh");
+                            //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+                          })
+
                         
                     // }else{
                     //     alert(response.data.mensaje);
                     //     return;
                     // }
 
-                });
+                }
+                ,
+                function(){
+                    $scope.cargando = false;
+                    alert("Error");
+                }
+                );
 
         }
 

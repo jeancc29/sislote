@@ -80,13 +80,13 @@ class LoginController extends Controller
         }
 
         $u = Users::on($u->servidor)->where(['usuario' => $data['usuario'], 'status' => 1])->get()->first();
-        $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
         if($u == null){
             return redirect('login')->withErrors([
                 'acceso' => 'Usuario no existe'
             ]);
         }
         
+        $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
         if($idBanca != null){
             $idBanca = $idBanca->id;
         }
@@ -120,6 +120,7 @@ class LoginController extends Controller
        session(['idBanca' => $idBanca]);
        session(['permisos' => $u->permisos]);
 
+       
       
        Userssesions::create([
            'idUsuario' => $u->id,
@@ -142,20 +143,16 @@ class LoginController extends Controller
         ])['datos'];
        // dd($data);
 
-       return Response::json([
-        'errores' => 1,
-        'mensaje' => 'Este usuario no tiene acceso al sistema',
-        'token' => JWT::decode($datos['token'], 'culo', array('HS256'))
-        // 'token' => $datos
-    ], 201);
+    //    return Response::json([
+    //     'errores' => 1,
+    //     'mensaje' => 'Este usuario no tiene acceso al sistema',
+    //     'token' => JWT::decode($datos['token'], 'culo', array('HS256'))
+    //     // 'token' => $datos
+    // ], 201);
 
         
 
         $u = Users::where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
-
-    
-        
-   
 
         if($u == null){
             return Response::json([

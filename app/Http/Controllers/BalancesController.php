@@ -59,22 +59,35 @@ class BalancesController extends Controller
             }
 
             
-            $usuario = Users::whereId(session("idUsuario"))->first();
+            $usuario = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$usuario->tienePermiso("Ver lista de balances de bancas") == true){
                 return redirect()->route('principal');
             }
 
-            $monedas = Coins::orderBy('pordefecto', 1)->get();
+            $monedas = Coins::on(session("servidor"))->orderBy('pordefecto', 1)->get();
             return view('balances.index', compact('controlador', 'usuario', 'monedas'));
         }
 
 
 
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.fechaHasta' => 'required'
-        ])['datos'];
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.fechaHasta' => 'required'
+        // ])['datos'];
+
+        
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Ver lista de balances de bancas") == true){
             return Response::json([
                 'errores' => 1,
@@ -82,16 +95,16 @@ class BalancesController extends Controller
             ], 201);
         }
 
-        $bancas = DB::table('branches')
+        $bancas = DB::connection($datos["servidor"])->table('branches')
             ->select('branches.id', 'branches.descripcion', 'branches.idMoneda', 'branches.dueno', 'users.usuario')
             ->join('users', 'branches.idUsuario', '=', 'users.id')
             ->where('branches.status', 1)->get();
         
         $bancas = collect($bancas)->map(function($b) use($datos){
-            return ['descripcion' => $b->descripcion, 'idMoneda' => $b->idMoneda, 'dueno' => $b->dueno, 'usuario' => $b->usuario, 'balance' => Helper::saldoPorFecha($b->id, 1, $datos['fechaHasta']), 'prestamo' => 0];
+            return ['descripcion' => $b->descripcion, 'idMoneda' => $b->idMoneda, 'dueno' => $b->dueno, 'usuario' => $b->usuario, 'balance' => Helper::saldoPorFecha($datos["servidor"], $b->id, 1, $datos['fechaHasta']), 'prestamo' => 0];
         });
 
-        $monedas = Coins::orderBy('pordefecto', 1)->get();
+        $monedas = Coins::on($datos["servidor"])->orderBy('pordefecto', 1)->get();
 
         return Response::json([
             'errores' => 0,
@@ -113,20 +126,31 @@ class BalancesController extends Controller
             }
 
             
-            $usuario = Users::whereId(session("idUsuario"))->first();
+            $usuario = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$usuario->tienePermiso("Ver lista de balances de bancos") == true){
                 return redirect()->route('principal');
             }
             return view('balances.bancos', compact('controlador', 'usuario'));
         }
 
+        
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.fechaHasta' => 'required'
+        // ])['datos'];
 
+        $datos = request()['datos'];
 
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.fechaHasta' => 'required'
-        ])['datos'];
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Ver lista de balances de bancos") == true){
             return Response::json([
                 'errores' => 1,
@@ -134,14 +158,14 @@ class BalancesController extends Controller
             ], 201);
         }
 
-        $idTipoEntidad = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
-        $bancas = DB::table('entities')
+        $idTipoEntidad = Types::on($datos["servidor"])->where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+        $bancas = DB::connection($datos["servidor"])->table('entities')
             ->select('entities.id', 'entities.nombre')
             ->join('types', 'entities.idTipo', '=', 'types.id')
             ->where(['entities.status' => 1, 'types.id' => $idTipoEntidad->id ])->get();
         
         $bancas = collect($bancas)->map(function($b) use($datos){
-            return ['nombre' => $b->nombre, 'balance' => Helper::saldoPorFecha($b->id, 2, $datos['fechaHasta']), 'prestamo' => 0];
+            return ['nombre' => $b->nombre, 'balance' => Helper::saldoPorFecha($datos["servidor"], $b->id, 2, $datos['fechaHasta']), 'prestamo' => 0];
         });
 
         return Response::json([

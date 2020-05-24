@@ -69,31 +69,33 @@ myApp
         $scope.inicializarDatos = function(response = null){
 
             
-           //console.log('bancasGlobal', bancasGlobal);
+        //    //console.log('bancasGlobal', bancasGlobal);
             
-            $scope.datos.objetoBancas = bancasGlobal;
-            // $scope.datos.optionsBancas = helperService.copiarObjecto(bancasGlobal);
-            $scope.datos.optionsSorteos = sorteosGlobal;
+        //     $scope.datos.objetoBancas = bancasGlobal;
+        //     // $scope.datos.optionsBancas = helperService.copiarObjecto(bancasGlobal);
+        //     $scope.datos.optionsSorteos = sorteosGlobal;
             
-            $scope.datos.ventas = vGlobal;
+        //     $scope.datos.ventas = vGlobal;
 
 
-            $scope.optionsMonedas = monedasGlobal;
-            $scope.selectedMoneda = $scope.optionsMonedas[0];
-            $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
-            $scope.cbxMonedasChanged();
+        //     $scope.optionsMonedas = monedasGlobal;
+        //     $scope.selectedMoneda = $scope.optionsMonedas[0];
+        //     $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
+        //     $scope.cbxMonedasChanged();
 
-            // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+        //     // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
             
-            $timeout(function() {
-                // anything you want can go here and will safely be run on the next digest.
-                //$('#multiselect').selectpicker('val', []);
-                $('#multiselect').selectpicker("refresh");
-                $('.selectpicker').selectpicker("refresh");
-                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
-              })
+        //     $timeout(function() {
+        //         // anything you want can go here and will safely be run on the next digest.
+        //         //$('#multiselect').selectpicker('val', []);
+        //         $('#multiselect').selectpicker("refresh");
+        //         $('.selectpicker').selectpicker("refresh");
+        //         //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+        //       })
 
-           
+            $scope.datos.bancas = null;
+            $scope.datos.idMoneda = null;
+            getVentas(true);
        
         }
         
@@ -186,16 +188,7 @@ myApp
 
         
 
-        $scope.abrirVentanaSms = function(){
-            if($scope.datos.sms == true || $scope.datos.whatsapp == true){
-                if($scope.datos.sms != true)
-                    $scope.datos.numSms = null;
-                if($scope.datos.whatsapp != true)
-                    $scope.datos.numWhatsapp = null;
-
-                $('#modal-sms').modal('show');
-            }
-        }
+        
 
       
         $scope.seleccionarTicket = function(ticket){
@@ -230,22 +223,59 @@ myApp
 
             // console.log($scope.datos.bancas);
             // return;
+            getVentas();
+            
 
-          $http.post(rutaGlobal+"/api/reportes/ventasporfecha", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
+        }
+
+        
+
+        function getVentas(onCreate = false){
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $scope.cargando = true;
+            $http.post(rutaGlobal+"/api/reportes/ventasporfecha", {'action':'sp_ventas_buscar', 'datos': jwt})
              .then(function(response){
-                console.log('monitoreo ',response);
+                console.log('ventasPorFecha ',response);
                 // if(response.data.errores == 0){
 
                     $scope.datos.ventas = response.data.ventas;
-                    $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
+                    $scope.cargando = false;
+
+                   if(onCreate)
+                   {
+                    $scope.datos.objetoBancas = response.data.bancas;
+                    // $scope.datos.optionsBancas = helperService.copiarObjecto(bancasGlobal);
+                    $scope.datos.optionsSorteos = response.data.sorteos;
                     
+                    $scope.optionsMonedas = response.data.monedas;
+                    $scope.selectedMoneda = $scope.optionsMonedas[0];
+                    $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
+                    $scope.cbxMonedasChanged();
+
+                    // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+                    
+                    $timeout(function() {
+                        // anything you want can go here and will safely be run on the next digest.
+                        //$('#multiselect').selectpicker('val', []);
+                        $('#multiselect').selectpicker("refresh");
+                        $('.selectpicker').selectpicker("refresh");
+                        //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+                    });
+                   }
+
                 // }else{
                 //     alert(response.data.mensaje);
                 //     return;
                 // }
 
-            });
-
+            }
+            // ,
+            // function(){
+            //     $scope.cargando = false;
+            //     alert("Error");
+            // }
+            );
         }
 
         $scope.totalesParaFiltros = function(){

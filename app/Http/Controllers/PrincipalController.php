@@ -54,12 +54,12 @@ class PrincipalController extends Controller
     public function index()
     {
         $controlador = Route::getCurrentRoute()->getName();
-        $usuario = Users::whereId(session('idUsuario'))->first();
+        $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
         if(!strpos(Request::url(), '/api/')){
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Vender tickets") == true){
                 return redirect()->route('dashboard');
             }
@@ -324,10 +324,21 @@ class PrincipalController extends Controller
 
     public function duplicar()
     {
-        $codigoBarra = request()->validate([
-            'datos.codigoBarra' => '',
-            'datos.codigoQr' => ''
-        ])['datos'];
+        // $codigoBarra = request()->validate([
+        //     'datos.codigoBarra' => '',
+        //     'datos.codigoQr' => ''
+        // ])['datos'];
+
+        $codigoBarra = request()['datos'];
+        try {
+            $codigoBarra = \Helper::jwtDecode($codigoBarra);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
 
         $errores = 0;
         $mensaje = '';
@@ -357,7 +368,7 @@ class PrincipalController extends Controller
         
     
         if($esCodigoBarra){
-            $idTicket = Tickets::where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
+            $idTicket = Tickets::on($codigoBarra["servidor"])->where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
             if(strlen($codigoBarra['codigoBarra']) != 10 || is_numeric($codigoBarra['codigoBarra']) != true){
                 return Response::json([
                     'errores' => 1,
@@ -368,20 +379,20 @@ class PrincipalController extends Controller
             $idTicket = $codigoBarra['codigoBarra'];
         }
         
-        $idVenta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [5])->value('id');
+        $idVenta = Sales::on($codigoBarra["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [5])->value('id');
         
         // if(strlen($codigoBarra['codigoBarra']) == 10 && is_numeric($codigoBarra['codigoBarra']) == true){
             if($idVenta != null){
-                $idLoterias = Salesdetails::distinct()->select('idLoteria')->where('idVenta', $idVenta)->get();
+                $idLoterias = Salesdetails::on($codigoBarra["servidor"])->distinct()->select('idLoteria')->where('idVenta', $idVenta)->get();
                 $idLoterias = collect($idLoterias)->map(function($id){
                     return $id->idLoteria;
                 });
     
-                $loterias = Lotteries::whereIn('id', $idLoterias)->whereStatus(1)->get();
+                $loterias = Lotteries::on($codigoBarra["servidor"])->whereIn('id', $idLoterias)->whereStatus(1)->get();
                 // $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
                 
-                $jugadas = collect(Salesdetails::where('idVenta', $idVenta)->get())->map(function($d){
-                    $sorteo = Draws::whereId($d['idSorteo'])->first()->descripcion;
+                $jugadas = collect(Salesdetails::on($codigoBarra["servidor"])->where('idVenta', $idVenta)->get())->map(function($d, $codigoBarra){
+                    $sorteo = Draws::on($codigoBarra["servidor"])->whereId($d['idSorteo'])->first()->descripcion;
                     return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
                 });
             }else{
@@ -418,13 +429,24 @@ class PrincipalController extends Controller
 
     public function pagar()
     {
-        $datos = request()->validate([
-            'datos.codigoBarra' => '',
-            'datos.codigoQr' => '',
-            'datos.idUsuario' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.codigoBarra' => '',
+        //     'datos.codigoQr' => '',
+        //     'datos.idUsuario' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos['servidor'])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Marcar ticket como pagado")){
             return Response::json([
                 'errores' => 1,
@@ -457,15 +479,15 @@ class PrincipalController extends Controller
     
     
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
-            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
-            $venta = Sales::where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
+            $idTicket = Tickets::on($datos['servidor'])->where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $venta = Sales::on($datos['servidor'])->where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
     
             if($venta != null){
                 // $venta['pagado'] = 1;
                 // $venta->save();
     
-                if(Helper::pagar($venta->id, $datos['idUsuario'])){
-                    $venta = Sales::whereId($venta->id)->first();
+                if(Helper::pagar($datos['servidor'], $venta->id, $datos['idUsuario'])){
+                    $venta = Sales::on($datos['servidor'])->whereId($venta->id)->first();
                     $mensaje = "El ticket se ha pagado correctamente";
                 }
                 else{
@@ -486,7 +508,7 @@ class PrincipalController extends Controller
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'venta' => ($venta != null) ? new SalesResource($venta) : null,
+            'venta' => ($venta != null) ? (new SalesResource($venta))->servidor($datos['servidor']) : null,
         ], 201);
     }
 
@@ -574,14 +596,25 @@ class PrincipalController extends Controller
 
     public function cancelar()
     {
-        $datos = request()->validate([
-            'datos.codigoBarra' => 'required',
-            'datos.razon' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.codigoBarra' => 'required',
+        //     'datos.razon' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         // if(!$usuario->tienePermiso("Eliminar ticket")){
         //     return Response::json([
         //         'errores' => 1,
@@ -602,8 +635,8 @@ class PrincipalController extends Controller
         
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
-            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
-            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0, 5])->get()->first();
+            $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [0, 5])->get()->first();
     
             
             
@@ -614,7 +647,7 @@ class PrincipalController extends Controller
                         'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
                     ], 201);
                 }
-                $banca = Branches::whereId($datos['idBanca'])->first();
+                $banca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->first();
                 $minutoTicketJugado =  getdate(strtotime($venta['created_at']));
                 $minutoActual = $fecha['minutes'];
     
@@ -653,11 +686,11 @@ class PrincipalController extends Controller
                     $venta['status'] = 0;
                     $venta->save();
 
-                    $ventasDetalles = Salesdetails::where('idVenta', $venta['id'])->get();
+                    $ventasDetalles = Salesdetails::on($datos["servidor"])->where('idVenta', $venta['id'])->get();
                     foreach($ventasDetalles as $v){
                         $v['premio'] = 0;
                         $v['status'] = 0;
-                        $stock = Stock::whereId($v["idStock"])->first();
+                        $stock = Stock::on($datos["servidor"])->whereId($v["idStock"])->first();
                         if($stock != null){
                             $stock->monto = $stock->monto + $v["monto"];
                             $stock->save();
@@ -666,7 +699,7 @@ class PrincipalController extends Controller
 
                     }
     
-                    Cancellations::create([
+                    Cancellations::on($datos["servidor"])->create([
                         'idTicket' => $venta['idTicket'],
                         'idUsuario' => $datos['idUsuario'],
                         'razon' => $datos['razon']
@@ -690,7 +723,7 @@ class PrincipalController extends Controller
         }
 
         $fecha = getdate();
-        $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        $ventas = Sales::on($datos["servidor"])->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                 ->whereNotIn('status', [0,5])->get();
     
         $idVentas = collect($ventas)->map(function($id){
@@ -703,12 +736,12 @@ class PrincipalController extends Controller
             'errores' => $errores,
             'mensaje' => $mensaje,
 
-            'loterias' => Lotteries::whereStatus(1)->get(),
-            'caracteristicasGenerales' =>  Generals::all(),
-            'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
-            'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
-            'ventas' => SalesResource::collection($ventas),
-            'bancas' => Branches::whereStatus(1)->get()
+            'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
+            'caracteristicasGenerales' =>  Generals::on($datos["servidor"])->get(),
+            'total_ventas' => Sales::on($datos["servidor"])->whereIn('id', $idVentas)->sum('total'),
+            'total_jugadas' => Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)->count('jugada'),
+            'ventas' => SalesResource::collection($ventas)->servidor($datos["servidor"]),
+            'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get()
         ], 201);
     }
 
@@ -850,14 +883,25 @@ class PrincipalController extends Controller
 
     public function eliminar()
     {
-        $datos = request()->validate([
-            'datos.codigoBarra' => 'required',
-            'datos.razon' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.codigoBarra' => 'required',
+        //     'datos.razon' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Eliminar ticket")){
             return Response::json([
                 'errores' => 1,
@@ -880,8 +924,8 @@ class PrincipalController extends Controller
     
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
-            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
-            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [5])->get()->first();
+            $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [5])->get()->first();
     
             
             
@@ -892,7 +936,7 @@ class PrincipalController extends Controller
                         'mensaje' => 'Primero debe cancelar el ticket'
                     ], 201);
                 }
-                $banca = Branches::whereId($datos['idBanca'])->first();
+                $banca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->first();
             
     
                
@@ -902,14 +946,14 @@ class PrincipalController extends Controller
                     $venta['pagado'] = 0;
                     $venta->save();
 
-                    $ventasDetalles = Salesdetails::where('idVenta', $venta['id'])->get();
+                    $ventasDetalles = Salesdetails::on($datos["servidor"])->where('idVenta', $venta['id'])->get();
                     foreach($ventasDetalles as $v){
                         $v['premio'] = 0;
                         $v['status'] = 0;
                         $v->save();
                     }
     
-                    Cancellations::create([
+                    Cancellations::on($datos["servidor"])->create([
                         'idTicket' => $venta['idTicket'],
                         'idUsuario' => $datos['idUsuario'],
                         'razon' => $datos['razon']

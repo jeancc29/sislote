@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -69,7 +69,8 @@ myApp
             $('#divInputFechaDesde').addClass('is-filled');
             $('#divInputFechaHasta').addClass('is-filled');
            
-                $http.get(rutaGlobal+"/api/transacciones")
+                var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario})
+                $http.get(rutaGlobal+"/api/transacciones?token=" + jwt)
                     .then(function(response){
                         console.log('Transacciones inicializarDatos: ', response.data);
 
@@ -120,51 +121,8 @@ myApp
         
 
 
-        $scope.cbxBancasChange = function(banca){
-            console.log('cbxBancas: ', $scope.datos.selectedBanca);
-            if($scope.datos.selectedBanca == null || $scope.datos.selectedBanca == undefined)
-                return;
-            
-            $scope.datos.id = $scope.datos.selectedBanca.id;
-            $scope.datos.es_banca = true;
-            $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
-                    .then(function(response){
-                       console.log(response.data);
-                       $('#entidad1_saldo_inicial').addClass('is-filled');
-                       var credito = 0, debito = 0;
-                       $scope.datos.addTransaccion.forEach(function(valor, indice, array){
-                            if(array[indice].entidad1.id == $scope.datos.id){
-                                debito += array[indice].debito;
-                                credito += array[indice].credito;
-                            }
-                       });
-                       $scope.datos.entidad1_saldo_inicial = response.data.saldo_inicial + (debito - credito);
-                    });
-        }
-
-        $scope.cbxEntidadesChange = function(Entidad){
-            console.log('cbxEntidads: ', $scope.datos.selectedEntidad);
-            if($scope.datos.selectedEntidad == null || $scope.datos.selectedEntidad == undefined)
-                return;
-            
-            $scope.datos.id = $scope.datos.selectedEntidad.id;
-            $scope.datos.es_banca = false;
-            $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
-                    .then(function(response){
-                       console.log(response.data);
-                       $('#entidad2_saldo_inicial').addClass('is-filled');
-                       var credito = 0, debito = 0;
-                       $scope.datos.addTransaccion.forEach(function(valor, indice, array){
-                            if(array[indice].entidad2.id == $scope.datos.id){
-                                debito += array[indice].debito;
-                                credito += array[indice].credito;
-                            }
-                       });
-
-                       $scope.datos.entidad2_saldo_inicial = response.data.saldo_inicial + (credito - debito);
-                    });
-        }
-
+       
+        
         $scope.cbxTipoEntidadChange = function(){
             console.log('cbxTipoEntidad: ', $scope.datos.selectedTipoEntidad.entidades);
             if(!$scope.empty($scope.datos.selectedTipoEntidad.entidades, 'string')){
@@ -316,12 +274,13 @@ myApp
             $scope.datos.idEntidad = $scope.datos.selectedEntidad.id;
             $scope.datos.idTipo = $scope.datos.selectedTipo.id;
             $scope.datos.idUsuario = $scope.datos.selectedUsuario.id;
+            $scope.datos.servidor = servidorGlobal;
 
             
           console.log('buscar: ', $scope.datos);
           
-
-            $http.post(rutaGlobal+"/api/transacciones/buscarTransaccion", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/transacciones/buscarTransaccion", {'action':'sp_loterias_actualiza', 'datos': jwt})
             .then(function(response){
                console.log(response.data);
                $scope.datos.transacciones = response.data.transacciones

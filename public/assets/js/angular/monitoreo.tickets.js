@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout, $window, $document){
+    .controller("myController", function($scope, $http, $timeout, $window, $document, helperService){
         $scope.busqueda = "";
         var ruta = '';
         $scope.txtActive = 0;
@@ -67,25 +67,26 @@ myApp
             
            //console.log('bancasGlobal', bancasGlobal);
             
-            $scope.datos.optionsBancas = bancasGlobal;
-            $scope.datos.optionsLoterias = loteriasGlobal;
-            $scope.datos.optionsSorteos = sorteosGlobal;
-            $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
-            $scope.datos.optionsLoterias.unshift({'id' : 0, 'descripcion' : 'N/A'});
-            $scope.datos.optionsSorteos.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            // $scope.datos.optionsBancas = bancasGlobal;
+            // $scope.datos.optionsLoterias = loteriasGlobal;
+            // $scope.datos.optionsSorteos = sorteosGlobal;
+            // $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            // $scope.datos.optionsLoterias.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            // $scope.datos.optionsSorteos.unshift({'id' : 0, 'descripcion' : 'N/A'});
 
-            $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
-            $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
-            $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+            // $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
+            // $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
+            // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
             
-            $timeout(function() {
-                // anything you want can go here and will safely be run on the next digest.
-                //$('#multiselect').selectpicker('val', []);
-                $('#multiselect').selectpicker("refresh");
-                $('.selectpicker').selectpicker("refresh");
-                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
-              })
+            // $timeout(function() {
+            //     // anything you want can go here and will safely be run on the next digest.
+            //     //$('#multiselect').selectpicker('val', []);
+            //     $('#multiselect').selectpicker("refresh");
+            //     $('.selectpicker').selectpicker("refresh");
+            //     //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+            //   })
 
+            getMonitoreo(true);
            
        
         }
@@ -219,16 +220,24 @@ myApp
                 $scope.datos.idSorteo = null;
             }else
                 $scope.datos.idSorteo = $scope.datos.selectedSorteo.id;
-          
+            
+            getMonitoreo();
+        }
+
+        function getMonitoreo(onCreate = false)
+        {
             $scope.datos.idUsuario = idUsuarioGlobal;
-            console.log('buscar: ', $scope.datos);
-
             $scope.datos.fecha = $scope.datos.monitoreo.fecha;
-
-          $http.post(rutaGlobal+"/api/monitoreo/tickets", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $scope.cargando = true;
+          $http.post(rutaGlobal+"/api/monitoreo/tickets", {'action':'sp_ventas_buscar', 'datos': jwt})
              .then(function(response){
                 console.log('monitoreo ',response);
                 if(response.data.errores == 0){
+                    if(onCreate)
+                        llenarCombos(response.data);
+
                     $scope.datos.monitoreo.ventas = response.data.monitoreo;
 
                     $scope.datos.monitoreo.total_todos = Object.keys($scope.datos.monitoreo.ventas).length;
@@ -245,7 +254,10 @@ myApp
                         if(array[indice].status == 0) $scope.datos.monitoreo.total_cancelados ++;
         
                     });
+                    $scope.cargando = false;
+
                 }else{
+                    $scope.cargando = false;
                     alert(response.data.mensaje);
                     return;
                 }
@@ -254,8 +266,35 @@ myApp
                 //     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
                 //     alert("Se ha guardado correctamente");
                 // }
-            });
+            }
+            ,
+            function(){
+                $scope.cargando = false;
+                alert("error");
+            }
+            );
+        }
 
+        function llenarCombos(data)
+        {
+            $scope.datos.optionsBancas = data.bancas;
+            $scope.datos.optionsLoterias = data.loterias;
+            $scope.datos.optionsSorteos = data.sorteos;
+            $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsLoterias.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsSorteos.unshift({'id' : 0, 'descripcion' : 'N/A'});
+
+            $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
+            $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
+            $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+            
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                //$('#multiselect').selectpicker('val', []);
+                $('#multiselect').selectpicker("refresh");
+                $('.selectpicker').selectpicker("refresh");
+                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+              })
         }
 
 
@@ -327,13 +366,15 @@ myApp
 
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = idBancaGlobal;
+            $scope.datos.cancelar.servidor = servidorGlobal;
             if(agregarRazon == true){
                 $scope.datos.cancelar.razon = ".";
                 $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
             }
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
 
-            $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
+           var jwt = helperService.createJWT($scope.datos.cancelar);
+            $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
 
@@ -371,6 +412,7 @@ myApp
 
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = idBancaGlobal;
+            $scope.datos.cancelar.servidor = servidorGlobal;
             if(agregarRazon == true){
                 $scope.datos.cancelar.razon = ".";
                 $scope.datos.cancelar.codigoBarra = ticket.codigoBarra;
@@ -380,7 +422,8 @@ myApp
             
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
 
-            $http.post(rutaGlobal+"/api/principal/eliminar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
+           var jwt = helperService.createJWT($scope.datos.cancelar);
+            $http.post(rutaGlobal+"/api/principal/eliminar", {'action':'sp_ventas_cancelar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
 
@@ -417,10 +460,12 @@ myApp
 
             $scope.datos.pagar.idUsuario = idUsuarioGlobal;
             $scope.datos.pagar.codigoBarra = ticket.codigoBarra;
+            $scope.datos.pagar.servidor = servidorGlobal;
 
             // console.log($scope.datos.pagar, ' Pagar idUsuario');
 
-            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': $scope.datos.pagar})
+            var jwt = helperService.createJWT($scope.datos.pagar);
+            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': jwt})
              .then(function(response){
 
 

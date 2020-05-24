@@ -14,7 +14,8 @@ myApp
              }
         }
 
-         $scope.optionsTipoCliente = [];
+        $scope.cargando = false; 
+        $scope.optionsTipoCliente = [];
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
         $scope.datos =  {
@@ -143,22 +144,32 @@ myApp
             
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.layout = 'Principal';
+            $scope.datos.servidor = servidorGlobal;
 
 
-          
-          $http.post(rutaGlobal+"/api/balance/bancas", {'action':'sp_ventas_buscar', 'datos': $scope.datos})
+          var jwt = helperService.createJWT($scope.datos);
+          $scope.cargando = true;
+          $http.post(rutaGlobal+"/api/balance/bancas", {'action':'sp_ventas_buscar', 'datos': jwt})
              .then(function(response){
                 console.log('balance ',response);
                 if(response.data.errores == 0){
 
+                    $scope.cargando = false;
                     $scope.datos.bancas = response.data.bancas;
                     
                 }else{
+                    $scope.cargando = false;
                     alert(response.data.mensaje);
                     return;
                 }
 
-            });
+            }
+            ,
+            function(){
+                $scope.cargando = false;
+                alert("Error");
+            }
+            );
 
         }
 

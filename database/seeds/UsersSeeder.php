@@ -20,9 +20,9 @@ class UsersSeeder extends Seeder
             'sexo' => 'Masculino',
             'email' => 'jean29@outlook.com',
             'celular' => '8094266800',
-            'idRole' => 1,
+            'idRole' => 4,
             'usuario' => 'jean',
-            'password' => Crypt::encryptString('123')
+            'password' => Crypt::encryptString('Jean06091929')
         ]);
         
         $usuario->permisos()->detach();

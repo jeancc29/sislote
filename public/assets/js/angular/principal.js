@@ -1168,10 +1168,11 @@ myApp
             }
 
             $scope.datos.duplicar.codigoBarra = $scope.datos.duplicar.numeroticket;
-
-            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': $scope.datos.duplicar})
+            $scope.datos.duplicar.servidor = $scope.datos.servidor;
+            var jwt = helperService.createJWT($scope.datos.duplicar);
+            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': jwt})
              .then(function(response){
-
+                console.log(response.data);
                
                 if(response.data.errores == 1){
                     alert(response.data.mensaje);
@@ -1261,10 +1262,12 @@ myApp
             }
 
             $scope.datos.duplicar.codigoBarra = $scope.datos.duplicar.numeroticket;
-
-            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': $scope.datos.duplicar})
+            $scope.datos.duplicar.servidor = $scope.datos.servidor;
+            var jwt = helperService.createJWT($scope.datos.duplicar);
+            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': jwt})
              .then(function(response){
 
+               console.log(response.data);
                
                 if(response.data.errores == 0){
                     $('#modal-duplicar').modal('toggle');
@@ -1410,10 +1413,11 @@ myApp
 
 
             $scope.datos.pagar.idUsuario = $scope.datos.idUsuario;
+            $scope.datos.pagar.servidor = $scope.datos.servidor;
 
             // console.log($scope.datos.pagar, ' Pagar idUsuario');
-
-            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': $scope.datos.pagar})
+            var jwt = helperService.createJWT($scope.datos.pagar);
+            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': jwt})
              .then(function(response){
 
 
@@ -1440,12 +1444,13 @@ myApp
 
             $scope.datos.ventasReporte.idUsuario = idUsuario;
             $scope.datos.ventasReporte.layout = 'Principal';
+            $scope.datos.ventasReporte.servidor = $scope.datos.servidor;
 
-          
-          $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': $scope.datos.ventasReporte})
+          var jwt = helperService.createJWT($scope.datos.ventasReporte);
+          $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': jwt})
              .then(function(response){
 
-                // console.log('ventasReporte_buscar: ', response);
+                console.log('ventasReporte_buscar: ', response.datos);
 
                 if(response.data.errores == 0){
                     $scope.datos.ventasReporte.loterias =response.data.loterias;
@@ -1534,11 +1539,12 @@ myApp
                 return;
             }
 
+            $scope.datos.cancelar.servidor = $scope.datos.servidor;
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = $scope.datos.selectedBancas.id;
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
-
-            $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
+            var jwt = helperService.createJWT($scope.datos.cancelar);
+            $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': jwt})
              .then(function(response){
                 // console.log(response.data);
 

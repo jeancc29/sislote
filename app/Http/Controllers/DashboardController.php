@@ -66,7 +66,7 @@ class DashboardController extends Controller
                 return redirect()->route('login');
             }
             
-            $sorteos = Draws::all();
+            $sorteos = Draws::on(session("servidor"))->get();
 
             //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
             $dashboard = new DashboardClass(null,session("servidor"), session("idUsuario"), null);

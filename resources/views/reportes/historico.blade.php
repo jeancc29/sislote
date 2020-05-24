@@ -52,12 +52,18 @@
 
 
 <!-- TODAS LAS LOTERIAS -->
-<div class="row justify-content-center">
+<div class="row justify-content-center" ng-init="buscar(true)">
   <div class="col-md-12">
       <div class="card " style="min-height: 1000px;">
         <div class="card-header card-header-info card-header-text">
           <div class="card-text">
-            <h4 class="card-title">Historico</h4>
+            <h4 class="card-title">
+                Historico
+                <div ng-show="cargando" class="ml-2 spinner-border" style="width: 1.7rem; height: 1.7rem;" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </h4>
+            
           </div>
         </div>
         <div class="card-body ">

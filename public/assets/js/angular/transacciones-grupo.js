@@ -3,7 +3,7 @@ myApp
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
-
+        $scope.cargando = false;
          $scope.optionsTipoCliente = [];
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
@@ -68,10 +68,12 @@ myApp
 
             $('#divInputFechaDesde').addClass('is-filled');
             $('#divInputFechaHasta').addClass('is-filled');
-           
-                $http.get(rutaGlobal+"/api/transacciones/grupo")
+                var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+                $scope.cargando = true;
+                $http.get(rutaGlobal+"/api/transacciones/grupo?token="+jwt)
                     .then(function(response){
                         console.log('Transacciones inicializarDatos: ', response.data);
+                        $scope.cargando = false;
 
                         $scope.datos.optionsTipoTransaccion = [{'idTipoBloqueo' : 1, 'descripcion' : 'Normal'}, {'idTipoBloqueo' : 2, 'descripcion' : 'Programada'}];
                         $scope.datos.selectedTipoTransaccion = $scope.datos.optionsTipoTransaccion[0];
@@ -97,7 +99,12 @@ myApp
                           })
 
                         
-                    });
+                    }
+                    ,
+                    function(){
+                        $scope.cargando = false;
+                    }
+                    );
             
        
         }
@@ -143,7 +150,9 @@ myApp
             
             $scope.datos.id = $scope.datos.selectedBanca.id;
             $scope.datos.es_banca = true;
-            $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': jwt})
                 .then(function(response){
                     console.log(response.data);
                     $('#entidad1_saldo_inicial').addClass('is-filled');
@@ -165,7 +174,9 @@ myApp
             
             $scope.datos.id = $scope.datos.selectedEntidad.id;
             $scope.datos.es_banca = false;
-            $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/transacciones/saldo", {'action':'sp_loterias_actualiza', 'datos': jwt})
                     .then(function(response){
                        console.log(response.data);
                        $('#entidad2_saldo_inicial').addClass('is-filled');
@@ -331,7 +342,9 @@ myApp
             
             $scope.datos.idUsuario = idUsuario;
             $scope.datos.btnCargando = true;
-            $http.post(rutaGlobal+"/api/transacciones/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/transacciones/guardar", {'action':'sp_loterias_actualiza', 'datos': jwt})
             .then(function(response){
                console.log(response.data);
                if(response.data.errores != 1){
@@ -436,19 +449,7 @@ myApp
         
 
 
-        $scope.eliminar = function(d){
-            $http.post(rutaGlobal+"/api/entidades/eliminar", {'action':'sp_loterias_elimnar', 'datos': d})
-             .then(function(response){
-                console.log(response);
-            
-                if(response.data.errores == 0)
-                {
-                    $scope.inicializarDatos(true);
-                    alert(response.data.mensaje);
-                }
-                
-            });
-        }
+       
        
 
       
