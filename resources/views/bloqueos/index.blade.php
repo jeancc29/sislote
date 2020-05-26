@@ -124,6 +124,23 @@
                             </div> <!-- END INPUT GROUP -->
                           </div><!-- END COL 12 -->
 
+                          <div class="col-12 text-center">
+                            <div class="input-group">
+                              
+                              <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold " style="color: black;">Moneda</label>                              
+
+                                <div  class=" col-sm-9 col-9">
+                                <select 
+                                    ng-model="datos.buscar.selectedMoneda"
+                                    ng-options="o.descripcion for o in datos.buscar.optionsMonedas"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Select tipo regla">
+                              </select>
+                              </div>
+                            </div> <!-- END INPUT GROUP -->
+                          </div><!-- END COL 12 -->
+
                           <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion != 'Por banca jugadas' && datos.buscar.selectedTipoBloqueos.descripcion != 'General jugadas'" ng-class="{'col-5': datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas', 'col-10': datos.buscar.selectedTipoBloqueos.descripcion == 'General loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'General jugadas'}" class="text-center">
                               <div class="input-group">
                               <!-- <label  for="jugada" class="bmd-label-floating font-weight-bold" style="color: black;">Dias</label> -->

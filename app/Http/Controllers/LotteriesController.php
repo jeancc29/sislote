@@ -50,7 +50,17 @@ class LotteriesController extends Controller
             return view('loterias.index', compact('controlador'));
         }
 
-        
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
 
         $fechaActual = strtotime(date("d-m-Y H:i:00",time()));
         // $fechaActual = strtotime($fechaActual['mday'] . ' ' . $fechaActual['month'].' '.$fechaActual['year'] . ' ' . time() );
@@ -62,9 +72,9 @@ class LotteriesController extends Controller
         
     
         return Response::json([
-            'loterias' => LotteriesResource::collection(Lotteries::whereIn('status', [1,0])->get()),
-            'dias' => Days::all(),
-            'sorteos' => Draws::all()
+            'loterias' => LotteriesResource::collection(Lotteries::on($datos["servidor"])->whereIn('status', [1,0])->get())->servidor($datos["servidor"]),
+            'dias' => Days::on($datos["servidor"])->get(),
+            'sorteos' => Draws::on($datos["servidor"])->get()
         ], 201);
 
         
@@ -101,17 +111,27 @@ class LotteriesController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.descripcion' => 'required',
-            'datos.abreviatura' => 'required|min:1|max:10',
-            'datos.status' => 'required',
-            // 'datos.horaCierre' => 'required',
-            'datos.sorteos' => 'required',
-            'datos.loterias' => '',
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.descripcion' => 'required',
+        //     'datos.abreviatura' => 'required|min:1|max:10',
+        //     'datos.status' => 'required',
+        //     // 'datos.horaCierre' => 'required',
+        //     'datos.sorteos' => 'required',
+        //     'datos.loterias' => '',
     
-        ])['datos'];
+        // ])['datos'];
 
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
 
         //Validamos que cuando el sorteo super pale este seleccionado entonces no se permiten mas sorteos
         $sorteoCollection = collect($datos['sorteos']);
@@ -132,17 +152,17 @@ class LotteriesController extends Controller
         $mensaje = '';
     
         $loterias = collect($datos['loterias']);
-        list($loterias_seleccionadas, $no) = $loterias->partition(function($l){
-            return $l['seleccionado'] == true && Lotteries::where(['id' => $l['id'], 'status' => 1])->first() != null;
+        list($loterias_seleccionadas, $no) = $loterias->partition(function($l) use($datos){
+            return $l['seleccionado'] == true && Lotteries::on($datos["servidor"])->where(['id' => $l['id'], 'status' => 1])->first() != null;
         });
 
         
         foreach($loterias_seleccionadas as $s){
             //Verificamos que las loterias seleccionada para super pale deben tener el sorteo pale asignados a ellas
-            if(Lotteries::whereId($s['id'])->first()->sorteos()->whereDescripcion('Pale')->first() == null){
+            if(Lotteries::on($datos["servidor"])->whereId($s['id'])->first()->sorteos()->whereDescripcion('Pale')->first() == null){
                 return Response::json([
                     'errores' => 1,
-                    'mensaje' => 'Debe asignarle el sorteo pale a la loteria ' . Lotteries::whereId($s['id'])->first()->descripcion
+                    'mensaje' => 'Debe asignarle el sorteo pale a la loteria ' . Lotteries::on($datos["servidor"])->whereId($s['id'])->first()->descripcion
                 ], 201);
             }
         }
@@ -150,7 +170,7 @@ class LotteriesController extends Controller
        
     
     
-        $loteria = Lotteries::whereId($datos['id'])->get()->first();
+        $loteria = Lotteries::on($datos["servidor"])->whereId($datos['id'])->get()->first();
         if($loteria != null){
             $loteria['descripcion'] = $datos['descripcion'];
             $loteria['abreviatura'] = $datos['abreviatura'];
@@ -167,7 +187,7 @@ class LotteriesController extends Controller
             $loteria->sorteos()->attach($sorteos);
 
             foreach($datos['sorteos'] as $s){
-                $sorteo = Draws::whereId($s['id'])->first();
+                $sorteo = Draws::on($datos["servidor"])->whereId($s['id'])->first();
                 if($sorteo != null){
                     if($sorteo['descripcion'] == "Super pale"){
                         $loteria->drawRelations()->detach();
@@ -203,7 +223,7 @@ class LotteriesController extends Controller
             // }
     
         }else{
-            $loteria = Lotteries::create([
+            $loteria = Lotteries::on($datos["servidor"])->create([
                 'descripcion' => $datos['descripcion'],
                 'abreviatura' => $datos['abreviatura'],
                 // 'horaCierre' => $datos['horaCierre'],
@@ -221,7 +241,7 @@ class LotteriesController extends Controller
            
 
             foreach($datos['sorteos'] as $s){
-                $sorteo = Draws::whereId($s['id'])->first();
+                $sorteo = Draws::on($datos["servidor"])->whereId($s['id'])->first();
                 if($sorteo != null){
                     if($sorteo['descripcion'] == "Super pale"){
                         $loteria->drawRelations()->detach();
@@ -259,9 +279,9 @@ class LotteriesController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
-            'loterias' => LotteriesResource::collection(Lotteries::whereIn('status', [1,0])->get()),
-            'dias' => Days::all(),
-            'sorteos' => Draws::all(),
+            'loterias' => LotteriesResource::collection(Lotteries::on($datos["servidor"])->whereIn('status', [1,0])->get())->servidor($datos["servidor"]),
+            'dias' => Days::on($datos["servidor"])->get(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
             'aa' => $sorteos
         ], 201);
     }
@@ -308,14 +328,25 @@ class LotteriesController extends Controller
      */
     public function destroy(Lotteries $lotteries)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.descripcion' => 'required',
-            'datos.abreviatura' => 'required',
-            'datos.status' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.descripcion' => 'required',
+        //     'datos.abreviatura' => 'required',
+        //     'datos.status' => 'required'
+        // ])['datos'];
 
-        $loteria = Lotteries::whereId($datos['id'])->first();
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        $loteria = Lotteries::on($datos["servidor"])->whereId($datos['id'])->first();
         if($loteria != null){
             $loteria->status = 2;
             $loteria->save();

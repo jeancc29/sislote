@@ -284,7 +284,7 @@ class Helper{
         }
     }
 
-    public static function determinarSorteo($jugada, $loteria){
+    public static function determinarSorteo($servidor, $jugada, $loteria){
         
         $idSorteo = 0;
   
@@ -293,24 +293,24 @@ class Helper{
         $idSorteo = 1;
     }
    else if(strlen($jugada) == 3){
-        $idSorteo = DB::table('draws')->whereDescripcion("Pick 3 Straight")->first();
+        $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 3 Straight")->first();
         if($idSorteo != null){
             $idSorteo = $idSorteo->id;
         }
    }
    else if(strlen($jugada) == 4){
         if(gettype(strpos($jugada, '+')) == "integer"){
-            $idSorteo = DB::table('draws')->whereDescripcion("Pick 3 Box")->first();
+            $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 3 Box")->first();
             if($idSorteo != null){
                 $idSorteo = $idSorteo->id;
             }
         }
         else{
-            $sorteo = DB::table('draws')
+            $sorteo = DB::connection($servidor)->table('draws')
                 ->select('draws.id')
                 ->join('draw_lottery', 'draws.id', '=', 'draw_lottery.idSorteo')
                 ->where(['draw_lottery.idLoteria' => $loteria->id, 'draws.descripcion' => 'Super pale'])->first();
-            $drawRelations = DB::table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
+            $drawRelations = DB::connection($servidor)->table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
             if($sorteo == null || $drawRelations <= 1)
                 $idSorteo = 2;
             else if($sorteo != null || $drawRelations >= 2)
@@ -319,13 +319,13 @@ class Helper{
    }
     else if(strlen($jugada) == 5){
             if(gettype(strpos($jugada, '+')) == "integer"){
-                $idSorteo = DB::table('draws')->whereDescripcion("Pick 4 Box")->first();
+                $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 4 Box")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
             }
             else if(gettype(strpos($jugada, '-')) == "integer"){
-                $idSorteo = DB::table('draws')->whereDescripcion("Pick 4 Straight")->first();
+                $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 4 Straight")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
@@ -454,8 +454,8 @@ class Helper{
         return $jugada;
     }
 
-    static function quitarUltimoCaracter($cadena, $idSorteo){
-        $sorteo = DB::table('draws')->whereId($idSorteo)->first();
+    static function quitarUltimoCaracter($servidor, $cadena, $idSorteo){
+        $sorteo = DB::connection($servidor)->table('draws')->whereId($idSorteo)->first();
         if($sorteo == null){
             return $cadena;
         }
@@ -966,7 +966,7 @@ class Helper{
     }
 
 
-    static function cambiarComisionesATickets($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function cambiarComisionesATickets($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         if($fechaInicial == null && $fechaFinal == null){
             $fecha = getdate();
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
@@ -974,24 +974,24 @@ class Helper{
         }
 
         
-        $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
+        $idVentasDeEstaBanca = Sales::on($servidor)->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
         $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
             return $id->id;
         });
-            $datosComisiones = Commissions::where('idBanca', $idBanca)->get();
+            $datosComisiones = Commissions::on($servidor)->where('idBanca', $idBanca)->get();
             
             foreach($datosComisiones as $d){
-                $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                $loteria = Lotteries::on($servidor)->whereId($d['idLoteria'])->first();
                 if($loteria == null)
                     continue;
 
                 
 
                 if($d['directo'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Directo')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Directo')->first();
                     if($sorteo != null){
 
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['directo'] / 100) * $s['monto'];
                             $s->save();
@@ -1001,9 +1001,9 @@ class Helper{
                 }
 
                 if($d['pale'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Pale')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pale')->first();
                     if($sorteo != null && $loteria->sorteoExiste($sorteo->id) == true){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pale'] / 100) * $s['monto'];
                             $s->save();
@@ -1012,9 +1012,9 @@ class Helper{
                 }
 
                 if($d['tripleta'] > 0){
-                    $sorteo = Draws::whereDescripcion('Tripleta')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Tripleta')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['tripleta'] / 100) * $s['monto'];
                             $s->save();
@@ -1023,9 +1023,9 @@ class Helper{
                 }
 
                 if($d['superPale'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Super pale')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Super pale')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['superPale'] / 100) * $s['monto'];
                             $s->save();
@@ -1034,9 +1034,9 @@ class Helper{
                 }
 
                 if($d['pick3Straight'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Pick 3 Straight')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 3 Straight')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick3Straight'] / 100) * $s['monto'];
                             $s->save();
@@ -1045,9 +1045,9 @@ class Helper{
                 }
 
                 if($d['pick3Box'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 3 Box')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 3 Box')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick3Box'] / 100) * $s['monto'];
                             $s->save();
@@ -1056,9 +1056,9 @@ class Helper{
                 }
 
                 if($d['pick4Straight'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Pick 4 Straight')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 4 Straight')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick4Straight'] / 100) * $s['monto'];
                             $s->save();
@@ -1067,9 +1067,9 @@ class Helper{
                 }
 
                 if($d['pick4Box'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 4 Box')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 4 Box')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick4Box'] / 100) * $s['monto'];
                             $s->save();

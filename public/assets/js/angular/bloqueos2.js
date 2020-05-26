@@ -323,9 +323,10 @@ myApp
 
                 return;
             }
-            $http.get(rutaGlobal+"/api/bloqueos")
+            var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+            $http.get(rutaGlobal+"/api/bloqueos?token="+ jwt)
              .then(function(response){
-                console.log('Bancas: ', response.bancas);
+                console.log('Bancas: ', response.data);
 
                 
 
@@ -343,6 +344,8 @@ myApp
 
                 $scope.datos.buscar.optionsBancas = response.data.bancas;
                 $scope.datos.buscar.optionsDias = response.data.dias;
+                $scope.datos.buscar.optionsMonedas = response.data.monedas;
+                $scope.datos.buscar.selectedMoneda = $scope.datos.buscar.optionsMonedas[0];
 
 
 
@@ -466,7 +469,9 @@ myApp
                 // $scope.datos.bancas =  $scope.datos.optionsBancas;
                 $scope.datos.bancas =  [];
                 $scope.datos.idMoneda =  $scope.datos.selectedMoneda.id;
-                $http.post(rutaGlobal+"/api/bloqueos/general/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+                $scope.datos.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT($scope.datos);
+                $http.post(rutaGlobal+"/api/bloqueos/general/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                 .then(function(response){
                     console.log(response.data);
                     if(response.data.errores == 0){
@@ -484,7 +489,9 @@ myApp
                 }
 
                 $scope.datos.idMoneda =  $scope.datos.selectedMoneda.id;
-                $http.post(rutaGlobal+"/api/bloqueos/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+                $scope.datos.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT($scope.datos);
+                $http.post(rutaGlobal+"/api/bloqueos/loterias/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                 .then(function(response){
                     console.log(response.data);
                     if(response.data.errores == 0){
@@ -518,7 +525,9 @@ myApp
                 $scope.datos.bloqueoJugada.idMoneda =  $scope.datos.bloqueoJugada.selectedMoneda.id;
                 console.log('idMoneda: ', $scope.datos.bloqueoJugada.idMoneda);
                 // return;
-                $http.post(rutaGlobal+"/api/bloqueos/general/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
+                $scope.datos.bloqueoJugada.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT($scope.datos.bloqueoJugada);
+                $http.post(rutaGlobal+"/api/bloqueos/general/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                     .then(function(response){
                     console.log(response);
                     if(response.data.errores == 0){
@@ -554,7 +563,9 @@ myApp
                 $scope.datos.bloqueoJugada.idUsuario = $scope.datos.idUsuario;
                 $scope.datos.bloqueoJugada.idSorteo = $scope.datos.selectedSorteo.id;
                 $scope.datos.bloqueoJugada.idMoneda =  $scope.datos.bloqueoJugada.selectedMoneda.id;
-                $http.post(rutaGlobal+"/api/bloqueos/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.bloqueoJugada})
+                $scope.datos.bloqueoJugada.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT($scope.datos.bloqueoJugada);
+                $http.post(rutaGlobal+"/api/bloqueos/jugadas/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                     .then(function(response){
                     console.log(response);
                     if(response.data.errores == 0){
@@ -590,7 +601,9 @@ myApp
          
            if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General loterias"){
             //    bloqueo.idBloqueo = 100000;
-                $http.post(rutaGlobal+"/api/bloqueosgenerales/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                bloqueo.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT(bloqueo);
+                $http.post(rutaGlobal+"/api/bloqueosgenerales/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                 .then(function(response){
                     console.log(response);
                     $scope.datos.tabSelectedLoteria.sorteos.splice(index, 1);
@@ -1012,9 +1025,12 @@ myApp
                 }
             }
             
+            $scope.datos.buscar.idMoneda = $scope.datos.buscar.selectedMoneda.id;
             $scope.datos.buscar.idUsuario = idUsuario;
             $scope.datos.buscar.idTipoBloqueo = $scope.datos.buscar.selectedTipoBloqueos.idTipoBloqueo;
-            $http.post(rutaGlobal+"/api/bloqueos/loterias/buscar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos.buscar})
+            $scope.datos.buscar.servidor =  servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos.buscar);
+            $http.post(rutaGlobal+"/api/bloqueos/loterias/buscar", {'action':'sp_bancas_actualizar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
                 

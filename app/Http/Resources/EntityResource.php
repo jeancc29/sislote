@@ -22,7 +22,7 @@ class EntityResource extends JsonResource
      */
     public function toArray($request)
     {
-        $moneda = Coins::whereId($this->idMoneda)->first();
+        $moneda = Coins::on($this->servidor)->whereId($this->idMoneda)->first();
         return [
             'id' => $this->id,
             'nombre' => $this->nombre,

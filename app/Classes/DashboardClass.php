@@ -102,7 +102,7 @@ class DashboardClass{
             return $d->id;
         });
         //VENTAS AGRUPADAS POR DIA PARA LA GRAFICA
-        $ventasGrafica = Sales::on($this->servidor)->select(DB::raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios, sum(descuentoMonto)  as descuentoMonto'))
+        $ventasGrafica = Sales::on($this->servidor)->select(DB::connection($this->servidor)->raw('DATE(created_at) as date, sum(subTotal) subTotal, sum(total) total, sum(premios) premios, sum(descuentoMonto)  as descuentoMonto'))
             ->whereBetween('created_at', array($this->fecha6DiasAtras, $this->fechaActual))
             ->whereNotIn('status', [0,5])
             ->whereIn('idBanca', $bancas)

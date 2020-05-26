@@ -152,11 +152,11 @@ class Branches extends Model
         return $abierta;
     }
 
-    public function limiteVenta($monto_a_vender){
+    public function limiteVenta($servidor, $monto_a_vender){
         $abierta = false;
         $fecha = getdate();
         
-       $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+       $ventas = Sales::on($servidor)->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->where('idBanca', $this->id)
             ->whereNotIn('status', [0,5])->sum('total');
 

@@ -391,7 +391,7 @@ class PrincipalController extends Controller
                 $loterias = Lotteries::on($codigoBarra["servidor"])->whereIn('id', $idLoterias)->whereStatus(1)->get();
                 // $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
                 
-                $jugadas = collect(Salesdetails::on($codigoBarra["servidor"])->where('idVenta', $idVenta)->get())->map(function($d, $codigoBarra){
+                $jugadas = collect(Salesdetails::on($codigoBarra["servidor"])->where('idVenta', $idVenta)->get())->map(function($d) use($codigoBarra){
                     $sorteo = Draws::on($codigoBarra["servidor"])->whereId($d['idSorteo'])->first()->descripcion;
                     return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
                 });

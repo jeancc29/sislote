@@ -3,12 +3,19 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 use App\Blockslotteries;
 use App\Salesdetails;
 
 class LotteriesResource extends JsonResource
 {
+    protected $servidor;
+
+    public function servidor($value){
+        $this->servidor = $value;
+        return $this;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -29,9 +36,9 @@ class LotteriesResource extends JsonResource
             'loteriasRelacionadas' => $this->drawRelations,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'quiniela' => Blockslotteries::where(['idLoteria' => $this->id, 'idSorteo' => 1])->value('monto'),
-            'pale' => Blockslotteries::where(['idLoteria' => $this->id, 'idSorteo' => 2])->value('monto'),
-            'tripleta' => Blockslotteries::where(['idLoteria' => $this->id, 'idSorteo' => 3])->value('monto'),
+            'quiniela' => Blockslotteries::on($this->servidor)->where(['idLoteria' => $this->id, 'idSorteo' => 1])->value('monto'),
+            'pale' => Blockslotteries::on($this->servidor)->where(['idLoteria' => $this->id, 'idSorteo' => 2])->value('monto'),
+            'tripleta' => Blockslotteries::on($this->servidor)->where(['idLoteria' => $this->id, 'idSorteo' => 3])->value('monto'),
             'bloqueosjugadas' => $this->blocksplays()
                 ->whereStatus(1)
                 ->where('fechaDesde', '<=', getdate()['year'].'-'.getdate()['mon'].'-'.getdate()['mday'] . ' 00:00:00')
@@ -40,5 +47,26 @@ class LotteriesResource extends JsonResource
             // 'ventas' => Salesdetails::join('sales', 'salesdetails.idVenta', 'sales.id')->whereNotIn('status', [0,5])->where('salesdetails.idLoteria', $this->id)->sum('salesdetails.monto'),
             // 'premios' => Salesdetails::join('sales', 'salesdetails.idVenta', 'sales.id')->whereNotIn('status', [0,5])->where('salesdetails.idLoteria', $this->id)->sum('salesdetails.premio')
         ];
+    }
+    public static function collection($resource){
+        return new LotteriesResourceCollection($resource, get_called_class());
+    }
+    
+}
+
+class LotteriesResourceCollection extends ResourceCollection {
+
+    protected $servidor;
+
+    public function servidor($value){
+        $this->servidor = $value;
+        return $this;
+    }
+
+    public function toArray($request){
+        return $this->collection->map(function(LotteriesResource $resource) use($request){
+            return $resource->servidor($this->servidor)->toArray($request);
+    })->all();
+
     }
 }

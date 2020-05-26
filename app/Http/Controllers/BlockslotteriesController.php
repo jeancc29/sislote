@@ -55,29 +55,52 @@ class BlockslotteriesController extends Controller
         if(!strpos(Request::url(), '/api/')){
             return view('bloqueos.index', compact('controlador'));
         }
+
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
         
 
-        $loterias = Lotteries::select('id', 'descripcion', 'abreviatura')->whereStatus(1)->get();
-        $bancas = Branches::select('id', 'descripcion')->whereStatus(1)->get();
+        $loterias = Lotteries::on($datos["servidor"])->select('id', 'descripcion', 'abreviatura')->whereStatus(1)->get();
+        $bancas = Branches::on($datos["servidor"])->select('id', 'descripcion')->whereStatus(1)->get();
 
 
         return Response::json([
             'loterias' => $loterias,
             'bancas' => $bancas,
-            'sorteos' => Draws::all(),
-            'dias' => Days::all(),
-            'monedas' => Coins::all(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get(),
+            'monedas' => Coins::on($datos["servidor"])->get(),
         ], 201);
     }
 
     public function buscar(Request $request)
     {
-        $datos = request()->validate([
-            'datos.bancas' => '',
-            'datos.dias' => '',
-            'datos.idUsuario' => 'required',
-            'datos.idTipoBloqueo' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.bancas' => '',
+        //     'datos.dias' => '',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idTipoBloqueo' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
     
     
         
@@ -86,13 +109,13 @@ class BlockslotteriesController extends Controller
             $idDias = collect($datos['dias'])->map(function($d){
                 return $d['id'];
             });
-            $dias = Days::whereIn('id', $idDias)->get();
+            $dias = Days::on($datos["servidor"])->whereIn('id', $idDias)->get();
             //COLLECT DIAS
-            $dias = collect($dias)->map(function($d){
-                $loterias = collect(Lotteries::whereStatus(1)->get())->map(function($l) use($d){
+            $dias = collect($dias)->map(function($d) use($datos){
+                $loterias = collect(Lotteries::on($datos["servidor"])->whereStatus(1)->get())->map(function($l) use($d, $datos){
                     //COLLECT SORTEOS
-                    $sorteos = collect($l['sorteos'])->map(function($s) use($d, $l){
-                        $bloqueo = Blocksgenerals::where(['idLoteria' => $l['id'], 'idSorteo' => $s['id'], 'idDia' => $d['id']])->first();
+                    $sorteos = collect($l['sorteos'])->map(function($s) use($d, $l, $datos){
+                        $bloqueo = Blocksgenerals::on($datos["servidor"])->where(['idLoteria' => $l['id'], 'idSorteo' => $s['id'], 'idDia' => $d['id'], "idMoneda" => $datos["idMoneda"]])->first();
                         $montoBloqueo = 0;
                         if($bloqueo != null)
                             $montoBloqueo = $bloqueo['monto'];
@@ -117,17 +140,17 @@ class BlockslotteriesController extends Controller
                 return $d['id'];
             });
 
-            $dias = Days::whereIn('id', $idDias)->get();
+            $dias = Days::on($datos["servidor"])->whereIn('id', $idDias)->get();
             //COLLECT DIAS
-            $dias = collect($dias)->map(function($d) use($idBancas){
-                $bancas = BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', $idBancas)->get());
+            $dias = collect($dias)->map(function($d) use($idBancas, $datos){
+                $bancas = BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', $idBancas)->get())->servidor($datos["servidor"]);
                 //COLLECT BANCAS
-                $bancas = collect($bancas)->map(function($b) use($d){
+                $bancas = collect($bancas)->map(function($b) use($d, $datos){
                     //COLLECT LOTERIAS
-                    $loterias = collect($b['loterias'])->map(function($l) use($b, $d){
+                    $loterias = collect($b['loterias'])->map(function($l) use($b, $d, $datos){
                         //COLLECT SORTEOS
-                        $sorteos = collect($l['sorteos'])->map(function($s) use($d, $b, $l){
-                            $bloqueo = Blockslotteries::where(['idBanca' => $b['id'], 'idLoteria' => $l['id'], 'idSorteo' => $s['id'], 'idDia' => $d['id']])->first();
+                        $sorteos = collect($l['sorteos'])->map(function($s) use($d, $b, $l, $datos){
+                            $bloqueo = Blockslotteries::on($datos["servidor"])->where(['idBanca' => $b['id'], 'idLoteria' => $l['id'], 'idSorteo' => $s['id'], 'idDia' => $d['id'], "idMoneda" => $datos["idMoneda"]])->first();
                             $montoBloqueo = 0;
                             if($bloqueo != null)
                                 $montoBloqueo = $bloqueo['monto'];
@@ -148,14 +171,14 @@ class BlockslotteriesController extends Controller
         }
 
         else if($datos['idTipoBloqueo'] == 2){
-            $loterias = collect(Lotteries::whereStatus(1)->get())->map(function($l){
+            $loterias = collect(Lotteries::on($datos["servidor"])->whereStatus(1)->get())->map(function($l) use($datos){
                 //COLLECT JUGADAS
                 $fecha = Carbon::now();
-                $jugadas = Blocksplaysgenerals::where('idLoteria', $l['id'])
+                $jugadas = Blocksplaysgenerals::on($datos["servidor"])->where(['idLoteria' => $l['id'], "idMoneda" => $datos["idMoneda"]])
                 ->whereRaw('date(blocksplaysgenerals.fechaHasta) >= ? ', [$fecha->toDateString()])
                 ->get();
-                $jugadas = collect($jugadas)->map(function($j){
-                    return ["id" => $j["id"], "jugada" => $j["jugada"], "monto" => $j["monto"], "idSorteo" => $j["idSorteo"], "sorteo" => Draws::whereId($j["idSorteo"])->first()->descripcion, "fechaDesde" => $j["fechaDesde"], "fechaHasta" => $j["fechaHasta"],  "idBloqueo" => $j["id"]];
+                $jugadas = collect($jugadas)->map(function($j) use($datos){
+                    return ["id" => $j["id"], "jugada" => $j["jugada"], "monto" => $j["monto"], "idSorteo" => $j["idSorteo"], "sorteo" => Draws::on($datos["servidor"])->whereId($j["idSorteo"])->first()->descripcion, "fechaDesde" => $j["fechaDesde"], "fechaHasta" => $j["fechaHasta"],  "idBloqueo" => $j["id"]];
                 });
                 return ["id" => $l['id'], "descripcion" => $l['descripcion'], "jugadas" => $jugadas, "cantidadDeBloqueos" => count($jugadas)];
             });
@@ -173,18 +196,18 @@ class BlockslotteriesController extends Controller
 
             
             
-                $bancas = BranchesResource::collection(Branches::whereIn('id', $idBancas)->get());
+                $bancas = BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('id', $idBancas)->get())->servidor($datos["servidor"]);
                 //COLLECT BANCAS
-                $bancas = collect($bancas)->map(function($b){
+                $bancas = collect($bancas)->map(function($b) use($datos){
                     //COLLECT LOTERIAS
-                    $loterias = collect($b['loterias'])->map(function($l) use($b){
+                    $loterias = collect($b['loterias'])->map(function($l) use($b, $datos){
                         //COLLECT SORTEOS
                         $fecha = Carbon::now();
-                        $jugadas = Blocksplays::where(['idLoteria' => $l['id'], "idBanca" => $b['id']])
+                        $jugadas = Blocksplays::on($datos["servidor"])->where(['idLoteria' => $l['id'], "idBanca" => $b['id'], "idMoneda" => $datos["idMoneda"]])
                         ->whereRaw('date(blocksplays.fechaHasta) >= ? ', [$fecha->toDateString()])
                         ->get();
-                        $jugadas = collect($jugadas)->map(function($j){
-                            return ["id" => $j["id"], "jugada" => $j["jugada"], "monto" => $j["monto"], "idSorteo" => $j["idSorteo"], "sorteo" => Draws::whereId($j["idSorteo"])->first()->descripcion, "fechaDesde" => $j["fechaDesde"], "fechaHasta" => $j["fechaHasta"],  "idBloqueo" => $j["id"]];
+                        $jugadas = collect($jugadas)->map(function($j) use($datos){
+                            return ["id" => $j["id"], "jugada" => $j["jugada"], "monto" => $j["monto"], "idSorteo" => $j["idSorteo"], "sorteo" => Draws::on($datos["servidor"])->whereId($j["idSorteo"])->first()->descripcion, "fechaDesde" => $j["fechaDesde"], "fechaHasta" => $j["fechaHasta"],  "idBloqueo" => $j["id"]];
                         });
                         return ["id" => $l['id'], "descripcion" => $l['descripcion'], "jugadas" => $jugadas, "cantidadDeBloqueos" => count($jugadas)];
                     
@@ -202,7 +225,8 @@ class BlockslotteriesController extends Controller
         
     
         return Response::json([
-            'dias' => $dias
+            'dias' => $dias,
+            "idMoneda" => $datos["idMoneda"]
         ], 201);
     }
 
@@ -237,19 +261,29 @@ class BlockslotteriesController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.loterias' => 'required',
-            'datos.sorteos' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.bancas' => 'required',
-            'datos.ckbDias' => 'required',
-            'datos.idMoneda' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.loterias' => 'required',
+        //     'datos.sorteos' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.bancas' => 'required',
+        //     'datos.ckbDias' => 'required',
+        //     'datos.idMoneda' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
     
     
             $loterias = collect($datos['loterias']);
-            list($loterias_seleccionadas, $no) = $loterias->partition(function($l){
-                return $l['seleccionado'] == true && Lotteries::where(['id' => $l['id'], 'status' => 1])->first() != null;
+            list($loterias_seleccionadas, $no) = $loterias->partition(function($l) use($datos){
+                return $l['seleccionado'] == true && Lotteries::on($datos["servidor"])->where(['id' => $l['id'], 'status' => 1])->first() != null;
             });
     
             $sorteos = collect($datos['sorteos']);
@@ -269,20 +303,20 @@ class BlockslotteriesController extends Controller
     foreach($datos['bancas'] as $banca):
         foreach($loterias_seleccionadas as $l):
            
-            if(Branches::whereId($banca['id'])->first()->loterias()->wherePivot('idLoteria', $l['id'])->first() == null)
+            if(Branches::on($datos["servidor"])->whereId($banca['id'])->first()->loterias()->wherePivot('idLoteria', $l['id'])->first() == null)
                     continue;
     
                    
            
             foreach($sorteos_seleccionadas as $s):
-                if(Lotteries::whereId($l['id'])->first()->sorteos()->wherePivot('idSorteo', $s['id'])->first() == null)
+                if(Lotteries::on($datos["servidor"])->whereId($l['id'])->first()->sorteos()->wherePivot('idSorteo', $s['id'])->first() == null)
                     continue;
     
                    
     
                 foreach($dias_seleccionadas as $d):
                     
-                    $bloqueo = Blockslotteries::where(
+                    $bloqueo = Blockslotteries::on($datos["servidor"])->where(
                             [
                                 'idBanca' => $banca['id'], 
                                 'idLoteria' => $l['id'], 
@@ -297,9 +331,9 @@ class BlockslotteriesController extends Controller
                         $bloqueo->save();
                         
                         
-                            $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
+                            $dia = Days::on($datos["servidor"])->where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                             if($dia != null){
-                                $stocksJugadasDelDiaActual = Stock::where(
+                                $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                                 [
                                     'idBanca' => $banca['id'], 
                                     'idLoteria' => $l['id'], 
@@ -325,7 +359,7 @@ class BlockslotteriesController extends Controller
                         
                     }else{
                         //CREAR BLOQUEO
-                        $b = Blockslotteries::create([
+                        $b = Blockslotteries::on($datos["servidor"])->create([
                             'idBanca' => $banca['id'],
                             'idLoteria' => $l['id'],
                             'idSorteo' => $s['id'],
@@ -336,9 +370,9 @@ class BlockslotteriesController extends Controller
 
                         
 
-                        $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
+                        $dia = Days::on($datos["servidor"])->where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                         if($dia != null){
-                            $stocksJugadasDelDiaActual = Stock::where(
+                            $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                             [
                                 'idBanca' => $banca['id'], 
                                 'idLoteria' => $l['id'], 
@@ -366,15 +400,15 @@ class BlockslotteriesController extends Controller
             endforeach; //End foreahc loterias
         endforeach; //End foreach banca
     
-        $loterias = Lotteries::select('id', 'descripcion', 'abreviatura')->whereStatus(1)->get();
-            $bancas = Branches::select('id', 'descripcion')->whereStatus(1)->get();
+        $loterias = Lotteries::on($datos["servidor"])->select('id', 'descripcion', 'abreviatura')->whereStatus(1)->get();
+            $bancas = Branches::on($datos["servidor"])->select('id', 'descripcion')->whereStatus(1)->get();
     
     
         return Response::json([
             'loterias' => $loterias,
             'bancas' => $bancas,
-            'sorteos' => Draws::all(),
-            'dias' => Days::all(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get(),
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente'
         ], 201);
@@ -383,18 +417,27 @@ class BlockslotteriesController extends Controller
 
     public function storeGeneral(Request $request)
     {
-        $datos = request()->validate([
-            'datos.loterias' => 'required',
-            'datos.sorteos' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.ckbDias' => 'required',
-            'datos.idMoneda' => 'required',
-        ])['datos'];
-    
+        // $datos = request()->validate([
+        //     'datos.loterias' => 'required',
+        //     'datos.sorteos' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.ckbDias' => 'required',
+        //     'datos.idMoneda' => 'required',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
     
             $loterias = collect($datos['loterias']);
-            list($loterias_seleccionadas, $no) = $loterias->partition(function($l){
-                return $l['seleccionado'] == true && Lotteries::where(['id' => $l['id'], 'status' => 1])->first() != null;
+            list($loterias_seleccionadas, $no) = $loterias->partition(function($l) use($datos){
+                return $l['seleccionado'] == true && Lotteries::on($datos["servidor"])->where(['id' => $l['id'], 'status' => 1])->first() != null;
             });
     
             $sorteos = collect($datos['sorteos']);
@@ -419,14 +462,14 @@ class BlockslotteriesController extends Controller
                    
            
             foreach($sorteos_seleccionadas as $s):
-                if(Lotteries::whereId($l['id'])->first()->sorteos()->wherePivot('idSorteo', $s['id'])->first() == null)
+                if(Lotteries::on($datos["servidor"])->whereId($l['id'])->first()->sorteos()->wherePivot('idSorteo', $s['id'])->first() == null)
                     continue;
     
                    
     
                 foreach($dias_seleccionadas as $d):
                     
-                    $bloqueo = Blocksgenerals::where(
+                    $bloqueo = Blocksgenerals::on($datos["servidor"])->where(
                             [ 
                                 'idLoteria' => $l['id'], 
                                 'idSorteo' => $s['id'],
@@ -442,9 +485,9 @@ class BlockslotteriesController extends Controller
                         
 
                         
-                            $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
+                            $dia = Days::on($datos["servidor"])->where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                             if($dia != null){
-                                $stocksJugadasDelDiaActual = Stock::where(
+                                $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                                 [
                                     'idLoteria' => $l['id'], 
                                     'idSorteo' => $s['id'],
@@ -469,7 +512,7 @@ class BlockslotteriesController extends Controller
                         
                     }else{
                         //CREAR BLOQUEO
-                        $b = Blocksgenerals::create([
+                        $b = Blocksgenerals::on($datos["servidor"])->create([
                             'idLoteria' => $l['id'],
                             'idSorteo' => $s['id'],
                             'idDia' => $d['id'],
@@ -479,9 +522,9 @@ class BlockslotteriesController extends Controller
 
                         
 
-                        $dia = Days::where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
+                        $dia = Days::on($datos["servidor"])->where(['id' => $d['id'], 'wday' => $fecha['wday']])->first();
                         if($dia != null){
-                            $stocksJugadasDelDiaActual = Stock::where(
+                            $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                             [
                                 'idLoteria' => $l['id'], 
                                 'idSorteo' => $s['id'],
@@ -508,15 +551,15 @@ class BlockslotteriesController extends Controller
             endforeach; //End foreahc loterias
        
     
-        $loterias = Lotteries::select('id', 'descripcion', 'abreviatura')->whereStatus(1)->get();
-        $bancas = Branches::select('id', 'descripcion')->whereStatus(1)->get();
+        $loterias = Lotteries::on($datos["servidor"])->select('id', 'descripcion', 'abreviatura')->whereStatus(1)->get();
+        $bancas = Branches::on($datos["servidor"])->select('id', 'descripcion')->whereStatus(1)->get();
     
     
         return Response::json([
             'loterias' => $loterias,
             'bancas' => $bancas,
-            'sorteos' => Draws::all(),
-            'dias' => Days::all(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get(),
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente'
         ], 201);

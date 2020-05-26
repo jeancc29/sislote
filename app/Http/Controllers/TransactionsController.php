@@ -103,7 +103,7 @@ class TransactionsController extends Controller
         ->get();
         
         $tipos = Types::on($datos["servidor"])->where(['renglon' => 'entidad', 'status' => 1])->get();
-        $tipos = collect($tipos)->map(function($d, $datos){
+        $tipos = collect($tipos)->map(function($d) use($datos){
             $entidades = null;
             if($d->descripcion == "Banca"){
                 $entidades = Branches::on($datos["servidor"])->whereStatus(1)->get();

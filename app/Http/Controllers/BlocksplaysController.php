@@ -71,16 +71,25 @@ class BlocksplaysController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.loterias' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.bancas' => 'required',
-            'datos.jugadas' => 'required',
-            'datos.fechaDesde' => 'required',
-            'datos.fechaHasta' => 'required',
-            'datos.idMoneda' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.loterias' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.bancas' => 'required',
+        //     'datos.jugadas' => 'required',
+        //     'datos.fechaDesde' => 'required',
+        //     'datos.fechaHasta' => 'required',
+        //     'datos.idMoneda' => 'required',
+        // ])['datos'];
     
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
     
             $loterias = collect($datos['loterias']);
             list($loterias_seleccionadas, $no) = $loterias->partition(function($l){
@@ -91,7 +100,7 @@ class BlocksplaysController extends Controller
                 return $d['id'];
             });
 
-            $loterias_seleccionadas = Lotteries::whereIn('id', $loterias)->whereStatus(1)->get();
+            $loterias_seleccionadas = Lotteries::on($datos["servidor"])->whereIn('id', $loterias)->whereStatus(1)->get();
     
             $fechaDesde = getdate(strtotime($datos['fechaDesde']));
             $fechaHasta = getdate(strtotime($datos['fechaHasta']));
@@ -103,22 +112,22 @@ class BlocksplaysController extends Controller
             $fechaHastaCarbon = new Carbon($fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday']);
             $fechaActualCarbon = Carbon::now();
     
-            $loterias = Lotteries::whereStatus(1)->get();
-            $bancas = Branches::whereStatus(1)->get();
+            $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->get();
+            $bancas = Branches::on($datos["servidor"])->whereStatus(1)->get();
 
     foreach($datos['bancas'] as $banca):
         foreach($loterias_seleccionadas as $l):
-            if(Branches::whereId($banca['id'])->first()->loterias()->wherePivot('idLoteria', $l['id'])->first() == null)
+            if(Branches::on($datos["servidor"])->whereId($banca['id'])->first()->loterias()->wherePivot('idLoteria', $l['id'])->first() == null)
                     continue;
 
             foreach($datos['jugadas'] as $j):
            
             
-                $j['idSorteo'] = Helper::determinarSorteo($j['jugada'], $l);
-                $j['jugada'] = Helper::quitarUltimoCaracter($j['jugada'], $j['idSorteo']);
+                $j['idSorteo'] = Helper::determinarSorteo($datos["servidor"], $j['jugada'], $l);
+                $j['jugada'] = Helper::quitarUltimoCaracter($datos["servidor"], $j['jugada'], $j['idSorteo']);
                    
     
-                    $bloqueo = Blocksplays::where(
+                    $bloqueo = Blocksplays::on($datos["servidor"])->where(
                         [
                             'idBanca' => $banca['id'], 
                             'idLoteria' => $l['id'], 
@@ -147,7 +156,7 @@ class BlocksplaysController extends Controller
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
                         {
-                            $stocksJugadasDelDiaActual = Stock::where(
+                            $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                                 [
                                     'idBanca' => $banca['id'], 
                                     'idLoteria' => $l['id'], 
@@ -182,7 +191,7 @@ class BlocksplaysController extends Controller
                                 }
                         }
                     }else{
-                        $b = Blocksplays::create([
+                        $b = Blocksplays::on($datos["servidor"])->create([
                             'idBanca' => $banca['id'],
                             'idLoteria' => $l['id'],
                             'idSorteo' => $j['idSorteo'],
@@ -205,7 +214,7 @@ class BlocksplaysController extends Controller
                             //     'mensaje' => 'Monto vendido '
                             // ], 201);
 
-                            $stocksJugadasDelDiaActual = Stock::where(
+                            $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                                 [
                                     'idBanca' => $banca['id'], 
                                     'idLoteria' => $l['id'], 
@@ -241,15 +250,15 @@ class BlocksplaysController extends Controller
             endforeach; //End foreahc loterias
         endforeach; //End foreach banca
     
-        $loterias = Lotteries::whereStatus(1)->get();
-            $bancas = Branches::whereStatus(1)->get();
+        $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->get();
+            $bancas = Branches::on($datos["servidor"])->whereStatus(1)->get();
     
     
         return Response::json([
             'loterias' => $loterias,
             'bancas' => $bancas,
-            'sorteos' => Draws::all(),
-            'dias' => Days::all(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get(),
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente'
         ], 201);
@@ -260,15 +269,25 @@ class BlocksplaysController extends Controller
     
     public function storeGeneral(Request $request)
     {
-        $datos = request()->validate([
-            'datos.loterias' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idMoneda' => 'required',
-            'datos.jugadas' => 'required',
-            'datos.fechaDesde' => 'required',
-            'datos.fechaHasta' => 'required',
-            'datos.ignorarDemasBloqueos' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.loterias' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idMoneda' => 'required',
+        //     'datos.jugadas' => 'required',
+        //     'datos.fechaDesde' => 'required',
+        //     'datos.fechaHasta' => 'required',
+        //     'datos.ignorarDemasBloqueos' => ''
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
     
     
             $loterias = collect($datos['loterias']);
@@ -280,7 +299,7 @@ class BlocksplaysController extends Controller
                 return $d['id'];
             });
 
-            $loterias_seleccionadas = Lotteries::whereIn('id', $loterias)->whereStatus(1)->get();
+            $loterias_seleccionadas = Lotteries::on($datos["servidor"])->whereIn('id', $loterias)->whereStatus(1)->get();
     
             $fechaDesde = getdate(strtotime($datos['fechaDesde']));
             $fechaHasta = getdate(strtotime($datos['fechaHasta']));
@@ -292,8 +311,8 @@ class BlocksplaysController extends Controller
             $fechaHastaCarbon = new Carbon($fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday']);
             $fechaActualCarbon = Carbon::now();
     
-            $loterias = Lotteries::whereStatus(1)->get();
-            $bancas = Branches::whereStatus(1)->get();
+            $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->get();
+            $bancas = Branches::on($datos["servidor"])->whereStatus(1)->get();
 
  
         foreach($loterias_seleccionadas as $l):
@@ -301,11 +320,11 @@ class BlocksplaysController extends Controller
             foreach($datos['jugadas'] as $j):
            
             
-                $j['idSorteo'] = Helper::determinarSorteo($j['jugada'], $l);
-                $j['jugada'] = Helper::quitarUltimoCaracter($j['jugada'], $j['idSorteo']);
+                $j['idSorteo'] = Helper::determinarSorteo($datos["servidor"], $j['jugada'], $l);
+                $j['jugada'] = Helper::quitarUltimoCaracter($datos["servidor"], $j['jugada'], $j['idSorteo']);
                    
     
-                    $bloqueo = Blocksplaysgenerals::where(
+                    $bloqueo = Blocksplaysgenerals::on($datos["servidor"])->where(
                         [
                             'idLoteria' => $l['id'], 
                             'jugada' => $j['jugada'],
@@ -326,7 +345,7 @@ class BlocksplaysController extends Controller
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
                         {
-                            $stocksJugadasDelDiaActual = Stock::where(
+                            $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                                 [
                                     'idLoteria' => $l['id'], 
                                     'jugada' => $j['jugada'],
@@ -351,7 +370,7 @@ class BlocksplaysController extends Controller
                                 }
                         }
                     }else{
-                        $b = Blocksplaysgenerals::create([
+                        $b = Blocksplaysgenerals::on($datos["servidor"])->create([
                             'idLoteria' => $l['id'],
                             'idSorteo' => $j['idSorteo'],
                             'jugada' => $j['jugada'],
@@ -369,7 +388,7 @@ class BlocksplaysController extends Controller
 
                         if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
                         {
-                            $stocksJugadasDelDiaActual = Stock::where(
+                            $stocksJugadasDelDiaActual = Stock::on($datos["servidor"])->where(
                                 [
                                     'idLoteria' => $l['id'], 
                                     'jugada' => $j['jugada'],
@@ -399,151 +418,22 @@ class BlocksplaysController extends Controller
             endforeach; //End foreahc loterias
     
     
-        $loterias = Lotteries::whereStatus(1)->get();
-            $bancas = Branches::whereStatus(1)->get();
+        $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->get();
+        $bancas = Branches::on($datos["servidor"])->whereStatus(1)->get();
     
     
         return Response::json([
             'loterias' => $loterias,
             'bancas' => $bancas,
-            'sorteos' => Draws::all(),
-            'dias' => Days::all(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get(),
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente'
         ], 201);
     }
 
     //CODIGO GUARDAR VIEJO
-    public function storeViejo(Request $request)
-    {
-        $datos = request()->validate([
-            'datos.loterias' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idSorteo' => 'required',
-            'datos.bancas' => 'required',
-            'datos.jugada' => 'required',
-            'datos.monto' => 'required',
-            'datos.fechaDesde' => 'required',
-            'datos.fechaHasta' => 'required',
-        ])['datos'];
     
-    
-            $loterias = collect($datos['loterias']);
-            list($loterias_seleccionadas, $no) = $loterias->partition(function($l){
-                return $l['seleccionado'] == true && Lotteries::where(['id' => $l['id'], 'status' => 1])->first() != null;
-            });
-    
-            $fechaDesde = getdate(strtotime($datos['fechaDesde']));
-            $fechaHasta = getdate(strtotime($datos['fechaHasta']));
-            $fecha = getdate();
-
-            $fechaDesdeCarbon = new Carbon($datos['fechaDesde']);
-            $fechaHastaCarbon = new Carbon($datos['fechaHasta']);
-            $fechaActualCarbon = Carbon::now();
-    
-            $loterias = Lotteries::whereStatus(1)->get();
-            $bancas = Branches::whereStatus(1)->get();
-    
-    foreach($datos['bancas'] as $banca):
-        foreach($loterias_seleccionadas as $l):
-           
-            if(Branches::whereId($banca['id'])->first()->loterias()->wherePivot('idLoteria', $l['id'])->first() == null)
-                    continue;
-    
-                   
-    
-                    $bloqueo = Blocksplays::where(
-                        [
-                            'idBanca' => $banca['id'], 
-                            'idLoteria' => $l['id'], 
-                            'jugada' => $datos['jugada'],
-                            'idSorteo' => $datos['idSorteo'],
-                            'status' => 1
-                        ])
-                        ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))->first();
-    
-                    if($bloqueo != null){
-                        $bloqueo['monto'] = $datos['monto'];
-                        $bloqueo['fechaDesde'] = $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00';
-                        $bloqueo['fechaHasta'] = $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00';
-                        $bloqueo->save();
-
-                        if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
-                        {
-                            $stocksJugadasDelDiaActual = Stock::where(
-                                [
-                                    'idBanca' => $banca['id'], 
-                                    'idLoteria' => $l['id'], 
-                                    'jugada' => $datos['jugada'],
-                                    'idSorteo' => $datos['idSorteo']
-                                ])
-                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
-                                ->get();
-
-                                foreach($stocksJugadasDelDiaActual as $s)
-                                {
-                                    $montoVendido = $s['montoInicial'] - $s['monto'];
-                                    $s['montoInicial'] = $datos['monto'];
-                                    $s['monto'] = $datos['monto'] - $montoVendido;
-                                    $s['esBloqueoJugada'] = 1;
-                                    $s->save();
-                                }
-                        }
-                    }else{
-                        Blocksplays::create([
-                            'idBanca' => $banca['id'],
-                            'idLoteria' => $l['id'],
-                            'idSorteo' => $datos['idSorteo'],
-                            'jugada' => $datos['jugada'],
-                            'montoInicial' => $datos['monto'],
-                            'monto' => $datos['monto'],
-                            'fechaDesde' => $fechaDesde['year'].'-'.$fechaDesde['mon'].'-'.$fechaDesde['mday'] . ' 00:00:00',
-                            'fechaHasta' => $fechaHasta['year'].'-'.$fechaHasta['mon'].'-'.$fechaHasta['mday'] . ' 23:50:00',
-                            'idUsuario' => $datos['idUsuario'],
-                            'status' => 1
-                        ]);
-
-                        if($fechaDesdeCarbon->toDateString() <= $fechaActualCarbon->toDateString() && $fechaHastaCarbon->toDateString() >= $fechaActualCarbon->toDateString())
-                        {
-                            $stocksJugadasDelDiaActual = Stock::where(
-                                [
-                                    'idBanca' => $banca['id'], 
-                                    'idLoteria' => $l['id'], 
-                                    'jugada' => $datos['jugada'],
-                                    'idSorteo' => $datos['idSorteo']
-                                ])
-                                ->whereBetween('created_at', array($fechaActualCarbon->toDateString() . ' 00:00:00', $fechaHastaCarbon->toDateString() . ' 23:50:00'))
-                                ->get();
-
-                                foreach($stocksJugadasDelDiaActual as $s)
-                                {
-                                    $montoVendido = $s['montoInicial'] - $s['monto'];
-                                    $s['montoInicial'] = $datos['monto'];
-                                    $s['monto'] = $datos['monto'] - $montoVendido;
-                                    $s['esBloqueoJugada'] = 1;
-                                    $s->save();
-                                }
-                        }
-                    }
-                   
-          
-            endforeach; //End foreahc loterias
-        endforeach; //End foreach banca
-    
-        $loterias = Lotteries::whereStatus(1)->get();
-            $bancas = Branches::whereStatus(1)->get();
-    
-    
-        return Response::json([
-            'loterias' => LotteriesResource::collection($loterias),
-            'bancas' => BranchesResource::collection($bancas),
-            'sorteos' => Draws::all(),
-            'dias' => Days::all(),
-            'errores' => 0,
-            'mensaje' => 'Se ha guardado correctamente'
-        ], 201);
-    }
-
     public function buscar(Request $request)
     {
         $datos = request()->validate([

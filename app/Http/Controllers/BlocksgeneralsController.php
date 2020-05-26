@@ -92,8 +92,17 @@ class BlocksgeneralsController extends Controller
     public function eliminar(BlocksGeneralsRequest $request)
     {
         
-        $validated = $request->validated();
-        Blocksgenerals::whereId($validated["datos"]["idBloqueo"])->first()->delete();
+        // $validated = $request->validated();
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+        Blocksgenerals::on($datos["servidor"])->whereId($datos["idBloqueo"])->first()->delete();
 
     
         return Response::json([

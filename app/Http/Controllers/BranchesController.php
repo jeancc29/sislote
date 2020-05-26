@@ -55,17 +55,32 @@ class BranchesController extends Controller
         if(!strpos(Request::url(), '/api/')){
             return view('bancas.index', compact('controlador'));
         }
+
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        
        
         // $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
-        $bancas = Branches::whereIn('status', array(0, 1))->get();
+        $bancas = Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get();
 
         return Response::json([
             'bancas' => BranchesResourceSmall::collection($bancas),
-            'usuarios' => Users::whereIn('status', array(0, 1))->get(),
-            'monedas' => Coins::all(),
+            'usuarios' => Users::on($datos["servidor"])->whereIn('status', array(0, 1))->get(),
+            'monedas' => Coins::on($datos["servidor"])->get(),
             'loterias' => [],
-            'frecuencias' => Frecuency::all(),
-            'dias' => Days::all()
+            'frecuencias' => Frecuency::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get()
         ], 201);
 
     }
@@ -88,49 +103,61 @@ class BranchesController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.descripcion' => 'required',
-            'datos.ip' => 'required|min:1|max:15',
-            'datos.codigo' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idUsuarioBanca' => 'required',
-            'datos.idMoneda' => 'required',
-            'datos.dueno' => 'required',
-            'datos.localidad' => 'required',
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.descripcion' => 'required',
+        //     'datos.ip' => 'required|min:1|max:15',
+        //     'datos.codigo' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idUsuarioBanca' => 'required',
+        //     'datos.idMoneda' => 'required',
+        //     'datos.dueno' => 'required',
+        //     'datos.localidad' => 'required',
     
-            'datos.balanceDesactivacion' => '',
-            'datos.limiteVenta' => 'required',
-            'datos.descontar' => 'required',
-            'datos.deCada' => 'required',
-            'datos.minutosCancelarTicket' => 'required',
-            'datos.piepagina1' => '',
-            'datos.piepagina2' => '',
-            'datos.piepagina3' => '',
-            'datos.piepagina4' => '',
-            'datos.status' => 'required',
-            'datos.imprimirCodigoQr' => 'required',
+        //     'datos.balanceDesactivacion' => '',
+        //     'datos.limiteVenta' => 'required',
+        //     'datos.descontar' => 'required',
+        //     'datos.deCada' => 'required',
+        //     'datos.minutosCancelarTicket' => 'required',
+        //     'datos.piepagina1' => '',
+        //     'datos.piepagina2' => '',
+        //     'datos.piepagina3' => '',
+        //     'datos.piepagina4' => '',
+        //     'datos.status' => 'required',
+        //     'datos.imprimirCodigoQr' => 'required',
     
-            'datos.lunes' => '',
-            'datos.martes' => '',
-            'datos.miercoles' => '',
-            'datos.jueves' => '',
-            'datos.viernes' => '',
-            'datos.sabado' => '',
-            'datos.domingo' => '',
+        //     'datos.lunes' => '',
+        //     'datos.martes' => '',
+        //     'datos.miercoles' => '',
+        //     'datos.jueves' => '',
+        //     'datos.viernes' => '',
+        //     'datos.sabado' => '',
+        //     'datos.domingo' => '',
     
-            'datos.comisiones' => 'required',
-            'datos.pagosCombinaciones' => 'required',
-            'datos.loteriasSeleccionadas' => 'required',
-            'datos.gastos' => '',
-        ])['datos'];
+        //     'datos.comisiones' => 'required',
+        //     'datos.pagosCombinaciones' => 'required',
+        //     'datos.loteriasSeleccionadas' => 'required',
+        //     'datos.gastos' => '',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
     
     
         $errores = 0;
         $mensaje = '';
     
         
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso('Manejar bancas')){
             return Response::json([
                 'errores' => 1,
@@ -139,12 +166,12 @@ class BranchesController extends Controller
         }
     
        
-        $banca = Branches::whereId($datos['id'])->get()->first();
+        $banca = Branches::on($datos["servidor"])->whereId($datos['id'])->get()->first();
         
     
         if($banca != null){
     
-            if(Branches::where(['idUsuario'=> $datos['idUsuarioBanca'], 'status' => 1])->whereNotIn('id', [$banca->id])->first() != null){
+            if(Branches::on($datos["servidor"])->where(['idUsuario'=> $datos['idUsuarioBanca'], 'status' => 1])->whereNotIn('id', [$banca->id])->first() != null){
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => 'Este usuario ya tiene una banca registrada y solo se permite un usaurio por banca'
@@ -172,14 +199,14 @@ class BranchesController extends Controller
             $banca->save();
     
         }else{
-            if(Branches::where(['idUsuario'=> $datos['idUsuarioBanca'], 'status' => 1])->count() > 0)
+            if(Branches::on($datos["servidor"])->where(['idUsuario'=> $datos['idUsuarioBanca'], 'status' => 1])->count() > 0)
             {
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => 'Este usuario ya tiene una banca registrada y solo se permite un usaurio por banca'
                 ], 201);
             }
-            $banca = Branches::create([
+            $banca = Branches::on($datos["servidor"])->create([
                 'descripcion' => $datos['descripcion'],
                 'ip' => $datos['ip'],
                 'codigo' => $datos['codigo'],
@@ -225,7 +252,7 @@ class BranchesController extends Controller
           /********************* DIAS ************************/
             //Eliminamos los dias para luego agregarlos nuevamentes
             $banca->dias()->detach();
-            $dias = Days::all();
+            $dias = Days::on($datos["servidor"])->all();
             $dias = collect($dias)->map(function($d) use($banca, $datos){
                 switch ($d['descripcion']) {
                     case 'Lunes':
@@ -263,10 +290,10 @@ class BranchesController extends Controller
             });
             //Eliminamos las loterias que no esten incluidas en las loterias que han sido recibidas
             // Commissions::where('idBanca', $banca['id'])->whereNotIn('idLoteria', $idLoterias)->delete();
-            Commissions::where('idBanca', $banca['id'])->delete();
+            Commissions::on($datos["servidor"])->where('idBanca', $banca['id'])->delete();
             foreach($datos['loteriasSeleccionadas'] as $l){
                 if($banca->loterias()->wherePivot('idLoteria', $l['id'])->first() != null){
-                    Commissions::create([
+                    Commissions::on($datos["servidor"])->create([
                         'idBanca' => $banca['id'],
                         'idLoteria' => $l['id'],
                         'directo' => $l['comisiones']['directo'],
@@ -281,7 +308,7 @@ class BranchesController extends Controller
                 }
             }
 
-            Helper::cambiarComisionesATickets($banca['id']);
+            Helper::cambiarComisionesATickets($datos["servidor"], $banca['id']);
     
     
     
@@ -298,7 +325,7 @@ class BranchesController extends Controller
             //Eliminamos las loterias que no esten incluidas en las loterias que han sido recibidas
             // Payscombinations::where('idBanca', $banca['id'])->whereNotIn('idLoteria', $idLoterias)->delete();
             
-            Payscombinations::where('idBanca', $banca['id'])->delete();
+            Payscombinations::on($datos["servidor"])->where('idBanca', $banca['id'])->delete();
             foreach($datos['loteriasSeleccionadas'] as $l){
                 if($banca->loterias()->wherePivot('idLoteria', $l['id'])->first() != null){
                   
@@ -353,7 +380,7 @@ class BranchesController extends Controller
                     if((new Helper)->isNumber($l['pagosCombinaciones']['pick424Way']) == false){
                         return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 24-way no tiene formato correcto'], 201);
                     }
-                    Payscombinations::create([
+                    Payscombinations::on($datos["servidor"])->create([
                         'idBanca' => $banca['id'],
                         'idLoteria' => $l['id'],
                         'primera' => (int)$l['pagosCombinaciones']['primera'],
@@ -382,9 +409,9 @@ class BranchesController extends Controller
              $idGastos = collect($datos['gastos'])->map(function($d){
                 return $d['id'];
             });
-             Automaticexpenses::where('idBanca', $banca['id'])->whereNotIn('id', $idGastos)->delete();
+             Automaticexpenses::on($datos["servidor"])->where('idBanca', $banca['id'])->whereNotIn('id', $idGastos)->delete();
              foreach($datos['gastos'] as $l){
-                $gasto = Automaticexpenses::where(['idBanca' => $banca['id'], 'id' => $l['id']])->first();
+                $gasto = Automaticexpenses::on($datos["servidor"])->where(['idBanca' => $banca['id'], 'id' => $l['id']])->first();
                 
 
                 
@@ -417,7 +444,7 @@ class BranchesController extends Controller
                     if(strtolower($l['frecuencia']['descripcion']) == strtolower("SEMANAL")){
                         $idDia = $l['idDia'];
                     }
-                    Automaticexpenses::create([
+                    Automaticexpenses::on($datos["servidor"])->create([
                         'idBanca' => $banca['id'],
                         'descripcion' => $l['descripcion'],
                         'monto' => $l['monto'],
@@ -438,8 +465,8 @@ class BranchesController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
-            'banca' => BranchesResource::collection(Branches::whereId($banca->id)->get()),
-            'bancas' => BranchesResource::collection(Branches::whereIn('status', array(0, 1))->get()),
+            'banca' => BranchesResource::collection(Branches::on($datos["servidor"])->whereId($banca->id)->get())->servidor($datos["servidor"]),
+            'bancas' => BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get())->servidor($datos["servidor"]),
             'gastos' => $datos['gastos']
         ], 201);
     }
@@ -452,49 +479,71 @@ class BranchesController extends Controller
      */
     public function show(Branches $branches)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required'
+        // ])['datos'];
 
-
-        $banca = Branches::whereId($datos['id'])->first();
-        if($banca == null){
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
             return Response::json([
                 'errores' => 1,
-                'usuarios' => 'La banca no existe'
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
             ], 201);
         }
 
 
-        $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
-        $loterias = collect($loterias)->map(function($l){
-            $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria', $l['id'])->get();
+        $banca = Branches::on($datos["servidor"])->whereId($datos['id'])->first();
+        if($banca == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'La banca no existe'
+            ], 201);
+        }
+
+
+        $loterias =Lotteries::on($datos["servidor"])->whereStatus(1)->has('sorteos')->get();
+        $loterias = collect($loterias)->map(function($l) use($datos){
+            $sorteos = Draws::on($datos["servidor"])->join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria', $l['id'])->get();
             return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
         });
 
         return Response::json([
             'errores' => 0,
             'mensaje' => '',
-            'banca' => new BranchesResource($banca),
+            'banca' => (new BranchesResource($banca))->servidor($datos["servidor"]),
             'loterias' => $loterias,
-            'frecuencias' => Frecuency::all(),
-            'dias' => Days::all()
+            'frecuencias' => Frecuency::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get()
         ], 201);
     }
 
     public function getDatos(Branches $branches)
     {
-        $datos = request()->validate([
-            'datos.id' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => ''
+        // ])['datos'];
 
 
        
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
-
-        $loterias =Lotteries::whereStatus(1)->has('sorteos')->get();
-        $loterias = collect($loterias)->map(function($l){
-            $sorteos = Draws::join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria', $l['id'])->get();
+        $loterias =Lotteries::on($datos["servidor"])->whereStatus(1)->has('sorteos')->get();
+        $loterias = collect($loterias)->map(function($l) use($datos){
+            $sorteos = Draws::on($datos["servidor"])->join('draw_lottery', 'draw_lottery.idSorteo', 'draws.id')->where('draw_lottery.idLoteria', $l['id'])->get();
             return ['id' => $l['id'], 'descripcion' => $l['descripcion'], 'status' => $l['status'], 'sorteos' => $sorteos];
         });
 
@@ -502,8 +551,8 @@ class BranchesController extends Controller
             'errores' => 0,
             'mensaje' => '',
             'loterias' => $loterias,
-            'frecuencias' => Frecuency::all(),
-            'dias' => Days::all(),
+            'frecuencias' => Frecuency::on($datos["servidor"])->get(),
+            'dias' => Days::on($datos["servidor"])->get(),
         ], 201);
     }
 

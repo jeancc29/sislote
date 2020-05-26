@@ -50,7 +50,7 @@ class TicketPrintClass{
     function __construct($servidor, $idVenta){
         $this->servidor = $servidor;
         $this->venta = Sales::on($this->servidor)->whereId($idVenta)->get()->first();
-        $this->ventaColeccion = SalesResource::collection(Sales::on($this->servidor)->whereId($idVenta)->get(), $this->servidor);
+        $this->ventaColeccion = SalesResource::collection(Sales::on($this->servidor)->whereId($idVenta)->get())->servidor($this->servidor);
         $this->banca = Branches::on($this->servidor)->whereId($this->venta->idBanca)->first();
         $this->ventasDetalles = Salesdetails::on($this->servidor)->where('idVenta', $this->venta->id)->orderBy('idLoteria', 'desc')->get();
         $this->ventasDetalles = collect($this->ventasDetalles);

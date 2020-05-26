@@ -224,8 +224,8 @@ myApp
 
         
         $scope.inicializarDatos = function(todos, idUsuarioBanca = 0){
-               
-            $http.get(rutaGlobal+"/api/bancas")
+            var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+            $http.get(rutaGlobal+"/api/bancas?token=" + jwt)
              .then(function(response){
                 console.log('Bancas: ', response.data);
 
@@ -485,9 +485,9 @@ myApp
 
                 $scope.datos.cargando = true;
 
-
-
-                 $http.post(rutaGlobal+"/api/bancas/getDatos", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+                $scope.datos.servidor = servidorGlobal;
+                var jwt = helperService.createJWT($scope.datos);
+                 $http.post(rutaGlobal+"/api/bancas/getDatos", {'action':'sp_bancas_actualizar', 'datos': jwt})
              .then(function(response){
                 // console.log(response.data);
                 if(response.data.errores == 0){
@@ -550,8 +550,9 @@ myApp
                 // $(".ps-scrollbar-y").scrollTop = 0;
                 $scope.datos.cargando = true;
 
-
-                $http.post(rutaGlobal+"/api/bancas/get", {'action':'sp_bancas_actualizar', 'datos': d})
+                d.servidor = servidorGlobal;
+                var jwt = helperService.createJWT(d);
+                $http.post(rutaGlobal+"/api/bancas/get", {'action':'sp_bancas_actualizar', 'datos': jwt})
                 .then(function(response){
                     $scope.datos.cargando = false;
                    console.log(response.data);
@@ -1126,7 +1127,9 @@ myApp
 
             _convertir_apertura_y_cierre(true);
             $scope.datos.btnCargando = true;
-          $http.post(rutaGlobal+"/api/bancas/guardar", {'action':'sp_bancas_actualizar', 'datos': datos})
+            datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(datos);
+          $http.post(rutaGlobal+"/api/bancas/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0){
