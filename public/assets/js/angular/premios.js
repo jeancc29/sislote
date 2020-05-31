@@ -33,8 +33,8 @@ myApp
 
         $scope.inicializarDatos = function(idLoteria, idSorteo){
             
-
-            $http.get(rutaGlobal+"/api/premios", {'action':'sp_datosgenerales_obtener_todos'})
+            var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+            $http.get(rutaGlobal+"/api/premios?token=" + jwt, {'action':'sp_datosgenerales_obtener_todos'})
              .then(function(response){
                 console.log('Loteria ajav: ', response.data);
 
@@ -93,9 +93,13 @@ myApp
         }
         $scope.buscarPorFecha = function(idLoteria, idSorteo){
             
+            var datos = {};
 
-            $scope.datos.idUsuario = idUsuarioGlobal;
-            $http.post(rutaGlobal+"/api/premios/buscarPorFecha", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
+            datos.fecha = $scope.datos.fecha;
+            datos.idUsuario = idUsuarioGlobal;
+            datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(datos);
+            $http.post(rutaGlobal+"/api/premios/buscarPorFecha", {'action':'sp_premios_actualiza', 'datos': jwt})
              .then(function(response){
                 console.log('Loteria ajav: ', response.data);
 
@@ -278,8 +282,9 @@ myApp
             }
 
 
-          
-          $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
+        $scope.datos.servidor = servidorGlobal;
+        var jwt = helperService.createJWT($scope.datos);
+          $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': jwt})
              .then(function(response){
                 console.log('premios:', response);
                 if(response.data.errores == 0){
@@ -308,7 +313,9 @@ myApp
             }
 
             $scope.datos.idLoteria = id;
-            $http.post(rutaGlobal+"/api/premios/erase", {'action':'sp_premios_actualiza', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/premios/erase", {'action':'sp_premios_actualiza', 'datos': jwt})
              .then(function(response){
                 console.log(response);
                 if(response.data.errores == 0){

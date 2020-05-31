@@ -57,6 +57,10 @@ class AutomaticExpenses extends Command
         // // Escribe el contenido al fichero
         // file_put_contents($fichero, $actual);
 
+        $servidores = Server::on("mysql")->get();
+        foreach ($servidores as $servi):
+        $servidor = $servi->descripcion;
+        
         $prueba = new Carbon("2019-01-20");
 
         $fecha = Carbon::now();
@@ -68,7 +72,7 @@ class AutomaticExpenses extends Command
 
         $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";
         $fechaHasta = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 23:59:00";
-        $usuario = Users::whereNombres("Sistema")->first();
+        $usuario = Users::on($servidor)->whereNombres("Sistema")->first();
         $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Consumo automatico de banca")->first();
         $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
         $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
@@ -269,7 +273,7 @@ class AutomaticExpenses extends Command
         }
 
         
-
+    endforeach;
 
         // Draws::create([
         //     'descripcion' => 'Sorteo cronjob',

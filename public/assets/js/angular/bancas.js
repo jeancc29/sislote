@@ -72,20 +72,43 @@ myApp
         }
 
         function _convertir_apertura_y_cierre(_24){
-            $scope.datos.lunes.apertura = hora_convertir($('#lunesHoraApertura').val(), _24);
-            $scope.datos.lunes.cierre = hora_convertir($('#lunesHoraCierre').val(), _24);
-            $scope.datos.martes.apertura = hora_convertir($('#martesHoraApertura').val(), _24);
-            $scope.datos.martes.cierre = hora_convertir($('#martesHoraCierre').val(), _24);
-            $scope.datos.miercoles.apertura = hora_convertir($('#miercolesHoraApertura').val(), _24);
-            $scope.datos.miercoles.cierre = hora_convertir($('#miercolesHoraCierre').val(), _24);
-            $scope.datos.jueves.apertura = hora_convertir($('#juevesHoraApertura').val(), _24);
-            $scope.datos.jueves.cierre = hora_convertir($('#juevesHoraCierre').val(), _24);
-            $scope.datos.viernes.apertura = hora_convertir($('#viernesHoraApertura').val(), _24);
-            $scope.datos.viernes.cierre = hora_convertir($('#viernesHoraCierre').val(), _24);
-            $scope.datos.sabado.apertura = hora_convertir($('#sabadoHoraApertura').val(), _24);
-            $scope.datos.sabado.cierre = hora_convertir($('#sabadoHoraCierre').val(), _24);
-            $scope.datos.domingo.apertura = hora_convertir($('#domingoHoraApertura').val(), _24);
-            $scope.datos.domingo.cierre = hora_convertir($('#domingoHoraCierre').val(), _24);
+            // $scope.datos.lunes.apertura = hora_convertir($('#lunesHoraApertura').val(), _24);
+            // $scope.datos.lunes.cierre = hora_convertir($('#lunesHoraCierre').val(), _24);
+            // $scope.datos.martes.apertura = hora_convertir($('#martesHoraApertura').val(), _24);
+            // $scope.datos.martes.cierre = hora_convertir($('#martesHoraCierre').val(), _24);
+            // $scope.datos.miercoles.apertura = hora_convertir($('#miercolesHoraApertura').val(), _24);
+            // $scope.datos.miercoles.cierre = hora_convertir($('#miercolesHoraCierre').val(), _24);
+            // $scope.datos.jueves.apertura = hora_convertir($('#juevesHoraApertura').val(), _24);
+            // $scope.datos.jueves.cierre = hora_convertir($('#juevesHoraCierre').val(), _24);
+            // $scope.datos.viernes.apertura = hora_convertir($('#viernesHoraApertura').val(), _24);
+            // $scope.datos.viernes.cierre = hora_convertir($('#viernesHoraCierre').val(), _24);
+            // $scope.datos.sabado.apertura = hora_convertir($('#sabadoHoraApertura').val(), _24);
+            // $scope.datos.sabado.cierre = hora_convertir($('#sabadoHoraCierre').val(), _24);
+            // $scope.datos.domingo.apertura = hora_convertir($('#domingoHoraApertura').val(), _24);
+            // $scope.datos.domingo.cierre = hora_convertir($('#domingoHoraCierre').val(), _24);
+            
+            $scope.datos.lunes.aperturaGuardar = agregarCeroIzquierda($scope.datos.lunes.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.lunes.apertura.getMinutes());;
+            $scope.datos.lunes.cierreGuardar =agregarCeroIzquierda($scope.datos.lunes.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.lunes.cierre.getMinutes());;
+            $scope.datos.martes.aperturaGuardar = agregarCeroIzquierda($scope.datos.martes.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.martes.apertura.getMinutes());;
+            $scope.datos.martes.cierreGuardar = agregarCeroIzquierda($scope.datos.martes.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.martes.cierre.getMinutes());;
+            $scope.datos.miercoles.aperturaGuardar = agregarCeroIzquierda($scope.datos.miercoles.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.miercoles.apertura.getMinutes());;
+            $scope.datos.miercoles.cierreGuardar = agregarCeroIzquierda($scope.datos.miercoles.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.miercoles.cierre.getMinutes());;
+            $scope.datos.jueves.aperturaGuardar = agregarCeroIzquierda($scope.datos.jueves.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.jueves.apertura.getMinutes());
+            $scope.datos.jueves.cierreGuardar = agregarCeroIzquierda($scope.datos.jueves.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.jueves.cierre.getMinutes());
+            $scope.datos.viernes.aperturaGuardar = agregarCeroIzquierda($scope.datos.viernes.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.viernes.apertura.getMinutes());
+            $scope.datos.viernes.cierreGuardar = agregarCeroIzquierda($scope.datos.viernes.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.viernes.cierre.getMinutes());
+            $scope.datos.sabado.aperturaGuardar = agregarCeroIzquierda($scope.datos.sabado.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.sabado.apertura.getMinutes());
+            $scope.datos.sabado.cierreGuardar = agregarCeroIzquierda($scope.datos.sabado.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.sabado.cierre.getMinutes());
+            $scope.datos.domingo.aperturaGuardar = agregarCeroIzquierda($scope.datos.domingo.apertura.getHours()) + ':' + agregarCeroIzquierda($scope.datos.domingo.apertura.getMinutes());
+            $scope.datos.domingo.cierreGuardar = agregarCeroIzquierda($scope.datos.domingo.cierre.getHours()) + ':' + agregarCeroIzquierda($scope.datos.domingo.cierre.getMinutes());
+
+        }
+
+        agregarCeroIzquierda = function(valor){
+            var str = "" + valor;
+            var pad = "00";
+            var ans = pad.substring(0, pad.length - str.length) + str;
+            return ans;
         }
 
 
@@ -174,32 +197,32 @@ myApp
 
 
             'lunes' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'martes' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'miercoles' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'jueves' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'viernes' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'sabado' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'domingo' : {
-                'apertura': hora_convertir("01:00:00"),
-                'cierre' : hora_convertir("23:00:00")
+                'apertura': new Date(1970, 0, 1, 1, 0, 0),
+                'cierre' :new Date(1970, 0, 1, 23, 0, 0)
             },
             'comisiones' :{
                 'loterias' : [],
@@ -497,20 +520,20 @@ myApp
                     $scope.datos.gastos = [];
     
                    
-                     $scope.datos.lunes.apertura = hora_convertir("01:00:00");
-                     $scope.datos.lunes.cierre = hora_convertir("23:00:00");
-                     $scope.datos.martes.apertura = hora_convertir("01:00:00");
-                     $scope.datos.martes.cierre = hora_convertir("23:00:00");
-                     $scope.datos.miercoles.apertura = hora_convertir("01:00:00");
-                     $scope.datos.miercoles.cierre = hora_convertir("23:00:00");
-                     $scope.datos.jueves.apertura = hora_convertir("01:00:00");
-                     $scope.datos.jueves.cierre = hora_convertir("23:00:00");
-                     $scope.datos.viernes.apertura = hora_convertir("01:00:00");
-                     $scope.datos.viernes.cierre = hora_convertir("23:00:00");
-                     $scope.datos.sabado.apertura = hora_convertir("01:00:00");
-                     $scope.datos.sabado.cierre = hora_convertir("23:00:00");
-                     $scope.datos.domingo.apertura = hora_convertir("01:00:00");
-                     $scope.datos.domingo.cierre = hora_convertir("23:00:00");
+                     $scope.datos.lunes.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.lunes.cierre = new Date(1970, 0, 1, 23, 0, 0);
+                     $scope.datos.martes.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.martes.cierre = new Date(1970, 0, 1, 23, 0, 0);
+                     $scope.datos.miercoles.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.miercoles.cierre = new Date(1970, 0, 1, 23, 0, 0);
+                     $scope.datos.jueves.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.jueves.cierre = new Date(1970, 0, 1, 23, 0, 0);
+                     $scope.datos.viernes.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.viernes.cierre = new Date(1970, 0, 1, 23, 0, 0);
+                     $scope.datos.sabado.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.sabado.cierre = new Date(1970, 0, 1, 23, 0, 0);
+                     $scope.datos.domingo.apertura =new Date(1970, 0, 1, 1, 0, 0);
+                     $scope.datos.domingo.cierre = new Date(1970, 0, 1, 23, 0, 0);
     
                      
                     
@@ -582,20 +605,20 @@ myApp
     
                     
                     
-                    $scope.datos.lunes.apertura = d.dias[0].pivot.horaApertura;
-                    $scope.datos.lunes.cierre = d.dias[0].pivot.horaCierre;
-                    $scope.datos.martes.apertura = d.dias[1].pivot.horaApertura;
-                    $scope.datos.martes.cierre = d.dias[1].pivot.horaCierre;
-                    $scope.datos.miercoles.apertura = d.dias[2].pivot.horaApertura;
-                    $scope.datos.miercoles.cierre = d.dias[2].pivot.horaCierre;
-                    $scope.datos.jueves.apertura = d.dias[3].pivot.horaApertura;
-                    $scope.datos.jueves.cierre = d.dias[3].pivot.horaCierre;
-                    $scope.datos.viernes.apertura = d.dias[4].pivot.horaApertura;
-                    $scope.datos.viernes.cierre = d.dias[4].pivot.horaCierre;
-                    $scope.datos.sabado.apertura = d.dias[5].pivot.horaApertura;
-                    $scope.datos.sabado.cierre = d.dias[5].pivot.horaCierre;
-                    $scope.datos.domingo.apertura = d.dias[6].pivot.horaApertura;
-                    $scope.datos.domingo.cierre = d.dias[6].pivot.horaCierre;
+                    $scope.datos.lunes.apertura = new Date(1970, 0, 1, d.dias[0].pivot.horaApertura.split(':')[0], d.dias[0].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.lunes.cierre = new Date(1970, 0, 1, d.dias[0].pivot.horaCierre.split(':')[0], d.dias[0].pivot.horaCierre.split(':')[1], 0);
+                    $scope.datos.martes.apertura = new Date(1970, 0, 1, d.dias[1].pivot.horaApertura.split(':')[0], d.dias[1].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.martes.cierre = new Date(1970, 0, 1, d.dias[1].pivot.horaCierre.split(':')[0], d.dias[1].pivot.horaCierre.split(':')[1], 0);
+                    $scope.datos.miercoles.apertura = new Date(1970, 0, 1, d.dias[2].pivot.horaApertura.split(':')[0], d.dias[2].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.miercoles.cierre = new Date(1970, 0, 1, d.dias[2].pivot.horaCierre.split(':')[0], d.dias[2].pivot.horaCierre.split(':')[1], 0);
+                    $scope.datos.jueves.apertura = new Date(1970, 0, 1, d.dias[3].pivot.horaApertura.split(':')[0], d.dias[3].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.jueves.cierre = new Date(1970, 0, 1, d.dias[3].pivot.horaCierre.split(':')[0], d.dias[3].pivot.horaCierre.split(':')[1], 0);
+                    $scope.datos.viernes.apertura = new Date(1970, 0, 1, d.dias[4].pivot.horaApertura.split(':')[0], d.dias[4].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.viernes.cierre = new Date(1970, 0, 1, d.dias[4].pivot.horaCierre.split(':')[0], d.dias[4].pivot.horaCierre.split(':')[1], 0);
+                    $scope.datos.sabado.apertura = new Date(1970, 0, 1, d.dias[5].pivot.horaApertura.split(':')[0], d.dias[5].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.sabado.cierre = new Date(1970, 0, 1, d.dias[5].pivot.horaCierre.split(':')[0], d.dias[5].pivot.horaCierre.split(':')[1], 0);
+                    $scope.datos.domingo.apertura = new Date(1970, 0, 1, d.dias[6].pivot.horaApertura.split(':')[0], d.dias[6].pivot.horaApertura.split(':')[1], 0);
+                    $scope.datos.domingo.cierre = new Date(1970, 0, 1, d.dias[6].pivot.horaCierre.split(':')[0], d.dias[6].pivot.horaCierre.split(':')[1], 0);
                     
     
                     $scope.datos.ckbLoterias.forEach(function(valor, indice, array){
@@ -1167,7 +1190,7 @@ myApp
                 // Handle error here
                 $scope.datos.btnCargando = false;
                 console.log('Error jean: ', response);
-                alert("Error");
+                alert("Error: " + response.data.message);
             }
             );
         
@@ -1259,7 +1282,9 @@ myApp
 
         $scope.eliminar = function(d){
             console.log('bancas eliminar: ',d);
-            $http.post(rutaGlobal+"/api/bancas/eliminar", {'action':'sp_bancas_elimnar', 'datos': d})
+            d.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/bancas/eliminar", {'action':'sp_bancas_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0)

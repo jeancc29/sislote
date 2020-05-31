@@ -52,22 +52,49 @@ class CoinsController extends Controller
             return view('monedas.index', compact('controlador'));
         }
 
+        $datos = request()->validate([
+            "token" => ''
+        ]);
+
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
         $fechaActual = strtotime(date("d-m-Y H:i:00",time()));
         // $fechaActual = strtotime($fechaActual['mday'] . ' ' . $fechaActual['month'].' '.$fechaActual['year'] . ' ' . time() );
     
         return Response::json([
-            'monedas' => Coins::all(),
+            'monedas' => Coins::on($datos["servidor"])->get(),
         ], 201);
     }
 
     public function pordefecto(Coins $coins)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required'
+        // ])['datos'];
 
-        Coins::where('id', '>', 0)->update(['pordefecto' => 0]);
-        $coin = Coins::whereId($datos['id'])->first();
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        Coins::on($datos["servidor"])->where('id', '>', 0)->update(['pordefecto' => 0]);
+        $coin = Coins::on($datos["servidor"])->whereId($datos['id'])->first();
         $coin->pordefecto = 1;
         $coin->save();
 
@@ -79,7 +106,7 @@ class CoinsController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha establecido por defecto correctamente',
-            'monedas' => Coins::all(),
+            'monedas' => Coins::on($datos["servidor"])->get(),
         ], 201);
     }
 
@@ -101,16 +128,28 @@ class CoinsController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.descripcion' => 'required',
-            'datos.abreviatura' => 'required',
-            'datos.permiteDecimales' => 'required',
-            'datos.equivalenciaDeUnDolar' => 'required',
-            'datos.color' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.descripcion' => 'required',
+        //     'datos.abreviatura' => 'required',
+        //     'datos.permiteDecimales' => 'required',
+        //     'datos.equivalenciaDeUnDolar' => 'required',
+        //     'datos.color' => 'required',
+        // ])['datos'];
 
-        $entidad = Coins::whereId($datos['id'])->first();
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $entidad = Coins::on($datos["servidor"])->whereId($datos['id'])->first();
 
         if($entidad != null){
             $entidad->descripcion = $datos['descripcion'];
@@ -120,7 +159,7 @@ class CoinsController extends Controller
             $entidad->color = $datos['color'];
             $entidad->save();
         }else{
-            Coins::create([
+            Coins::on($datos["servidor"])->create([
                 'descripcion' => $datos['descripcion'],
                 'abreviatura' => $datos['abreviatura'],
                 'permiteDecimales' => $datos['permiteDecimales'],
@@ -132,7 +171,7 @@ class CoinsController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
-            'monedas' => Coins::all(),
+            'monedas' => Coins::on($datos["servidor"])->get(),
         ], 201);
     }
 
@@ -178,11 +217,23 @@ class CoinsController extends Controller
      */
     public function destroy(Coins $coins)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required'
+        // ])['datos'];
 
-        $entidad = Coins::whereId($datos['id'])->delete();
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $entidad = Coins::on($datos["servidor"])->whereId($datos['id'])->delete();
 
         // if($entidad != null){
         //     $entidad->status = 2;
@@ -192,7 +243,7 @@ class CoinsController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha eliminado correctamente',
-            'monedas' => Coins::all(),
+            'monedas' => Coins::on($datos["servidor"])->get(),
         ], 201);
     }
 }

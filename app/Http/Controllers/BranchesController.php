@@ -151,7 +151,79 @@ class BranchesController extends Controller
                 'token' => $datos
             ], 201);
         }
+
+        $branchesClass = new \App\Classes\BranchesClass($datos["servidor"], $datos);
+        $banca = $branchesClass->save();
+        
+        $errores = 0;
+        $mensaje = '';
     
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'banca' => BranchesResource::collection(Branches::on($datos["servidor"])->whereId($banca->id)->get())->servidor($datos["servidor"]),
+            'bancas' => BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get())->servidor($datos["servidor"]),
+            'gastos' => $datos['gastos'],
+            'bancaServidor' => $banca->getConnectionName()
+        ], 201);
+    }
+
+    public function storeViejo(Request $request)
+    {
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.descripcion' => 'required',
+        //     'datos.ip' => 'required|min:1|max:15',
+        //     'datos.codigo' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idUsuarioBanca' => 'required',
+        //     'datos.idMoneda' => 'required',
+        //     'datos.dueno' => 'required',
+        //     'datos.localidad' => 'required',
+    
+        //     'datos.balanceDesactivacion' => '',
+        //     'datos.limiteVenta' => 'required',
+        //     'datos.descontar' => 'required',
+        //     'datos.deCada' => 'required',
+        //     'datos.minutosCancelarTicket' => 'required',
+        //     'datos.piepagina1' => '',
+        //     'datos.piepagina2' => '',
+        //     'datos.piepagina3' => '',
+        //     'datos.piepagina4' => '',
+        //     'datos.status' => 'required',
+        //     'datos.imprimirCodigoQr' => 'required',
+    
+        //     'datos.lunes' => '',
+        //     'datos.martes' => '',
+        //     'datos.miercoles' => '',
+        //     'datos.jueves' => '',
+        //     'datos.viernes' => '',
+        //     'datos.sabado' => '',
+        //     'datos.domingo' => '',
+    
+        //     'datos.comisiones' => 'required',
+        //     'datos.pagosCombinaciones' => 'required',
+        //     'datos.loteriasSeleccionadas' => 'required',
+        //     'datos.gastos' => '',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        // nea
+
+        // $branchesClass = new \App\Classes\BranchesClass($datos["servidor"], $datos);
+        // $branchesClass->save();
+        
     
         $errores = 0;
         $mensaje = '';
@@ -252,7 +324,7 @@ class BranchesController extends Controller
           /********************* DIAS ************************/
             //Eliminamos los dias para luego agregarlos nuevamentes
             $banca->dias()->detach();
-            $dias = Days::on($datos["servidor"])->all();
+            $dias = Days::on($datos["servidor"])->get();
             $dias = collect($dias)->map(function($d) use($banca, $datos){
                 switch ($d['descripcion']) {
                     case 'Lunes':
@@ -587,15 +659,27 @@ class BranchesController extends Controller
      */
     public function destroy()
     {
-        $datos = request()->validate([
-            'datos.id' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
     
         $errores = 0;
-        $mensaje = 'Se ha guardado correctamente';
+        $mensaje = 'Se ha eliminado correctamente';
     
        
-        $banca = Branches::whereId($datos['id'])->get()->first();
+        $banca = Branches::on($datos["servidor"])->whereId($datos['id'])->get()->first();
         
     
         if($banca != null){

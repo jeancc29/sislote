@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Crypt;
 
 
 class AwardsClass{
+    public $servidor;
     public $fecha;
     public $loteria;
     public $primera;
@@ -48,8 +49,9 @@ class AwardsClass{
     public $numerosGanadores;
     public $idUsuario;
 
-    function __construct($idLteria) {
-        $this->loteria = Lotteries::whereId($idLteria)->first();
+    function __construct($servidor, $idLteria) {
+        $this->servidor = $servidor;
+        $this->loteria = Lotteries::on($this->servidor)->whereId($idLteria)->first();
     }
 
     public function getLoteriaDescripcion(){
@@ -164,7 +166,7 @@ class AwardsClass{
             $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
             $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
             
-            $numeroGanador = Awards::where('idLoteria', $this->loteria['id'])
+            $numeroGanador = Awards::on($this->servidor)->where('idLoteria', $this->loteria['id'])
             ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
 
                 //Si es diferente de nulo entonces existe, asi que debo actualizar los numeros ganadores
@@ -179,17 +181,32 @@ class AwardsClass{
                 }else{
                     $fechaString = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' ' .$fechaActual['hours'] . ':' . $fechaActual['minutes'];
                     $fecha = new Carbon($fechaString);
-                    Awards::create([
-                        'idUsuario' => $this->idUsuario,
-                        'idLoteria' => $this->loteria->id,
-                        'numeroGanador' => $this->numerosGanadores,
-                        'primera' =>  $this->primera,
-                        'segunda' => $this->segunda,
-                        'tercera' => $this->tercera,
-                        'pick3' => $this->pick3,
-                        'pick4' => $this->pick4,
-                        'created_at' => $fecha
-                    ]);
+                    // abort(403, "No tiene permisos para realizar esta accion: $this->servidor");
+                    // $f->toDatetimeString
+                    $premio = new  Awards;
+                    $premio->setConnection($this->servidor);
+                    $premio->idUsuario = $this->idUsuario;
+                    $premio->idLoteria = $this->loteria->id;
+                    $premio->numeroGanador = $this->numerosGanadores;
+                    $premio->primera = $this->primera;
+                    $premio->segunda = $this->segunda;
+                    $premio->tercera = $this->tercera;
+                    $premio->pick3 = $this->pick3;
+                    $premio->pick4 = $this->pick4;
+                    $premio->created_at = $fecha;
+                    $premio->save();
+
+                    // Awards::on($this->servidor)->create([
+                    //     'idUsuario' => $this->idUsuario,
+                    //     'idLoteria' => $this->loteria->id,
+                    //     'numeroGanador' => $this->numerosGanadores,
+                    //     'primera' =>  $this->primera,
+                    //     'segunda' => $this->segunda,
+                    //     'tercera' => $this->tercera,
+                    //     'pick3' => $this->pick3,
+                    //     'pick4' => $this->pick4,
+                    //     'created_at' => $fecha
+                    // ]);
                 }
         }catch (Exception $e) {
             $guardadoCorrectamente = false;
@@ -205,12 +222,12 @@ class AwardsClass{
             $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
             $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
             
-            $numeroGanador = Awards::where('idLoteria', $this->loteria['id'])
+            $numeroGanador = Awards::on($this->servidor)->where('idLoteria', $this->loteria['id'])
             ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
 
             //Si es diferente de nulo entonces existe, asi que debo eliminar
             if($numeroGanador != null){
-                Awards::where('idLoteria', $this->loteria['id'])
+                Awards::on($this->servidor)->where('idLoteria', $this->loteria['id'])
                 ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->delete();
             }
         }catch (Exception $e) {
@@ -225,12 +242,12 @@ class AwardsClass{
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
         $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
 
-        $idVentas = Sales::select('sales.id')
+        $idVentas = Sales::on($this->servidor)->select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
         ->where('salesdetails.idLoteria', $idLoteria)->whereNotIn('sales.status', [0,5])->get();
 
-        $jugadas = Salesdetails::whereIn('idVenta', $idVentas)->where('idLoteria', $idLoteria)
+        $jugadas = Salesdetails::on($this->servidor)->whereIn('idVenta', $idVentas)->where('idLoteria', $idLoteria)
                 ->orderBy('jugada', 'asc')
                 ->get();
 
@@ -242,7 +259,7 @@ class AwardsClass{
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
         $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
 
-        $cantidadTicksMarcadoComoPagado = Sales::select('sales.id')
+        $cantidadTicksMarcadoComoPagado = Sales::on($this->servidor)->select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
         ->where(['salesdetails.idLoteria' => $idLoteria, 'salesdetails.pagado' => 1])->whereNotIn('sales.status', [0,5])->count();
@@ -256,24 +273,24 @@ class AwardsClass{
         $premio = 0;
         $busqueda = strpos($this->numerosGanadores, $jugada);
 
-        $venta = Sales::whereId($idVenta)->first();
-        $idBanca = Branches::whereId($venta->idBanca)->first()->id;  
+        $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
+        $idBanca = Branches::on($this->servidor)->whereId($venta->idBanca)->first()->id;  
         
         
         if($this->primera == $jugada){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primera');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primera');
         }
 
         if($this->segunda == $jugada){
             if($premio == null) $premio = 0;
-            $premio += $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segunda');
+            $premio += $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segunda');
         }
 
         
 
         if($this->tercera == $jugada){
             if($premio == null) $premio = 0;
-            $premio += $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tercera');
+            $premio += $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tercera');
         }
 
         // if(gettype($busqueda) == "integer"){
@@ -296,9 +313,9 @@ class AwardsClass{
         $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
         $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
 
-        $venta = Sales::whereId($idVenta)->first();
-        $idBanca = Branches::whereId($venta->idBanca)->first()->id;
-        $sorteo = Draws::whereId($idSorteo)->first();
+        $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
+        $idBanca = Branches::on($this->servidor)->whereId($venta->idBanca)->first()->id;
+        $sorteo = Draws::on($this->servidor)->whereId($idSorteo)->first();
 
     //    //Si el sorteo es diferente de super pale entonces es un pale normal
     //     if($sorteo['descripcion'] != "Super pale"){
@@ -376,13 +393,13 @@ class AwardsClass{
         }
 
         if($hayPremiadoEnPrimera == true && $hayPremiadoEnSegunda == true){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
         }
         else if($hayPremiadoEnPrimera == true && $hayPremiadoEnTercera == true){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraTercera');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraTercera');
         }
         else if($hayPremiadoEnSegunda == true && $hayPremiadoEnTercera){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
         }
 
         
@@ -417,7 +434,7 @@ class AwardsClass{
         }
 
         if($hayPremiadoEnPrimera == true && $hayPremiadoEnSegunda == true){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
         }
 
        
@@ -440,8 +457,8 @@ class AwardsClass{
         // $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
         // $busqueda3 = strpos($this->numerosGanadores, substr($jugada, 4, 2));
 
-        $venta = Sales::whereId($idVenta)->first();
-        $idBanca = Branches::whereId($venta->idBanca)->first()->id;
+        $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
+        $idBanca = Branches::on($this->servidor)->whereId($venta->idBanca)->first()->id;
 
         
         // if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer" && gettype($busqueda3) == "integer"){
@@ -524,10 +541,10 @@ class AwardsClass{
         }
 
         if($contador == 3){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tresNumeros');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('tresNumeros');
         }
         else if($contador == 2){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('dosNumeros');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('dosNumeros');
         }
 
         return $premio;
@@ -548,12 +565,12 @@ class AwardsClass{
         // $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
         // $busqueda3 = strpos($this->numerosGanadores, substr($jugada, 4, 2));
 
-        $venta = Sales::whereId($idVenta)->first();
-        $idBanca = Branches::whereId($venta['idBanca'])->first()->id;
+        $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
+        $idBanca = Branches::on($this->servidor)->whereId($venta['idBanca'])->first()->id;
 
         if($esStraight == true){
             if($jugada == $this->pick3){
-                $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick3TodosEnSecuencia');
+                $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick3TodosEnSecuencia');
             }else{
                 $premio = 0;
             }
@@ -603,10 +620,10 @@ class AwardsClass{
         }  
 
         if($contador == 3 && Helper::existenNumerosIdenticos($jugada) == true){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick33Way');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick33Way');
         }
         else if($contador == 3){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick36Way');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick36Way');
         }
       
 
@@ -628,12 +645,12 @@ class AwardsClass{
         // $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
         // $busqueda3 = strpos($this->numerosGanadores, substr($jugada, 4, 2));
 
-        $venta = Sales::whereId($idVenta)->first();
-        $idBanca = Branches::whereId($venta['idBanca'])->first()->id;
+        $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
+        $idBanca = Branches::on($this->servidor)->whereId($venta['idBanca'])->first()->id;
 
         if($esStraight == true){
             if($jugada == $this->pick4){
-                $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick4TodosEnSecuencia');
+                $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick4TodosEnSecuencia');
             }else{
                 $premio = 0;
             }
@@ -728,42 +745,42 @@ class AwardsClass{
 
 
         if($contador == 4 && Helper::contarNumerosIdenticos($jugada) == 3 ){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick44Way');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick44Way');
         }
         else if($contador == 4 && Helper::contarNumerosIdenticos($jugada) == 4){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick46Way');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick46Way');
         }
         else if($contador == 4 && Helper::contarNumerosIdenticos($jugada) == 2){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick412Way');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick412Way');
         }
         else if($contador == 4){
-            $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick424Way');
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('pick424Way');
         }
       
 
         return $premio;
     }
 
-    public static function getLoterias($layout = null){
+    public static function getLoterias($servidor, $layout = null){
         $fecha = getdate();
         $fechaDesde = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
         $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
 
-        $loterias = Lotteries::whereStatus(1)->has('sorteos')->get();
+        $loterias = Lotteries::on($servidor)->whereStatus(1)->has('sorteos')->get();
         // == "vistaPremiosModal"
         if($layout != null){
             
 
             // if($layout != "vistaPremiosModal")
                 
-            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+            $loterias = collect($loterias)->map(function($l) use($servidor, $fechaDesde, $fechaHasta){
                 $primera = null;
                 $segunda = null;
                 $tercera = null;
                 $pick3 = null;
                 $pick4 = null;
-                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                $premios = Awards::on($servidor)->whereBetween('created_at', array($fechaDesde , $fechaHasta))
                                 ->where('idLoteria', $l['id'])
                                 ->first();
     
@@ -788,17 +805,17 @@ class AwardsClass{
             });
     
             // $loterias = collect($loteri']);
-            list($loterias, $no) = $loterias->partition(function($l){
-                return Helper::loteriaTienePremiosRegistradosHoy($l['id']) != true;
+            list($loterias, $no) = $loterias->partition(function($l) use($servidor){
+                return Helper::loteriaTienePremiosRegistradosHoy($servidor, $l['id']) != true;
             });
         }else{
-            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+            $loterias = collect($loterias)->map(function($l) use($servidor, $fechaDesde, $fechaHasta){
                 $primera = null;
                 $segunda = null;
                 $tercera = null;
                 $pick3 = null;
                 $pick4 = null;
-                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                $premios = Awards::on($servidor)->whereBetween('created_at', array($fechaDesde , $fechaHasta))
                                 ->where('idLoteria', $l['id'])
                                 ->first();
     

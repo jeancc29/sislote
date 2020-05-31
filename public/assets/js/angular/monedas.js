@@ -30,7 +30,8 @@ myApp
             if(helperService.empty(response, 'string')){
                 $scope.datos.monedas = response.data.monedas;
             }else{
-                $http.get(rutaGlobal+"/api/monedas")
+                var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+                $http.get(rutaGlobal+"/api/monedas?token=" + jwt)
                     .then(function(response){
                         console.log('Loteria ajav: ', response.data);
                         limpiar();
@@ -75,8 +76,9 @@ myApp
             }
             
             $scope.datos.permiteDecimales = ($scope.datos.permiteDecimales) ? 1 : 0;
-
-            $http.post(rutaGlobal+"/api/monedas/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/monedas/guardar", {'action':'sp_loterias_actualiza', 'datos': jwt})
                 .then(function(response){
                     if(response.data.errores == 0){
                         alert("Se ha guardado correctamente");
@@ -91,7 +93,9 @@ myApp
         }
 
         $scope.pordefecto = function(d){
-            $http.post(rutaGlobal+"/api/monedas/pordefecto", {'action':'sp_loterias_elimnar', 'datos': d})
+            d.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/monedas/pordefecto", {'action':'sp_loterias_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response);
                 if(response.data.errores == 0)
@@ -103,7 +107,9 @@ myApp
         }
 
         $scope.eliminar = function(d){
-            $http.post(rutaGlobal+"/api/monedas/eliminar", {'action':'sp_loterias_elimnar', 'datos': d})
+            d.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/monedas/eliminar", {'action':'sp_loterias_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response);
                 if(response.data.errores == 0)

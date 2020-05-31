@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -17,7 +17,9 @@ myApp
         $scope.inicializarDatos = function(todos, idRole = 0){
 
             $scope.datos.idUsuario = idUsuario;
-            $http.post(rutaGlobal+"/api/usuarios/sesiones", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/usuarios/sesiones", {'action':'sp_bancas_actualizar', 'datos': jwt})
             .then(function(response){
                console.log(response.data);
                $scope.datos.sesiones = response.data.sesiones;
@@ -32,7 +34,9 @@ myApp
         $scope.buscar = function(){
 
             $scope.datos.idUsuario = idUsuario;
-            $http.post(rutaGlobal+"/api/usuarios/sesiones", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/usuarios/sesiones", {'action':'sp_bancas_actualizar', 'datos': jwt})
             .then(function(response){
                console.log(response.data);
                $scope.datos.sesiones = response.data.sesiones;
@@ -125,89 +129,9 @@ myApp
        
         
 
-        $scope.actualizar = function(){
-         
-            //$scope.datos.horaCierre = moment($scope.datos.horaCierre, ['HH:mm']).format('HH:mm');
-            console.log('actualizar: ' , $scope.datos);
-
-            
-
-            if($scope.datos.nombres == undefined || $scope.datos.nombres == ""){
-                alert("El nombre no debe estar vacio");
-                return;
-            }
-            if($scope.datos.email == undefined || $scope.datos.email == ""){
-                alert("El correo no debe estar vacio");
-                return;
-            }
-            
-            if($scope.datos.usuario == undefined || $scope.datos.usuario == ""){
-                alert("El usuario no debe estar vacio");
-                return;
-            }
-            
-            if($scope.datos.id == 0){
-                if($scope.datos.password == undefined || $scope.datos.password == ""){
-                    alert("La contraseña no debe estar vacia");
-                    return;
-                }
-                if($scope.datos.password != $scope.datos.confirmar){
-                    alert("La contraseña no es igual");
-                    return;
-                }
-            }
-
-            if($scope.datos.permisos.length == 0){
-                alert("Debe seleccionar aunque sea 1 permiso");
-                return;
-            }
-            
-
-
-            $scope.datos.idTipoUsuario = $scope.datos.selectedUsuariosTipos.id;
-            $scope.datos.status = ($scope.datos.estado) ? 1 : 0;
-           
-
-          $http.post(rutaGlobal+"/api/usuarios/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
-             .then(function(response){
-                console.log(response.data);
-                if(response.data.errores == 0){
-                    
-                    if($scope.datos.id == 0){
-                        $scope.inicializarDatos(true);
-                        $scope.datos.mostrarFormEditar = false;
-                        alert("Se ha guardado correctamente");
-                    }
-                    else{
-                        $scope.inicializarDatos(false);
-                        $scope.datos.estado = ($scope.datos.estado == 1) ? true : false;
-                        alert("Se ha guardado correctamente");
-                    }
-                }else{
-                    alert(response.data.mensaje);
-                    return;
-                }
-                
-            });
         
 
-        }
-
-
-        $scope.eliminar = function(d){
-            console.log('usuarios eliminar: ',d);
-            $http.post(rutaGlobal+"/api/usuarios/eliminar", {'action':'sp_loterias_elimnar', 'datos': d})
-             .then(function(response){
-                console.log(response);
-            
-                if(response.data.errores == 0)
-                {
-                    $scope.inicializarDatos(true);
-                    alert(response.data.mensaje);
-                }
-                
-            });
-        }
+       
        
 
 
