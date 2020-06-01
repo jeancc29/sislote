@@ -23,6 +23,7 @@ class BlocksgeneralsEvent implements ShouldBroadcast
      */
     public function __construct($blocksgenerals, $eliminar = false)
     {
+        $this->room = $blocksgenerals->getConnectionName();
         if($eliminar){
             $this->action = "delete";
         }else{

@@ -1337,12 +1337,12 @@ class Helper{
 
 
     //Debemos verificar si todas las jugadas han sido pagadas
-    static function verificarTicketHaSidoPagado($idVenta){
-        $jugadasQueAunEstanPendiente = Salesdetails::where('idVenta', $idVenta)->whereStatus(0)->count();
+    static function verificarTicketHaSidoPagado($servidor, $idVenta){
+        $jugadasQueAunEstanPendiente = Salesdetails::on($servidor)->where('idVenta', $idVenta)->whereStatus(0)->count();
         if($jugadasQueAunEstanPendiente > 0){
             return false;
         }
-        $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
+        $jugadas = Salesdetails::on($servidor)->where('idVenta', $idVenta)->get();
 
         $montoPremios = 0;
         $montoPagado = 0;

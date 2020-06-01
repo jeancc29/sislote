@@ -74,6 +74,8 @@ class AwardsController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -240,6 +242,8 @@ class AwardsController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -452,6 +456,14 @@ class AwardsController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+            
+                // return Response::json([
+                //     'errores' => 1,
+                //     'mensaje' => 'Token incorrecto',
+                //     'token' => $datos
+                // ], 201);
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([

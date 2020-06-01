@@ -62,6 +62,8 @@ class BranchesController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,

@@ -80,6 +80,8 @@ class BalancesController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,

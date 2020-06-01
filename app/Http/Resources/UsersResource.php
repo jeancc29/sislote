@@ -19,7 +19,7 @@ class UsersResource extends JsonResource
             'id' => $this->id,
             'nombres' => $this->nombres,
             'email' => $this->email,
-            'servidor' => Crypt::encryptString($this->servidor),
+            'servidor' => $this->servidor,
             'usuario' => $this->usuario,
             'idTipoUsuario' => $this->idRole,
             'tipoUsuario' => $this->roles->descripcion,

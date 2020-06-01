@@ -110,6 +110,8 @@ class DashboardController extends Controller
                 // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
                 // $datos = json_decode(json_encode($datos), true);
                 $datos = \Helper::jwtDecode($datos["token"]);
+                if(isset($datos["datosMovil"]))
+                    $datos = $datos["datosMovil"];
             } catch (\Throwable $th) {
                 return Response::json([
                     'errores' => 1,

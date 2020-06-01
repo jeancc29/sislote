@@ -217,6 +217,8 @@ class ReportesController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -645,6 +647,8 @@ class ReportesController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -1001,14 +1005,27 @@ class ReportesController extends Controller
 
     public function monitoreoMovil()
     {
-        $datos = request()->validate([
-            'datos.fecha' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => '',
-            'datos.layout' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.fecha' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => '',
+        //     'datos.layout' => ''
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Monitorear ticket")){
             // return Response::json([
             //     'errores' => 1,
@@ -1033,18 +1050,18 @@ class ReportesController extends Controller
         }
 
         if(isset($datos['idBanca'])){
-            $datos['idBanca'] = Branches::where(['id' => $datos['idBanca'], 'status' => 1])->first();
+            $datos['idBanca'] = Branches::on($datos["servidor"])->where(['id' => $datos['idBanca'], 'status' => 1])->first();
             if($datos['idBanca'] != null)
                 $datos['idBanca'] = $datos['idBanca']->id;
         }else{
-            $datos['idBanca'] = Branches::where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
+            $datos['idBanca'] = Branches::on($datos["servidor"])->where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
         }
     
         $fecha = getdate(strtotime($datos['fecha']));
     
     
     
-        $monitoreo = Sales::select('id', 'idTicket', 'idBanca', 'total', 'status')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        $monitoreo = Sales::on($datos["servidor"])->select('id', 'idTicket', 'idBanca', 'total', 'status')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                     ->where('idBanca', $datos['idBanca'])
                     ->where('status', '!=', '5')
                     ->orderBy('id', 'desc')
@@ -1052,18 +1069,18 @@ class ReportesController extends Controller
     
        // return $ventas;
         
-       $monitoreo = collect($monitoreo)->map(function($m){
-           $codigo = Branches::select('codigo')->whereId($m['idBanca'])->first();
-           $codigoBarra = Tickets::whereId($m['idTicket'])->first();
+       $monitoreo = collect($monitoreo)->map(function($m) use($datos){
+           $codigo = Branches::on($datos["servidor"])->select('codigo')->whereId($m['idBanca'])->first();
+           $codigoBarra = Tickets::on($datos["servidor"])->whereId($m['idTicket'])->first();
            return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'codigoBarra' =>$codigoBarra['codigoBarra'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
        });
     
         return Response::json([
             'monitoreo' => $monitoreo,
-            'loterias' => Lotteries::whereStatus(1)->get(),
-            'caracteristicasGenerales' =>  Generals::all(),
-            'total_ventas' => Sales::sum('total'),
-            'total_jugadas' => Salesdetails::count('jugada'),
+            'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
+            'caracteristicasGenerales' =>  Generals::on($datos["servidor"])->get(),
+            'total_ventas' => Sales::on($datos["servidor"])->sum('total'),
+            'total_jugadas' => Salesdetails::on($datos["servidor"])->count('jugada'),
             'errores' => 0
         ], 201);
     }
@@ -1071,14 +1088,26 @@ class ReportesController extends Controller
 
     public function getTicketById()
     {
-        $datos = request()->validate([
-            'datos.idTicket' => 'required',
-            'datos.idUsuario' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idTicket' => 'required',
+        //     'datos.idUsuario' => 'required'
+        // ])['datos'];
     
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
        
 
-        $ticket = Sales::where('idTicket', $datos['idTicket'])->first();
+        $ticket = Sales::on($datos["servidor"])->where('idTicket', $datos['idTicket'])->first();
         if($ticket == null){
             return Response::json([
                 'errores' => 0,
@@ -1088,7 +1117,7 @@ class ReportesController extends Controller
     
     
         return Response::json([
-            'ticket' => new SalesResource($ticket),
+            'ticket' => (new SalesResource($ticket))->servidor($datos["servidor"]),
             'errores' => 0,
             'mensaje' => "El ticket no existe",
         ], 201);
@@ -1158,15 +1187,28 @@ class ReportesController extends Controller
 
     public function ticketsPendientesDePagoIndex()
     {
-        $datos = request()->validate([
-            'datos.fecha' => 'required',
-            'datos.idUsuario' => 'required',
-            'datos.idBanca' => '',
-            'datos.layout' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.fecha' => 'required',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idBanca' => '',
+        //     'datos.layout' => ''
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
 
         if($datos['idBanca'] == 0){
-            $bancas = Branches::whereStatus(1)->get();
+            $bancas = Branches::on($datos["servidor"])->whereStatus(1)->get();
             $datos['idBanca'] = collect($bancas)->map(function($b){
                 return $b['id'];
             });
@@ -1176,7 +1218,8 @@ class ReportesController extends Controller
 
         if($datos['fecha'] == "Todas las fechas"){
             $ticketsPendientesDePago = Sales::
-            select('sales.id')
+            on($datos["servidor"])
+            ->select('sales.id')
             ->join('salesdetails', 'salesdetails.idVenta', 'sales.id')
             ->whereNotIn('sales.status', [0, 5])
             ->where(['salesdetails.status' => 1, 'salesdetails.pagado' => 0])
@@ -1191,7 +1234,7 @@ class ReportesController extends Controller
 
            
 
-            $ticketsPendientesDePago = Sales::select('sales.id')
+            $ticketsPendientesDePago = Sales::on($datos["servidor"])->select('sales.id')
             ->join('salesdetails', 'salesdetails.idVenta', 'sales.id')
             ->whereNotIn('sales.status', [0, 5])
             ->where(['salesdetails.status' => 1, 'salesdetails.pagado' => 0])
@@ -1208,10 +1251,10 @@ class ReportesController extends Controller
             return $t['id'];
         });
 
-        $ticketsPendientesDePago = Sales::whereIn('id', $ticketsPendientesDePago)->get();
+        $ticketsPendientesDePago = Sales::on($datos["servidor"])->whereIn('id', $ticketsPendientesDePago)->get();
         return Response::json([
-            'bancas' => Branches::whereStatus(1)->get(),
-            'ticketsPendientesDePago' => SalesResource::collection($ticketsPendientesDePago)
+            'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get(),
+            'ticketsPendientesDePago' => SalesResource::collection($ticketsPendientesDePago)->servidor($datos["servidor"])
         ], 201);
         
     }

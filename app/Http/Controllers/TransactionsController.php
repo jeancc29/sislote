@@ -75,11 +75,16 @@ class TransactionsController extends Controller
         $datos = request()->validate([
             'token' => ''
         ]);
+       
+        // $datos = \Helper::jwtDecode($datos["token"]);
+
 
         try {
             // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
             // $datos = json_decode(json_encode($datos), true);
             $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,
@@ -138,6 +143,8 @@ class TransactionsController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -237,6 +244,8 @@ class TransactionsController extends Controller
             // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
             // $datos = json_decode(json_encode($datos), true);
             $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,
@@ -280,6 +289,8 @@ class TransactionsController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,
@@ -380,6 +391,8 @@ class TransactionsController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([

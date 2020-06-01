@@ -139,7 +139,6 @@ class LoginController extends Controller
         $datos = request()->validate([
             'datos.usuario' => 'required',
             'datos.password' => 'required',
-            'datos.token' => ''
         ])['datos'];
        // dd($data);
 
@@ -152,7 +151,18 @@ class LoginController extends Controller
 
         
 
-        $u = Users::where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
+        $u = Users::on("mysql")->where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
+
+        if($u == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Usuario o contraseña incorrectos'
+            ], 201);
+            // return redirect('login')->withErrors([
+            //     'usuario' => 'Usuario o contraseña incorrectos'
+            // ]);
+        }
+        $u = Users::on($u->servidor)->where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
 
         if($u == null){
             return Response::json([
@@ -174,7 +184,7 @@ class LoginController extends Controller
             // ]);
         }
 
-        $banca = Branches::where(['idUsuario' => $u->id, 'status' => 1])->first();
+        $banca = Branches::on($u->servidor)->where(['idUsuario' => $u->id, 'status' => 1])->first();
         if($banca == null){
             return Response::json([
                 'errores' => 1,
@@ -194,14 +204,14 @@ class LoginController extends Controller
     //    session(['idUsuario' => $u->id]);
     //    session(['permisos' => $u->permisos]);
 
-        Userssesions::create([
+        Userssesions::on($u->servidor)->create([
             'idUsuario' => $u->id,
             'esCelular' => true
         ]);
 
         $administrador = false;
         
-        $role = Roles::whereId($u->idRole)->first();
+        $role = Roles::on($u->servidor)->whereId($u->idRole)->first();
        if($role->descripcion == "Administrador")
             $administrador = true;
         else
@@ -222,7 +232,7 @@ class LoginController extends Controller
         'administrador' => $administrador,
         'usuario' => $u,
         'bancaObject' => new BranchesResourceSmall($banca),
-        "token" => $token
+        "apiKey" => \config("data.apiKey")
     ], 201);
     }
 
