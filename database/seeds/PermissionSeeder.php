@@ -137,6 +137,7 @@ class PermissionSeeder extends Seeder
             'status' => 1,
             'idTipo' => 5
         ]);
+         
 
 
 
@@ -256,6 +257,10 @@ class PermissionSeeder extends Seeder
         // ]);
 
       
-
+        p::create([
+            'descripcion' => 'Ver historico ventas',
+            'status' => 1,
+            'idTipo' => 5
+        ]);
     }
 }

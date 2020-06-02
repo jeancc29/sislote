@@ -58,6 +58,10 @@ class PermissionRoleSeeder extends Seeder
          DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 18]);
          DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 19]);
          DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 20]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 21]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 22]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 23]);
+         DB::table('permission_role')->insert(['idRole' => $administrador,'idPermiso' => 24]);
 
 
           // SUPERVISOR
