@@ -472,6 +472,79 @@ class PrincipalController extends Controller
     }
 
 
+    public function buscarTicket()
+    {
+        $datos = request()->validate([
+            'datos.codigoBarra' => '',
+            'datos.codigoQr' => '',
+            'datos.idUsuario' => 'required'
+        ])['datos'];
+    
+        $usuario = Users::whereId($datos['idUsuario'])->first();
+        if(!$usuario->tienePermiso("Marcar ticket como pagado")){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'No tiene permisos para realizar esta accion'
+            ], 201);
+        }
+
+        if(isset($datos['codigoBarra'])){
+            if(!(new Helper)->isNumber($datos['codigoBarra'])){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+            if(strlen($datos['codigoBarra']) != 10){
+                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            }
+        }
+        else if(isset($datos['codigoQr']) && !isset($datos['codigoBarra'])){
+            $datos['codigoBarra'] = base64_decode($datos['codigoQr']);
+        }else{
+            return Response::json(['errores' => 1, 'mensaje' => "Codigos no existen"], 201);
+        }
+    
+        $fecha = getdate();
+    
+        $errores = 0;
+        $mensaje = '';
+        $loterias = null;
+        $jugadas = null;
+    
+        
+    
+    
+        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
+            //->wherePagado(0)
+            // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
+            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0,5])->get()->first();
+            
+            if($venta != null){
+                
+                    return Response::json([
+                        'errores' => 0,
+                        'mensaje' => '',
+                        'venta' =>  new SalesResource($venta)
+                    ], 201);
+    
+            }else{
+                
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'El ticket no existe'
+                ], 201);
+            }
+        }else{
+                $errores = 1;
+                $mensaje = "El numero de ticket no es correcto";
+        }
+    
+    
+        return Response::json([
+            'errores' => $errores,
+            'mensaje' => $mensaje
+        ], 201);
+    }
+
     public function buscarTicketAPagar()
     {
         $datos = request()->validate([
