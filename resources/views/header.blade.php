@@ -136,8 +136,13 @@ if($controlador != "login"){
 <script src="{{asset('assets/js/angular/angular-animate.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/dependencies/rsvp-3.1.0.min.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/dependencies/sha-256.min.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/qz-tray.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/cmd.js'). '?'.rand(1,50)}}}}" ></script>
 <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/helper.js'). '?'.rand(1,50)}}" ></script>
+<script src="{{asset('assets/js/angular/servicios/printer.js'). '?'.rand(1,50)}}" ></script>
     <?php if($controlador == "dashboard"):?>
         <link href="{!!asset('assets/css/loading-bouncing.css') !!}" rel="stylesheet" />
     <?php endif; ?>
@@ -1253,30 +1258,33 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 <a data-toggle="collapse" href="#collapseExample" class="username">
                     <span>
                        <!-- Tania Andrew  -->
-                       <?php if(isset($_SESSION['usuario'])) echo $_SESSION['usuario'] . " - " . $_SESSION['tipoUsuario'];?>
+                       <?php echo session('usuario') . " (". session("servidor") . ")";?>
                       <b class="caret"></b>
                     </span>
                 </a>
                 <div class="collapse" id="collapseExample">
                     <ul class="nav">
+                    @inject('helper', '\App\Classes\Helper')
+                    @foreach(session("servidores") as $servidor)
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{route('cambiarServidor')}}?token={{\App\Classes\Helper::jwtEncodeServidor($servidor['descripcion'], session('usuario'))}}">
                               <span class="sidebar-mini"> MP </span>
-                              <span class="sidebar-normal"> My Profile </span>
+                              <span class="sidebar-normal"> {{$servidor["descripcion"]}} </span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                    @endforeach
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="#">
                               <span class="sidebar-mini"> EP </span>
                               <span class="sidebar-normal"> Edit Profile </span>
                             </a>
-                        </li>
-                        <li class="nav-item">
+                        </li> -->
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="#">
                               <span class="sidebar-mini"> S </span>
                               <span class="sidebar-normal"> Settings </span>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
             </div>

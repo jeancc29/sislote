@@ -161,6 +161,8 @@ class DashboardController extends Controller
                 'totalPremiosLoterias' => $totalPremiosLoterias,
                 'loteriasJugadasDashboard' => $loteriasJugadasDashboard,
                 'monedas' => Coins::on($datos["servidor"])->orderBy('pordefecto', 1)->get(),
+                'bancas' => $dashboard->getBancas(),
+                'moneda' => $datos
             ], 201);
         }
     }

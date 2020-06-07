@@ -17,6 +17,7 @@
 
 Route::get('/login', 'LoginController@index')->name('login');
 Route::get('/cerrar', 'LoginController@cerrarSesion')->name('cerrarSesion');
+Route::get('/cambiarServidor', 'LoginController@cambiarServidor')->name('cambiarServidor');
 Route::post('/login/acceder', 'LoginController@acceder')->name('login.acceder');
 
 Route::get('/loterias', 'LotteriesController@index')->name('loterias');

@@ -81,6 +81,10 @@ class DashboardClass{
         //     return $d->id;
         // });
     }
+
+    function getBancas(){
+        return $this->bancas;
+    }
     
 
     function ventasGrafica()

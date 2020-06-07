@@ -122,12 +122,12 @@ myApp
             $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
             $scope.monedaColor = $scope.selectedMoneda.color;
            $scope.cargandoOnFechaChanged = true;
-           var jwt = helperService.createJWT({"fecha" : fecha, "servidor" : servidorGlobal, "idUsuario": idUsuarioGlobal, "idMoneda" : $scope.datos.idMoneda});
+           var jwt = helperService.createJWT({"fecha" : fecha, "servidor" : servidorGlobal, "idUsuario": idUsuarioGlobal, "idMoneda" : $scope.selectedMoneda.id});
 
             $http.get(rutaGlobal+"/api/dashboard?token=" + jwt)
              .then(function(response){
                 
-                
+                console.log(response.data);
 
                  $scope.ventasGrafica = response.data.ventasGrafica;
                  crearGrafica();
