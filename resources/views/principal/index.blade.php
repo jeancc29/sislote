@@ -75,18 +75,30 @@
                
 
                 <div class="row">
-                       
+                    <div class="col-sm-1 col-2 text-center">
+                        <div class="form-check mt-3">
+                            <label class="form-check-label">
+                                <input ng-model="datos.print"  class="form-check-input" type="checkbox" value=""> print
+                                <!-- <i class="material-icons text-success" style="font-size: 24px;">chat</i> -->
+                                
+                                <span class="form-check-sign">
+                                <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
 
                     <div class="col-sm-1 col-2 text-center">
-                                <div class="form-check mt-3">
-                                <label class="form-check-label">
-                                    <input ng-model="datos.hayDescuento" ng-change="calcularTotal()" class="form-check-input" type="checkbox" value=""> Desc
-                                    <span class="form-check-sign">
-                                    <span class="check"></span>
-                                    </span>
-                                </label>
-                                </div>
+                        <div class="form-check mt-3">
+                            <label class="form-check-label">
+                                <input ng-model="datos.hayDescuento" ng-change="calcularTotal()" class="form-check-input" type="checkbox" value=""> Desc
+                                <span class="form-check-sign">
+                                <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
+                    
 
                     <div  class="col-lg-4 col-md-4 col-sm-4 col-10">
                     <!-- o.descripcion disable when validarHora(o.horaCierre, o.descripcion) for o in datos.optionsLoterias track by o.id -->
@@ -219,16 +231,16 @@
 
 
                     <div class="col-sm-1 col-2 ">
-                                <div class="form-check mt-3">
-                                <label class="form-check-label">
-                                    <input ng-model="datos.print"  class="form-check-input" type="checkbox" value=""> print
-                                    <!-- <i class="material-icons text-success" style="font-size: 24px;">chat</i> -->
-                                    
-                                    <span class="form-check-sign">
-                                    <span class="check"></span>
-                                    </span>
-                                </label>
-                                </div>
+                        <div class="form-check mt-3">
+                            <label class="form-check-label">
+                                <input ng-model="datos.print"  class="form-check-input" type="checkbox" value=""> print
+                                <!-- <i class="material-icons text-success" style="font-size: 24px;">chat</i> -->
+                                
+                                <span class="form-check-sign">
+                                <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="col-sm-1 col-2 ">
@@ -291,14 +303,14 @@
                 <div class="row p-0 m-0">
                     <iframe id="iframeOcultoMovil" name="iframeOcultoMovil"  style="width:0px; height:0px; border:0px; margin:0px;"></iframe>
                     <div class="col-sm-1 col-3 text-center">
-                                <div class="form-check mt-3">
-                                <label class="form-check-label">
-                                    <input ng-model="datos.hayDescuento" ng-change="calcularTotal()" class="form-check-input" type="checkbox" value=""> Desc
-                                    <span class="form-check-sign">
-                                    <span class="check"></span>
-                                    </span>
-                                </label>
-                                </div>
+                        <div class="form-check mt-3">
+                            <label class="form-check-label">
+                                <input ng-model="datos.hayDescuento" ng-change="calcularTotal()" class="form-check-input" type="checkbox" value=""> Desc
+                                <span class="form-check-sign">
+                                <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
 
                     <div  class="col-9 m-0 p-0">

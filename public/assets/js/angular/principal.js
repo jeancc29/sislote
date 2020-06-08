@@ -1,7 +1,7 @@
 // var myApp = angular
 //     .module("myModule", [])
 myApp
-    .controller("myController", function($scope, helperService, $http, $timeout, $window, $document){
+    .controller("myController", function($scope, helperService, printerService, $http, $timeout, $window, $document){
         $scope.busqueda = "";
         var ruta = '';
         $scope.txtActive = 0;
@@ -20,6 +20,7 @@ myApp
         $scope.selectedTipoCliente = {};
         $scope.es_cliente = false;
         $scope.datos =  {
+            "print" : true,
             "idVenta":0,
             "compartido":0,
         "idUsuario": 0,
@@ -947,7 +948,7 @@ myApp
                         //   $scope.datos.enviarSMS.codigoBarra = response.data.venta.codigoBarra;
                         //   $scope.print();
                           //$scope.abrirVentanaSms();
-                          
+                          printerService.printTicket(response.data.venta);
                         }
                     else{
                         alert(response.data.mensaje);
@@ -1018,36 +1019,7 @@ myApp
         }
 
         $scope.imprimirTicket = function(ticket, es_movil){
-            // window.print();
-            // console.log('imprimirTicekt: ', ticket);
-            $window.sessionStorage.removeItem('ticket');
-            $window.sessionStorage.setItem('ticket', JSON.stringify(ticket));
-            // console.log(ruta);
-            
-            //a=window.frames['iframeOculto'].src= ruta;
-
-            if(!es_movil)
-                $('#iframeOculto').attr('src',ruta);
-            else
-                $('#iframeOcultoMovil').attr('src',ruta);
-
-            // console.log('iframe: ', $('#iframeOculto'));
-
-
-            var json = [];
-            var contador = 0;
-            $.each($window.sessionStorage, function(i, v){
-                json.push(angular.fromJson(v));
-            });
-            // console.log('iimprimirTicket: ', json);
-            
-
-            //a=window.frames['iframeOculto'].src= '';
-            // setTimeout(() => { $(".printFrame").remove(); }, 1000);
-            //setTimeout(() => {  window.frames['iframeOculto'].src= ''; }, 1000);
-
-
-
+            printerService.printTicket(ticket, CMD.TICKET_COPIA);
 
         }
 
@@ -1423,6 +1395,9 @@ myApp
                     return;
                 }else if(response.data.errores == 0){
                     $scope.datos.pagar.codigoBarra = null;
+                    console.log("pagar ticket: ", response.data);
+                    if(tieneJugadasPendientes(response.data.venta))
+                        printerService.printTicket(response.data.venta, CMD.TICKET_PAGADO);
                     alert(response.data.mensaje);
                 }
 
@@ -1430,7 +1405,21 @@ myApp
         }
 
 
-
+        var tieneJugadasPendientes = function(venta){
+            var tienePendientes = false;
+            for(var c=0; c < venta.jugadas.length; c++){
+                console.log("tieneJugadasPendientes j: ", venta.jugadas[c]);
+                console.log("tieneJugadasPendientes js: ", venta.jugadas[c].status);
+                
+                if(venta.jugadas[c].status == 0){
+                    tienePendientes = true;
+                    break;
+                }
+            }
+            console.log("tieneJugadasPendientes: ", tienePendientes);
+            
+            return tienePendientes;
+        }
 
 
         $scope.ventasReporte_buscar = function(){

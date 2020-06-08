@@ -134,8 +134,13 @@ if($controlador != "login"){
 <script src="{{asset('assets/js/angular/angular-animate.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular/myapp.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/dependencies/rsvp-3.1.0.min.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/dependencies/sha-256.min.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/qz-tray.js')}}" ></script>
+<script src="{{asset('assets/js/js-qzprint/cmd.js'). '?'.rand(1,50)}}}}" ></script>
 <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/helper.js'). '?'.rand(1,50)}}" ></script>
+<script src="{{asset('assets/js/angular/servicios/printer.js'). '?'.rand(1,50)}}" ></script>
     <?php if($controlador == "dashboard"):?>
         <link href="{!!asset('assets/css/loading-bouncing.css') !!}" rel="stylesheet" />
     <?php endif; ?>

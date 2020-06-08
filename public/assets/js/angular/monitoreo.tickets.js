@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout, $window, $document){
+    .controller("myController", function($scope, printerService, $http, $timeout, $window, $document){
         $scope.busqueda = "";
         var ruta = '';
         $scope.txtActive = 0;
@@ -255,6 +255,11 @@ myApp
                 //     alert("Se ha guardado correctamente");
                 // }
             });
+
+        }
+
+        $scope.imprimirTicket = function(ticket, es_movil){
+            printerService.printTicket(ticket, CMD.TICKET_COPIA);
 
         }
 

@@ -198,4 +198,49 @@ myApp.service('helperService', function(){
         return banca.descripcion + ' (' + banca.monedaAbreviatura + ')';
     }
 
+    this.toSecuencia = function(idTicket, codigo = null){
+        var str = "" + idTicket;
+        var pad = "000000000";
+        if(codigo == null)
+            return pad.substring(0, pad.length - str.length) + str;
+        else
+            return codigo + "-" + pad.substring(0, pad.length - str.length) + str;
+    }
+
+    this.agregarSignoYletrasParaImprimir = function(jugada, sorteo){
+        switch(sorteo){
+          case "Pale":
+            return jugada[0] + jugada[1] + '-' + jugada[2] + jugada[3];
+            break;
+          case "Pick 3 Box":
+            return jugada + "B";
+            break;
+          case "Pick 4 Box":
+            return jugada + "B";
+            break;
+          case "Pick 3 Straight":
+            return jugada + "S";
+            break;
+          case "Pick 4 Straight":
+            return jugada + "S";
+            break;
+          case "Tripleta":
+            return jugada[0] + jugada[1] + '-' + jugada[2] + jugada[3] + '-' + jugada[4] + jugada[5];
+            break;
+          default:
+            return jugada;
+            break;
+        }
+      }
+
+      // Here's how to do basic integer<->byte (string/char) operations in JavaScript. 
+      // Took me a good while to dig this up.
+
+        function intToChar(integer) {
+            return String.fromCharCode(integer)
+        }
+    
+        function charToInt(char) {
+            return char.charCodeAt(0)
+        }
 });
