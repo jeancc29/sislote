@@ -1,6 +1,10 @@
 myApp.service('printerService', function(helperService){
     
     this.printTicket = async function(venta, typeTicket = CMD.TICKET_ORIGINAL){
+        if(helperService.empty(localStorage.getItem("impresora"), 'string') == true){
+            window.abrirModalImpresora(true);
+            return;
+        }
 		// var data = [
         //     CMD.TEXT_FORMAT.TXT_NORMAL,
         //     'Raw Data\n',
@@ -14,6 +18,32 @@ myApp.service('printerService', function(helperService){
         //     CMD.PAPER.PAPER_FULL_CUT,
         //     ];
         var data = this.generateTicket(venta, typeTicket);
+
+            // qz.print(config, data).catch(function(e) { console.error(e); });
+            if(!qz.websocket.isActive())
+            {
+                qz.websocket.connect().then(function() {
+                var config = qz.configs.create("POS58 Printer");
+                return qz.print(config, data);
+                }).catch(function(err) { console.error(err); });
+            }else{
+                // await qz.websocket.disconnect()
+                var config = qz.configs.create("POS58 Printer");
+                // await qz.websocket.connect(config)
+                return qz.print(config, data);
+            }
+    }
+
+    
+
+    this.probarImpresora = async function(){
+        if(helperService.empty(localStorage.getItem("impresora"), 'string') == true){
+            window.abrirModalImpresora(true);
+            return;
+        }
+		
+        var data = [];
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "**PRUEBA EXITOSA**", 3);
 
             // qz.print(config, data).catch(function(e) { console.error(e); });
             if(!qz.websocket.isActive())

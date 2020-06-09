@@ -139,6 +139,7 @@ if($controlador != "login"){
 <script src="{{asset('assets/js/js-qzprint/qz-tray.js')}}" ></script>
 <script src="{{asset('assets/js/js-qzprint/cmd.js'). '?'.rand(1,50)}}}}" ></script>
 <script src="{{asset('assets/js/angular/premios.modal.js'). '?'.rand(1,50)}}" ></script>
+<script src="{{asset('assets/js/angular/impresora.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/helper.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/printer.js'). '?'.rand(1,50)}}" ></script>
     <?php if($controlador == "dashboard"):?>
@@ -1244,9 +1245,11 @@ if(session('idUsuario') == null && $controlador != 'login'){
                   <i class="material-icons design_bullet-list-67 visible-on-sidebar-mini">arrow_forward</i>
               </button>
             </div>
-        </a></div>
+        </a>
+    </div>
 
     <div class="sidebar-wrapper">
+        
         
         <div class="user">
             <div class="photo">
@@ -1284,7 +1287,15 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 </div>
             </div>
         </div>
+        
         <ul class="nav">
+
+            <li id="btnImpresora" class="nav-item ">
+                <a class="nav-link"  >
+                    <i class="material-icons">printer</i>
+                    <p> Impresora </p>
+                </a>
+            </li>
 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('dashboard')}}">
@@ -1292,6 +1303,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     <p> Dashboard </p>
                 </a>
             </li>
+            
 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('principal')}}">
@@ -1538,5 +1550,50 @@ if(session('idUsuario') == null && $controlador != 'login'){
     </div>
 </div>
 @endif
+
+<!-- <div ng-controller='controllerImpresora'> -->
+<div style="z-index:1000000000" id="modal-impresora" class="modal fade modal-impresora" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                 <div class="modal-header">
+                    <h3 class="modal-title" id="exampleModalLabel">Registrar impresora</h3>
+                    <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                    </div> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <div id="txtImpresoraGroup" class="form-group">
+                            <label for="fechaBusqueda" class="bmd-label-floating">Impresora</label>
+                            <input  id="txtImpresora" type="text" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-3">
+                            <input id="btnImpresoraGuardar" type="submit" class="btn btn-primary" value="Guardar">   
+                        </div>
+                    </div>
+
+
+                    <div class="container">
+
+                        <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
+                        @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
+                        </div> -->
+                    </div>
+
+                </div> <!-- END MODAL-BODY -->
+                
+            </div> <!-- END MODAL-CONTENT-->
+        </div>
+    </div>
+<!-- </div> -->
+    <!-- END MODAL DUPLICAR TICKET -->
 
 @yield('content')

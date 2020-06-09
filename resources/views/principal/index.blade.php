@@ -52,7 +52,7 @@
                     Fecha: <span class="bg-secondary p-2 text-white rounded">@{{datos.fecha}}</span>
                     </a>
 
-                    <button style="display: block;" class="navbar-toggler ml-auto" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navigation-example">
+                    <button id="toggle-navigation" style="display: block;" class="navbar-toggler ml-auto" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navigation-example">
                         <span class="sr-only">Toggle navigation</span>
                         <span class="navbar-toggler-icon icon-bar"></span>
                         <span class="navbar-toggler-icon icon-bar mt-1"></span>
@@ -137,7 +137,7 @@
 
                             <!-- <div class="form-group"> -->
                                 
-                                <div style="font-size: 16px" class="col-3 col-sm-2 mt-2">
+                                <div style="font-size: 16px" class="col-3 col-sm-1 mt-2">
                                 <input disabled ng-model="datos.montoExistente" type="text" class="form-control" id="inputPassword" placeholder="0.00">
                                 </div>
                             <!-- </div> -->

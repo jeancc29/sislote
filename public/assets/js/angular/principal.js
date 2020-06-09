@@ -903,8 +903,7 @@ myApp
 
         $scope.venta_guardar = function(e){
             //e.preventDefault();
-
-
+          
 
 
                 if(Object.keys($scope.datos.jugadas).length ==0)
@@ -934,6 +933,13 @@ myApp
                 
                 
                 $scope.datos.subTotal = 0;
+                if($scope.datos.print){
+                    if(helperService.empty(localStorage.getItem("impresora"), 'string') == true){
+                        window.abrirModalImpresora(true);
+                        return;
+                    }
+                }
+                
                 $http.post(rutaGlobal+"/api/principal/guardar",{'datos':$scope.datos, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 
@@ -948,7 +954,8 @@ myApp
                         //   $scope.datos.enviarSMS.codigoBarra = response.data.venta.codigoBarra;
                         //   $scope.print();
                           //$scope.abrirVentanaSms();
-                          printerService.printTicket(response.data.venta);
+                          if($scope.datos.print)
+                            printerService.printTicket(response.data.venta);
                         }
                     else{
                         alert(response.data.mensaje);
@@ -1020,7 +1027,6 @@ myApp
 
         $scope.imprimirTicket = function(ticket, es_movil){
             printerService.printTicket(ticket, CMD.TICKET_COPIA);
-
         }
 
         $scope.buscar = function(){
