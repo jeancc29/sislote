@@ -1,4 +1,20 @@
 myApp.service('printerService', function(helperService){
+    var intentosDeConexion = 0;
+    var maximoIntentosDeConexion = 10
+
+    this.connectToQzServer = function(){
+        var self = this;
+        if(!qz.websocket.isActive()){
+            qz.websocket.connect().then(function() {
+            
+            }).catch(function(err) { 
+                intentosDeConexion++;
+                if(intentosDeConexion <= maximoIntentosDeConexion)
+                    self.connectToQzServer();
+                console.error(err); 
+            });
+        }
+    }
     
     this.printTicket = async function(venta, typeTicket = CMD.TICKET_ORIGINAL){
         if(helperService.empty(localStorage.getItem("impresora"), 'string') == true){
