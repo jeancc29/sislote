@@ -53,9 +53,15 @@ class DatabaseSeeder extends Seeder
 
 
     public function truncateTables(array $tables){
-    	DB::statement('SET FOREIGN_KEY_CHECKS = 0');
-    	foreach($tables as $t){
-    		DB::table($t)->truncate();
-    	}
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $ser):
+        $servidor = $ser->descripcion;
+
+            DB::connection($servidor)->statement('SET FOREIGN_KEY_CHECKS = 0');
+            foreach($tables as $t){
+                DB::connection($servidor)->table($t)->truncate();
+            }
+        
+        endforeach;
     }
 }

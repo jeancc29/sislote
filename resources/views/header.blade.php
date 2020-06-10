@@ -1262,9 +1262,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                       <b class="caret"></b>
                     </span>
                 </a>
+                @if(session("tipoUsuario") == "Programador")
                 <div class="collapse" id="collapseExample">
                     <ul class="nav">
-                    @inject('helper', '\App\Classes\Helper')
                     @foreach(session("servidores") as $servidor)
                         <li class="nav-item">
                             <a class="nav-link" href="{{route('cambiarServidor')}}?token={{\App\Classes\Helper::jwtEncodeServidor($servidor['descripcion'], session('usuario'))}}">
@@ -1287,6 +1287,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                         </li> -->
                     </ul>
                 </div>
+                @endif;
             </div>
         </div>
         <ul class="nav">

@@ -114,6 +114,8 @@ class LoginController extends Controller
         
         //Session::put('idUsuario', $u->id);
 
+        $rol = $u->roles;
+        $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
         session(['apiKey' => \config("data.apiKey")]);
         session(['servidor' => $u->servidor]);
         session(['servidores' => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get()]);
@@ -121,6 +123,7 @@ class LoginController extends Controller
         session(['usuario' => $u->usuario]);
         session(['idBanca' => $idBanca]);
         session(['permisos' => $u->permisos]);
+        session(['tipoUsuario' => $tipoUsuario]);
 
        
       
@@ -213,8 +216,9 @@ class LoginController extends Controller
 
         $administrador = false;
         
-        $role = Roles::on($u->servidor)->whereId($u->idRole)->first();
-       if($role->descripcion == "Administrador")
+        $role = $u->roles;
+        $tipoUsuario = ($role != null) ? $role->descripcion : "Banquero";
+        if($tipoUsuario == "Administrador")
             $administrador = true;
         else
             $administrador = false;
@@ -234,7 +238,8 @@ class LoginController extends Controller
         'administrador' => $administrador,
         'usuario' => $u,
         'bancaObject' => new BranchesResourceSmall($banca),
-        "apiKey" => \config("data.apiKey")
+        "apiKey" => \config("data.apiKey"),
+        "tipoUsuario" => $tipoUsuario,
     ], 201);
     }
 
@@ -289,6 +294,8 @@ class LoginController extends Controller
                 }
             }
 
+            $rol = $u->roles;
+            $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
             session(['servidor' => $servidor->descripcion]);
             session(['apiKey' => \config("data.apiKey")]);
             session(['servidor' => $u->servidor]);
@@ -297,6 +304,7 @@ class LoginController extends Controller
             session(['usuario' => $u->usuario]);
             session(['idBanca' => $idBanca]);
             session(['permisos' => $u->permisos]);
+            session(['tipoUsuario' => $tipoUsuario]);
             // dd($datos);
             return back()->withInput();
         } catch (\Throwable $th) {

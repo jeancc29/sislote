@@ -280,6 +280,8 @@ class Helper{
             session()->forget('servidor');
             session()->forget('apiKey');
             session()->forget('servidores');
+            session()->forget('usuario');
+            session()->forget('tipoUsuario');
             
             redirect()->route('login');
         }

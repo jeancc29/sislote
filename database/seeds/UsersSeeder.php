@@ -14,24 +14,7 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
-        $usuario = u::create([
-            'nombres' => 'Jean carlos',
-            'apellidos' => 'Contreras',
-            'sexo' => 'Masculino',
-            'email' => 'jean29@outlook.com',
-            'celular' => '8094266800',
-            'idRole' => 4,
-            'usuario' => 'jean',
-            'password' => Crypt::encryptString('Jean06091929')
-        ]);
         
-        $usuario->permisos()->detach();
-        $permisos = p::all();
-        $permisos = collect($permisos)->map(function($d) use($usuario){
-            return ['idPermiso' => $d['id'], 'idUsuario' => $usuario['id']];
-        });
-       
-        $usuario->permisos()->attach($permisos);
 
 
 
@@ -46,5 +29,31 @@ class UsersSeeder extends Seeder
             'password' => Crypt::encryptString('Jean06091929'),
             'status' => 3
         ]);
+    }
+
+    public function createOrUpdateJean($servidor)
+    {
+        $usuario = Users::on($servidor)->whereUsuario("jean")->get()->first();
+        if($usuario == null){
+            $usuario = u::on($servidor)->create([
+                'nombres' => 'Jean carlos',
+                'apellidos' => 'Contreras',
+                'sexo' => 'Masculino',
+                'email' => 'jean29@outlook.com',
+                'celular' => '8094266800',
+                'idRole' => 4,
+                'usuario' => 'jean',
+                'password' => Crypt::encryptString('Jean06091929')
+            ]);
+        }
+        
+        
+        $usuario->permisos()->detach();
+        $permisos = p::on($servidor)->all();
+        $permisos = collect($permisos)->map(function($d) use($usuario){
+            return ['idPermiso' => $d['id'], 'idUsuario' => $usuario['id']];
+        });
+       
+        $usuario->permisos()->attach($permisos);
     }
 }
