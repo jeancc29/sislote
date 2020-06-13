@@ -1,10 +1,10 @@
 //commands based on https://github.com/humbertopiaia/escpos-commands-js/blob/master/src/commands.js
 //all the commands below may vary by printer, check the manual
 const CMD = {
-    TICKET_ORIGINAL = "ORIGINAL",
-    TICKET_COPIA = "COPIA",
-    TICKET_CANCELADO = "CANCELADO",
-    TICKET_PAGADO = "PAGADO",
+    TICKET_ORIGINAL : "ORIGINAL",
+    TICKET_COPIA : "COPIA",
+    TICKET_CANCELADO : "CANCELADO",
+    TICKET_PAGADO : "PAGADO",
     LF: '\x0a',
     ESC: '\x1b',
     FS: '\x1c',

@@ -16,24 +16,19 @@ class UsersSeeder extends Seeder
     {
         
 
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $ser):
+            $servidor = $ser->descripcion;
 
+            $this->createOrUpdateJean($servidor);
+            $this->createOrUpdateSistema($servidor);
 
-        $usuario = u::create([
-            'nombres' => 'Sistema',
-            'apellidos' => 'Sistema',
-            'sexo' => 'Masculino',
-            'email' => 'jeancon29@gmail.com',
-            'celular' => '8294266800',
-            'idRole' => 1,
-            'usuario' => 'sistema',
-            'password' => Crypt::encryptString('Jean06091929'),
-            'status' => 3
-        ]);
+        endforeach;
     }
 
     public function createOrUpdateJean($servidor)
     {
-        $usuario = Users::on($servidor)->whereUsuario("jean")->get()->first();
+        $usuario = u::on($servidor)->whereUsuario("jean")->get()->first();
         if($usuario == null){
             $usuario = u::on($servidor)->create([
                 'nombres' => 'Jean carlos',
@@ -41,19 +36,45 @@ class UsersSeeder extends Seeder
                 'sexo' => 'Masculino',
                 'email' => 'jean29@outlook.com',
                 'celular' => '8094266800',
-                'idRole' => 4,
+                'idRole' => \App\Roles::on($servidor)->whereDescripcion("Programador")->first()->id,
                 'usuario' => 'jean',
-                'password' => Crypt::encryptString('Jean06091929')
+                'password' => Crypt::encryptString('Jean06091929'),
             ]);
+        }else{
+            $usuario->servidor = $servidor;
+            $usuario->idRole = \App\Roles::on($servidor)->whereDescripcion("Programador")->first()->id;
+            $usuario->save();
         }
         
         
         $usuario->permisos()->detach();
-        $permisos = p::on($servidor)->all();
+        $permisos = p::on($servidor)->get();
         $permisos = collect($permisos)->map(function($d) use($usuario){
             return ['idPermiso' => $d['id'], 'idUsuario' => $usuario['id']];
         });
        
         $usuario->permisos()->attach($permisos);
+    }
+
+    public function createOrUpdateSistema($servidor){
+        $usuario = u::on($servidor)->whereUsuario("sistema")->get()->first();
+        if($usuario == null){
+            $usuario = u::on($servidor)->create([
+                'nombres' => 'Sistema',
+                'apellidos' => 'Sistema',
+                'sexo' => 'Masculino',
+                'email' => 'jeancon29@gmail.com',
+                'celular' => '8294266800',
+                'idRole' => 1,
+                'usuario' => 'sistema',
+                'password' => Crypt::encryptString('Jean06091929'),
+                'status' => 3,
+                'servidor' => $serv
+            ]);
+        }else{
+            $usuario->servidor = $servidor;
+            $usuario->save();
+        }
+        
     }
 }

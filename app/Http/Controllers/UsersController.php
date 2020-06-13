@@ -74,9 +74,28 @@ class UsersController extends Controller
             ], 201);
         }
 
+        $roles = null;
+        $usuarios = null;
+        $usuario = Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if($usuario != null){
+            $role = $usuario->roles;
+            if($role != null){
+                if($role->descripcion == "Programador"){
+                    $roles = Roles::on($datos["servidor"])->get();
+                    $usuarios = Users::on($datos["servidor"])->whereIn('status', array(0, 1))->get();
+                }
+            }
+        }
+
+        if($roles == null)
+            $roles = Roles::on($datos["servidor"])->where('descripcion', '!=', 'Programador')->get();
+              
+        if($usuarios == null)
+            $usuarios = Users::on($datos["servidor"])->whereIn('status', array(0, 1))->where('idRole', '!=', Roles::on($datos["servidor"])->whereDescripcion("Programador")->first()->id)->get();
+
         return Response::json([
-            'usuarios' => UsersResource::collection(Users::on($datos["servidor"])->whereIn('status', array(0, 1))->get()),
-            'usuariosTipos' => RolesResource::collection(Roles::on($datos["servidor"])->get()),
+            'usuarios' => UsersResource::collection($usuarios),
+            'usuariosTipos' => RolesResource::collection($roles),
             'permisos' => Permissions::on($datos["servidor"])->get()
         ], 201);
     }

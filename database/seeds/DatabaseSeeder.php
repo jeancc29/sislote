@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
         
         $this->call('RolesSeeder');
         $this->call('PermissionRoleSeeder');
-        // $this->call('UsersSeeder');
+        $this->call('UsersSeeder');
         // $this->call('BlockslotteriesSeeder');
         // $this->call('BranchesSeeder');
         // $this->call('GeneralsSeeder');
