@@ -25,12 +25,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     function cerrarMenu(){
-        var element = document.querySelector("#toggle-navigation");
-        var evObj = document.createEvent('Events');
-        evObj.initEvent('click', true, false);
-        element.dispatchEvent(evObj);
-        console.log("Dentro cerrarMenu");
-    
+        if($('#toggle-navigation').length){
+            var element = document.querySelector("#toggle-navigation");
+            var evObj = document.createEvent('Events');
+            evObj.initEvent('click', true, false);
+            element.dispatchEvent(evObj);
+            console.log("Dentro cerrarMenu");
+        }
     }
 
     var guardar = function(){

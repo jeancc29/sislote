@@ -39,12 +39,12 @@ myApp.service('printerService', function(helperService){
             if(!qz.websocket.isActive())
             {
                 qz.websocket.connect().then(function() {
-                var config = qz.configs.create("POS58 Printer");
+                var config = qz.configs.create(localStorage.getItem("impresora"));
                 return qz.print(config, data);
                 }).catch(function(err) { console.error(err); });
             }else{
                 // await qz.websocket.disconnect()
-                var config = qz.configs.create("POS58 Printer");
+                var config = qz.configs.create(localStorage.getItem("impresora"));
                 // await qz.websocket.connect(config)
                 return qz.print(config, data);
             }
