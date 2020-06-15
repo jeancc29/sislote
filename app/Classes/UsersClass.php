@@ -59,8 +59,11 @@ class UsersClass{
 
             if($usuarioDBPrincipal != null)
                 $this->update($usuarioDBPrincipal);
-            else
+            else{
+                $this->datos['password'] = $usuario->password;
+                $this->datos['confirmar'] = $usuario->password;
                 $this->create("mysql");
+            }
 
         }else{
             $this->validarCorreo($this->servidor);
