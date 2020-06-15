@@ -60,8 +60,8 @@ class UsersClass{
             if($usuarioDBPrincipal != null)
                 $this->update($usuarioDBPrincipal);
             else{
-                $this->datos['password'] = $usuario->password;
-                $this->datos['confirmar'] = $usuario->password;
+                $this->datos['password'] = Crypt::decryptString($usuario->password);
+                $this->datos['confirmar'] = Crypt::decryptString($usuario->password);
                 $this->create("mysql");
             }
 
