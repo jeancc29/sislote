@@ -54,8 +54,14 @@ class UsersClass{
             $this->validarUsuario($this->servidor, $usuario);
             $this->validarCorreo("mysql", $usuarioDBPrincipal);
             $this->validarUsuario("mysql", $usuarioDBPrincipal);
+            
             $usuario = $this->update($usuario);
-            $this->update($usuarioDBPrincipal);
+
+            if($usuarioDBPrincipal != null)
+                $this->update($usuarioDBPrincipal);
+            else
+                $this->create("mysql");
+
         }else{
             $this->validarCorreo($this->servidor);
             $this->validarUsuario($this->servidor);
@@ -78,6 +84,12 @@ class UsersClass{
                 if($usuario->id != $id->id){
                     abort(403, 'El correo ya existe, elija uno diferente');
                 }
+                if($servidor == "mysql"){
+                    //Si el usuario existe con un servidor diferente eso quiere decir que no se puede usar ese usuario
+                    if($this->servidor != $usuario->servidor){
+                        abort(403, 'El usuario ya existe, elija uno diferente');
+                    }
+                }
             }else{
                 abort(403, 'El correo ya existe, elija uno diferente');
             }
@@ -86,12 +98,18 @@ class UsersClass{
 
     private function validarUsuario($servidor, Users $usuario = null)
     {
-        $id = Users::on($servidor)->whereEmail($this->datos['usuario'])->first();
+        $id = Users::on($servidor)->whereUsuario($this->datos['usuario'])->first();
         if($id != null){
             if($usuario != null)
             {
                 if($usuario->id != $id->id){
                     abort(403, 'El usuario ya existe, elija uno diferente');
+                }
+                if($servidor == "mysql"){
+                    //Si el usuario existe con un servidor diferente eso quiere decir que no se puede usar ese usuario
+                    if($this->servidor != $usuario->servidor){
+                        abort(403, 'El usuario ya existe, elija uno diferente');
+                    }
                 }
             }else{
                 abort(403, 'El usuario ya existe, elija uno diferente');
