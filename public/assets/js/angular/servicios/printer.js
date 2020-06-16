@@ -345,7 +345,8 @@ myApp.service('printerService', function(helperService){
          var saltoLinea = "";
         if((contadorCicloJugadas + 1) == cantidadJugadas)
             // saltoLinea = "                     \n";
-            saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                     ", monto) + "\n";
+            // saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                     ", monto) + "\n";
+            saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                              ", monto) + "\n";
 
         return saltoLinea;
       }
