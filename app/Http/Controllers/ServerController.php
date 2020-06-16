@@ -17,6 +17,36 @@ class ServerController extends Controller
         //
     }
 
+    public function servidorExiste(Request $request)
+    {
+     
+        $datos = request()->validate([
+            'token' => 'required'
+        ]);
+
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+            $servidor = \App\Server::on("mysql")->whereDescripcion($datos["data"]["servidor"])->first();
+            if($servidor == null){
+                (new Helper)->cerrar_session();
+                return redirect()->route('login');
+            }
+            
+
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            // return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'Token incorrecto',
+            //     'token' => $datos
+            // ], 201);
+            abort(403, "Token incorrecto" . $th);
+        }
+       
+        
+    }
+
     /**
      * Show the form for creating a new resource.
      *
