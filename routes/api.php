@@ -149,3 +149,6 @@ Route::get('/monedas', 'CoinsController@index');
 Route::post('/monedas/guardar', 'CoinsController@store');
 Route::post('/monedas/eliminar', 'CoinsController@destroy');
 Route::post('/monedas/pordefecto', 'CoinsController@pordefecto');
+
+Route::post('/servidor/servidorExiste', 'ServerController@servidorExiste');
+

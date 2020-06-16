@@ -20,20 +20,21 @@ class ServerController extends Controller
     public function servidorExiste(Request $request)
     {
      
-        $datos = request()->validate([
-            'token' => 'required'
-        ]);
+        $datos = request()['datos'];
 
         try {
-            $datos = \Helper::jwtDecode($datos["token"]);
-            $servidor = \App\Server::on("mysql")->whereDescripcion($datos["data"]["servidor"])->first();
-            if($servidor == null){
-                (new Helper)->cerrar_session();
-                return redirect()->route('login');
-            }
-            
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
 
-            
+            $servidor = \App\Server::on("mysql")->whereDescripcion($datos["servidor"])->first();
+            if($servidor == null){
+                abort(203, "Servidor no existe");
+            }
+
+            return Response::json([
+                'message' => "Si existe"
+            ], 201);
         } catch (\Throwable $th) {
             //throw $th;
             // return Response::json([
