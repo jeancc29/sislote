@@ -1037,7 +1037,8 @@ div:not(.btn-group-not).btn-group {
      ng-init="ROOT_PATH = '/'" ng-init="load('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')"
     class="<?php if($controlador == 'login') echo 'off-canvas-sidebar' ?>" 
     
-    on-shift-tab="venta_guardar($event,'email')">
+    on-shift-tab="venta_guardar($event,'email')"
+    ng-keypress="keyPressGuardarVenta($event)">
       <!-- ng-keyup="venta_guardar($event)" -->
 
 <?php 

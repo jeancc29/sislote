@@ -815,6 +815,17 @@ myApp
 
         $scope.inputJugadaKeyup = function(evento){
             // console.log('inputJugadaKeyup: ', evento.key);
+            
+            //si es un asterisco pues entonces lo quito
+            if(evento.keyCode == 42){
+                if(helperService.empty($scope.datos.jugada, "string") == false){
+                    if($scope.datos.jugada.indexOf("*") != -1){
+                        $scope.datos.jugada.replace("*", "");
+                    }
+                }
+                return;
+            }
+
             if($scope.datos.jugada != undefined){
                 if(evento.key == '+'){
                     if($scope.datos.jugada.length != 4 && $scope.datos.jugada.length != 5){
@@ -1629,6 +1640,14 @@ myApp
 
         $scope.getBancaMoneda = function(banca){
            return helperService.getBancaMoneda(banca);
+        }
+
+        $scope.keyPressGuardarVenta = function(event){
+            console.log("keyPressGuardarVenta evento: ", event.keyCode);
+            if(helperService.empty(String(event.keyCode), "string") == false){
+                if(event.keyCode == 42)
+                    $scope.venta_guardar(2);
+            }
         }
 
 
