@@ -61,7 +61,7 @@ class BalancesController extends Controller
             
             $usuario = Users::whereId(session("idUsuario"))->first();
             if(!$usuario->tienePermiso("Ver lista de balances de bancas") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
 
             $monedas = Coins::orderBy('pordefecto', 1)->get();
@@ -115,7 +115,7 @@ class BalancesController extends Controller
             
             $usuario = Users::whereId(session("idUsuario"))->first();
             if(!$usuario->tienePermiso("Ver lista de balances de bancos") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
             return view('balances.bancos', compact('controlador', 'usuario'));
         }

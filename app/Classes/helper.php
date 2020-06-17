@@ -1816,4 +1816,13 @@ class Helper{
         }
     }
 
+    public static function tienePermiso($idUsuario, $permiso)
+    {
+        $u = Users::where(["id" => $idUsuario, "status" => 1])->first();
+        if($u != null)
+            return $u->permisos->contains("descripcion", $permiso);
+        else
+            return false;
+    }
+
 }

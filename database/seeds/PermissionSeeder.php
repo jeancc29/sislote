@@ -262,5 +262,8 @@ class PermissionSeeder extends Seeder
             'status' => 1,
             'idTipo' => 5
         ]);
+
+        p::create(["descripcion" => "Manejar monedas", "status" => 1, "idTipo" => 9]);
+        p::create(["descripcion" => "Ver Dashboard", "status" => 1, "idTipo" => 6]);
     }
 }

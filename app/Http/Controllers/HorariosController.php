@@ -52,7 +52,7 @@ class HorariosController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar horarios de loterias") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
             return view('horarios.index', compact('controlador'));
         }

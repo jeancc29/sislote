@@ -64,7 +64,7 @@ class LoansController extends Controller
                 return redirect()->route('login');
             }
             if(!$u->tienePermiso("Manejar prestamos") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
         $idTipo = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first()->id;
 

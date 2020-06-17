@@ -1051,7 +1051,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
 ?>
 <!--  wrapper-full-page -->
-@if($controlador != 'login')
+@if($controlador != 'login' && \App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar resultados"))
 <div ng-controller='controllerPremiosModal'>
 
 <div ng-class="{'dblock': (mostrarModalPremios == true), 'dnone': (mostrarModalPremios == false)}" class="dnone row panelPremios panel-premios max-width-570" ng-init="loadPremiosModal('<?php if (isset($_SESSION['idUsuario'])) echo $_SESSION['idUsuario']; ?>', '/')">
@@ -1297,22 +1297,21 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     <p> Impresora </p>
                 </a>
             </li>
-
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver Dashboard"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('dashboard')}}">
                     <i class="material-icons">dashboard</i>
                     <p> Dashboard </p>
                 </a>
             </li>
-            
-
+            @endif
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('principal')}}">
                     <i class="material-icons">attach_money</i>
                     <p> Vender </p>
                 </a>
             </li>
-
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver ventas") == true || \App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver historico ventas") == true)
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#reportesToggle">
                     <i class="material-icons">insert_chart_outlined</i>
@@ -1323,19 +1322,22 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
                 <div class="collapse" id="reportesToggle">
                     <ul class="nav">
+                        @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver historico ventas"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('reportes.historico')}}">
                               <span class="sidebar-mini"> H </span>
                               <span class="sidebar-normal"> Historico </span>
                             </a>
                         </li>
-
+                        @endif
+                        @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver ventas"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('reportes.ventasporfecha')}}">
                               <span class="sidebar-mini"> V </span>
                               <span class="sidebar-normal"> Ventas por fecha </span>
                             </a>
                         </li>
+                        @endif
 
                         <!-- <li class="nav-item ">
                             <a class="nav-link" href="">
@@ -1346,7 +1348,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </ul>
                 </div>
             </li>
+            @endif
 
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Monitorear ticket"))
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#monitoreoToggle">
                     <i class="material-icons">image</i>
@@ -1372,8 +1376,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </ul>
                 </div>
             </li>
-
+            @endif
             
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar transacciones"))
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#transaccionesToggle">
                     <i class="material-icons">image</i>
@@ -1399,6 +1404,8 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </ul>
                 </div>
             </li>
+            @endif
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver lista de balances de bancas") == true || \App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver lista de balances de bancos") == true)
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#balanceToggle">
                     <i class="material-icons">account_balance_wallet</i>
@@ -1409,22 +1416,28 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
                 <div class="collapse" id="balanceToggle">
                     <ul class="nav">
+                    @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver lista de balances de bancas"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('balance.bancas')}}">
                               <span class="sidebar-mini"> B </span>
                               <span class="sidebar-normal"> Bancas </span>
                             </a>
                         </li>
+                    @endif
+                    @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver lista de balances de bancos"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('balance.bancos')}}">
                               <span class="sidebar-mini"> B </span>
                               <span class="sidebar-normal"> Bancos </span>
                             </a>
                         </li>
+                    @endif
                     </ul>
                 </div>
             </li>
+            @endif
 
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar prestamos"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('prestamos')}}">
                     <i class="material-icons">format_list_numbered</i>
@@ -1433,7 +1446,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
+            @endif
 
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar entidades contables"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('entidades')}}">
                     <i class="material-icons">format_list_numbered</i>
@@ -1442,8 +1457,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
-
+            @endif
             
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar loterias") == true || \App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar reglas"))
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#pagesExamples">
                     <i class="material-icons">image</i>
@@ -1454,22 +1470,27 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
                 <div class="collapse" id="pagesExamples">
                     <ul class="nav">
+                    @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar loterias"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('loterias')}}">
                               <span class="sidebar-mini"> E </span>
                               <span class="sidebar-normal"> Editar </span>
                             </a>
                         </li>
+                    @endif
+                    @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar reglas"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('bloqueos')}}">
                               <span class="sidebar-mini"> B </span>
                               <span class="sidebar-normal"> Bloqueos </span>
                             </a>
                         </li>
+                    @endif
                     </ul>
                 </div>
             </li>
-
+            @endif
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar bancas"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('bancas')}}">
                     <i class="material-icons">store</i>
@@ -1478,6 +1499,8 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
+            @endif
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar resultados"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('premios')}}">
                     <i class="material-icons">format_list_numbered</i>
@@ -1486,9 +1509,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
-
+            @endif
             
-
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar horarios de loterias"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('horarios')}}">
                     <i class="material-icons">av_timer</i>
@@ -1497,7 +1520,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
+            @endif
 
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar usuarios") == true || \App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver inicios de sesion"))
             <li class="nav-item active">
                 <a class="nav-link" data-toggle="collapse" href="#usuariosToggle">
                     <i class="material-icons">image</i>
@@ -1508,28 +1533,34 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
                 <div class="collapse" id="usuariosToggle">
                     <ul class="nav">
+                    @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar usuarios"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('usuarios')}}">
                               <span class="sidebar-mini"> E </span>
                               <span class="sidebar-normal"> Editar </span>
                             </a>
                         </li>
+                    @endif
+                    @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Ver inicios de sesion"))
                         <li class="nav-item ">
                             <a class="nav-link" href="{{route('usuarios.sesiones')}}">
                               <span class="sidebar-mini"> S </span>
                               <span class="sidebar-normal"> Sesiones de usuarios </span>
                             </a>
                         </li>
+                    @endif
                     </ul>
                 </div>
             </li>
+           @endif
+           @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar monedas")) 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('monedas')}}">
                     <i class="material-icons">attach_money</i>
                     <p> Monedas </p>
                 </a>
             </li>
-
+            @endif
             
 
             

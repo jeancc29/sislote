@@ -16,6 +16,7 @@
 // });
 
 Route::get('/login', 'LoginController@index')->name('login');
+Route::get('/sinpermiso', 'LoginController@sinpermiso')->name('sinpermiso');
 Route::get('/cerrar', 'LoginController@cerrarSesion')->name('cerrarSesion');
 Route::post('/login/acceder', 'LoginController@acceder')->name('login.acceder');
 

@@ -51,6 +51,15 @@ class EntityController extends Controller
     {
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar entidades contables") == true){
+                return redirect()->route('sinpermiso');
+            }
+
             return view('entidades.index', compact('controlador'));
         }
 

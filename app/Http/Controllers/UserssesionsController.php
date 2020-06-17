@@ -52,7 +52,7 @@ class UserssesionsController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Ver inicios de sesion") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
             return view('usuarios.sesiones', compact('controlador'));
         }

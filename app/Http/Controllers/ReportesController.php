@@ -126,7 +126,15 @@ class ReportesController extends Controller
         
         if(!strpos(Request::url(), '/api/')){
             // return "<h1>Dentro reporte jugadas: $controlador </h1>";
-           
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Ver historico ventas") == true){
+                return redirect()->route('sinpermiso');
+            }
+
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
             $fechaFinalSinHora = Carbon::now();
@@ -298,6 +306,15 @@ class ReportesController extends Controller
         
         if(!strpos(Request::url(), '/api/')){
             // return "<h1>Dentro reporte jugadas: $controlador </h1>";
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Ver ventas") == true){
+                return redirect()->route('sinpermiso');
+            }
+
             $fecha = getdate();
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';

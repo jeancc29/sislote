@@ -391,10 +391,15 @@ class MonitoreoController extends Controller
         $controlador = Route::getCurrentRoute()->getName();
         $usuario = Users::whereId(session('idUsuario'))->first();
         if(!strpos(Request::url(), '/api/')){
+           
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
+
             $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Monitorear ticket") == true){
+                return redirect()->route('sinpermiso');
+            }
             // if(!$u->tienePermiso("Manejar transacciones") == true){
             //     return redirect()->route('principal');
             // }

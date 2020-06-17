@@ -49,7 +49,7 @@
 
                
                     <a href="#" class="navbar-brand font-weight-bold" style="font-size: 16px; color: black">
-                    Fecha: <span class="bg-secondary p-2 text-white rounded">@{{datos.fecha}}</span>
+                    Fecha: <span class="bg-secondary p-2 text-white rounded">@{{datos.fecha}} <span id="txtTime"></span> </span>
                     </a>
 
                     <button id="toggle-navigation" style="display: block;" class="navbar-toggler ml-auto" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navigation-example">

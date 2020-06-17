@@ -65,7 +65,7 @@ class TransactionsController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar transacciones") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
             return view('transacciones.index', compact('controlador'));
         }
@@ -199,7 +199,7 @@ class TransactionsController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar transacciones") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
             return view('transacciones.grupo', compact('controlador'));
         }

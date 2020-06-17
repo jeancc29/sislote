@@ -33,8 +33,6 @@ class AndroidversionsController extends Controller
                 return redirect()->route('principal');
             }
 
-            
-
             return view('versiones.index', compact('controlador'));
         }
 

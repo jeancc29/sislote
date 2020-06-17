@@ -63,6 +63,11 @@ class DashboardController extends Controller
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
+
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Ver Dashboard") == true){
+                return redirect()->route('sinpermiso');
+            }
             
             
             
@@ -220,6 +225,11 @@ class DashboardController extends Controller
 
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
+            }
+
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Ver Dashboard") == true){
+                return redirect()->route('sinpermiso');
             }
             
             $sorteos = Draws::all();

@@ -53,7 +53,7 @@ class UsersController extends Controller
             }
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar usuarios") == true){
-                return redirect()->route('principal');
+                return redirect()->route('sinpermiso');
             }
             return view('usuarios.index', compact('controlador'));
         }

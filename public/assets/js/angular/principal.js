@@ -302,9 +302,9 @@ myApp
             ruta = ROOT_PATH;
             // console.log('ROOT_PATH: ', ruta);
             $scope.inicializarDatos();
-
           $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
           //$scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
+          startTime();
 
           var a = new Hola("Jean", "Contreras");
         //   console.log('clase: ', ruta);
@@ -1646,10 +1646,37 @@ myApp
         $scope.keyPressGuardarVenta = function(event){
             console.log("keyPressGuardarVenta evento: ", event.keyCode);
             if(helperService.empty(String(event.keyCode), "string") == false){
-                if(event.keyCode == 42)
+                if(event.keyCode == 42){
+                    quitarAsteriscoInputJugada();
                     $scope.venta_guardar(2);
+                }
             }
         }
+
+        function quitarAsteriscoInputJugada(){
+            if(helperService.empty($scope.datos.jugada, "string") == false){
+                if($scope.datos.jugada.indexOf("*") != -1){
+                    $scope.datos.jugada.replace("*", "");
+                }
+            }
+        }
+
+        function startTime() {
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var s = today.getSeconds();
+            m = checkTime(m);
+            s = checkTime(s);
+            document.getElementById('txtTime').innerHTML =
+            h + ":" + m + ":" + s;
+            var t = setTimeout(startTime, 500);
+          }
+
+          function checkTime(i) {
+            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+            return i;
+          }
 
 
     })

@@ -53,6 +53,15 @@ class BranchesController extends Controller
         
         $controlador = Route::getCurrentRoute()->getName(); 
         if(!strpos(Request::url(), '/api/')){
+            if(!Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+
+            $u = Users::whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar bancas") == true){
+                return redirect()->route('sinpermiso');
+            }
+
             return view('bancas.index', compact('controlador'));
         }
        

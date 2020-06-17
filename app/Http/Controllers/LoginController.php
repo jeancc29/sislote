@@ -56,6 +56,15 @@ class LoginController extends Controller
         return view('login.index', compact('controlador'));
     }
 
+    public function sinpermiso()
+    {
+        $controlador = Route::getCurrentRoute()->getName(); 
+        // $route = Route();
+        //echo $controlador;
+        
+        return view('login.sinpermiso', compact('controlador'));
+    }
+
     public function acceder(Request $request)
     {
         $data = request()->validate([
