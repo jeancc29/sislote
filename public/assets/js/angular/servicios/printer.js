@@ -209,7 +209,7 @@ myApp.service('printerService', function(helperService){
             
             if(jugadas.length > 0){
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
-                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, arrayLoterias[indice].descripcion);
+                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, arrayLoterias[indice].descripcion);
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
             
                 jugadas.forEach(function(valor, indiceJugadas, arrayJugadas){
@@ -244,7 +244,7 @@ myApp.service('printerService', function(helperService){
 
                 var loteriasLength = (typeTicket == CMD.TICKET_PAGADO) ? venta.loterias.length - 1 : venta.loterias.length;
                 if(loteriasLength > 1){
-                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "total: " + String(totalPorLoteria), 2);
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "total: " + String(totalPorLoteria));
                 }
                 
             }
@@ -262,7 +262,7 @@ myApp.service('printerService', function(helperService){
         if((typeTicket != CMD.TICKET_ORIGINAL && typeTicket != CMD.TICKET_PAGADO) || venta.banca.imprimirCodigoQr == 0)
             saltoLineaTotal += "\n\n";
         
-        data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "TOTAL: " + String(helperService.redondear(total)) + saltoLineaTotal )
+        data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "TOTAL: " + String(helperService.redondear(total)))
         
         if(typeTicket == CMD.TICKET_CANCELADO)
             data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "** CANCELADO **\n\n\n");
@@ -271,14 +271,14 @@ myApp.service('printerService', function(helperService){
             var banca = venta.banca;
 
             if(banca.piepagina1 != null){
-                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, banca.piepagina1);
+                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_NORMAL, banca.piepagina1);
             }
             if(banca.piepagina2 != null)
-                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, banca.piepagina2);
+                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_NORMAL, banca.piepagina2);
             if(banca.piepagina3 != null)
-                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, banca.piepagina3);
+                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_NORMAL, banca.piepagina3);
             if(banca.piepagina4 != null)
-                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, banca.piepagina4);
+                data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_NORMAL, banca.piepagina4);
             if(banca.imprimirCodigoQr == 1)
                 data = CMD.QR(data, venta.codigoQr);
             

@@ -435,6 +435,7 @@ myApp
                     if(Object.keys($scope.datos.loterias).length > 1){
                         $scope.datos.montoExistente = 'X';
                         $('#inputMonto').focus();
+                        $('#inputMonto').select();
                         return;
                     }
                     
@@ -815,7 +816,7 @@ myApp
 
         $scope.inputJugadaKeyup = function(evento){
             // console.log('inputJugadaKeyup: ', evento.key);
-            
+
             //si es un asterisco pues entonces lo quito
             if(evento.keyCode == 42){
                 if(helperService.empty($scope.datos.jugada, "string") == false){
