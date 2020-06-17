@@ -1567,7 +1567,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('cerrarSesion')}}?cerrar=si">
-                    <i class="material-icons">format_list_numbered</i>
+                    <i class="material-icons">clear</i>
                     <p> Cerrar </p>
                 </a>
             </li>
