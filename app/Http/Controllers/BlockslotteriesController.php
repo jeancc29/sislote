@@ -39,6 +39,7 @@ use App\Http\Resources\SalesResource;
 use App\Http\Resources\BranchesResource;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
+use App\Classes\Helper;
 
 use Illuminate\Support\Facades\Crypt;
 
