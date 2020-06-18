@@ -51,6 +51,29 @@ myApp.service('printerService', function(helperService){
             }
     }
 
+    this.printCuadre = async function(datos){
+        if(helperService.empty(localStorage.getItem("impresora"), 'string') == true){
+            window.abrirModalImpresora(true);
+            return;
+        }
+		
+        var data = this.generateCuadre(datos);
+
+            // qz.print(config, data).catch(function(e) { console.error(e); });
+            if(!qz.websocket.isActive())
+            {
+                qz.websocket.connect().then(function() {
+                var config = qz.configs.create(localStorage.getItem("impresora"));
+                return qz.print(config, data);
+                }).catch(function(err) { console.error(err); });
+            }else{
+                // await qz.websocket.disconnect()
+                var config = qz.configs.create(localStorage.getItem("impresora"));
+                // await qz.websocket.connect(config)
+                return qz.print(config, data);
+            }
+    }
+
     
 
     this.probarImpresora = async function(){
@@ -310,6 +333,27 @@ myApp.service('printerService', function(helperService){
         }
     }
 
+     this.generateCuadre = function(datos){
+        var data = [];
+        data.push(CMD.TEXT_FORMAT.TXT_ALIGN_CT);
+        console.log("printerService generateCUadre: ", datos);
+        
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "Cuadre");
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, datos.banca.descripcion);
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance hasta la fecha: " + String(datos.balanceHastaLaFecha));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Tickets pendientes: " + String(datos.pendientes));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Tickets perdedores: " + String(datos.perdedores));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Tickets ganadores:  " + String(datos.ganadores));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Total:              " + String(datos.total));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Ventas:             " + String(datos.ventas));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Comisiones:         " + String(datos.comisiones));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "descuentos:         " + String(datos.descuentos));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "premios:            " + String(datos.premios));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "neto:               " + String(datos.neto));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance mas ventas: " + String(datos.balanceActual));
+        return data;
+      }
+
     this.addCommandAndTextToData = function(data, cmd, text, lineSpace = 1){
         var lineSpaceString = '';
         for (let contador = 0; contador < lineSpace; contador++) {
@@ -371,5 +415,7 @@ myApp.service('printerService', function(helperService){
             
         return '';
       }
+
+      
 
 });

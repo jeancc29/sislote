@@ -1439,6 +1439,11 @@ myApp
             return tienePendientes;
         }
 
+        $scope.imprimirCuadre = function(){
+            if(helperService.empty($scope.datos.ventasReporte.ventas.banca, "string") == false)
+                printerService.printCuadre($scope.datos.ventasReporte.ventas);
+        }
+
 
         $scope.ventasReporte_buscar = function(){
 
@@ -1453,7 +1458,7 @@ myApp
           $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': $scope.datos.ventasReporte})
              .then(function(response){
 
-                // console.log('ventasReporte_buscar: ', response);
+                console.log('ventasReporte_buscar: ', response);
 
                 if(response.data.errores == 0){
                     $scope.datos.ventasReporte.loterias =response.data.loterias;

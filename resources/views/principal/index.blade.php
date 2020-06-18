@@ -1479,8 +1479,11 @@
                             <input ng-model="datos.ventasReporte.fecha" id="fechaBusqueda" type="date" class="form-control" required>
                             </div>
                         </div>
-                        <div class="form-group col-sm-3">
+                        <div class="form-group col-sm-2">
                             <input ng-click="ventasReporte_buscar()" type="submit" class="btn btn-primary" value="Buscar">   
+                        </div>
+                        <div class="form-group col-sm-2">
+                            <input ng-click="imprimirCuadre()" type="submit" class="btn btn-success" value="Imprimir">   
                         </div>
                     </div>
 
@@ -1558,7 +1561,7 @@
                                         <td class="text-center">@{{datos.ventasReporte.ventas.neto}}</td>
                                     </tr>
                                     <tr>
-                                        <th scope="row" class="text-center">Balance</th>
+                                        <th scope="row" class="text-center">Balance mas ventas</th>
                                         <td class="text-center">@{{datos.ventasReporte.ventas.balanceActual | currency}}</td>
                                     </tr>
                                 </tbody>
