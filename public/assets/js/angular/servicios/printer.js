@@ -232,7 +232,9 @@ myApp.service('printerService', function(helperService){
             
             if(jugadas.length > 0){
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
+                data.push(CMD.TEXT_FORMAT.TXT_2HEIGHT);
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, arrayLoterias[indice].descripcion);
+                data.push(CMD.TEXT_FORMAT.TXT_BOLD_OFF);
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
             
                 jugadas.forEach(function(valor, indiceJugadas, arrayJugadas){
@@ -334,6 +336,28 @@ myApp.service('printerService', function(helperService){
     }
 
      this.generateCuadre = function(datos){
+        var data = [];
+        data.push(CMD.TEXT_FORMAT.TXT_ALIGN_CT);
+        console.log("printerService generateCUadre: ", datos);
+        
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "Cuadre");
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, datos.banca.descripcion);
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance hasta la fecha: " + String(datos.balanceHastaLaFecha));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Tickets pendientes: " + String(datos.pendientes));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Tickets perdedores: " + String(datos.perdedores));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Tickets ganadores: " + String(datos.ganadores));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Total: " + String(datos.total));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Ventas: " + String(datos.ventas));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Comisiones: " + String(datos.comisiones));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "descuentos: " + String(datos.descuentos));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "premios: " + String(datos.premios));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "neto: " + String(datos.neto));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance mas ventas: " + String(datos.balanceActual));
+        data.push(CMD.PAPER.PAPER_FULL_CUT);
+        data.push("\x1b\x69");
+        return data;
+      }
+     this.generateCuadreViejo = function(datos){
         var data = [];
         data.push(CMD.TEXT_FORMAT.TXT_ALIGN_CT);
         console.log("printerService generateCUadre: ", datos);

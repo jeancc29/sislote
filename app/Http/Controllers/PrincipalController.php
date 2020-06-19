@@ -1217,13 +1217,13 @@ class PrincipalController extends Controller
         if(!$usuario->tienePermiso('Vender tickets')){
             return Response::json([
                 'errores' => 1,
-                'mensaje' => 'No tiene permisos para realizar esta accion'
+                'mensaje' => 'No tiene permisos para realizar esta accion vender'
             ], 201);
         }
         if(!$usuario->tienePermiso('Acceso al sistema')){
             return Response::json([
                 'errores' => 1,
-                'mensaje' => 'No tiene permisos para realizar esta accion'
+                'mensaje' => 'No tiene permisos para realizar esta accion acceso'
             ], 201);
         }
     

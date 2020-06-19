@@ -69,10 +69,10 @@ BEGIN
 			select 1 as errores, 'Error: El usuario no existe' as mensaje;
         end if;
        
-	if (select count(p.descripcion) from users u inner join permission_user pu on u.id = pu.idUsuario inner join permissions p on p.id = pu.idPermiso where p.descripcion in('Vender tickets', 'Acceso al sistema') and u.id = pidUsuario) != 2
+	if (select count(p.descripcion) from users u inner join permission_user pu on u.id = pu.idUsuario inner join permissions p on p.id = pu.idPermiso where p.descripcion in('Vender tickets', 'Acceso al sistema') and u.id = pidUsuario) < 2
     then
 		set @errores = 1;
-		select 1 as errores, 'Error: No tiene permiso para realizar esta accion' as mensaje;
+		select 1 as errores, 'Error: No tiene permiso para realizar esta accion vender y acceso' as mensaje;
     end if;
     
    
@@ -82,7 +82,7 @@ BEGIN
 		if not exists(select count(p.descripcion) from users u inner join permission_user pu on u.id = pu.idUsuario inner join permissions p on p.id = pu.idPermiso where p.descripcion = 'Jugar como cualquier banca' and u.id = pidUsuario)
         then
 			set @errores = 1;
-			select 1 as errores, 'Error: No tiene permiso para realizar esta accion' as mensaje;
+			select 1 as errores, 'Error: No tiene permiso para realizar esta accion jugar como cualquier banca' as mensaje;
         end if;
     end if;
     
