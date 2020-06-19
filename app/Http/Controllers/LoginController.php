@@ -318,6 +318,92 @@ class LoginController extends Controller
         
     }
 
+
+    public function cambiarServidorApi(Request $request)
+    {
+     
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+            // return Response::json(["datos" => $datos, "errores" => 0], 201);
+
+            $servidor = \App\Server::on("mysql")->whereDescripcion($datos["servidor"])->first();
+            if($servidor == null){
+                abort(403, "Servidor no existe");
+            }            
+
+            $u = Users::on("mysql")->whereUsuario($datos["usuario"])->first();
+            if($u == null){
+                abort(403, "Usuario no existe general");
+            }
+
+
+            $u = Users::on($servidor->descripcion)->whereUsuario($u->usuario)->first();
+            if($u == null){
+                abort(403, "Usuario no existe");
+            }
+
+
+
+            $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
+            if($idBanca != null){
+                $idBanca = $idBanca->id;
+            }else{
+                $idBanca = Branches::on($u->servidor)->whereStatus(1)->first();
+                if($idBanca != null){
+                    $idBanca = $idBanca->id;
+                }else{
+                    $idBanca = 0;
+                }
+            }
+
+            $rol = $u->roles;
+            $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
+
+            if($idBanca == 0){
+                $banca = Branches::on($datos["servidor"])->whereStatus(1)->first();
+                if($banca != null)
+                    $banca = new BranchesResourceSmall($banca);
+            }else{
+                $banca = Branches::on($datos["servidor"])->whereStatus(1)->whereId($idBanca)->first();
+                if($banca != null)
+                    $banca = new BranchesResourceSmall($banca);
+            }
+            
+            // return Response::json(["datos" => $datos, "errores" => 0], 201);
+
+            return Response::json([
+                'errores' => 0,
+                'mensaje' => '',
+                'idUsuario' => $u->id,
+                'permisos' => $u->permisos,
+                'banca' => $banca->descripcion,
+                'idBanca' => $banca->id,
+                'administrador' => $tipoUsuario == "Administrador",
+                'usuario' => $u,
+                'bancaObject' => $banca,
+                "apiKey" => \config("data.apiKey"),
+                "tipoUsuario" => $tipoUsuario,
+                "servidores" => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get()
+            ], 201);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            // return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'Token incorrecto',
+            //     'token' => $datos
+            // ], 201);
+            abort(403, "Token incorrecto" . $th);
+        }
+       
+        
+    }
+
     /**
      * Show the form for creating a new resource.
      *

@@ -29,7 +29,7 @@ class ServerController extends Controller
 
             $servidor = \App\Server::on("mysql")->whereDescripcion($datos["servidor"])->first();
             if($servidor == null){
-                abort(203, "Servidor no existe");
+                abort(403, "Servidor no existe");
             }
 
             return Response::json([

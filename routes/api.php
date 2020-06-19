@@ -56,6 +56,7 @@ date_default_timezone_set("America/Santiago");
 // Route::post('/realtime', 'RealtimeController@index');
 Route::post('/realtime/todos', 'RealtimeController@todos');
 Route::post('/acceder', 'LoginController@accederApi');
+Route::post('/cambiarServidorApi', 'LoginController@cambiarServidorApi');
 
 Route::get('/dashboard', 'DashboardController@index');
 
