@@ -223,10 +223,7 @@ class LoginController extends Controller
         else
             $administrador = false;
 
-
-            $h = array('email' => $u->usuario, 'password' => $datos['password']);
-
-        
+        $h = array('email' => $u->usuario, 'password' => $datos['password']);
       
        return Response::json([
         'errores' => 0,
@@ -240,6 +237,7 @@ class LoginController extends Controller
         'bancaObject' => new BranchesResourceSmall($banca),
         "apiKey" => \config("data.apiKey"),
         "tipoUsuario" => $tipoUsuario,
+        "servidores" => \App\Server::on("mysql")->get()
     ], 201);
     }
 
