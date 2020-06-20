@@ -1884,7 +1884,7 @@
 <script src="{{asset('assets/js/material-dashboard.js')}}" type="text/javascript"></script>
 <!-- <script src="{{asset('assets/js/prueba_jquery.js')}}" type="text/javascript"></script> -->
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
-<script src="{{asset('assets/demo/demo.js')}}"></script>
+<script src="{{asset('assets/demo/demo.js'). '?'.rand(1,50)}}"></script>
 
 
 
