@@ -399,6 +399,9 @@ myApp
                     })
         }
 
+        function indexOfLoteriaYJugadaActual(elemento){
+            return elemento.jugada == $scope.datos.jugada && elemento.idLoteria == $scope.datos.loterias[0].id;
+        }
 
         $scope.monto_disponible = function(esBlur = false){
             
@@ -473,7 +476,17 @@ myApp
                     $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos.montoDisponible, 'action':'sp_jugadas_obtener_montoDisponible'})
                     .then(function(response){
                           console.log(response);
-                       $scope.datos.montoExistente = response.data.monto;
+                        
+                        var indexJugada = $scope.datos.jugadas.findIndex(indexOfLoteriaYJugadaActual);
+                        if(indexJugada != -1){
+                            var montoDisponible = helperService.redondear(response.data.monto) - $scope.datos.jugadas[indexJugada].monto;
+                            if(montoDisponible < 0)
+                                $scope.datos.montoExistente = 0;
+                            else
+                                $scope.datos.montoExistente = montoDisponible;
+                        }else{
+                            $scope.datos.montoExistente = response.data.monto;
+                        }
                         $('#inputMonto').focus();
                         
                     })
@@ -928,7 +941,8 @@ myApp
                         de presionar la tecla Shift la directiva se activaba creyendo que se habian presionado las 2 teclas cuando
                         solamente habia sido una, asi que por esta razon tube que reestablecer sus valores a 'false' */
                     map = {9: false, 16: false};
-                    alert('No hay jugadas realizadas');
+                    // alert('No hay jugadas realizadas');
+                    demo.showSwal('auto-close', "No hay jugadas", "Debe registrar jugadas para crear ticket");
                     return;
                 }
                 // if(Object.keys($scope.datos.loterias).length ==0)
@@ -1449,16 +1463,13 @@ myApp
 
             $('#fechaVentasReporte').addClass('is-filled');
 
-            
-
             $scope.datos.ventasReporte.idUsuario = idUsuario;
             $scope.datos.ventasReporte.layout = 'Principal';
-
           
-          $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': $scope.datos.ventasReporte})
+            $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': $scope.datos.ventasReporte})
              .then(function(response){
 
-                console.log('ventasReporte_buscar: ', response);
+                // console.log('ventasReporte_buscar: ', response);
 
                 if(response.data.errores == 0){
                     $scope.datos.ventasReporte.loterias =response.data.loterias;
@@ -1711,4 +1722,25 @@ myApp
                 }
             });
         };
-        })
+        });
+
+        myApp.directive('customValidation', function(){
+            return {
+              require: 'ngModel',
+              link: function(scope, element, attrs, modelCtrl) {
+         
+                modelCtrl.$parsers.push(function (inputValue) {
+         
+                  var transformedInput = inputValue.toLowerCase().replace(/ /g, ''); 
+                  var transformedInput = inputValue.toLowerCase().replace("*", ''); 
+         
+                  if (transformedInput!=inputValue) {
+                    modelCtrl.$setViewValue(transformedInput);
+                    modelCtrl.$render();
+                  }         
+         
+                  return transformedInput;         
+                });
+              }
+            };
+         });

@@ -130,7 +130,7 @@
                                             class="form-control h4" 
                                             id="inputJugada" 
                                             type="text" name="text" 
-                                            minLength="2" maxLength="6"  required="true" />
+                                            minLength="2" maxLength="6"  required="true" ng-trim="false" custom-validation/>
                                     </div>
                                 </form>
                             </div>
@@ -1895,6 +1895,7 @@
 
     // Initialise the wizard
     demo.initMaterialWizard();
+    demo.showSwal();
     setTimeout(function() {
       $('.card.card-wizard').addClass('active');
     }, 600);

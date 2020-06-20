@@ -352,7 +352,7 @@ myApp.service('printerService', function(helperService){
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "descuentos: " + String(datos.descuentos));
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "premios: " + String(datos.premios));
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "neto: " + String(datos.neto));
-        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance mas ventas: " + String(datos.balanceActual));
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance mas ventas: " + String(datos.balanceActual), 2);
         data.push(CMD.PAPER.PAPER_FULL_CUT);
         data.push("\x1b\x69");
         return data;
