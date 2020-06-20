@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Draws;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class DrawsController extends Controller
 {

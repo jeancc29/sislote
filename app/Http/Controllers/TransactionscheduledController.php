@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Transactionscheduled;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class TransactionscheduledController extends Controller
 {

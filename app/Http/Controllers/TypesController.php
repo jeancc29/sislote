@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Types;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class TypesController extends Controller
 {

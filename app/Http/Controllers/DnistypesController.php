@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Dnistypes;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class DnistypesController extends Controller
 {

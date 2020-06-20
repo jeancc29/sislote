@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Idventatemporal;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class IdventatemporalController extends Controller
 {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Tickets;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class TicketsController extends Controller
 {

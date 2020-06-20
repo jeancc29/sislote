@@ -10,6 +10,7 @@ use App\Http\Requests\BlocksGeneralsRequest;
 use Illuminate\Support\Facades\Route; 
 use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
+use App\Classes\Helper;
 
 class BlocksgeneralsController extends Controller
 {

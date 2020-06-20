@@ -35,6 +35,7 @@ use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 
 use Illuminate\Support\Facades\Crypt;
+use App\Classes\Helper;
 
 class LotteriesController extends Controller
 {

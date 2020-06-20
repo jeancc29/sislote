@@ -6,6 +6,7 @@ use App\Blocksplaysgenerals;
 use Request;
 use App\Http\Requests\BlocksplaysgeneralsRequest;
 use Illuminate\Support\Facades\Response;
+use App\Classes\Helper;
 
 
 class BlocksplaysgeneralsController extends Controller

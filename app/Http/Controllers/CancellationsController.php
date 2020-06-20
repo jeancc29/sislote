@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Cancellations;
 use Illuminate\Http\Request;
 
-
+use App\Classes\Helper;
 class CancellationsController extends Controller
 {
     /**

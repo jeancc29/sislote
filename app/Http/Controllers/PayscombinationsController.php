@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Payscombinations;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class PayscombinationsController extends Controller
 {

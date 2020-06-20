@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Automaticexpenses;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class AutomaticexpensesController extends Controller
 {

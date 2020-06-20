@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Logs;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class LogsController extends Controller
 {

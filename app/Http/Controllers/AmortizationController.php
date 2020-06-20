@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Amortization;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class AmortizationController extends Controller
 {

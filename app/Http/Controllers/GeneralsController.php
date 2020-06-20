@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Generals;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class GeneralsController extends Controller
 {

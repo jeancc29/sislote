@@ -37,6 +37,7 @@ use App\Http\Resources\UsersResource;
 use App\Http\Resources\EntityResource;
 
 use Illuminate\Support\Facades\Crypt;
+use App\Classes\Helper;
 
 class CoinsController extends Controller
 {

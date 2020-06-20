@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Frecuency;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class FrecuencyController extends Controller
 {

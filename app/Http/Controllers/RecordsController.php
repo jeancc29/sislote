@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Records;
 use Illuminate\Http\Request;
+use App\Classes\Helper;
 
 class RecordsController extends Controller
 {
