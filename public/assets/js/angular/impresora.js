@@ -42,6 +42,22 @@ document.addEventListener("DOMContentLoaded", function() {
         $('#modal-impresora').modal('hide');
     }
 
+    var descargarAppImprimir = function(){
+        console.log("descargarAppImprimir");
+        $.fileDownload(rutaProgramaJavaParaImprimir, {
+            successCallback: function (url) {
+         
+                alert('You just got a file download dialog or ribbon for this URL :' + url);
+            },
+            failCallback: function (html, url) {
+         
+                alert('Your file download just failed for this URL:' + url + '\r\n' +
+                        'Here was the resulting error HTML: \r\n' + html
+                        );
+            }
+        });
+    }
+
     var probar = function(){
         var txtImpresora = document.querySelector("#txtImpresora");
         localStorage.setItem('impresora', txtImpresora.value);
@@ -57,6 +73,11 @@ document.addEventListener("DOMContentLoaded", function() {
     var btnImpresoraGuardar = document.querySelector("#btnImpresoraGuardar");
     btnImpresoraGuardar.addEventListener('click', function(e){
         guardar();
+    });
+
+    var btnImpresoraDescargar = document.querySelector("#btnImpresoraDescargar");
+    btnImpresoraDescargar.addEventListener('click', function(e){
+        descargarAppImprimir();
     });
 
     // var btnImpresoraProbar = document.querySelector("#btnImpresoraProbar");

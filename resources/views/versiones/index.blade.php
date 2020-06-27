@@ -341,6 +341,7 @@
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 <script src="{{asset('assets/demo/demo.js')}}"></script>
 
+<script src="{{asset('assets/js/jquery.fileDownload.js')}}" ></script>
 
 
 

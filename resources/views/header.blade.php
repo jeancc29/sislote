@@ -65,6 +65,7 @@ if($controlador != "login"){
 <link href="{!!asset('assets/demo/demo.css') !!}" rel="stylesheet" />
 
 <script>
+    window.rutaProgramaJavaParaImprimir = "<?php echo asset('assets/java/mavenproject1-1.0-jar-with-dependencies.jar')?>" ;
     window.rutaGlobal = (false) ? "<?php echo url('') ?>" : '';
     window.idUsuario = "<?php echo session('idUsuario') ?>";
     window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
@@ -142,6 +143,7 @@ if($controlador != "login"){
 <script src="{{asset('assets/js/angular/impresora.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/helper.js'). '?'.rand(1,50)}}" ></script>
 <script src="{{asset('assets/js/angular/servicios/printer.js'). '?'.rand(1,50)}}" ></script>
+
     <?php if($controlador == "dashboard"):?>
         <link href="{!!asset('assets/css/loading-bouncing.css') !!}" rel="stylesheet" />
     <?php endif; ?>
@@ -1609,6 +1611,9 @@ if(session('idUsuario') == null && $controlador != 'login'){
                         </div>
                         <div class="form-group col-sm-3">
                             <input id="btnImpresoraGuardar" type="submit" class="btn btn-primary" value="Guardar">   
+                        </div>
+                        <div class="form-group col-sm-3">
+                            <input id="btnImpresoraDescargar" type="submit" class="btn btn-primary" value="Descargar app para imprimir">   
                         </div>
                     </div>
 

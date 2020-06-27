@@ -21,6 +21,40 @@ myApp.service('printerService', function(helperService){
             window.abrirModalImpresora(true);
             return;
         }
+		
+        var data = this.generateTicketGrande(venta, typeTicket);
+
+            // qz.print(config, data).catch(function(e) { console.error(e); });
+            // Crea una nueva conexión.
+            const socket = new WebSocket('ws://localhost:8999');
+
+            // Abre la conexión
+            socket.addEventListener('open', function (event) {
+                console.log("Conectado");
+                data.unshift(localStorage.getItem("impresora"));
+                socket.send(data);
+            });
+
+            // Escucha por mensajes
+            socket.addEventListener('message', function (event) {
+                console.log('Message from server', event.data);
+                if(event.data == true)
+                    socket.close();
+            });
+
+            socket.addEventListener('onerror', function (event) {
+                console.log('Error from server', event.data);
+            });
+
+            socket.addEventListener('onclose', function (event) {
+                console.log('Close from server', event.data);
+            });
+    }
+    this.printTicketViewjo = async function(venta, typeTicket = CMD.TICKET_ORIGINAL){
+        if(helperService.empty(localStorage.getItem("impresora"), 'string') == true){
+            window.abrirModalImpresora(true);
+            return;
+        }
 		// var data = [
         //     CMD.TEXT_FORMAT.TXT_NORMAL,
         //     'Raw Data\n',
@@ -58,20 +92,44 @@ myApp.service('printerService', function(helperService){
         }
 		
         var data = this.generateCuadre(datos);
+        // Crea una nueva conexión.
+        const socket = new WebSocket('ws://localhost:8999');
+
+        // Abre la conexión
+        socket.addEventListener('open', function (event) {
+            console.log("Conectado");
+            data.unshift(localStorage.getItem("impresora"));
+            socket.send(data);
+        });
+
+        // Escucha por mensajes
+        socket.addEventListener('message', function (event) {
+            console.log('Message from server', event.data);
+            if(event.data == true)
+                socket.close();
+        });
+
+        socket.addEventListener('onerror', function (event) {
+            console.log('Error from server', event.data);
+        });
+
+        socket.addEventListener('onclose', function (event) {
+            console.log('Close from server', event.data);
+        });
 
             // qz.print(config, data).catch(function(e) { console.error(e); });
-            if(!qz.websocket.isActive())
-            {
-                qz.websocket.connect().then(function() {
-                var config = qz.configs.create(localStorage.getItem("impresora"));
-                return qz.print(config, data);
-                }).catch(function(err) { console.error(err); });
-            }else{
-                // await qz.websocket.disconnect()
-                var config = qz.configs.create(localStorage.getItem("impresora"));
-                // await qz.websocket.connect(config)
-                return qz.print(config, data);
-            }
+            // if(!qz.websocket.isActive())
+            // {
+            //     qz.websocket.connect().then(function() {
+            //     var config = qz.configs.create(localStorage.getItem("impresora"));
+            //     return qz.print(config, data);
+            //     }).catch(function(err) { console.error(err); });
+            // }else{
+            //     // await qz.websocket.disconnect()
+            //     var config = qz.configs.create(localStorage.getItem("impresora"));
+            //     // await qz.websocket.connect(config)
+            //     return qz.print(config, data);
+            // }
     }
 
     
