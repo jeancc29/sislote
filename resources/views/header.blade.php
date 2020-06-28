@@ -1587,7 +1587,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
 <!-- <div ng-controller='controllerImpresora'> -->
 <div style="z-index:1000000000" id="modal-impresora" class="modal fade modal-impresora" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
                  <div class="modal-header">
@@ -1602,21 +1602,63 @@ if(session('idUsuario') == null && $controlador != 'login'){
 
                 <div class="modal-body">
 
-                    <div class="row">
-                        <div class="col-sm-8">
+                    <div class="row justify-content-center">
+                        <div class="col-sm-7">
                             <div id="txtImpresoraGroup" class="form-group">
                             <label for="fechaBusqueda" class="bmd-label-floating">Impresora</label>
                             <input  id="txtImpresora" type="text" class="form-control" required>
                             </div>
                         </div>
-                        <div class="form-group col-sm-3">
+                        <!-- <div class="form-group col-sm-3">
                             <input id="btnImpresoraGuardar" type="submit" class="btn btn-primary" value="Guardar">   
+                        </div> -->
+                        
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" name="exampleRadios" value="papelPequeno" id="radioPapelPequeno"> Papel peque&ntilde;o
+                                <span class="circle">
+                                <span class="check"></span>
+                                </span>
+                            </label>
                         </div>
-                        <div class="form-group col-sm-3">
-                            <input id="btnImpresoraDescargar" type="submit" class="btn btn-primary" value="Descargar app para imprimir">   
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" name="exampleRadios" value="papelGrande" id="radioPapelGrande" checked> Papel grande
+                                <span class="circle">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                        
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="form-group">
+                            <input id="btnImpresoraGuardar" type="submit" class="btn btn-primary" value="Guardar">   
                         </div>
                     </div>
 
+                        <div class="row my-3 justify-content-center">
+                            <h4>Pasos para descargar app para imprimir desde escritorio</h4>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-2 mt-3">
+                                <p>Primer paso</p>
+                            </div>
+                            <div class="col-3">
+                                <a target="_blank" href="https://www.oracle.com/java/technologies/javase/jdk14-archive-downloads.html" class="btn btn-outline-info">Descargar java SDK 14</a>
+                            </div>
+                           
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-2 mt-3">
+                                <p>Segundo paso</p>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <input id="btnImpresoraDescargar" type="submit" class="btn btn-outline-primary" value="Descargar app para imprimir">   
+                            </div>
+                        </div>
 
                     <div class="container">
 

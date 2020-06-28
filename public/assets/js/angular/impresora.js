@@ -12,9 +12,22 @@ document.addEventListener("DOMContentLoaded", function() {
 
     window.abrirModalImpresora = function(abrirPorqueDebeRegistrarImpresora = false){
         var txtImpresora = document.querySelector("#txtImpresora");
+        var radioPapelPequeno = document.querySelector("#radioPapelPequeno");
+        var radioPapelGrande = document.querySelector("#radioPapelGrande");
+
         txtImpresora.value = localStorage.getItem("impresora");
         $('#txtImpresoraGroup').addClass('is-filled');
 
+        var papel = window.getPapel();
+        if(papel == "grande"){
+            radioPapelGrande.checked = true;
+            radioPapelPequeno.checked = false;
+        }
+        else{
+            radioPapelPequeno.checked = true;
+            radioPapelGrande.checked = false;
+        }
+        
         if(abrirPorqueDebeRegistrarImpresora){
             alert("Debe registrar una impresora");
             $('#modal-impresora').modal('show');
@@ -22,6 +35,14 @@ document.addEventListener("DOMContentLoaded", function() {
             cerrarMenu();
             $('#modal-impresora').modal('show');
         }
+    }
+
+    window.getPapel = function(){
+        var papel = localStorage.getItem("papel");
+        if(papel == null){
+            return "grande";
+        }
+        return papel;
     }
     
     function cerrarMenu(){
@@ -38,6 +59,13 @@ document.addEventListener("DOMContentLoaded", function() {
         localStorage.clear();
         var txtImpresora = document.querySelector("#txtImpresora");
         localStorage.setItem('impresora', txtImpresora.value);
+
+        var radioPapelGrande = document.querySelector("#radioPapelGrande");
+        if(radioPapelGrande.checked)
+            localStorage.setItem('papel', "grande");
+        else
+            localStorage.setItem('papel', "pequeno");
+
         console.log("guardar: ", localStorage.getItem('impresora'));
         $('#modal-impresora').modal('hide');
     }

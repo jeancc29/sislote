@@ -21,8 +21,12 @@ myApp.service('printerService', function(helperService){
             window.abrirModalImpresora(true);
             return;
         }
-		
-        var data = this.generateTicketGrande(venta, typeTicket);
+        
+        var data;
+        if(window.getPapel() == "grande")
+            data = this.generateTicketGrande(venta, typeTicket);
+        else
+            data = this.generateTicket(venta, typeTicket);
 
             // qz.print(config, data).catch(function(e) { console.error(e); });
             // Crea una nueva conexión.
@@ -473,9 +477,11 @@ myApp.service('printerService', function(helperService){
          var saltoLinea = "";
         if((contadorCicloJugadas + 1) == cantidadJugadas)
             // saltoLinea = "                     \n";
-            // saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                     ", monto) + "\n";
-            saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                              ", monto) + "\n";
-
+            if(window.getPapel() == "grande")
+                saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                              ", monto) + "\n";
+            else 
+                saltoLinea = this.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("                     ", monto) + "\n";
+        
         return saltoLinea;
       }
 
