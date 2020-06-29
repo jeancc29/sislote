@@ -25272,7 +25272,7 @@ li.disabled a{
  .ps-container>.ps-scrollbar-x-rail {
      display: none;
      position: absolute;
-     opacity: 0;
+     opacity: 0.6;
      -webkit-transition: background-color .2s linear, opacity .2s linear;
      -o-transition: background-color .2s linear, opacity .2s linear;
      -moz-transition: background-color .2s linear, opacity .2s linear;
@@ -25304,7 +25304,7 @@ li.disabled a{
  .ps-container>.ps-scrollbar-y-rail {
      display: none;
      position: absolute;
-     opacity: 0;
+     opacity: 0.6;
      -webkit-transition: background-color .2s linear, opacity .2s linear;
      -o-transition: background-color .2s linear, opacity .2s linear;
      -moz-transition: background-color .2s linear, opacity .2s linear;

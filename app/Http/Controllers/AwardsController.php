@@ -57,16 +57,14 @@ class AwardsController extends Controller
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
-<<<<<<< HEAD
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar resultados") == true){
                 return redirect()->route('sinpermiso');
-=======
-            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
-            if(!$u->tienePermiso("Manejar transacciones") == true){
-                return redirect()->route('principal');
->>>>>>> unirServidores
             }
+            // $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
+            // if(!$u->tienePermiso("Manejar transacciones") == true){
+            //     return redirect()->route('principal');
+            // }
 
             
 

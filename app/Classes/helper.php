@@ -1820,15 +1820,15 @@ class Helper{
         }
     }
 
-<<<<<<< HEAD
     public static function tienePermiso($idUsuario, $permiso)
     {
-        $u = Users::where(["id" => $idUsuario, "status" => 1])->first();
+        $u = Users::on(session("servidor"))->where(["id" => $idUsuario, "status" => 1])->first();
         if($u != null)
             return $u->permisos->contains("descripcion", $permiso);
         else
             return false;
-=======
+    }
+
     public static function jwtDecode($token)
     {
         $stdClass = \Firebase\JWT\JWT::decode($token, \config('data.apiKey'), array('HS256'));
@@ -1856,7 +1856,6 @@ class Helper{
     public static function stdClassToArray($stdClass)
     {
         return json_decode(json_encode($stdClass), true);
->>>>>>> unirServidores
     }
 
 }

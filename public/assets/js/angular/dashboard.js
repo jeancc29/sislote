@@ -86,6 +86,7 @@ myApp
                  $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
                  $scope.monedaColor = $scope.selectedMoneda.color;
                  
+                 
                 console.log('Bancas: ', $scope.optionsMonedas);
                 
                 $timeout(function() {
@@ -93,6 +94,9 @@ myApp
                     //$('#multiselect').selectpicker('val', []);
                     $('.selectpicker').selectpicker("refresh");
                     crearGrafica();
+                    helperService.actualizarScrollBar();
+                    // var culo = $('.main-panel').perfectScrollbar('update');
+                    // console.log("Perfect scrollbal: ", culo);
                   })
                 
                 
