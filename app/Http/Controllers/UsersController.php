@@ -51,7 +51,7 @@ class UsersController extends Controller
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar usuarios") == true){
                 return redirect()->route('sinpermiso');
             }
@@ -59,11 +59,44 @@ class UsersController extends Controller
         }
 
 
+        $datos = request()->validate([
+            'token' => '',
+        ]);
+        // $datos = \Helper::jwtDecode($datos["token"]);
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $roles = null;
+        $usuarios = null;
+        $usuario = Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if($usuario != null){
+            $role = $usuario->roles;
+            if($role != null){
+                if($role->descripcion == "Programador"){
+                    $roles = Roles::on($datos["servidor"])->get();
+                    $usuarios = Users::on($datos["servidor"])->whereIn('status', array(0, 1))->get();
+                }
+            }
+        }
+
+        if($roles == null)
+            $roles = Roles::on($datos["servidor"])->where('descripcion', '!=', 'Programador')->get();
+              
+        if($usuarios == null)
+            $usuarios = Users::on($datos["servidor"])->whereIn('status', array(0, 1))->where('idRole', '!=', Roles::on($datos["servidor"])->whereDescripcion("Programador")->first()->id)->get();
 
         return Response::json([
-            'usuarios' => UsersResource::collection(Users::whereIn('status', array(0, 1))->get()),
-            'usuariosTipos' => RolesResource::collection(Roles::all()),
-            'permisos' => Permissions::all()
+            'usuarios' => UsersResource::collection($usuarios),
+            'usuariosTipos' => RolesResource::collection($roles),
+            'permisos' => Permissions::on($datos["servidor"])->get()
         ], 201);
     }
 
@@ -85,21 +118,83 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.id' => 'required',
-            'datos.nombres' => 'required',
-            'datos.email' => 'required|email',
-            'datos.usuario' => 'required',
-            'datos.password' => '',
-            'datos.confirmar' => '',
-            'datos.permisos' => 'required',
-            'datos.status' => 'required',
-            'datos.idTipoUsuario' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.id' => 'required',
+        //     'datos.nombres' => 'required',
+        //     'datos.email' => 'required|email',
+        //     'datos.usuario' => 'required',
+        //     'datos.password' => '',
+        //     'datos.confirmar' => '',
+        //     'datos.permisos' => 'required',
+        //     'datos.status' => 'required',
+        //     'datos.idTipoUsuario' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
     
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
+        if(!$usuario->tienePermiso('Manejar usuarios')){
+           abort(403, "No tiene permisos para realizar esta accion");
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $errores = 0;
+        $mensaje = '';
+    
+        
+        //Verificar si el usuario tiene permisos
+        //$permiso = Users
+    
+        $usersClass = new \App\Classes\UsersClass($datos["servidor"], $datos);
+        $usuario = $usersClass->save();
+           
+        $usuario = Users::on($datos["servidor"])->whereId($usuario->id)->first();
+        event(new UsersEvent(new UsersResource($usuario)));
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente'
+        ], 201);
+    }
+
+    public function storeViejo(Request $request)
+    {
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.id' => 'required',
+        //     'datos.nombres' => 'required',
+        //     'datos.email' => 'required|email',
+        //     'datos.usuario' => 'required',
+        //     'datos.password' => '',
+        //     'datos.confirmar' => '',
+        //     'datos.permisos' => 'required',
+        //     'datos.status' => 'required',
+        //     'datos.idTipoUsuario' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+    
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso('Manejar usuarios')){
             return Response::json([
                 'errores' => 1,
@@ -115,7 +210,7 @@ class UsersController extends Controller
         //$permiso = Users
     
        
-        $usuario = Users::whereId($datos['id'])->get()->first();
+        $usuario = Users::on("mysql")->whereId($datos['id'])->get()->first();
         
     
         if($usuario != null){
@@ -131,7 +226,7 @@ class UsersController extends Controller
                 }
             }
     
-            $id = Users::whereEmail($datos['email'])->first();
+            $id = Users::on($datos["mysql"])->whereEmail($datos['email'])->first();
             if($id != null){
                 if($usuario->id != $id->id){
                     return Response::json([
@@ -141,7 +236,7 @@ class UsersController extends Controller
                 }
             }
     
-            $id = Users::whereUsuario($datos['usuario'])->first();
+            $id = Users::on($datos["mysql"])->whereUsuario($datos['usuario'])->first();
            if($id != null){
             if($usuario->id != $id->id){
                 return Response::json([
@@ -153,6 +248,15 @@ class UsersController extends Controller
     
     
             $usuario->save();
+
+            $usuario = Users::on($datos["servidor"])->whereUsuario($datos["usuario"])->first();
+            $usuario->nombres = $usuario->nombres;
+            $usuario->email = $usuario->email;
+            $usuario->usuario = $usuario->usuario;
+            $usuario->idRole = $usuario->idRole;
+            $usuario->password = $usuario->password;
+            $usuario->save();
+
         }else{
     
             if(empty($datos['password']) && empty($datos['confirmar'])){
@@ -169,20 +273,30 @@ class UsersController extends Controller
                 ], 201);
             }
             
-            if(Users::whereEmail($datos['email'])->first() != null){
+            if(Users::on("mysql")->whereEmail($datos['email'])->first() != null){
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => 'El correo ya existe, elija uno diferente'
                 ], 201);
             }
-            if(Users::whereUsuario($datos['usuario'])->first() != null){
+            if(Users::on("mysql")->whereUsuario($datos['usuario'])->first() != null){
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => 'El usuario ya existe, elija uno diferente'
                 ], 201);
             }
     
-            $usuario = Users::create([
+            $usuario = Users::on($datos["servidor"])->create([
+                'nombres' => $datos['nombres'],
+                'email' => $datos['email'],
+                'usuario' => $datos['usuario'],
+                'password' => Crypt::encryptString($datos['password']),
+                'idRole' => $datos['idTipoUsuario'],
+                'status' => $datos['status']
+            ]);
+           
+
+            $usuario = Users::on($datos["servidor"])->create([
                 'nombres' => $datos['nombres'],
                 'email' => $datos['email'],
                 'usuario' => $datos['usuario'],
@@ -204,7 +318,7 @@ class UsersController extends Controller
     
     
            
-            $usuario = Users::whereId($usuario->id)->first();
+            $usuario = Users::on($datos["servidor"])->whereId($usuario->id)->first();
             event(new UsersEvent(new UsersResource($usuario)));
     
         return Response::json([
@@ -255,14 +369,26 @@ class UsersController extends Controller
      */
     public function destroy(Users $users)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.usuario' => 'required',
-            'datos.nombres' => 'required',
-            'datos.status' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.usuario' => 'required',
+        //     'datos.nombres' => 'required',
+        //     'datos.status' => 'required'
+        // ])['datos'];
 
-        $usuario = Users::whereId($datos['id'])->get()->first();
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $usuario = Users::on($datos["servidor"])->whereId($datos['id'])->get()->first();
         if($usuario != null){
             $usuario->status = 2;
             $usuario->save();

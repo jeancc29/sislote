@@ -389,71 +389,78 @@ class MonitoreoController extends Controller
     public function tickets()
     {
         $controlador = Route::getCurrentRoute()->getName();
-        $usuario = Users::whereId(session('idUsuario'))->first();
+        $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
         if(!strpos(Request::url(), '/api/')){
            
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
 
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Monitorear ticket") == true){
                 return redirect()->route('sinpermiso');
             }
             // if(!$u->tienePermiso("Manejar transacciones") == true){
             //     return redirect()->route('principal');
             // }
-            $bancas = Branches::whereStatus(1)->get()->toJson();
-            $loterias = Lotteries::whereStatus(1)->get()->toJson();
-            $sorteos = Draws::whereStatus(1)->get()->toJson();
+            $bancas = Branches::on(session("servidor"))->whereStatus(1)->get()->toJson();
+            $loterias = Lotteries::on(session("servidor"))->whereStatus(1)->get()->toJson();
+            $sorteos = Draws::on(session("servidor"))->whereStatus(1)->get()->toJson();
             return view('monitoreo.tickets', compact('controlador', 'usuario', 'bancas', 'loterias', 'sorteos'));
         }
-
-        
-        
 
     }
 
     public function monitoreo()
     {
-        $datos = request()->validate([
-            'datos.fecha' => 'required',
-            'datos.idUsuario' => '',
-            'datos.idBanca' => '',
-            'datos.idLoteria' => '',
-            'datos.idSorteo' => '',
-            'datos.jugada' => '',
-            'datos.layout' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.fecha' => 'required',
+        //     'datos.idUsuario' => '',
+        //     'datos.idBanca' => '',
+        //     'datos.idLoteria' => '',
+        //     'datos.idSorteo' => '',
+        //     'datos.jugada' => '',
+        //     'datos.layout' => ''
+        // ])['datos'];
 
-     
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         
        
-        if(!$usuario->tienePermiso("Monitorear ticket")){
+        // if(!$usuario->tienePermiso("Monitorear ticket")){
           
-            // return Response::json([
-            //     'errores' => 1,
-            //     'mensaje' => 'No tiene permisos para realizar esta accion'
-            // ], 201);
-             //Datos['layout'] es un parametro que me indicara si se esta accediendo 
-            // desde la ventana principal o desde otra venta, si es de la ventana principal entonces
-            // se verifica que la variable $datos['layout'] este definida y que su valor sea igual a 'Principal', 
-            // de lo contrario no tendra permisos
-            if(!isset($datos['layout'])){
-                return Response::json([
-                    'errores' => 1,
-                    'mensaje' => 'No tiene permisos para realizar esta accion'
-                ], 201);
-            }
-            else if($datos['layout'] != 'Principal'){
-                return Response::json([
-                    'errores' => 1,
-                    'mensaje' => 'No tiene permisos para realizar esta accion'
-                ], 201);
-            }
-        }
+        //     // return Response::json([
+        //     //     'errores' => 1,
+        //     //     'mensaje' => 'No tiene permisos para realizar esta accion'
+        //     // ], 201);
+        //      //Datos['layout'] es un parametro que me indicara si se esta accediendo 
+        //     // desde la ventana principal o desde otra venta, si es de la ventana principal entonces
+        //     // se verifica que la variable $datos['layout'] este definida y que su valor sea igual a 'Principal', 
+        //     // de lo contrario no tendra permisos
+        //     if(!isset($datos['layout'])){
+        //         return Response::json([
+        //             'errores' => 1,
+        //             'mensaje' => 'No tiene permisos para realizar esta accion'
+        //         ], 201);
+        //     }
+        //     else if($datos['layout'] != 'Principal'){
+        //         return Response::json([
+        //             'errores' => 1,
+        //             'mensaje' => 'No tiene permisos para realizar esta accion'
+        //         ], 201);
+        //     }
+        // }
 
         
     
@@ -492,7 +499,7 @@ class MonitoreoController extends Controller
         }
 
         
-        $idVentas = Sales::select('id')
+        $idVentas = Sales::on($datos["servidor"])->select('id')
                     ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                     ->where($consultaVentas)
                     ->where('status', '!=', '5') //Eliminado
@@ -512,7 +519,7 @@ class MonitoreoController extends Controller
             return $d['id'];
         });
 
-        $ventasDetalles = Salesdetails::whereIn('idVenta', $idVentas)
+        $ventasDetalles = Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)
                     ->where($consultaVentasDetalles)
                     ->orderBy('id', 'desc')
                     ->get();
@@ -522,15 +529,17 @@ class MonitoreoController extends Controller
             return $d['idVenta'];
         });
 
-        $monitoreo = Sales::whereIn('id', $idVentas)->orderBy('id', 'desc')->get();
+        $monitoreo = Sales::on($datos["servidor"])->whereIn('id', $idVentas)->orderBy('id', 'desc')->get();
         
     
         return Response::json([
-            'monitoreo' => SalesResource::collection($monitoreo),
-            'loterias' => Lotteries::whereStatus(1)->get(),
-            'caracteristicasGenerales' =>  Generals::all(),
-            'total_ventas' => Sales::whereIn('id', $idVentas)->sum('total'),
-            'total_jugadas' => Salesdetails::whereIn('idVenta', $idVentas)->count('jugada'),
+            'monitoreo' => SalesResource::collection($monitoreo)->servidor($datos["servidor"]),
+            'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
+            'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get(),
+            'sorteos' => Draws::on($datos["servidor"])->get(),
+            'caracteristicasGenerales' =>  Generals::on($datos["servidor"])->get(),
+            'total_ventas' => Sales::on($datos["servidor"])->whereIn('id', $idVentas)->sum('total'),
+            'total_jugadas' => Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)->count('jugada'),
             'errores' => 0
         ], 201);
     }

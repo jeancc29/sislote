@@ -16,19 +16,30 @@ class RolesSeeder extends Seeder
         //     'status' => 1
         // ]);
 
-        r::create([
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $ser):
+        $servidor = $ser->descripcion;
+
+        r::on($servidor)->create([
             'descripcion' => 'Administrador',
             'status' => 1
         ]);
 
-        r::create([
+        r::on($servidor)->create([
             'descripcion' => 'Supervisor',
             'status' => 1
         ]);
 
-        r::create([
+        r::on($servidor)->create([
             'descripcion' => 'Banquero',
             'status' => 1
         ]);
+
+        r::on($servidor)->create([
+            'descripcion' => 'Programador',
+            'status' => 1
+        ]);
+
+        endforeach;
     }
 }

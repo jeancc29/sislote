@@ -38,6 +38,8 @@ use App\Http\Resources\BranchesResourceSmall;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
 use App\Classes\Helper;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Firebase\JWT\JWT;
 
 
 class LoginController extends Controller
@@ -79,19 +81,25 @@ class LoginController extends Controller
 
         
 
-        $u = Users::where(['usuario' => $data['usuario'], 'status' => 1])->get()->first();
+        $u = Users::on("mysql")->where(['usuario' => $data['usuario'], 'status' => 1])->get()->first();
         if($u == null){
             return redirect('login')->withErrors([
                 'acceso' => 'Usuario no existe'
             ]);
         }
-        $idBanca = Branches::where('idUsuario', $u->id)->first();
+
+        $u = Users::on($u->servidor)->where(['usuario' => $data['usuario'], 'status' => 1])->get()->first();
+        if($u == null){
+            return redirect('login')->withErrors([
+                'acceso' => 'Usuario no existe'
+            ]);
+        }
+        
+        $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
         if($idBanca != null){
             $idBanca = $idBanca->id;
         }
         
-   
-
         if($u == null){
             return redirect('login')->withErrors([
                 'usuario' => 'Usuario o contraseña incorrectos'
@@ -115,16 +123,24 @@ class LoginController extends Controller
         
         //Session::put('idUsuario', $u->id);
 
-       session(['idUsuario' => $u->id]);
-       session(['idBanca' => $idBanca]);
-       session(['permisos' => $u->permisos]);
+        $rol = $u->roles;
+        $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
+        session(['apiKey' => \config("data.apiKey")]);
+        session(['servidor' => $u->servidor]);
+        session(['servidores' => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get()]);
+        session(['idUsuario' => $u->id]);
+        session(['usuario' => $u->usuario]);
+        session(['idBanca' => $idBanca]);
+        session(['permisos' => $u->permisos]);
+        session(['tipoUsuario' => $tipoUsuario]);
 
+       
       
-       Userssesions::create([
+       Userssesions::on($u->servidor)->create([
            'idUsuario' => $u->id,
            'esCelular' => false
        ]);
-       $role = Roles::whereId($u->idRole)->first();
+       $role = Roles::on($u->servidor)->whereId($u->idRole)->first();
        if($role->descripcion == "Administrador" || $role->descripcion == "Supervisor")
             return redirect()->route('dashboard');
         else
@@ -136,17 +152,31 @@ class LoginController extends Controller
      
         $datos = request()->validate([
             'datos.usuario' => 'required',
-            'datos.password' => 'required'
+            'datos.password' => 'required',
         ])['datos'];
        // dd($data);
 
+    //    return Response::json([
+    //     'errores' => 1,
+    //     'mensaje' => 'Este usuario no tiene acceso al sistema',
+    //     'token' => JWT::decode($datos['token'], 'culo', array('HS256'))
+    //     // 'token' => $datos
+    // ], 201);
+
         
 
-        $u = Users::where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
+        $u = Users::on("mysql")->where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
 
-    
-        
-   
+        if($u == null){
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Usuario o contraseña incorrectos'
+            ], 201);
+            // return redirect('login')->withErrors([
+            //     'usuario' => 'Usuario o contraseña incorrectos'
+            // ]);
+        }
+        $u = Users::on($u->servidor)->where(['usuario' => $datos['usuario'], 'status' => 1])->get()->first();
 
         if($u == null){
             return Response::json([
@@ -168,7 +198,7 @@ class LoginController extends Controller
             // ]);
         }
 
-        $banca = Branches::where(['idUsuario' => $u->id, 'status' => 1])->first();
+        $banca = Branches::on($u->servidor)->where(['idUsuario' => $u->id, 'status' => 1])->first();
         if($banca == null){
             return Response::json([
                 'errores' => 1,
@@ -188,18 +218,21 @@ class LoginController extends Controller
     //    session(['idUsuario' => $u->id]);
     //    session(['permisos' => $u->permisos]);
 
-        Userssesions::create([
+        Userssesions::on($u->servidor)->create([
             'idUsuario' => $u->id,
             'esCelular' => true
         ]);
 
         $administrador = false;
         
-        $role = Roles::whereId($u->idRole)->first();
-       if($role->descripcion == "Administrador")
+        $role = $u->roles;
+        $tipoUsuario = ($role != null) ? $role->descripcion : "Banquero";
+        if($tipoUsuario == "Administrador")
             $administrador = true;
         else
             $administrador = false;
+
+        $h = array('email' => $u->usuario, 'password' => $datos['password']);
       
        return Response::json([
         'errores' => 0,
@@ -210,7 +243,10 @@ class LoginController extends Controller
         'idBanca' => $banca->id,
         'administrador' => $administrador,
         'usuario' => $u,
-        'bancaObject' => new BranchesResourceSmall($banca)
+        'bancaObject' => new BranchesResourceSmall($banca),
+        "apiKey" => \config("data.apiKey"),
+        "tipoUsuario" => $tipoUsuario,
+        "servidores" => \App\Server::on("mysql")->get()
     ], 201);
     }
 
@@ -223,6 +259,158 @@ class LoginController extends Controller
        
         (new Helper)->cerrar_session();
         return redirect()->route('login');
+    }
+
+    public function cambiarServidor(Request $request)
+    {
+     
+        $datos = request()->validate([
+            'token' => 'required'
+        ]);
+
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+            $servidor = \App\Server::on("mysql")->whereDescripcion($datos["data"]["servidor"])->first();
+            if($servidor == null){
+                (new Helper)->cerrar_session();
+                return redirect()->route('login');
+            }
+            
+
+            $u = Users::on("mysql")->whereUsuario($datos["data"]["usuario"])->first();
+            if($u == null){
+                (new Helper)->cerrar_session();
+                return redirect()->route('login');
+            }
+
+            $u = Users::on($servidor->descripcion)->whereUsuario($u->usuario)->first();
+            if($u == null){
+                (new Helper)->cerrar_session();
+                return redirect()->route('login');
+            }
+
+            $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
+            if($idBanca != null){
+                $idBanca = $idBanca->id;
+            }else{
+                $idBanca = Branches::on($u->servidor)->whereStatus(1)->first();
+                if($idBanca != null){
+                    $idBanca = $idBanca->id;
+                }else{
+                    $idBanca = 0;
+                }
+            }
+
+            $rol = $u->roles;
+            $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
+            session(['servidor' => $servidor->descripcion]);
+            session(['apiKey' => \config("data.apiKey")]);
+            session(['servidor' => $u->servidor]);
+            session(['servidores' => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get()]);
+            session(['idUsuario' => $u->id]);
+            session(['usuario' => $u->usuario]);
+            session(['idBanca' => $idBanca]);
+            session(['permisos' => $u->permisos]);
+            session(['tipoUsuario' => $tipoUsuario]);
+            // dd($datos);
+            return back()->withInput();
+        } catch (\Throwable $th) {
+            //throw $th;
+            // return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'Token incorrecto',
+            //     'token' => $datos
+            // ], 201);
+            abort(403, "Token incorrecto" . $th);
+        }
+       
+        
+    }
+
+
+    public function cambiarServidorApi(Request $request)
+    {
+     
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+            // return Response::json(["datos" => $datos, "errores" => 0], 201);
+
+            $servidor = \App\Server::on("mysql")->whereDescripcion($datos["servidor"])->first();
+            if($servidor == null){
+                abort(403, "Servidor no existe");
+            }            
+
+            $u = Users::on("mysql")->whereUsuario($datos["usuario"])->first();
+            if($u == null){
+                abort(403, "Usuario no existe general");
+            }
+
+
+            $u = Users::on($servidor->descripcion)->whereUsuario($u->usuario)->first();
+            if($u == null){
+                abort(403, "Usuario no existe");
+            }
+
+
+
+            $idBanca = Branches::on($u->servidor)->where('idUsuario', $u->id)->first();
+            if($idBanca != null){
+                $idBanca = $idBanca->id;
+            }else{
+                $idBanca = Branches::on($u->servidor)->whereStatus(1)->first();
+                if($idBanca != null){
+                    $idBanca = $idBanca->id;
+                }else{
+                    $idBanca = 0;
+                }
+            }
+
+            $rol = $u->roles;
+            $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
+
+            if($idBanca == 0){
+                $banca = Branches::on($datos["servidor"])->whereStatus(1)->first();
+                if($banca != null)
+                    $banca = new BranchesResourceSmall($banca);
+            }else{
+                $banca = Branches::on($datos["servidor"])->whereStatus(1)->whereId($idBanca)->first();
+                if($banca != null)
+                    $banca = new BranchesResourceSmall($banca);
+            }
+            
+            // return Response::json(["datos" => $datos, "errores" => 0], 201);
+
+            return Response::json([
+                'errores' => 0,
+                'mensaje' => '',
+                'idUsuario' => $u->id,
+                'permisos' => $u->permisos,
+                'banca' => $banca->descripcion,
+                'idBanca' => $banca->id,
+                'administrador' => $tipoUsuario == "Administrador",
+                'usuario' => $u,
+                'bancaObject' => $banca,
+                "apiKey" => \config("data.apiKey"),
+                "tipoUsuario" => $tipoUsuario,
+                "servidores" => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get()
+            ], 201);
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            // return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'Token incorrecto',
+            //     'token' => $datos
+            // ], 201);
+            abort(403, "Token incorrecto" . $th);
+        }
+       
+        
     }
 
     /**

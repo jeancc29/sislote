@@ -28,7 +28,7 @@ class AndroidversionsController extends Controller
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if($u->usuario != "jean"){
                 return redirect()->route('principal');
             }
@@ -45,7 +45,20 @@ class AndroidversionsController extends Controller
         //Intalacion == 2
         //Activo == 1
         //Elimnado == 0
-        $versiones = Androidversions::where('status', '!=', 2)->orderBy('id', 'desc')->get();
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->orderBy('id', 'desc')->get();
 
 
         return Response::json([
@@ -57,22 +70,34 @@ class AndroidversionsController extends Controller
 
     public function publicar(Request $request)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
 
         //Hay 3 status
         //Intalacion == 2
         //Activo == 1
         //Elimnado == 0
-        $versiones = Androidversions::where('status', '!=', 2)->get();
+        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->get();
         foreach($versiones as $v){
             $v->status = 1;
             $v->save();
         }
 
-        $version = Androidversions::whereId($datos['id'])->first();
+        $version = Androidversions::on($datos["servidor"])->whereId($datos['id'])->first();
         if($version != null){
             $version->status = 3;
             $version->save();
@@ -80,7 +105,7 @@ class AndroidversionsController extends Controller
         }
 
 
-        $versiones = Androidversions::where('status', '!=', 2)->get();
+        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->get();
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
@@ -126,27 +151,39 @@ class AndroidversionsController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.id' => '',
-            'datos.version' => 'required',
-            'datos.enlace' => 'required',
-            'datos.status' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.id' => '',
+        //     'datos.version' => 'required',
+        //     'datos.enlace' => 'required',
+        //     'datos.status' => 'required',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
 
         //Hay 3 status
         //Intalacion == 2
         //Activo == 1
         //Elimnado == 0
-        $version = Androidversions::whereId($datos['id'])->first();
+        $version = Androidversions::on($datos["servidor"])->whereId($datos['id'])->first();
         if($version != null){
             $version->status = $datos['status'];
             $version->version = $datos['version'];
             $version->enlace = $datos['enlace'];
             $version->save();
         }else{
-            $version = Androidversions::create([
+            $version = Androidversions::on($datos["servidor"])->create([
                 'version' => $datos['version'],
                 'enlace' => $datos['enlace'],
                 'status' => $datos['status']
@@ -155,7 +192,7 @@ class AndroidversionsController extends Controller
         }
 
 
-        $versiones = Androidversions::where('status', '!=', 2)->get();
+        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->get();
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',

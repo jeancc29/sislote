@@ -57,9 +57,15 @@ class AwardsController extends Controller
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
+<<<<<<< HEAD
             $u = Users::whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar resultados") == true){
                 return redirect()->route('sinpermiso');
+=======
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar transacciones") == true){
+                return redirect()->route('principal');
+>>>>>>> unirServidores
             }
 
             
@@ -68,14 +74,25 @@ class AwardsController extends Controller
         }
 
 
-        // $datos = request()->validate([
-        //     'datos.codigoBarra' => 'required',
-        //     'datos.razon' => 'required',
-        //     'datos.idUsuario' => 'required'
-        // ])['datos'];
+        $datos = request()->validate([
+            'token' => 'required'
+        ]);
+
+        try {
+            $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
         $layout = isset($datos['layout']) ? $datos['layout'] : null;
-        $loterias = AwardsClass::getLoterias($layout);
+        $loterias = AwardsClass::getLoterias($datos["servidor"], $layout);
 
         return Response::json([
             'loterias' => $loterias
@@ -89,31 +106,45 @@ class AwardsController extends Controller
        
 
 
-        $datos = request()->validate([
-            'datos.fecha' => 'required',
-            'datos.idUsuario' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.fecha' => 'required',
+        //     'datos.idUsuario' => 'required'
+        // ])['datos'];
+        $datos = request()['datos'];
 
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        
 
         $fecha = getdate(strtotime($datos['fecha']));
         $fechaDesde = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
         $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
 
-        $loterias = Lotteries::whereStatus(1)->has('sorteos')->get();
+        $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->has('sorteos')->get();
         // == "vistaPremiosModal"
         if(isset($datos['layout'])){
             
-
+            
             // if($datos['layout'] != "vistaPremiosModal")
                 
-            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+            $loterias = collect($loterias)->map(function($l) use($datos, $fechaDesde, $fechaHasta){
                 $primera = null;
                 $segunda = null;
                 $tercera = null;
                 $pick3 = null;
                 $pick4 = null;
-                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                $premios = Awards::on($datos["servidor"])->whereBetween('created_at', array($fechaDesde , $fechaHasta))
                                 ->where('idLoteria', $l['id'])
                                 ->first();
     
@@ -138,17 +169,17 @@ class AwardsController extends Controller
             });
     
             // $loterias = collect($datos['loterias']);
-            list($loterias, $no) = $loterias->partition(function($l){
-                return Helper::loteriaTienePremiosRegistradosHoy($l['id']) != true;
+            list($loterias, $no) = $loterias->partition(function($l) use($datos){
+                return Helper::loteriaTienePremiosRegistradosHoy($datos["servidor"], $l['id']) != true;
             });
         }else{
-            $loterias = collect($loterias)->map(function($l) use($fechaDesde, $fechaHasta){
+            $loterias = collect($loterias)->map(function($l) use($datos, $fechaDesde, $fechaHasta){
                 $primera = null;
                 $segunda = null;
                 $tercera = null;
                 $pick3 = null;
                 $pick4 = null;
-                $premios = Awards::whereBetween('created_at', array($fechaDesde , $fechaHasta))
+                $premios = Awards::on($datos["servidor"])->whereBetween('created_at', array($fechaDesde , $fechaHasta))
                                 ->where('idLoteria', $l['id'])
                                 ->first();
     
@@ -202,15 +233,31 @@ class AwardsController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            //'datos.idLoteria' => 'required',
-            //'datos.numerosGanadores' => 'required|min:2|max:6',
-            'datos.fecha' => '',
-            'datos.layout' => '',
-            'datos.idUsuario' => 'required',
-            'datos.loterias' => 'required',
-            'datos.idBanca' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     //'datos.idLoteria' => 'required',
+        //     //'datos.numerosGanadores' => 'required|min:2|max:6',
+        //     'datos.fecha' => '',
+        //     'datos.layout' => '',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.loterias' => 'required',
+        //     'datos.idBanca' => 'required',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
         $fecha = getdate();
 
@@ -229,10 +276,11 @@ class AwardsController extends Controller
         
         $errores = 0;
         $mensaje = '';
-        $idBanca = Branches::whereId($datos['idBanca'])->whereStatus(1)->first();
+        $idBanca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->whereStatus(1)->first();
         if($idBanca == null){
             $idBanca = Branches::
-                where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
+                on($datos["servidor"])
+                ->where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
                 ->first()->id;         
         }else{
             $idBanca = $idBanca->id;
@@ -241,7 +289,7 @@ class AwardsController extends Controller
         
     
     foreach($datos['loterias'] as $l):
-        $awardsClass = new AwardsClass($l['id']);
+        $awardsClass = new AwardsClass($datos["servidor"], $l['id']);
         $awardsClass->fecha = $fecha;
         $awardsClass->idUsuario = $datos['idUsuario'];
         $awardsClass->primera = $l['primera'];
@@ -281,7 +329,7 @@ class AwardsController extends Controller
                 $busqueda2 = false;
                 $busqueda3 = false;
 
-                $sorteo = Draws::whereId($j['idSorteo'])->first();
+                $sorteo = Draws::on($datos["servidor"])->whereId($j['idSorteo'])->first();
 
                 
     
@@ -355,14 +403,14 @@ class AwardsController extends Controller
     
     
     
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::on($datos["servidor"])->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->whereNotIn('status', [0,5])
             ->get();
     
             foreach($ventas as $v){
-                $todas_las_jugadas = Salesdetails::where(['idVenta' => $v['id']])->count();
-                $todas_las_jugadas_salientes = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->count();
-                $cantidad_premios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
+                $todas_las_jugadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
+                $todas_las_jugadas_salientes = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
+                $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
                 
 
                 
@@ -371,7 +419,7 @@ class AwardsController extends Controller
                 {
                     if($cantidad_premios > 0)
                     {
-                        $montoPremios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
+                        $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
                         $v['premios'] = $montoPremios;
                         $v['status'] = 2;
                     }
@@ -386,7 +434,7 @@ class AwardsController extends Controller
                 }
             }
     
-        $loterias = AwardsClass::getLoterias();
+        $loterias = AwardsClass::getLoterias($datos["servidor"]);
 
         return Response::json([
             'errores' => 0,
@@ -400,16 +448,36 @@ class AwardsController extends Controller
 
     public function erase(Request $request)
     {
-        $datos = request()->validate([
-            //'datos.idLoteria' => 'required',
-            //'datos.numerosGanadores' => 'required|min:2|max:6',
-            'datos.idUsuario' => 'required',
-            'datos.idLoteria' => 'required',
-            'datos.idBanca' => 'required',
-            'datos.fecha' => '',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     //'datos.idLoteria' => 'required',
+        //     //'datos.numerosGanadores' => 'required|min:2|max:6',
+        //     'datos.idUsuario' => 'required',
+        //     'datos.idLoteria' => 'required',
+        //     'datos.idBanca' => 'required',
+        //     'datos.fecha' => '',
+        // ])['datos'];
 
-        
+        $datos = request()['datos'];
+
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+            
+                // return Response::json([
+                //     'errores' => 1,
+                //     'mensaje' => 'Token incorrecto',
+                //     'token' => $datos
+                // ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
     
             $fecha = getdate();
             $fechaRequest = new Carbon($datos['fecha']);
@@ -425,16 +493,17 @@ class AwardsController extends Controller
 
         $errores = 0;
         $mensaje = '';
-        $idBanca = Branches::whereId($datos['idBanca'])->whereStatus(1)->first();
+        $idBanca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->whereStatus(1)->first();
         if($idBanca == null){
             $idBanca = Branches::
-                where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
+                on($datos["servidor"])
+                ->where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
                 ->first()->id;         
         }else{
             $idBanca = $idBanca->id;
         }
 
-        $awardsClass = new AwardsClass($datos['idLoteria']);
+        $awardsClass = new AwardsClass($datos["servidor"], $datos['idLoteria']);
         $awardsClass->fecha = $fecha;
         $awardsClass->idUsuario = $datos['idUsuario'];
         // $awardsClass->primera = "";
@@ -458,14 +527,14 @@ class AwardsController extends Controller
             //Aqui buscaremos todos los tickets creados en el dia de hoy y vamos a 
             //asignarles el estado pendiente a los tickets en los cuales sus loterias aun no han salido
     
-            $ventas = Sales::whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            $ventas = Sales::on($datos["servidor"])->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
             ->whereNotIn('status', [0,5])
             ->get();
     
             foreach($ventas as $v){
-                $todas_las_jugadas_realizadas = Salesdetails::where(['idVenta' => $v['id']])->count();
-                $todas_las_jugadas_que_ya_salieron = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->count();
-                $cantidad_premios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
+                $todas_las_jugadas_realizadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
+                $todas_las_jugadas_que_ya_salieron = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
+                $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
                 
                 //Si la cantidad de jugadas realizadas es la que misma que la cantidad que jugadas que se 
                 //han marcado como que ya salieron los premios, entonces la venta debe cambiar de status pendiente a ganadores o perdedores
@@ -473,7 +542,7 @@ class AwardsController extends Controller
                 {
                     if($cantidad_premios > 0)
                     {
-                        $montoPremios = Salesdetails::where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
+                        $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
                         $v['premios'] = $montoPremios;
                         $v['status'] = 2;
                     }    
@@ -493,7 +562,7 @@ class AwardsController extends Controller
             }
     
     
-        $loterias = AwardsClass::getLoterias();
+        $loterias = AwardsClass::getLoterias($datos["servidor"]);
     
         return Response::json([
             'errores' => 0,

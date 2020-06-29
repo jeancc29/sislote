@@ -25,6 +25,7 @@ class VersionsEvent implements ShouldBroadcast
      */
     public function __construct($version)
     {
+        $this->room = $version->getConnectionName();
         $this->version = $version;
     }
 

@@ -69,6 +69,8 @@ if($controlador != "login"){
     window.rutaGlobal = (false) ? "<?php echo url('') ?>" : '';
     window.idUsuario = "<?php echo session('idUsuario') ?>";
     window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
+    window.apiKeyGlobal = "<?php echo session('apiKey') ?>";
+    window.servidorGlobal = "<?php echo session('servidor') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
     window.monedasGlobal = <?php if(isset($monedas)) echo $monedas; else echo 'null'; ?>;
@@ -130,7 +132,7 @@ if($controlador != "login"){
 </script>
 
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
 <script src="{{asset('assets/js/angular.min.js')}}" ></script>
 <script src="{{asset('assets/js/angular/angular-animate.js')}}" ></script>
 <script src="{{asset('assets/js/angular-route.min.js')}}" ></script>
@@ -1262,32 +1264,36 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 <a data-toggle="collapse" href="#collapseExample" class="username">
                     <span>
                        <!-- Tania Andrew  -->
-                       <?php if(isset($_SESSION['usuario'])) echo $_SESSION['usuario'] . " - " . $_SESSION['tipoUsuario'];?>
+                       <?php echo session('usuario') . " (". session("servidor") . ")";?>
                       <b class="caret"></b>
                     </span>
                 </a>
+                @if(session("tipoUsuario") == "Programador")
                 <div class="collapse" id="collapseExample">
                     <ul class="nav">
+                    @foreach(session("servidores") as $servidor)
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{{route('cambiarServidor')}}?token={{\App\Classes\Helper::jwtEncodeServidor($servidor['descripcion'], session('usuario'))}}">
                               <span class="sidebar-mini"> MP </span>
-                              <span class="sidebar-normal"> My Profile </span>
+                              <span class="sidebar-normal"> {{$servidor["descripcion"]}} </span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                    @endforeach
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="#">
                               <span class="sidebar-mini"> EP </span>
                               <span class="sidebar-normal"> Edit Profile </span>
                             </a>
-                        </li>
-                        <li class="nav-item">
+                        </li> -->
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="#">
                               <span class="sidebar-mini"> S </span>
                               <span class="sidebar-normal"> Settings </span>
                             </a>
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
+                @endif;
             </div>
         </div>
         

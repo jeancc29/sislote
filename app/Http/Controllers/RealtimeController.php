@@ -144,14 +144,26 @@ class RealtimeController extends Controller
 
     public function todos()
     {
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        // ])['datos'];
        // dd($data);
 
-        
+       $datos = request()['datos'];
+       try {
+           $datos = \Helper::jwtDecode($datos);
+           if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+       } catch (\Throwable $th) {
+           //throw $th;
+           return Response::json([
+               'errores' => 1,
+               'mensaje' => 'Token incorrecto',
+               'token' => $datos
+           ], 201);
+       }
 
-        $u = Users::where(['id' => $datos['idUsuario'], 'status' => 1])->first();
+        $u = Users::on($datos["servidor"])->where(['id' => $datos['idUsuario'], 'status' => 1])->first();
 
 
         if($u == null){
@@ -171,19 +183,19 @@ class RealtimeController extends Controller
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
         
 
-        $maxId = Realtime::max('id');
-        $stocks = Stock::whereBetween('created_at', array($fechaInicial, $fechaFinal))->get();
-        $blockslotteries = Blockslotteries::all();
-        $Blocksgenerals = Blocksgenerals::all();
-        $blocksplays = Blocksplays::whereStatus(1)
+        $maxId = Realtime::on($datos["servidor"])->max('id');
+        $stocks = Stock::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get();
+        $blockslotteries = Blockslotteries::on($datos["servidor"])->get();
+        $Blocksgenerals = Blocksgenerals::on($datos["servidor"])->get();
+        $blocksplays = Blocksplays::on($datos["servidor"])->whereStatus(1)
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->get();
-        $blocksplaysgenerals = Blocksplaysgenerals::whereStatus(1)
+        $blocksplaysgenerals = Blocksplaysgenerals::on($datos["servidor"])->whereStatus(1)
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->get();
-        $draws = Draws::whereStatus(1)->get();
+        $draws = Draws::on($datos["servidor"])->whereStatus(1)->get();
         
       
        return Response::json([
@@ -196,7 +208,7 @@ class RealtimeController extends Controller
         'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
         'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
         'draws' => count($draws) > 0 ? $draws : null,
-        'version' => Androidversions::whereStatus(3)->first(),
+        'version' => Androidversions::on($datos["servidor"])->whereStatus(3)->first(),
         'usuario' => new UsersResource($u)
         ], 201);
     }

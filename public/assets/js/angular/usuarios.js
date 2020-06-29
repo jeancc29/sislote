@@ -33,7 +33,8 @@ myApp
         
         $scope.inicializarDatos = function(todos, idRole = 0){
                
-            $http.get(rutaGlobal+"/api/usuarios")
+            var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+            $http.get(rutaGlobal+"/api/usuarios?token=" + jwt)
              .then(function(response){
                 console.log('Loteria ajav: ', response.data);
 
@@ -206,9 +207,10 @@ myApp
 
             $scope.datos.idTipoUsuario = $scope.datos.selectedUsuariosTipos.id;
             $scope.datos.status = ($scope.datos.estado) ? 1 : 0;
+            $scope.datos.servidor = servidorGlobal;
            
-
-          $http.post(rutaGlobal+"/api/usuarios/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+            jwt = helperService.createJWT($scope.datos);
+          $http.post(rutaGlobal+"/api/usuarios/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0){
@@ -230,7 +232,15 @@ myApp
                     return;
                 }
                 
-            });
+            }
+            ,
+            function(response) {
+                // Handle error here
+                $scope.datos.btnCargando = false;
+                console.log('Error jean: ', response);
+                alert("Error: " + response.data.message);
+            }
+            );
         
 
         }
@@ -238,7 +248,9 @@ myApp
 
         $scope.eliminar = function(d){
             console.log('usuarios eliminar: ',d);
-            $http.post(rutaGlobal+"/api/usuarios/eliminar", {'action':'sp_loterias_elimnar', 'datos': d})
+            d.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/usuarios/eliminar", {'action':'sp_loterias_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response);
             
@@ -248,7 +260,15 @@ myApp
                     alert(response.data.mensaje);
                 }
                 
-            });
+            }
+            ,
+            function(response) {
+                // Handle error here
+                $scope.datos.btnCargando = false;
+                console.log('Error jean: ', response);
+                alert("Error: " + response.data.message);
+            }
+            );
         }
        
 

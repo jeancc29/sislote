@@ -237,8 +237,8 @@ myApp
 
             console.log('ruta: ', rutaGlobal);
             
-               
-            $http.get(rutaGlobal+"/api/horarios")
+            var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+            $http.get(rutaGlobal+"/api/horarios?token=" + jwt)
              .then(function(response){
                 console.log('Bancas: ', response.data);
 
@@ -476,7 +476,9 @@ myApp
             
            console.log('actualizr:', $scope.datos.loterias);
         //    return;
-          $http.post(rutaGlobal+"/api/horarios/normal/guardar", {'action':'sp_bancas_actualizar', 'datos': $scope.datos})
+        $scope.datos.servidor = servidorGlobal;
+        var jwt = helperService.createJWT($scope.datos);
+          $http.post(rutaGlobal+"/api/horarios/normal/guardar", {'action':'sp_bancas_actualizar', 'datos': jwt})
              .then(function(response){
                 console.log(response.data);
                 if(response.data.errores == 0){

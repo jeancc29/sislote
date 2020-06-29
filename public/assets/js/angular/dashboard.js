@@ -64,9 +64,12 @@ myApp
             var fecha = $scope.datos.fecha.getFullYear() + '-' + helperService.to2Digitos($scope.datos.fecha.getMonth() + 1) + '-' + helperService.to2Digitos($scope.datos.fecha.getDate());
             // console.log('Bancas: ', $scope.datos.fecha.getDate(), ' completa:', $scope.datos.fecha);
             $scope.cargando = true;
-            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal + "&idMoneda=" + $scope.datos.idMoneda)
+            var jwt = helperService.createJWT({"fecha" : fecha, "servidor" : servidorGlobal, "idUsuario": idUsuarioGlobal, "idMoneda" : $scope.datos.idMoneda});
+
+            $http.get(rutaGlobal+"/api/dashboard?token="+ jwt)
              .then(function(response){
                 $scope.cargando = false;
+                console.log(response.data);
                  $scope.ventasGrafica = response.data.ventasGrafica;
                  console.log($scope.ventasGrafica);
                  
@@ -119,10 +122,12 @@ myApp
             $scope.monedaAbreviatura = $scope.selectedMoneda.abreviatura;
             $scope.monedaColor = $scope.selectedMoneda.color;
            $scope.cargandoOnFechaChanged = true;
-            $http.get(rutaGlobal+"/api/dashboard?fecha=" + fecha + "&idUsuario=" + idUsuarioGlobal + "&idMoneda=" + $scope.selectedMoneda.id)
+           var jwt = helperService.createJWT({"fecha" : fecha, "servidor" : servidorGlobal, "idUsuario": idUsuarioGlobal, "idMoneda" : $scope.selectedMoneda.id});
+
+            $http.get(rutaGlobal+"/api/dashboard?token=" + jwt)
              .then(function(response){
                 
-                
+                console.log(response.data);
 
                  $scope.ventasGrafica = response.data.ventasGrafica;
                  crearGrafica();

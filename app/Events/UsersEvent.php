@@ -22,6 +22,7 @@ class UsersEvent implements ShouldBroadcast
      */
     public function __construct($user)
     {
+        $this->room = $user->getConnectionName();
         $this->user = $user;
     }
 

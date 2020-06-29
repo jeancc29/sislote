@@ -120,8 +120,11 @@ myApp
         $scope.datos.idBanca = $scope.datos.selectedBancas.id;
 
 
-        $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
+        var jwt = helperService.createJWT($scope.datos);
+        $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':jwt, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
+                 
+                
                 
 
                 if(response.data.errores == 1){
@@ -238,11 +241,12 @@ myApp
                 $scope.datos.jugadasReporte.selectedLoteria = {};
                 $scope.datos.optionsLoterias = [];
          
-                
-                $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
+                var jwt = helperService.createJWT($scope.datos);
+                $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':jwt, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
                 
-
+                console.log(response.data);
+                
                 if(response.data.errores == 1){
                     alert('Error: ' + response.data.mensaje);
                     return;
@@ -301,8 +305,12 @@ myApp
             
             ruta = ROOT_PATH;
             // console.log('ROOT_PATH: ', ruta);
+            $scope.datos.idUsuario = idUsuario;
+            $scope.datos.servidor = servidorGlobal;
             $scope.inicializarDatos();
           $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
+
+        //   $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
           //$scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
           startTime();
 
@@ -463,6 +471,7 @@ myApp
                     $scope.datos.montoDisponible.jugada = helperService.ordenarMenorAMayor($scope.datos.jugada);
                     $scope.datos.montoDisponible.idLoteria = $scope.datos.idLoteria;
                     $scope.datos.montoDisponible.idBanca = $scope.datos.idBanca;
+                    $scope.datos.montoDisponible.servidor = $scope.datos.servidor;
                    
                     // $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                     //   .then(function(response){
@@ -472,8 +481,8 @@ myApp
                     //       return;
                     //   })
 
-                    
-                    $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos.montoDisponible, 'action':'sp_jugadas_obtener_montoDisponible'})
+                    var jwt = helperService.createJWT($scope.datos.montoDisponible);
+                    $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':jwt, 'action':'sp_jugadas_obtener_montoDisponible'})
                     .then(function(response){
                           console.log(response);
                         
@@ -497,16 +506,6 @@ myApp
             $scope.datos.montoExistente = 0;
           }
   
-          $scope.hola = function(){
-            $scope.datos.idLoteria = $scope.datos.loterias[0].id;
-            console.log('hola: ', $scope.datos);
-            $http.post("https://loteriasdo.ml/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
-                           .then(function(response){
-                                 console.log(response);
-                                  $scope.datos.montoExistente = response.data.monto;
-            
-                           })
-            }
           
           $scope.jugadaCorrecta = function(){
               if($scope.datos.jugada == undefined || $scope.datos.jugada == null)
@@ -966,7 +965,8 @@ myApp
                     }
                 }
                 
-                $http.post(rutaGlobal+"/api/principal/guardar",{'datos':$scope.datos, 'action':'sp_ventas_actualiza'})
+                var jwt = helperService.createJWT($scope.datos);
+                $http.post(rutaGlobal+"/api/principal/guardar",{'datos':jwt, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 
                     console.log('Principal.js venta_guardar : ', response.data);
@@ -1065,11 +1065,12 @@ myApp
             $scope.datos.monitoreo.idUsuario = $scope.datos.idUsuario;
             $scope.datos.monitoreo.layout = 'Principal';
             $scope.datos.monitoreo.idBanca = $scope.datos.selectedBancas.id;
+            $scope.datos.monitoreo.servidor = $scope.datos.servidor;
             
-
-          $http.post(rutaGlobal+"/api/reportes/monitoreo", {'action':'sp_ventas_buscar', 'datos': $scope.datos.monitoreo})
+          var jwt = helperService.createJWT($scope.datos.monitoreo);
+          $http.post(rutaGlobal+"/api/reportes/monitoreo", {'action':'sp_ventas_buscar', 'datos': jwt})
              .then(function(response){
-                // console.log('monitoreo ',response);
+                console.log('monitoreo ',response);
                 if(response.data.errores == 0){
                     $scope.datos.monitoreo.ventas = response.data.monitoreo;
 
@@ -1173,10 +1174,11 @@ myApp
             }
 
             $scope.datos.duplicar.codigoBarra = $scope.datos.duplicar.numeroticket;
-
-            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': $scope.datos.duplicar})
+            $scope.datos.duplicar.servidor = $scope.datos.servidor;
+            var jwt = helperService.createJWT($scope.datos.duplicar);
+            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': jwt})
              .then(function(response){
-
+                console.log(response.data);
                
                 if(response.data.errores == 1){
                     alert(response.data.mensaje);
@@ -1266,10 +1268,12 @@ myApp
             }
 
             $scope.datos.duplicar.codigoBarra = $scope.datos.duplicar.numeroticket;
-
-            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': $scope.datos.duplicar})
+            $scope.datos.duplicar.servidor = $scope.datos.servidor;
+            var jwt = helperService.createJWT($scope.datos.duplicar);
+            $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': jwt})
              .then(function(response){
 
+               console.log(response.data);
                
                 if(response.data.errores == 0){
                     $('#modal-duplicar').modal('toggle');
@@ -1415,10 +1419,11 @@ myApp
 
 
             $scope.datos.pagar.idUsuario = $scope.datos.idUsuario;
+            $scope.datos.pagar.servidor = $scope.datos.servidor;
 
             // console.log($scope.datos.pagar, ' Pagar idUsuario');
-
-            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': $scope.datos.pagar})
+            var jwt = helperService.createJWT($scope.datos.pagar);
+            $http.post(rutaGlobal+"/api/principal/pagar", {'action':'sp_pagar_buscar', 'datos': jwt})
              .then(function(response){
 
 
@@ -1466,10 +1471,13 @@ myApp
             $scope.datos.ventasReporte.idUsuario = idUsuario;
             $scope.datos.ventasReporte.layout = 'Principal';
           
-            $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': $scope.datos.ventasReporte})
+            $scope.datos.ventasReporte.servidor = $scope.datos.servidor;
+
+          var jwt = helperService.createJWT($scope.datos.ventasReporte);
+          $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': jwt})
              .then(function(response){
 
-                // console.log('ventasReporte_buscar: ', response);
+                console.log('ventasReporte_buscar: ', response.datos);
 
                 if(response.data.errores == 0){
                     $scope.datos.ventasReporte.loterias =response.data.loterias;
@@ -1558,11 +1566,12 @@ myApp
                 return;
             }
 
+            $scope.datos.cancelar.servidor = $scope.datos.servidor;
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
             $scope.datos.cancelar.idBanca = $scope.datos.selectedBancas.id;
            // $scope.datos.cancelar.codigoBarra = $scope.datos.idUsuario;
-
-            $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': $scope.datos.cancelar})
+            var jwt = helperService.createJWT($scope.datos.cancelar);
+            $http.post(rutaGlobal+"/api/principal/cancelar", {'action':'sp_ventas_cancelar', 'datos': jwt})
              .then(function(response){
                 // console.log(response.data);
 

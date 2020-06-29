@@ -23,6 +23,7 @@ class BlockslotteriesEvent implements ShouldBroadcast
      */
     public function __construct($blockslotteries, $eliminar = false)
     {
+        $this->room = $blockslotteries->getConnectionName();
         if($eliminar){
             $this->action = "delete";
         }else{

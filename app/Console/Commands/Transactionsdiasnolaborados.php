@@ -56,15 +56,19 @@ class Transactionsdiasnolaborados extends Command
         $ultimoDiaMes = new Carbon("last day of this month");
         $primerDiaMes = new Carbon("first day of this month");
         $horaParaRealizarGasto = 10;
+
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $servi):
+        $servidor = $servi->descripcion;
         
 
         $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";
         $fechaHasta = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 23:59:00";
-        $usuario = Users::whereNombres("Sistema")->first();
-        $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Sorteo")->first();
-        $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-        $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
-        $entidad = Entity::whereNombre("Sistema")->first();
+        $usuario = Users::on($servidor)->whereNombres("Sistema")->first();
+        $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Sorteo")->first();
+        $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+        $idTipoEntidad2 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
+        $entidad = Entity::on($servidor)->whereNombre("Sistema")->first();
 
         
 
@@ -81,32 +85,32 @@ class Transactionsdiasnolaborados extends Command
 
 
         
-        $transaccionesProgramadas = Transactionscheduled::whereStatus(1)->whereFecha($fecha->toDateString())->get();
+        $transaccionesProgramadas = Transactionscheduled::on($servidor)->whereStatus(1)->whereFecha($fecha->toDateString())->get();
         foreach($transaccionesProgramadas as $t){
             
            
          
                 
                
-                $idTipoEntidad1 = Types::whereId($t->idTipoEntidad1)->first();
-                $idTipoEntidad2 = Types::whereId($t->idTipoEntidad2)->first();
+                $idTipoEntidad1 = Types::on($servidor)->whereId($t->idTipoEntidad1)->first();
+                $idTipoEntidad2 = Types::on($servidor)->whereId($t->idTipoEntidad2)->first();
                 $saldoInicialEntidad1 = 0;
                 $saldoInicialEntidad2 = 0;
                 if($idTipoEntidad1 == null || $idTipoEntidad2 == null)
                     continue;
 
                 if($idTipoEntidad1->descripcion == "Banca"){
-                    $saldoInicialEntidad1 = (new Helper)->saldo($t->idEntidad1, 1);
+                    $saldoInicialEntidad1 = (new Helper)->saldo($servidor, $t->idEntidad1, 1);
                 }
                 else if($idTipoEntidad1->descripcion == "Banco"){
-                    $saldoInicialEntidad1 = (new Helper)->saldo($t->idEntidad1, 2);
+                    $saldoInicialEntidad1 = (new Helper)->saldo($servidor, $t->idEntidad1, 2);
                 }
 
                 if($idTipoEntidad2->descripcion == "Banca"){
-                    $saldoInicialEntidad2 = (new Helper)->saldo($t->idEntidad2, 1);
+                    $saldoInicialEntidad2 = (new Helper)->saldo($servidor, $t->idEntidad2, 1);
                 }
                 else if($idTipoEntidad2->descripcion == "Banco"){
-                    $saldoInicialEntidad2 = (new Helper)->saldo($t->idEntidad2, 2);
+                    $saldoInicialEntidad2 = (new Helper)->saldo($servidor, $t->idEntidad2, 2);
                 }
 
                 
@@ -115,7 +119,7 @@ class Transactionsdiasnolaborados extends Command
                 $saldoFinalEntidad1 = ($t->credito == 0 || $t->credito == null) ? $saldoInicialEntidad1 + $t->debito : $saldoInicialEntidad1 - $t->credito; 
                 $saldoFinalEntidad2 = ($t->credito == 0 || $t->credito == null) ? $saldoInicialEntidad2 - $t->debito : $saldoInicialEntidad2 + $t->credito; 
 
-                $t = transactions::create([
+                $t = transactions::on($servidor)->create([
                     'idUsuario' => $usuario->id,
                     'idTipo' => $t->idTipo,
                     'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -133,6 +137,8 @@ class Transactionsdiasnolaborados extends Command
                 ]);
                 
         }
+
+    endforeach;
     }
     
 }

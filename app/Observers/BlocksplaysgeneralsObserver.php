@@ -20,7 +20,7 @@ class BlocksplaysgeneralsObserver
         $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
         $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
-        $blocksplaysgenerals = Blocksplaysgenerals::whereId($blocksplaysgenerals->id)
+        $blocksplaysgenerals = Blocksplaysgenerals::on($blocksplaysgenerals->getConnectionName())->whereId($blocksplaysgenerals->id)
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->first();
@@ -41,7 +41,7 @@ class BlocksplaysgeneralsObserver
         $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
         $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
-        $blocksplaysgenerals = Blocksplaysgenerals::whereId($blocksplaysgenerals->id)
+        $blocksplaysgenerals = Blocksplaysgenerals::on($blocksplaysgenerals->getConnectionName())->whereId($blocksplaysgenerals->id)
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->first();
@@ -62,6 +62,7 @@ class BlocksplaysgeneralsObserver
         $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
         $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
         $stock = Stock::
+        on($blocksplaysgenerals->getConnectionName())->
             whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->where([
                 'jugada' => $blocksplaysgenerals->jugada, 

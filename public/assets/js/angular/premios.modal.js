@@ -54,8 +54,8 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
 
         $scope.inicializarDatosPremiosModal = function(idLoteria, idSorteo){
             
-     
-            $http.get(rutaGlobal+"/api/premios?layout=vistaPremiosModal", {'action':'sp_datosgenerales_obtener_todos'})
+            var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario, "layout" : "vistaPremiosModal"});
+            $http.get(rutaGlobal+"/api/premios?layout=vistaPremiosModal&&token=" + jwt, {'action':'sp_datosgenerales_obtener_todos'})
              .then(function(response){
                 console.log('Loteria ajav: ', response.data);
 
@@ -89,7 +89,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
             },
             function(response) {
                 // Handle error here
-                //console.log('Error jean: ', response);
+                console.log('Error jean: ', response);
                 alert("Error");
             });
        
@@ -237,9 +237,9 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
             }
 
             $scope.datosPremiosModal.idUsuario = idUsuarioGlobal;
-
-          
-          $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': $scope.datosPremiosModal})
+            $scope.datosPremiosModal.servidor = servidorGlobal;
+          var jwt = helperService.createJWT($scope.datosPremiosModal);
+          $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': jwt})
              .then(function(response){
                 // console.log(response);
                 if(response.data.errores == 0){

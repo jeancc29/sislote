@@ -55,15 +55,19 @@ class Transactionsdraws extends Command
         $ultimoDiaMes = new Carbon("last day of this month");
         $primerDiaMes = new Carbon("first day of this month");
         $horaParaRealizarGasto = 10;
+
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $servi):
+        $servidor = $servi->descripcion;
         
 
         $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";
         $fechaHasta = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 23:59:00";
-        $usuario = Users::whereNombres("Sistema")->first();
-        $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Sorteo")->first();
-        $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-        $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
-        $entidad = Entity::whereNombre("Sistema")->first();
+        $usuario = Users::on($servidor)->whereNombres("Sistema")->first();
+        $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Sorteo")->first();
+        $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+        $idTipoEntidad2 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
+        $entidad = Entity::on($servidor)->whereNombre("Sistema")->first();
 
         
 
@@ -80,23 +84,23 @@ class Transactionsdraws extends Command
 
 
         
-        $bancas = BranchesResource::collection(Branches::whereStatus(1)->get());
+        $bancas = BranchesResource::collection(Branches::on($servidor)->whereStatus(1)->get())->servidor($servidor);
         foreach($bancas as $b){
             
            
-            $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idTipo'=> $tipo->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
+            $t = transactions::on($servidor)->where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idTipo'=> $tipo->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
             if($t != null)
                  continue;
                 
                 //  $this->info('des:prem:comi '.$b['descuentosDelDia'].':'.$b['premiosDelDia'].':'.$b['comisionesDelDia']);
-                $ventasDelDia = Helper::ventasPorBanca($b['id']);
-                $descuentosDelDia = Helper::descuentosPorBanca($b['id']);
-                $premiosDelDia = Helper::premiosPorBanca($b['id']);
-                $comisionesDelDia = Helper::comisionesPorBanca($b['id']);
+                $ventasDelDia = Helper::ventasPorBanca($servidor, $b['id']);
+                $descuentosDelDia = Helper::descuentosPorBanca($servidor, $b['id']);
+                $premiosDelDia = Helper::premiosPorBanca($servidor, $b['id']);
+                $comisionesDelDia = Helper::comisionesPorBanca($servidor, $b['id']);
                 //  $this->info('des:prem:comi '.$descuentosDelDia.';'.$premiosDelDia.';'.$comisionesDelDia);
                 //  return $b;
                 $saldoFinalEntidad1 = 0;
-                $saldo = (new Helper)->saldo($b['id'], 1);
+                $saldo = (new Helper)->saldo($servidor, $b['id'], 1);
                 $totalNeto = $ventasDelDia - ($descuentosDelDia + $premiosDelDia + $comisionesDelDia);
 
                 if($totalNeto >= 0){
@@ -109,7 +113,7 @@ class Transactionsdraws extends Command
                     $debito = 0;
                 }
 
-                $t = transactions::create([
+                $t = transactions::on($servidor)->create([
                     'idUsuario' => $usuario->id,
                     'idTipo' => $tipo->id,
                     'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -131,5 +135,7 @@ class Transactionsdraws extends Command
                 
                
         }
+
+    endforeach;
     }
 }

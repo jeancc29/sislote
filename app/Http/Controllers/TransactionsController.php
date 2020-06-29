@@ -63,7 +63,7 @@ class TransactionsController extends Controller
             if(!(new Helper)->existe_sesion()){
                 return redirect()->route('login');
             }
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar transacciones") == true){
                 return redirect()->route('sinpermiso');
             }
@@ -72,7 +72,25 @@ class TransactionsController extends Controller
 
 
         
+        $datos = request()->validate([
+            'token' => ''
+        ]);
        
+        // $datos = \Helper::jwtDecode($datos["token"]);
+
+
+        try {
+            // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
+            // $datos = json_decode(json_encode($datos), true);
+            $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
         
 
         $fechaActual = strtotime(date("d-m-Y H:i:00",time()));
@@ -85,21 +103,21 @@ class TransactionsController extends Controller
         $fechaDesde = $fechaDesde->year.'-'.$fechaDesde->month.'-'.$fechaDesde->day. " 00:00:00";
         $fechaHasta = $fechaHasta->year.'-'.$fechaHasta->month.'-'.$fechaHasta->day. " 23:59:00";
 
-        $t = transactions::whereBetween('created_at', array($fechaDesde, $fechaHasta))
+        $t = transactions::on($datos["servidor"])->whereBetween('created_at', array($fechaDesde, $fechaHasta))
         ->whereStatus(1)
         ->get();
         
-        $tipos = Types::where(['renglon' => 'entidad', 'status' => 1])->get();
-        $tipos = collect($tipos)->map(function($d){
+        $tipos = Types::on($datos["servidor"])->where(['renglon' => 'entidad', 'status' => 1])->get();
+        $tipos = collect($tipos)->map(function($d) use($datos){
             $entidades = null;
             if($d->descripcion == "Banca"){
-                $entidades = Branches::whereStatus(1)->get();
+                $entidades = Branches::on($datos["servidor"])->whereStatus(1)->get();
                 $entidades = collect($entidades)->map(function($d){
                     return ['id' => $d->id, 'descripcion' => $d->descripcion];
                 });
             }
             else if($d->descripcion == "Banco" || $d->descripcion == "Otros"){
-                $entidades = Entity::whereStatus(['status' => 1, 'idTipo' => $d->id])->get();
+                $entidades = Entity::on($datos["servidor"])->whereStatus(['status' => 1, 'idTipo' => $d->id])->get();
                 $entidades = collect($entidades)->map(function($d){
                     return ['id' => $d->id, 'descripcion' => $d->nombre];
                 });
@@ -108,19 +126,33 @@ class TransactionsController extends Controller
         });
 
         return Response::json([
-            'bancas' => Branches::whereStatus(1)->get(),
+            'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get(),
             'entidades' => $tipos,
-            'tipos' => Types::whereRenglon('transaccion')->whereStatus(1)->get(),
-            'transacciones' => TransactionsResource::collection($t),
-            'usuarios' => Users::whereStatus(1)->get()
+            'tipos' => Types::on($datos["servidor"])->whereRenglon('transaccion')->whereStatus(1)->get(),
+            'transacciones' => TransactionsResource::collection($t)->servidor($datos["servidor"]),
+            'usuarios' => Users::on($datos["servidor"])->whereStatus(1)->get()
         ], 201);
     }
     public function saldo()
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.es_banca' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.es_banca' => 'required',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
         $saldo_inicial = 0;
 
@@ -157,13 +189,13 @@ class TransactionsController extends Controller
         // }
 
         if($datos["es_banca"] == 1)
-            $saldo_inicial = Helper::saldo($datos["id"], 1);
+            $saldo_inicial = Helper::saldo($datos["servidor"], $datos["id"], 1);
         else
-            $saldo_inicial = Helper::saldo($datos["id"], 2);
+            $saldo_inicial = Helper::saldo($datos["servidor"], $datos["id"], 2);
 
         return Response::json([
             'saldo_inicial' => $saldo_inicial,
-            'tipos' => Types::whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
+            'tipos' => Types::on($datos["servidor"])->whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
         ], 201);
     }
 
@@ -197,14 +229,29 @@ class TransactionsController extends Controller
             if(!(new Helper)->existe_sesion()){
                 return redirect()->route('login');
             }
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar transacciones") == true){
                 return redirect()->route('sinpermiso');
             }
             return view('transacciones.grupo', compact('controlador'));
         }
 
-        
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+
+        try {
+            // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
+            // $datos = json_decode(json_encode($datos), true);
+            $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
 
         $fechaActual = strtotime(date("d-m-Y H:i:00",time()));
         // $fechaActual = strtotime($fechaActual['mday'] . ' ' . $fechaActual['month'].' '.$fechaActual['year'] . ' ' . time() );
@@ -216,28 +263,41 @@ class TransactionsController extends Controller
         $fechaDesde = $fechaDesde->year.'-'.$fechaDesde->month.'-'.$fechaDesde->day. " 00:00:00";
         $fechaHasta = $fechaHasta->year.'-'.$fechaHasta->month.'-'.$fechaHasta->day. " 23:59:00";
 
-        $t = Transactionsgroups::whereBetween('created_at', array($fechaDesde, $fechaHasta))
+        $t = Transactionsgroups::on($datos["servidor"])->whereBetween('created_at', array($fechaDesde, $fechaHasta))
         ->get();
         
     
         return Response::json([
-            'bancas' => BranchesResourceSmall::collection(Branches::whereStatus(1)->get()),
-            'entidades' => Entity::whereStatus(1)->get(),
-            'tipos' => Types::whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago', 'Descuento dias no laborados'])->get(),
-            'grupos' => TransactionsgroupsResource::collection($t)
+            'bancas' => BranchesResourceSmall::collection(Branches::on($datos["servidor"])->whereStatus(1)->get()),
+            'entidades' => Entity::on($datos["servidor"])->whereStatus(1)->get(),
+            'tipos' => Types::on($datos["servidor"])->whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago', 'Descuento dias no laborados'])->get(),
+            'grupos' => TransactionsgroupsResource::collection($t)->servidor($datos["servidor"])
         ], 201);
     }
     public function buscarTransaccion()
     {
-        $datos = request()->validate([
-            'datos.fechaDesde' => 'required',
-            'datos.fechaHasta' => 'required',
-            'datos.idTipoEntidad' => 'required',
-            'datos.idEntidad' => 'required',
-            'datos.idTipo' => 'required',
-            
-            'datos.idUsuario' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.fechaDesde' => 'required',
+        //     'datos.fechaHasta' => 'required',
+        //     'datos.idTipoEntidad' => 'required',
+        //     'datos.idEntidad' => 'required',
+        //     'datos.idTipo' => 'required',
+        //     'datos.idUsuario' => 'required',
+        // ])['datos'];
+
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
 
         $condicionTipoEntidad = '=';
         $condicionEntidad = '=';
@@ -259,7 +319,7 @@ class TransactionsController extends Controller
         if($datos['idUsuario'] == 0)
             $condicionUsuario = '!=';
 
-        $t = transactions::whereBetween('created_at', array($fechaDesde, $fechaHasta))
+        $t = transactions::on($datos["servidor"])->whereBetween('created_at', array($fechaDesde, $fechaHasta))
             ->where('idUsuario', $condicionUsuario, $datos['idUsuario'])
             ->where('idTipoEntidad1', $condicionTipoEntidad, $datos['idTipoEntidad'])
             ->where('idEntidad1', $condicionEntidad, $datos['idEntidad'])
@@ -270,7 +330,7 @@ class TransactionsController extends Controller
         return Response::json([
             'fechaDesde' => $fechaDesde,
             'fechaHasta' => $fechaHasta,
-            'transacciones' => TransactionsResource::collection($t)
+            'transacciones' => TransactionsResource::collection($t)->servidor($datos["servidor"])
         ], 201);
     }
 
@@ -323,16 +383,30 @@ class TransactionsController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.addTransaccion' => 'required',
-            'datos.idUsuario' => 'required',
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.addTransaccion' => 'required',
+        //     'datos.idUsuario' => 'required',
+        // ])['datos'];
 
-        $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first()->id;
-        $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first()->id;
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $idTipoEntidad1 = Types::on($datos["servidor"])->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first()->id;
+        $idTipoEntidad2 = Types::on($datos["servidor"])->where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first()->id;
 
 
-        $u = Users::whereId($datos['idUsuario'])->first();
+        $u = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
         foreach($datos['addTransaccion'] as $t){
             if($t['tipo']['descripcion'] == "Ajuste"){
                 if(!$u->tienePermiso("Crear ajustes") == true){
@@ -376,20 +450,20 @@ class TransactionsController extends Controller
            
             if($t["tipoTransaccion"] == "Programada"){
                 if($colleccionProgramada == null){
-                    $grupoProgramada = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);                    
+                    $grupoProgramada = Transactionsgroups::on($datos["servidor"])->create(['idUsuario' => $datos['idUsuario']]);                    
                 }
                 
                 $fecha = new Carbon($t['fecha']);
                 $fechaCarbon = Carbon::now();
                 if($fecha->gt($fechaCarbon) == false){
-                    Transactionsgroups::whereId($grupoProgramada->id)->delete();
+                    Transactionsgroups::on($datos["servidor"])->whereId($grupoProgramada->id)->delete();
                     return Response::json([
                         'errores' => 1,
                         'mensaje' => "La fecha debe ser mayor que el dia actual"
                     ], 201);
                 }
 
-                $transaccionProgramada = Transactionscheduled::create([
+                $transaccionProgramada = Transactionscheduled::on($datos["servidor"])->create([
                     'fecha' => $fecha->toDateString(),
                     'idUsuario' => $datos['idUsuario'],
                     'idTipo' => $t['tipo']['id'],
@@ -420,9 +494,9 @@ class TransactionsController extends Controller
                 }
             }else{
                 if($colleccionNormal == null){
-                    $grupoNormal = Transactionsgroups::create(['idUsuario' => $datos['idUsuario']]);                    
+                    $grupoNormal = Transactionsgroups::on($datos["servidor"])->create(['idUsuario' => $datos['idUsuario']]);                    
                 }
-                $transaccion = transactions::create([
+                $transaccion = transactions::on($datos["servidor"])->create([
                     'idUsuario' => $datos['idUsuario'],
                     'idTipo' => $t['tipo']['id'],
                     'idTipoEntidad1' => $idTipoEntidad1,
@@ -482,17 +556,17 @@ class TransactionsController extends Controller
        $fechaDesde = $fechaDesde->year.'-'.$fechaDesde->month.'-'.$fechaDesde->day. " 00:00:00";
        $fechaHasta = $fechaHasta->year.'-'.$fechaHasta->month.'-'.$fechaHasta->day. " 23:59:00";
 
-       $t = Transactionsgroups::whereBetween('created_at', array($fechaDesde, $fechaHasta))
+       $t = Transactionsgroups::on($datos["servidor"])->whereBetween('created_at', array($fechaDesde, $fechaHasta))
        ->get();
        
 
        return Response::json([
            'errores' => 0,
            'mensaje' => "Se ha guardado correctamente",
-        'bancas' => Branches::whereStatus(1)->get(),
-        'entidades' => Entity::whereStatus(1)->get(),
-        'tipos' => Types::whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago'])->get(),
-        'grupos' => TransactionsgroupsResource::collection($t)
+        'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get(),
+        'entidades' => Entity::on($datos["servidor"])->whereStatus(1)->get(),
+        'tipos' => Types::on($datos["servidor"])->whereRenglon('transaccion')->whereIn('descripcion', ['Ajuste', 'Cobro', 'Pago'])->get(),
+        'grupos' => TransactionsgroupsResource::collection($t)->servidor($datos["servidor"])
     ], 201);
     
     }

@@ -4,10 +4,17 @@ namespace App\Http\Resources;
 use App\Http\Resources\AutomaticexpensesResource;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use App\Classes\Helper;
 
 class BranchesResource extends JsonResource
 {
+    protected $servidor;
+
+    public function servidor($value){
+        $this->servidor = $value;
+        return $this;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -45,11 +52,33 @@ class BranchesResource extends JsonResource
             'pagosCombinaciones' => $this->pagosCombinaciones,
             'comisiones' => $this->comisiones,
             'gastos' => AutomaticexpensesResource::collection($this->gastos),
-            'ventasDelDia' => Helper::ventasPorBanca($this->id),
-            'descuentosDelDia' => Helper::descuentosPorBanca($this->id),
-            'premiosDelDia' => Helper::premiosPorBanca($this->id),
-            'comisionesDelDia' => Helper::comisionesPorBanca($this->id),
-            'ticketsDelDia' => Helper::ticketsPorBanca($this->id)
+            'ventasDelDia' => Helper::ventasPorBanca($this->servidor, $this->id),
+            'descuentosDelDia' => Helper::descuentosPorBanca($this->servidor, $this->id),
+            'premiosDelDia' => Helper::premiosPorBanca($this->servidor, $this->id),
+            'comisionesDelDia' => Helper::comisionesPorBanca($this->servidor, $this->id),
+            'ticketsDelDia' => Helper::ticketsPorBanca($this->servidor, $this->id)
         ];
+    }
+
+    public static function collection($resource){
+        return new BranchesResourceCollection($resource, get_called_class());
+    }
+    
+}
+
+class BranchesResourceCollection extends ResourceCollection {
+
+    protected $servidor;
+
+    public function servidor($value){
+        $this->servidor = $value;
+        return $this;
+    }
+
+    public function toArray($request){
+        return $this->collection->map(function(BranchesResource $resource) use($request){
+            return $resource->servidor($this->servidor)->toArray($request);
+    })->all();
+
     }
 }

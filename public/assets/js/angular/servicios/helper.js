@@ -243,4 +243,47 @@ myApp.service('helperService', function(){
         function charToInt(char) {
             return char.charCodeAt(0)
         }
+    this.base64url = function(source) {
+        // Encode in classical base64
+        encodedSource = CryptoJS.enc.Base64.stringify(source);
+      
+        // Remove padding equal characters
+        encodedSource = encodedSource.replace(/=+$/, '');
+      
+        // Replace characters according to base64url specifications
+        encodedSource = encodedSource.replace(/\+/g, '-');
+        encodedSource = encodedSource.replace(/\//g, '_');
+      
+        return encodedSource;
+      }
+
+    this.createJWT = function(data){
+        var key = apiKeyGlobal;
+        var header = {
+        "alg": "HS256",
+        "typ": "JWT"
+        };
+
+        var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
+        var encodedHeader = this.base64url(stringifiedHeader);
+
+        // data = {
+        // "id": 1337,
+        // "username": "john.doe"
+        // };
+
+        var stringifiedData = CryptoJS.enc.Utf8.parse(JSON.stringify(data));
+        var encodedData = this.base64url(stringifiedData);
+
+        var token = encodedHeader + "." + encodedData;
+
+        var signature = CryptoJS.HmacSHA256(token, key);
+        signature = this.base64url(signature);
+
+        var signedToken = token + "." + signature;
+        return signedToken;
+    }
+
+    
+
 });

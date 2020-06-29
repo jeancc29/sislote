@@ -17,7 +17,7 @@ class PruebaStockObserver
      */
     public function created(Stock $stock)
     {
-        event(new RealtimeStockEvent(false, $stock));
+        event(new RealtimeStockEvent($stock->getConnectionName(), false, $stock));
     }
 
     /**
@@ -28,7 +28,7 @@ class PruebaStockObserver
      */
     public function updated(Stock $stock)
     {
-        event(new RealtimeStockEvent(false, $stock));
+        event(new RealtimeStockEvent($stock->getConnectionName(), false, $stock));
     }
 
     /**
@@ -39,7 +39,7 @@ class PruebaStockObserver
      */
     public function deleted(Stock $stock)
     {
-        event(new RealtimeStockEvent(false, $stock, true));
+        event(new RealtimeStockEvent($stock->getConnectionName(), false, $stock, true));
     }
 
     /**

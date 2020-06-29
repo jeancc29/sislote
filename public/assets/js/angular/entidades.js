@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, $timeout){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -52,7 +52,8 @@ myApp
                     
                   })
             }else{
-                $http.get(rutaGlobal+"/api/entidades")
+                var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+                $http.get(rutaGlobal+"/api/entidades?token=" + jwt)
                     .then(function(response){
                         console.log('Loteria ajav: ', response.data);
 
@@ -141,8 +142,9 @@ myApp
             $scope.datos.status = ($scope.datos.status) ? 1 : 0;
             $scope.datos.idTipo = $scope.datos.selectedTipo.id; 
             $scope.datos.idMoneda = $scope.datos.selectedMoneda.id; 
-
-            $http.post(rutaGlobal+"/api/entidades/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            $scope.datos.servidor = servidorGlobal; 
+            var jwt = helperService.createJWT($scope.datos);
+            $http.post(rutaGlobal+"/api/entidades/guardar", {'action':'sp_loterias_actualiza', 'datos': jwt})
                 .then(function(response){
                     console.log(response.data);
                     if(response.data.errores == 0){
@@ -159,7 +161,9 @@ myApp
 
 
         $scope.eliminar = function(d){
-            $http.post(rutaGlobal+"/api/entidades/eliminar", {'action':'sp_loterias_elimnar', 'datos': d})
+            d.servidor = servidorGlobal; 
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/entidades/eliminar", {'action':'sp_loterias_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response);
             

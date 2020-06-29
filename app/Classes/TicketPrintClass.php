@@ -37,6 +37,7 @@ use Carbon\Carbon;
 
 
 class TicketPrintClass{
+    private $servidor;
     private $html;
     private $banca;
     private $venta;
@@ -46,13 +47,14 @@ class TicketPrintClass{
     private $contadorJugadas;
     private $codigoBarra;
 
-    function __construct($idVenta){
-        $this->venta = Sales::whereId($idVenta)->first();
-        $this->ventaColeccion = SalesResource::collection(Sales::whereId($idVenta)->get());
-        $this->banca = Branches::whereId($this->venta->idBanca)->first();
-        $this->ventasDetalles = Salesdetails::where('idVenta', $this->venta->id)->orderBy('idLoteria', 'desc')->get();
+    function __construct($servidor, $idVenta){
+        $this->servidor = $servidor;
+        $this->venta = Sales::on($this->servidor)->whereId($idVenta)->get()->first();
+        $this->ventaColeccion = SalesResource::collection(Sales::on($this->servidor)->whereId($idVenta)->get())->servidor($this->servidor);
+        $this->banca = Branches::on($this->servidor)->whereId($this->venta->idBanca)->first();
+        $this->ventasDetalles = Salesdetails::on($this->servidor)->where('idVenta', $this->venta->id)->orderBy('idLoteria', 'desc')->get();
         $this->ventasDetalles = collect($this->ventasDetalles);
-        $this->usuario = Users::whereId($this->venta->idUsuario)->first();
+        $this->usuario = Users::on($this->servidor)->whereId($this->venta->idUsuario)->first();
         $this->codigoBarra = $this->ventaColeccion->map(function($v){
             return $v->codigoBarra;
         });;
@@ -78,7 +80,7 @@ class TicketPrintClass{
                 $loterias = $this->ventasDetalles->map(function($v){
                     return $v['idLoteria'];
                 });;
-                $loterias = Lotteries::whereIn('id', $loterias)->get();
+                $loterias = Lotteries::on($this->servidor)->whereIn('id', $loterias)->get();
                 //return $loterias;
                 foreach($loterias as $l){
                     $contadorJugadasLoteria = 0;
@@ -99,7 +101,7 @@ class TicketPrintClass{
                                 $this->openTableBody();
                     foreach($this->ventasDetalles as $d){
                         if($l->id == $d['idLoteria']){
-                            $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                            $loteria = Lotteries::on($this->servidor)->whereId($d['idLoteria'])->first();
                         $contadorJugadasLoteria++;
                         //Si la variable $idLoteria es diferente de $loteria->id entonces agregamos el header con el nombre de la loteria y su total
                         // if($idLoteria != $loteria->id){
@@ -131,7 +133,7 @@ class TicketPrintClass{
                             // $this->openTable();
                             //     $this->setTableHead();
                             //     $this->openTableBody();
-                                    $jugada = Helper::agregarGuion($d['jugada'], $d['idSorteo']);
+                                    $jugada = Helper::agregarGuion($this->servidor, $d['jugada'], $d['idSorteo']);
                                     $this->setJugada($jugada, $d['monto']);
                         //         $this->closeTableBody();
                         //     $this->closeTable();
@@ -338,7 +340,7 @@ class TicketPrintClass{
     }
 
     function setCodigoBarra(){
-        $codigoBarra = Tickets::whereId($this->venta->idTicket)->first()->codigoBarra;
+        $codigoBarra = Tickets::on($this->servidor)->whereId($this->venta->idTicket)->first()->codigoBarra;
         $this->html .= "<h2 class='text-center my-0'><strong>". $codigoBarra ."</strong></h2>";
     }
 

@@ -13,8 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->truncateTables([
                     // 'users',
-                    'permissions', 
-                    // 'roles', 
+                    // 'permissions', 
+                    'roles', 
                     'permission_role', 
                     // 'lotteries', 
                     // 'draws', 
@@ -36,12 +36,12 @@ class DatabaseSeeder extends Seeder
         // $this->call('DrawsSeeder');
 
         // $this->call('CountriesSeeder');
-        $this->call('PermissionSeeder');
+        // $this->call('PermissionSeeder');
         // $this->call('LotteriesSeeder');
         
-        // $this->call('RolesSeeder');
+        $this->call('RolesSeeder');
         $this->call('PermissionRoleSeeder');
-        // $this->call('UsersSeeder');
+        $this->call('UsersSeeder');
         // $this->call('BlockslotteriesSeeder');
         // $this->call('BranchesSeeder');
         // $this->call('GeneralsSeeder');
@@ -53,9 +53,15 @@ class DatabaseSeeder extends Seeder
 
 
     public function truncateTables(array $tables){
-    	DB::statement('SET FOREIGN_KEY_CHECKS = 0');
-    	foreach($tables as $t){
-    		DB::table($t)->truncate();
-    	}
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $ser):
+        $servidor = $ser->descripcion;
+
+            DB::connection($servidor)->statement('SET FOREIGN_KEY_CHECKS = 0');
+            foreach($tables as $t){
+                DB::connection($servidor)->table($t)->truncate();
+            }
+        
+        endforeach;
     }
 }

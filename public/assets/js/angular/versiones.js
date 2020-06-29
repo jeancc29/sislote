@@ -47,7 +47,8 @@ myApp
                 
               
             }else{
-                $http.post(rutaGlobal+"/api/versiones")
+              var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario})
+                $http.post(rutaGlobal+"/api/versiones?token=" + jwt)
                     .then(function(response){
                         console.log('Versiones: ', response.data);
 
@@ -118,8 +119,10 @@ myApp
 
             $scope.datos.status = ($scope.datos.status) ? 1 : 0;
             $scope.datos.idUsuario = idUsuarioGlobal; 
+            $scope.datos.servidor = servidorGlobal; 
 
-          $http.post(rutaGlobal+"/api/versiones/guardar", {'action':'sp_loterias_actualiza', 'datos': $scope.datos})
+            var jwt = helperService.createJWT($scope.datos);
+          $http.post(rutaGlobal+"/api/versiones/guardar", {'action':'sp_loterias_actualiza', 'datos': jwt})
              .then(function(response){
                  console.log(response.data);
                 if(response.data.errores == 0){
@@ -140,7 +143,9 @@ myApp
 
 
         $scope.eliminar = function(d){
-            $http.post(rutaGlobal+"/api/entidades/eliminar", {'action':'sp_loterias_elimnar', 'datos': d})
+            d.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/versiones/eliminar", {'action':'sp_loterias_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response);
             
@@ -154,7 +159,9 @@ myApp
         }
 
         $scope.publicar = function(d){
-            $http.post(rutaGlobal+"/api/versiones/publicar", {'action':'sp_loterias_elimnar', 'datos': d})
+            d.servidor = servidorGlobal;
+            var jwt = helperService.createJWT(d);
+            $http.post(rutaGlobal+"/api/versiones/publicar", {'action':'sp_loterias_elimnar', 'datos': jwt})
              .then(function(response){
                 console.log(response);
             

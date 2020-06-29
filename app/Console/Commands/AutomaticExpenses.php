@@ -57,6 +57,10 @@ class AutomaticExpenses extends Command
         // // Escribe el contenido al fichero
         // file_put_contents($fichero, $actual);
 
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $servi):
+        $servidor = $servi->descripcion;
+        
         $prueba = new Carbon("2019-01-20");
 
         $fecha = Carbon::now();
@@ -68,11 +72,11 @@ class AutomaticExpenses extends Command
 
         $fechaDesde = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 00:00:00";
         $fechaHasta = $fecha->year.'-'.$fecha->month.'-'.$fecha->day. " 23:59:00";
-        $usuario = Users::whereNombres("Sistema")->first();
-        $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Consumo automatico de banca")->first();
-        $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-        $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
-        $entidad = Entity::whereNombre("Sistema")->first();
+        $usuario = Users::on($servidor)->whereNombres("Sistema")->first();
+        $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Consumo automatico de banca")->first();
+        $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+        $idTipoEntidad2 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Sistema'])->first();
+        $entidad = Entity::on($servidor)->whereNombre("Sistema")->first();
 
         
 
@@ -86,7 +90,7 @@ class AutomaticExpenses extends Command
 
 
         
-        $bancas = Branches::whereStatus(1)->has('gastos')->get();
+        $bancas = Branches::on($servidor)->whereStatus(1)->has('gastos')->get();
         foreach($bancas as $b){
             $gastos = AutomaticexpensesResource::collection($b->gastos);
             foreach($gastos as $g){
@@ -99,13 +103,13 @@ class AutomaticExpenses extends Command
                     //Verificamos que la hora de la fecha actual sean las 11PM, osea las 24 que es igual a la hora cero 0
                     if($fecha->hour == $horaParaRealizarGasto){
                        //Verificamos que no haya transacciones realizadas en la fecha actual para la banca y el gasto especificado
-                       $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
+                       $t = transactions::on($servidor)->where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
                        if($t != null)
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], 1);
-                            $t = transactions::create([
+                            $saldo = (new Helper)->saldo($servidor, $b['id'], 1);
+                            $t = transactions::on($servidor)->create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
                                 'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -127,7 +131,7 @@ class AutomaticExpenses extends Command
                 }
                 //Verificamos si el gasto es semanal
                 if(strtolower($g->frecuencia->descripcion) == "semanal"){
-                    $gastoWday = Days::whereId($g->idDia)->first()->wday;
+                    $gastoWday = Days::on($servidor)->whereId($g->idDia)->first()->wday;
                     $this->info('Semanal wday: '.$gastoWday . " - " . $todayWday);
                     if($todayWday != $gastoWday)
                         continue;
@@ -136,13 +140,13 @@ class AutomaticExpenses extends Command
                     //Verificamos tambien si es el dia establecido cuando es semanal
                     if($fecha->hour == $horaParaRealizarGasto){
                        //Verificamos que no haya transacciones realizadas en la fecha actual para la banca y el gasto especificado
-                       $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
+                       $t = transactions::on($servidor)->where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
                        if($t != null)
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], 1);
-                            $t = transactions::create([
+                            $saldo = (new Helper)->saldo($servidor, $b['id'], 1);
+                            $t = transactions::on($servidor)->create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
                                 'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -170,13 +174,13 @@ class AutomaticExpenses extends Command
                     //Verificamos tambien si estamos a 15 o  al ultimo dia del mes para poder realizar la transaccion quincenal
                     if($fecha->hour == $horaParaRealizarGasto && ($fecha->day == 15 || $fecha->day == $ultimoDiaMes->day)){
                        //Verificamos que no haya transacciones realizadas en la fecha actual para la banca y el gasto especificado
-                       $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
+                       $t = transactions::on($servidor)->where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
                        if($t != null)
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], 1);
-                            $t = transactions::create([
+                            $saldo = (new Helper)->saldo($servidor, $b['id'], 1);
+                            $t = transactions::on($servidor)->create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
                                 'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -204,13 +208,13 @@ class AutomaticExpenses extends Command
                     //Verificamos tambien si hoy es el ultimo dia del mes para poder realizar la transaccion quincenal
                     if($fecha->hour == $horaParaRealizarGasto && $fecha->day == $ultimoDiaMes->day){
                        //Verificamos que no haya transacciones realizadas en la fecha actual para la banca y el gasto especificado
-                       $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
+                       $t = transactions::on($servidor)->where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
                        if($t != null)
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], 1);
-                            $t = transactions::create([
+                            $saldo = (new Helper)->saldo($servidor, $b['id'], 1);
+                            $t = transactions::on($servidor)->create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
                                 'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -238,13 +242,13 @@ class AutomaticExpenses extends Command
                     //Verificamos tambien si hoy es el ultimo dia del mes para poder realizar la transaccion quincenal
                     if($fecha->hour == $horaParaRealizarGasto && $fecha->day == $primerDiaMes->day && strtolower($fecha->englishMonth) == "january"){
                        //Verificamos que no haya transacciones realizadas en la fecha actual para la banca y el gasto especificado
-                       $t = transactions::where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
+                       $t = transactions::on($servidor)->where(['idTipoEntidad1' => $idTipoEntidad1->id, 'idEntidad1' => $b['id'], 'idGasto' => $g->id, 'status' => 1])->whereBetween('created_at', array($fechaDesde, $fechaHasta))->first();
                        if($t != null)
                             continue;
                        
                         
-                            $saldo = (new Helper)->saldo($b['id'], 1);
-                            $t = transactions::create([
+                            $saldo = (new Helper)->saldo($servidor, $b['id'], 1);
+                            $t = transactions::on($servidor)->create([
                                 'idUsuario' => $usuario->id,
                                 'idTipo' => $tipo->id,
                                 'idTipoEntidad1' => $idTipoEntidad1->id,
@@ -269,7 +273,7 @@ class AutomaticExpenses extends Command
         }
 
         
-
+    endforeach;
 
         // Draws::create([
         //     'descripcion' => 'Sorteo cronjob',

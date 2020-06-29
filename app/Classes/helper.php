@@ -32,45 +32,45 @@ use Twilio\Rest\Client;
 use Twilio\Exceptions\TwilioException;
 
 class Helper{
-    static function saldo($id, $entidad = 1){
+    static function saldo($servidor, $id, $entidad = 1){
         $datos = Array("id" => $id, "entidad" => $entidad);
 
         $saldo_inicial = 0;
 
         if($datos["entidad"] == 1){
-            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
-            $debito = transactions::where(
+            $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
                     'status' => 1
                 ])
-                ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])
+                ->whereNotIn('idTipo', [Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])
                 ->sum('debito');
-            $credito =  transactions::where(
+            $credito =  transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
                     'status' => 1
                 ])
-                ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
+                ->whereNotIn('idTipo', [Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
                 ->sum('credito');
             //El debito desembolso es un fondo emitido para un prestamo desde esta entidad, osea, que es un dinero que sale
             // por lo tanto este se le suma al credito
-            $debitoDesembolso =  transactions::where(
+            $debitoDesembolso =  transactions::on($servidor)->where(
                     [
                         'idEntidad1'=> $datos["id"], 
                         'idTipoEntidad2' => $idTipoEntidad1->id, 
                         'status' => 1
                     ])
-                    ->where('idTipo', Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)                
+                    ->where('idTipo', Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)                
                     ->sum('debito');
             $saldo_inicial = $debito - ($credito + $debitoDesembolso);
         }else if($datos["entidad"] == 2){
-            $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
-            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
-            $debito = transactions::where(
+            $idTipoEntidad2 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+            $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::on($servidor)->where(
                 [
                     'idEntidad2'=> $datos["id"],
                     'idTipoEntidad2' => $idTipoEntidad2->id,  
@@ -78,7 +78,7 @@ class Helper{
                 ])
                 ->where('idTipo', '!=', $tipo->id)                
                 ->sum('debito');
-            $credito = transactions::where(
+            $credito = transactions::on($servidor)->where(
                 [
                     'idEntidad2'=> $datos["id"],
                     'idTipoEntidad2' => $idTipoEntidad2->id,  
@@ -89,9 +89,9 @@ class Helper{
             $saldo_inicial = $credito - $debito;
         }
         else if($datos["entidad"] == 3){
-            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
-            $debito = transactions::where(
+            $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
@@ -100,7 +100,7 @@ class Helper{
                 ])
                 ->where('idTipo', '=', $tipo->id)
                 ->sum('debito');
-            $credito = transactions::where(
+            $credito = transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
@@ -117,7 +117,7 @@ class Helper{
 
 
 
-    static function saldoPorFecha($id, $entidad = 1, $fechaHasta = null){
+    static function saldoPorFecha($servidor, $id, $entidad = 1, $fechaHasta = null){
         $datos = Array("id" => $id, "entidad" => $entidad);
         $saldo_inicial = 0;
         $fecha = getdate();
@@ -137,42 +137,42 @@ class Helper{
 
 
         if($datos["entidad"] == 1){
-            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
-            $debito = transactions::where(
+            $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
                     'status' => 1
                 ])
-                ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
+                ->whereNotIn('idTipo', [Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
                 ->where('created_at', '<=', $fechaHasta)
                 ->sum('debito');
-            $credito =  transactions::where(
+            $credito =  transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
                     'status' => 1
                 ])
-                ->whereNotIn('idTipo', [Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
+                ->whereNotIn('idTipo', [Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first()->id, Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id])                
                 ->where('created_at', '<=', $fechaHasta)
                 ->sum('credito');
             //El debito desembolso es un fondo emitido para un prestamo desde esta entidad, osea, que es un dinero que sale
             // por lo tanto este se le suma al credito
-            $debitoDesembolso =  transactions::where(
+            $debitoDesembolso =  transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad2' => $idTipoEntidad1->id, 
                     'status' => 1
                 ])
-                ->where('idTipo', Types::whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)   
+                ->where('idTipo', Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Desembolso de prestamo")->first()->id)   
                 ->where('created_at', '<=', $fechaHasta)             
                 ->sum('debito');
             $saldo_inicial = $debito - ($credito + $debitoDesembolso);
         }else if($datos["entidad"] == 2){
-            $idTipoEntidad2 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
-            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
-            $debito = transactions::where(
+            $idTipoEntidad2 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banco'])->first();
+            $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::on($servidor)->where(
                 [
                     'idEntidad2'=> $datos["id"],
                     'idTipoEntidad2' => $idTipoEntidad2->id,  
@@ -181,7 +181,7 @@ class Helper{
                 ->where('idTipo', '!=', $tipo->id)
                 ->where('created_at', '<=', $fechaHasta)
                 ->sum('debito');
-            $credito = transactions::where(
+            $credito = transactions::on($servidor)->where(
                 [
                     'idEntidad2'=> $datos["id"],
                     'idTipoEntidad2' => $idTipoEntidad2->id,  
@@ -193,9 +193,9 @@ class Helper{
             $saldo_inicial = $credito - $debito;
         }
         else if($datos["entidad"] == 3){
-            $idTipoEntidad1 = Types::where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
-            $tipo = Types::whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
-            $debito = transactions::where(
+            $idTipoEntidad1 = Types::on($servidor)->where(['renglon' => 'entidad', 'descripcion' => 'Banca'])->first();
+            $tipo = Types::on($servidor)->whereRenglon('transaccion')->whereDescripcion("Caida Acumulada")->first();
+            $debito = transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
@@ -205,7 +205,7 @@ class Helper{
                 ->where('idTipo', '=', $tipo->id)
                 ->where('created_at', '<=', $fechaHasta)
                 ->sum('debito');
-            $credito = transactions::where(
+            $credito = transactions::on($servidor)->where(
                 [
                     'idEntidad1'=> $datos["id"], 
                     'idTipoEntidad1' => $idTipoEntidad1->id, 
@@ -277,12 +277,17 @@ class Helper{
             session()->forget('idUsuario');
             session()->forget('idBanca');
             session()->forget('permisos');
+            session()->forget('servidor');
+            session()->forget('apiKey');
+            session()->forget('servidores');
+            session()->forget('usuario');
+            session()->forget('tipoUsuario');
             
             redirect()->route('login');
         }
     }
 
-    public static function determinarSorteo($jugada, $loteria){
+    public static function determinarSorteo($servidor, $jugada, $loteria){
         
         $idSorteo = 0;
   
@@ -291,24 +296,24 @@ class Helper{
         $idSorteo = 1;
     }
    else if(strlen($jugada) == 3){
-        $idSorteo = DB::table('draws')->whereDescripcion("Pick 3 Straight")->first();
+        $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 3 Straight")->first();
         if($idSorteo != null){
             $idSorteo = $idSorteo->id;
         }
    }
    else if(strlen($jugada) == 4){
         if(gettype(strpos($jugada, '+')) == "integer"){
-            $idSorteo = DB::table('draws')->whereDescripcion("Pick 3 Box")->first();
+            $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 3 Box")->first();
             if($idSorteo != null){
                 $idSorteo = $idSorteo->id;
             }
         }
         else{
-            $sorteo = DB::table('draws')
+            $sorteo = DB::connection($servidor)->table('draws')
                 ->select('draws.id')
                 ->join('draw_lottery', 'draws.id', '=', 'draw_lottery.idSorteo')
                 ->where(['draw_lottery.idLoteria' => $loteria->id, 'draws.descripcion' => 'Super pale'])->first();
-            $drawRelations = DB::table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
+            $drawRelations = DB::connection($servidor)->table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
             if($sorteo == null || $drawRelations <= 1)
                 $idSorteo = 2;
             else if($sorteo != null || $drawRelations >= 2)
@@ -317,13 +322,13 @@ class Helper{
    }
     else if(strlen($jugada) == 5){
             if(gettype(strpos($jugada, '+')) == "integer"){
-                $idSorteo = DB::table('draws')->whereDescripcion("Pick 4 Box")->first();
+                $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 4 Box")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
             }
             else if(gettype(strpos($jugada, '-')) == "integer"){
-                $idSorteo = DB::table('draws')->whereDescripcion("Pick 4 Straight")->first();
+                $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 4 Straight")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
@@ -435,8 +440,8 @@ class Helper{
     }
 
 
-    static function agregarGuion($jugada, $idSorteo){
-        $sorteo = Draws::whereId($idSorteo)->first();
+    static function agregarGuion($servidor, $jugada, $idSorteo){
+        $sorteo = Draws::on($servidor)->whereId($idSorteo)->first();
         if($sorteo == null)
             return $jugada;
         
@@ -452,8 +457,8 @@ class Helper{
         return $jugada;
     }
 
-    static function quitarUltimoCaracter($cadena, $idSorteo){
-        $sorteo = DB::table('draws')->whereId($idSorteo)->first();
+    static function quitarUltimoCaracter($servidor, $cadena, $idSorteo){
+        $sorteo = DB::connection($servidor)->table('draws')->whereId($idSorteo)->first();
         if($sorteo == null){
             return $cadena;
         }
@@ -696,19 +701,19 @@ class Helper{
         return $c;
     }
 
-    static function loteriaTienePremiosRegistradosHoy($idLoteria){
+    static function loteriaTienePremiosRegistradosHoy($servidor, $idLoteria){
             $fechaActual = getdate();
             $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
             $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
             
-            $premios = Awards::where('idLoteria', $idLoteria)
+            $premios = Awards::on($servidor)->where('idLoteria', $idLoteria)
             ->whereBetween('created_at', array($fechaInicial, $fechaFinal))->get()->first();
 
             return ($premios != null) ? true : false;
     }
 
 
-    static function ventasPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function ventasPorBanca($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
         if($fechaInicial != null && $fechaFinal != null){
@@ -724,10 +729,10 @@ class Helper{
 
             
         if($idBanca == 0){
-            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ventas = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])->get();
         }else{
-            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ventas = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
@@ -737,10 +742,10 @@ class Helper{
             return $id->id;
         });
 
-        return round(Sales::whereIn('id', $idVentas)->sum('total'), 2);
+        return round(Sales::on($servidor)->whereIn('id', $idVentas)->sum('total'), 2);
     }
 
-    static function descuentosPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function descuentosPorBanca($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
         if($fechaInicial != null && $fechaFinal != null){
@@ -756,10 +761,10 @@ class Helper{
 
             
         if($idBanca == 0){
-            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ventas = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])->get();
         }else{
-            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ventas = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
@@ -769,10 +774,10 @@ class Helper{
             return $id->id;
         });
 
-        return round(Sales::whereIn('id', $idVentas)->sum('descuentoMonto'), 2);
+        return round(Sales::on($servidor)->whereIn('id', $idVentas)->sum('descuentoMonto'), 2);
     }
 
-    static function premiosPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function premiosPorBanca($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
         if($fechaInicial != null && $fechaFinal != null){
@@ -788,10 +793,10 @@ class Helper{
 
             
         if($idBanca == 0){
-            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ventas = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])->get();
         }else{
-            $ventas = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ventas = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
             ->whereNotIn('status', [0,5])
             ->where('idBanca', $idBanca)
             ->get();
@@ -801,10 +806,10 @@ class Helper{
             return $id->id;
         });
 
-        return round(Salesdetails::whereIn('idVenta', $idVentas)->sum('premio'), 2);
+        return round(Salesdetails::on($servidor)->whereIn('idVenta', $idVentas)->sum('premio'), 2);
     }
 
-    static function ticketsPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function ticketsPorBanca($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
         if($fechaInicial != null && $fechaFinal != null){
@@ -817,7 +822,7 @@ class Helper{
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
         }
      
-        $tickets = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        $tickets = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
         ->whereNotIn('status', [0,5])
         ->where('idBanca', $idBanca)
         ->count();
@@ -828,7 +833,7 @@ class Helper{
         return $tickets;
     }
 
-    static function ticketsPendientesPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function ticketsPendientesPorBanca($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         $fecha = getdate();
    
         if($fechaInicial != null && $fechaFinal != null){
@@ -841,7 +846,7 @@ class Helper{
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
         }
      
-        $tickets = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        $tickets = Sales::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
         ->whereNotIn('status', [0,5])
         ->where(['idBanca' => $idBanca, 'status' => 1])
         ->count();
@@ -852,7 +857,7 @@ class Helper{
         return $tickets;
     }
 
-    static function comisionesPorBanca($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function comisionesPorBanca($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         if($fechaInicial == null and $fechaFinal == null){
             $fecha = getdate();
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
@@ -860,21 +865,21 @@ class Helper{
         }
         
         $comisionesMonto = 0;
-            $datosComisiones = Commissions::where('idBanca', $idBanca)->get();
-            $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
+            $datosComisiones = Commissions::on($servidor)->where('idBanca', $idBanca)->get();
+            $idVentasDeEstaBanca = Sales::on($servidor)->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
             $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
                 return $id->id;
             });
             foreach($datosComisiones as $d){
-                $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                $loteria = Lotteries::on($servidor)->whereId($d['idLoteria'])->first();
                 if($loteria == null)
                     continue;
 
                 if($d['directo'] > 0){
-                    $sorteo = Draws::whereDescripcion('Directo')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Directo')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['directo'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['directo'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -882,10 +887,10 @@ class Helper{
                 }
 
                 if($d['pale'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pale')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pale')->first();
                     if($sorteo != null && $loteria->sorteoExiste($sorteo->id) == true){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['pale'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['pale'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -893,10 +898,10 @@ class Helper{
                 }
 
                 if($d['tripleta'] > 0){
-                    $sorteo = Draws::whereDescripcion('Tripleta')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Tripleta')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['tripleta'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['tripleta'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -904,10 +909,10 @@ class Helper{
                 }
 
                 if($d['superPale'] > 0){
-                    $sorteo = Draws::whereDescripcion('Super pale')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Super pale')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['superPale'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['superPale'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -915,10 +920,10 @@ class Helper{
                 }
 
                 if($d['pick3Straight'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 3 Straight')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 3 Straight')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['pick3Straight'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['pick3Straight'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -926,10 +931,10 @@ class Helper{
                 }
 
                 if($d['pick3Box'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 3 Box')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 3 Box')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['pick3Box'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['pick3Box'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -937,10 +942,10 @@ class Helper{
                 }
 
                 if($d['pick4Straight'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 4 Straight')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 4 Straight')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['pick4Straight'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['pick4Straight'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -948,10 +953,10 @@ class Helper{
                 }
 
                 if($d['pick4Box'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 4 Box')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 4 Box')->first();
                     if($sorteo != null){
                         //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                        $comisionesMonto += ($d['pick4Box'] / 100) * Salesdetails::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                        $comisionesMonto += ($d['pick4Box'] / 100) * Salesdetails::on($servidor)->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                             ->whereIn('idVenta', $idVentasDeEstaBanca)
                             ->where(['idLoteria' => $d['idLoteria'], 'idSorteo' => $sorteo->id])
                             ->sum('monto');
@@ -964,7 +969,7 @@ class Helper{
     }
 
 
-    static function cambiarComisionesATickets($idBanca, $fechaInicial = null, $fechaFinal = null){
+    static function cambiarComisionesATickets($servidor, $idBanca, $fechaInicial = null, $fechaFinal = null){
         if($fechaInicial == null && $fechaFinal == null){
             $fecha = getdate();
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
@@ -972,24 +977,24 @@ class Helper{
         }
 
         
-        $idVentasDeEstaBanca = Sales::select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
+        $idVentasDeEstaBanca = Sales::on($servidor)->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $idBanca)->whereNotIn('status', [0,5])->get();
         $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
             return $id->id;
         });
-            $datosComisiones = Commissions::where('idBanca', $idBanca)->get();
+            $datosComisiones = Commissions::on($servidor)->where('idBanca', $idBanca)->get();
             
             foreach($datosComisiones as $d){
-                $loteria = Lotteries::whereId($d['idLoteria'])->first();
+                $loteria = Lotteries::on($servidor)->whereId($d['idLoteria'])->first();
                 if($loteria == null)
                     continue;
 
                 
 
                 if($d['directo'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Directo')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Directo')->first();
                     if($sorteo != null){
 
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['directo'] / 100) * $s['monto'];
                             $s->save();
@@ -999,9 +1004,9 @@ class Helper{
                 }
 
                 if($d['pale'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Pale')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pale')->first();
                     if($sorteo != null && $loteria->sorteoExiste($sorteo->id) == true){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pale'] / 100) * $s['monto'];
                             $s->save();
@@ -1010,9 +1015,9 @@ class Helper{
                 }
 
                 if($d['tripleta'] > 0){
-                    $sorteo = Draws::whereDescripcion('Tripleta')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Tripleta')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['tripleta'] / 100) * $s['monto'];
                             $s->save();
@@ -1021,9 +1026,9 @@ class Helper{
                 }
 
                 if($d['superPale'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Super pale')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Super pale')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['superPale'] / 100) * $s['monto'];
                             $s->save();
@@ -1032,9 +1037,9 @@ class Helper{
                 }
 
                 if($d['pick3Straight'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Pick 3 Straight')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 3 Straight')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick3Straight'] / 100) * $s['monto'];
                             $s->save();
@@ -1043,9 +1048,9 @@ class Helper{
                 }
 
                 if($d['pick3Box'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 3 Box')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 3 Box')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick3Box'] / 100) * $s['monto'];
                             $s->save();
@@ -1054,9 +1059,9 @@ class Helper{
                 }
 
                 if($d['pick4Straight'] >= 0){
-                    $sorteo = Draws::whereDescripcion('Pick 4 Straight')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 4 Straight')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick4Straight'] / 100) * $s['monto'];
                             $s->save();
@@ -1065,9 +1070,9 @@ class Helper{
                 }
 
                 if($d['pick4Box'] > 0){
-                    $sorteo = Draws::whereDescripcion('Pick 4 Box')->first();
+                    $sorteo = Draws::on($servidor)->whereDescripcion('Pick 4 Box')->first();
                     if($sorteo != null){
-                        $Salesdetails = Salesdetails::whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
+                        $Salesdetails = Salesdetails::on($servidor)->whereIn('idVenta', $idVentasDeEstaBanca)->where(['idLoteria' => $loteria->id, 'idSorteo' => $sorteo->id])->get();
                         foreach($Salesdetails as $s){
                             $s['comision'] = ($d['pick4Box'] / 100) * $s['monto'];
                             $s->save();
@@ -1299,18 +1304,18 @@ class Helper{
         return $montoValido;
     }
 
-    static function loteriasOrdenadasPorHoraCierre($usuario, $retornarSoloAbiertas = false){
-        $loterias = Lotteries::whereStatus(1)->get();
+    static function loteriasOrdenadasPorHoraCierre($servidor, $usuario, $retornarSoloAbiertas = false){
+        $loterias = Lotteries::on($servidor)->whereStatus(1)->get();
         $loterias = collect($loterias);
-        $idDia = Days::whereWday(getdate()['wday'])->first()->id;
-        list($loterias, $no) = $loterias->partition(function($l) use($usuario, $retornarSoloAbiertas){
-            $loteria = Lotteries::whereId($l['id'])->first();
+        $idDia = Days::on($servidor)->whereWday(getdate()['wday'])->first()->id;
+        list($loterias, $no) = $loterias->partition(function($l) use($usuario, $retornarSoloAbiertas, $servidor){
+            $loteria = Lotteries::on($servidor)->whereId($l['id'])->first();
             
             //Si puede jugar fuera de horario entonces solo nos retornamos las loterias que no tengan premios registrados
             if($usuario->tienePermiso('Jugar fuera de horario') && $retornarSoloAbiertas == false)
-                return Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
+                return Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
             else
-                return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($loteria->id) != true;
+                return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
         });
 
         $idLoteriasAbiertas = collect($loterias)->map(function($l){
@@ -1319,6 +1324,7 @@ class Helper{
 
          $loterias = 
             Lotteries::
+            on($servidor)->
             join('day_lottery', 'day_lottery.idLoteria', '=', 'lotteries.id')
             ->whereIn('lotteries.id', $idLoteriasAbiertas)
             ->where('day_lottery.idDia', $idDia)
@@ -1334,12 +1340,12 @@ class Helper{
 
 
     //Debemos verificar si todas las jugadas han sido pagadas
-    static function verificarTicketHaSidoPagado($idVenta){
-        $jugadasQueAunEstanPendiente = Salesdetails::where('idVenta', $idVenta)->whereStatus(0)->count();
+    static function verificarTicketHaSidoPagado($servidor, $idVenta){
+        $jugadasQueAunEstanPendiente = Salesdetails::on($servidor)->where('idVenta', $idVenta)->whereStatus(0)->count();
         if($jugadasQueAunEstanPendiente > 0){
             return false;
         }
-        $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
+        $jugadas = Salesdetails::on($servidor)->where('idVenta', $idVenta)->get();
 
         $montoPremios = 0;
         $montoPagado = 0;
@@ -1355,14 +1361,14 @@ class Helper{
     }
 
 
-    static function pagar($idVenta, $idUsuario, $idBanca = null){
+    static function pagar($servidor, $idVenta, $idUsuario, $idBanca = null){
         
-        $venta = Sales::whereId($idVenta)->whereNotIn('status', [0,5])->first();
+        $venta = Sales::on($servidor)->whereId($idVenta)->whereNotIn('status', [0,5])->first();
         if($venta == null){
             return false;
         }
-        $jugadas = Salesdetails::where(['idVenta' => $idVenta, 'pagado' => 0])->where('premio', '>', 0)->get();
-        $jugadasQueAunEstanPendiente = Salesdetails::where('idVenta', $idVenta)->whereStatus(0)->count();
+        $jugadas = Salesdetails::on($servidor)->where(['idVenta' => $idVenta, 'pagado' => 0])->where('premio', '>', 0)->get();
+        $jugadasQueAunEstanPendiente = Salesdetails::on($servidor)->where('idVenta', $idVenta)->whereStatus(0)->count();
         $seMarcaronJugadasComoPagadas = false;
         $idTicket = $venta->idTicket;
 
@@ -1374,8 +1380,8 @@ class Helper{
                 $j->save();
                 $seMarcaronJugadasComoPagadas = true;
                 
-                Logs::create([
-                    'idBanca' => Helper::getIdBanca($idUsuario, $idBanca),
+                Logs::on($servidor)->create([
+                    'idBanca' => Helper::getIdBanca($servidor, $idUsuario, $idBanca),
                     'idUsuario' => $idUsuario,
                     'tabla' => 'salesdetails',
                     'idRegistroTablaAccion' => $j['id'],
@@ -1395,9 +1401,9 @@ class Helper{
                         $codigoBarra = rand(1111111111, getrandmax());
                         //return 'codiog: ' . $codigoBarra . ' faker: ' . $faker->isbn10;
                         //Verificamos de que el codigo de barra no exista
-                        if(Tickets::where('codigoBarra', $codigoBarra)->get()->first() == null){
+                        if(Tickets::on($servidor)->where('codigoBarra', $codigoBarra)->get()->first() == null){
                             if(is_numeric($codigoBarra)){
-                                $ticket = Tickets::whereId($idTicket)->first();
+                                $ticket = Tickets::on($servidor)->whereId($idTicket)->first();
                                 $ticket['codigoBarraAntiguo'] = $ticket['codigoBarra'];
                                 $ticket['codigoBarra'] = $codigoBarra;
                                 $ticket->save();
@@ -1417,21 +1423,21 @@ class Helper{
     }
 
 
-    public static function getIdBanca($idUsuario, $idBanca = null){
+    public static function getIdBanca($servidor, $idUsuario, $idBanca = null){
         if($idBanca != null){
-            $idBanca = Branches::where(['id' => $idBanca, 'status' => 1])->first();
+            $idBanca = Branches::on($servidor)->where(['id' => $idBanca, 'status' => 1])->first();
             if($idBanca != null)
                 $idBanca = $idBanca->id;
         }else{
             
-            $idBanca = Branches::where(['idUsuario' => $idUsuario, 'status' => 1])->first();
+            $idBanca = Branches::on($servidor)->where(['idUsuario' => $idUsuario, 'status' => 1])->first();
             if($idBanca != null)
                 $idBanca = $idBanca->id;
             else{
-                $u = Users::whereId($idUsuario)->first();
+                $u = Users::on($servidor)->whereId($idUsuario)->first();
                 //Si el usuario no tiene banca entonces verificamos si tiene permiso para jugar como cualquier banca para retornar el id de la primera banca activa
                 if($u->tienePermiso("Jugar como cualquier banca") == true){
-                    $idBanca = Branches::where(['status' => 1])->first();
+                    $idBanca = Branches::on($servidor)->where(['status' => 1])->first();
                     if($idBanca != null){
                         $idBanca = $idBanca->id;
                     }
@@ -1792,18 +1798,16 @@ class Helper{
     }
 
 
-    public static function indexPost($idUsuario, $idBanca){
-        return DB::select('call indexPost(?, ?)', array($idUsuario, $idBanca));
-
-        
+    public static function indexPost($servidor, $idUsuario, $idBanca){
+        return DB::connection($servidor)->select('call indexPost(?, ?)', array($idUsuario, $idBanca));
     }
 
-    public static function guardarVenta($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas){
-        return DB::select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
+    public static function guardarVenta($servidor, $idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas){
+        return DB::connection($servidor)->select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
     }
 
-    public static function montoDisponibleFuncion($jugada, $idLoteria, $idBanca){
-        return DB::select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
+    public static function montoDisponibleFuncion($servidor, $jugada, $idLoteria, $idBanca){
+        return DB::connection($servidor)->select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
     }
 
     public static function getEquivalenciaDeUnDolar($idBanca){
@@ -1816,6 +1820,7 @@ class Helper{
         }
     }
 
+<<<<<<< HEAD
     public static function tienePermiso($idUsuario, $permiso)
     {
         $u = Users::where(["id" => $idUsuario, "status" => 1])->first();
@@ -1823,6 +1828,35 @@ class Helper{
             return $u->permisos->contains("descripcion", $permiso);
         else
             return false;
+=======
+    public static function jwtDecode($token)
+    {
+        $stdClass = \Firebase\JWT\JWT::decode($token, \config('data.apiKey'), array('HS256'));
+        $datos = Helper::stdClassToArray($stdClass);
+        return $datos;
+    }
+
+    public static function jwtEncodeServidor($servidor, $usuario)
+    {
+        $time = time();
+        $key = \config('data.apiKey');
+
+        $token = array(
+            'iat' => $time, // Tiempo que inició el token
+            'exp' => $time + (60*60), // Tiempo que expirará el token (+1 hora)
+            'data' => [ // información del usuario
+                'usuario' => $usuario,
+                'servidor' => $servidor
+            ]
+        );
+
+        return \Firebase\JWT\JWT::encode($token, $key);
+    }
+
+    public static function stdClassToArray($stdClass)
+    {
+        return json_decode(json_encode($stdClass), true);
+>>>>>>> unirServidores
     }
 
 }

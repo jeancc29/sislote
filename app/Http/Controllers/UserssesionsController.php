@@ -50,7 +50,7 @@ class UserssesionsController extends Controller
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
             }
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Ver inicios de sesion") == true){
                 return redirect()->route('sinpermiso');
             }
@@ -61,17 +61,29 @@ class UserssesionsController extends Controller
 
     public function buscar()
     {
-        $datos = request()->validate([
-            'datos.idUsuario' => 'required',
-            'datos.fecha' => 'required'
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.fecha' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
 
         $fecha = getdate(strtotime($datos['fecha']));
         $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
         $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
         
-        $usuarios = Userssesions::select('idUsuario')->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        $usuarios = Userssesions::on($datos["servidor"])->select('idUsuario')->whereBetween('created_at', array($fechaInicial, $fechaFinal))
         ->groupBy('idUsuario')
         ->get();
 
@@ -79,17 +91,17 @@ class UserssesionsController extends Controller
             return $d->idUsuario;
         });
 
-        $usuarios = Users::whereIn('id', $usuarios)->get();
+        $usuarios = Users::on($datos["servidor"])->whereIn('id', $usuarios)->get();
 
-        $sesiones = collect($usuarios)->map(function($d) use($fechaInicial, $fechaFinal){
+        $sesiones = collect($usuarios)->map(function($d) use($fechaInicial, $fechaFinal, $datos){
            
-            $primerInicioSesionPC = Userssesions::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $primerInicioSesionPC = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                 ->where(['idUsuario' => $d['id'], 'esCelular' => 0])->min('created_at');
-            $ultimoInicioSesionPC = Userssesions::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ultimoInicioSesionPC = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                 ->where(['idUsuario' => $d['id'], 'esCelular' => 0])->max('created_at');
-            $primerInicioSesionCelular = Userssesions::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $primerInicioSesionCelular = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                 ->where(['idUsuario' => $d['id'], 'esCelular' => 1])->min('created_at');
-            $ultimoInicioSesionCelular = Userssesions::whereBetween('created_at', array($fechaInicial, $fechaFinal))
+            $ultimoInicioSesionCelular = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
                 ->where(['idUsuario' => $d['id'], 'esCelular' => 1])->max('created_at');
             
             
@@ -123,7 +135,7 @@ class UserssesionsController extends Controller
                 $ultimoInicioSesionCelular = $fecha . " " . $hora;
             }
 
-           $banca = Branches::where('idUsuario', $d['id'])->first();
+           $banca = Branches::on($datos["servidor"])->where('idUsuario', $d['id'])->first();
            if($banca != null){
                $banca = $banca->descripcion;
            }else{

@@ -65,6 +65,25 @@ class EntityController extends Controller
         }
 
         
+        $datos = request()->validate([
+            // 'fecha' => 'required',
+            // 'idUsuario' => 'required',
+            // 'idMoneda' => 'required',
+            // 'servidor' => 'required',
+            'token' => ''
+        ]);
+
+        try {
+            // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
+            // $datos = json_decode(json_encode($datos), true);
+            $datos = \Helper::jwtDecode($datos["token"]);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
 
         $fechaActual = strtotime(date("d-m-Y H:i:00",time()));
         // $fechaActual = strtotime($fechaActual['mday'] . ' ' . $fechaActual['month'].' '.$fechaActual['year'] . ' ' . time() );
@@ -76,9 +95,9 @@ class EntityController extends Controller
         
     
         return Response::json([
-            'entidades' => EntityResource::collection(Entity::whereIn('status', [1,0])->get()),
-            'tipos' => Types::whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get(),
-            'monedas' => Coins::all()
+            'entidades' => EntityResource::collection(Entity::on($datos["servidor"])->whereIn('status', [1,0])->get())->servidor($datos["servidor"]),
+            'tipos' => Types::on($datos["servidor"])->whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get(),
+            'monedas' => Coins::on($datos["servidor"])->get()
         ], 201);
     }
 
@@ -100,17 +119,27 @@ class EntityController extends Controller
      */
     public function store(Request $request)
     {
-        $datos = request()->validate([
-            'datos.id' => 'required',
-            'datos.nombre' => 'required',
-            'datos.status' => 'required',
-            'datos.idTipo' => 'required',
-            'datos.idMoneda' => '',
+        // $datos = request()->validate([
+        //     'datos.id' => 'required',
+        //     'datos.nombre' => 'required',
+        //     'datos.status' => 'required',
+        //     'datos.idTipo' => 'required',
+        //     'datos.idMoneda' => '',
     
-        ])['datos'];
+        // ])['datos'];
+        $datos = request()['datos'];
+
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
 
 
-        $entidad = Entity::whereId($datos['id'])->first();
+        $entidad = Entity::on($datos["servidor"])->whereId($datos['id'])->first();
 
         if($entidad != null){
             $entidad->nombre = $datos['nombre'];
@@ -119,7 +148,7 @@ class EntityController extends Controller
             $entidad->idMoneda = $datos['idMoneda'];
             $entidad->save();
         }else{
-            Entity::create([
+            Entity::on($datos["servidor"])->create([
                 'nombre' => $datos['nombre'],
                 'status' => $datos['status'],
                 'idTipo' => $datos['idTipo'],
@@ -132,8 +161,8 @@ class EntityController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
-            'entidades' => EntityResource::collection(Entity::whereIn('status', [1,0])->get()),
-            'tipos' => Types::whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
+            'entidades' => EntityResource::collection(Entity::on($datos["servidor"])->whereIn('status', [1,0])->get())->servidor($datos["servidor"]),
+            'tipos' => Types::on($datos["servidor"])->whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
         ], 201);
     }
 
@@ -180,13 +209,23 @@ class EntityController extends Controller
     public function destroy(Entity $entity)
     {
        
-        $datos = request()->validate([
-            'datos.id' => 'required'
+        // $datos = request()->validate([
+        //     'datos.id' => 'required'
     
-        ])['datos'];
+        // ])['datos'];
 
+        $datos = request()['datos'];
 
-        $entidad = Entity::whereId($datos['id'])->first();
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        $entidad = Entity::on($datos["servidor"])->whereId($datos['id'])->first();
 
         if($entidad != null){
             $entidad->status = 2;
@@ -196,8 +235,8 @@ class EntityController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha eliminado correctamente',
-            'entidades' => EntityResource::collection(Entity::whereIn('status', [1,0])->get()),
-            'tipos' => Types::whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
+            'entidades' => EntityResource::collection(Entity::on($datos["servidor"])->whereIn('status', [1,0])->get())->servidor($datos["servidor"]),
+            'tipos' => Types::on($datos["servidor"])->whereRenglon('entidad')->whereIn('descripcion', ['Banco', 'Otros'])->get()
         ], 201);
     }
 }

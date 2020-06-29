@@ -40,19 +40,20 @@ class DeleteStockCommand extends Command
      */
     public function handle()
     {
-        $prueba = new Carbon("2019-01-20 24:10");
+        $servidores = \App\Server::on("mysql")->get();
+        foreach ($servidores as $servi):
+        $servidor = $servi->descripcion;
 
-        $fecha = Carbon::now();
-        
+            $prueba = new Carbon("2019-01-20 24:10");
+            $fecha = Carbon::now();
+            $this->info('Eliminar:stock: ' . $prueba->hour);
 
-        $this->info('Eliminar:stock: ' . $prueba->hour);
 
+            if($fecha->hour != 0)
+                return;
 
-        if($fecha->hour != 0)
-            return;
-
-        Stock::truncate();
+            Stock::on($servidor)->truncate();
        
-       
+        endforeach;
     }
 }
