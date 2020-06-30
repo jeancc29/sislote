@@ -44,7 +44,7 @@ class UsersSeeder extends Seeder
                 'idRole' => \App\Roles::on($servidor)->whereDescripcion("Programador")->first()->id,
                 'usuario' => 'jean',
                 'password' => Crypt::encryptString('111729'),
-            ]);
+                'servidor' => $servidor]);
         }else{
             $usuario->servidor = $servidor;
             $usuario->password = Crypt::encryptString('111729');
@@ -75,7 +75,7 @@ class UsersSeeder extends Seeder
                 'usuario' => 'sistema',
                 'password' => Crypt::encryptString('111729'),
                 'status' => 3,
-                'servidor' => $serv
+                'servidor' => $servidor
             ]);
         }else{
             $usuario->servidor = $servidor;
