@@ -205,6 +205,8 @@ class LoginController extends Controller
                     'errores' => 1,
                     'mensaje' => 'Este usuario no tiene banca asignada'
                 ], 201);
+            }else{
+                $banca = Branches::on($u->servidor)->first();
             }
         }
 
@@ -241,8 +243,8 @@ class LoginController extends Controller
         'mensaje' => '',
         'idUsuario' => $u->id,
         'permisos' => $u->permisos,
-        'banca' => $banca->descripcion,
-        'idBanca' => $banca->id,
+        'banca' => ($banca != null) ? $banca->descripcion : "no tiene",
+        'idBanca' => ($banca != null) ? $banca->id : 0,
         'administrador' => $administrador,
         'usuario' => $u,
         'bancaObject' => new BranchesResourceSmall($banca),
