@@ -85,16 +85,16 @@ class UsersClass{
             if($usuario != null)
             {
                 if($usuario->id != $id->id){
-                    abort(403, 'El correo ya existe, elija uno diferente');
+                    abort(403, 'El correo ya existe, elija uno diferente u=true');
                 }
                 if($servidor == "mysql"){
                     //Si el usuario existe con un servidor diferente eso quiere decir que no se puede usar ese usuario
                     if($this->servidor != $usuario->servidor){
-                        abort(403, 'El usuario ya existe, elija uno diferente');
+                        abort(403, 'El usuario ya existe, elija uno diferente u=true ==mysql');
                     }
                 }
             }else{
-                abort(403, 'El correo ya existe, elija uno diferente');
+                abort(403, 'El correo ya existe, elija uno diferente u= null');
             }
         }
     }
