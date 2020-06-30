@@ -19,7 +19,7 @@ class RolesSeeder extends Seeder
         $servidores = \App\Server::on("mysql")->get();
         
         //Primero se crean los roles en la DB principal
-        $this->crearRoles($servidor);
+        $this->crearRoles("mysql");
         
         //Se crean los roles en la DB de cada cliente
         foreach ($servidores as $ser):
