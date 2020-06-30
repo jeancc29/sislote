@@ -35,7 +35,7 @@ class UsersSeeder extends Seeder
     {
         $usuario = u::on($servidor)->whereUsuario("jean")->get()->first();
         if($usuario == null){
-            $servidorUsuario = ($servidor == "mysql") ? Server::on("mysql")->first()->descripcion : $servidor;
+            $servidorUsuario = ($servidor == "mysql") ? \App\Server::on("mysql")->first()->descripcion : $servidor;
 
             $usuario = u::on($servidor)->create([
                 'nombres' => 'Jean carlos',
@@ -48,7 +48,7 @@ class UsersSeeder extends Seeder
                 'password' => Crypt::encryptString('111729'),
                 'servidor' => $servidorUsuario]);
         }else{
-            $servidorUsuario = ($servidor == "mysql") ? Server::on("mysql")->first()->descripcion : $servidor;
+            $servidorUsuario = ($servidor == "mysql") ? \App\Server::on("mysql")->first()->descripcion : $servidor;
             $usuario->servidor = $servidorUsuario;
             $usuario->password = Crypt::encryptString('111729');
             $usuario->idRole = \App\Roles::on($servidor)->whereDescripcion("Programador")->first()->id;
