@@ -44,12 +44,23 @@ class PermissionSeeder extends Seeder
 
 
         $servidores = \App\Server::on("mysql")->get();
+
+        //Primero creamos los permisos en la DB principal
+        $this->createPermisos("mysql");
+
+
+        //creamos los permisos en la DB de cada cliente
         foreach ($servidores as $ser):
         $servidor = $ser->descripcion;
 
+            $this->createPermisos($servidor);
+
+        endforeach;
+    }
+
+    public function createPermisos($servidor)
+    {
         //Estos idTipo que esta aqui no estan registrado en la table tipos, solo son para manejarlos de manera superficial
-
-
         //Usuarios idTipo == 1
         p::on($servidor)->create([
             'descripcion' => 'Manejar usuarios',
@@ -272,7 +283,5 @@ class PermissionSeeder extends Seeder
 
         p::on($servidor)->create(["descripcion" => "Manejar monedas", "status" => 1, "idTipo" => 9]);
         p::on($servidor)->create(["descripcion" => "Ver Dashboard", "status" => 1, "idTipo" => 6]);
-
-        endforeach;
     }
 }
