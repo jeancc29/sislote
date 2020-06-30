@@ -200,10 +200,12 @@ class LoginController extends Controller
 
         $banca = Branches::on($u->servidor)->where(['idUsuario' => $u->id, 'status' => 1])->first();
         if($banca == null){
-            return Response::json([
-                'errores' => 1,
-                'mensaje' => 'Este usuario no tiene banca asignada'
-            ], 201);
+            if($u->roles->descripcion != "Programador"){
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'Este usuario no tiene banca asignada'
+                ], 201);
+            }
         }
 
         if(!$u->tienePermiso("Acceso al sistema")){
