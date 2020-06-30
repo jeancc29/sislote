@@ -17,9 +17,21 @@ class RolesSeeder extends Seeder
         // ]);
 
         $servidores = \App\Server::on("mysql")->get();
+        
+        //Primero se crean los roles en la DB principal
+        $this->crearRoles($servidor);
+        
+        //Se crean los roles en la DB de cada cliente
         foreach ($servidores as $ser):
         $servidor = $ser->descripcion;
 
+            $this->crearRoles($servidor);
+
+        endforeach;
+    }
+
+    public function crearRoles($servidor)
+    {
         r::on($servidor)->create([
             'descripcion' => 'Administrador',
             'status' => 1
@@ -39,7 +51,5 @@ class RolesSeeder extends Seeder
             'descripcion' => 'Programador',
             'status' => 1
         ]);
-
-        endforeach;
     }
 }
