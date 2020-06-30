@@ -17,6 +17,11 @@ class UsersSeeder extends Seeder
         
 
         $servidores = \App\Server::on("mysql")->get();
+        //Primero creamos o actualizamos, los usuarios jean y sistema en la DB principal
+        $this->createOrUpdateJean("mysql");
+        $this->createOrUpdateSistema("mysql");
+
+        //creamos o actualizamos, los usuarios jean y sistema en las DB correspondientes a cada cliente
         foreach ($servidores as $ser):
             $servidor = $ser->descripcion;
 
