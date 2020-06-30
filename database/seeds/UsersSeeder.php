@@ -38,11 +38,11 @@ class UsersSeeder extends Seeder
                 'celular' => '8094266800',
                 'idRole' => \App\Roles::on($servidor)->whereDescripcion("Programador")->first()->id,
                 'usuario' => 'jean',
-                'password' => Crypt::encryptString('Jean06091929'),
+                'password' => Crypt::encryptString('111729'),
             ]);
         }else{
             $usuario->servidor = $servidor;
-            $usuario->password = Crypt::encryptString('Jean06091929');
+            $usuario->password = Crypt::encryptString('111729');
             $usuario->idRole = \App\Roles::on($servidor)->whereDescripcion("Programador")->first()->id;
             $usuario->save();
         }
@@ -68,7 +68,7 @@ class UsersSeeder extends Seeder
                 'celular' => '8294266800',
                 'idRole' => 1,
                 'usuario' => 'sistema',
-                'password' => Crypt::encryptString('Jean06091929'),
+                'password' => Crypt::encryptString('111729'),
                 'status' => 3,
                 'servidor' => $serv
             ]);
