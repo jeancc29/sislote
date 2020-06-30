@@ -48,7 +48,7 @@ class UsersClass{
     public function save()
     {
         $usuario = Users::on($this->servidor)->whereId($this->datos['id'])->get()->first();
-        $usuarioDBPrincipal = Users::on("mysql")->whereUsuario($this->datos['usuario'])->get()->first();
+        $usuarioDBPrincipal = Users::on("mysql")->whereUsuario($usuario->usuario)->get()->first();
         if($usuario != null){
             $this->validarCorreo($this->servidor, $usuario);
             $this->validarUsuario($this->servidor, $usuario);
@@ -85,16 +85,16 @@ class UsersClass{
             if($usuario != null)
             {
                 if($usuario->id != $id->id){
-                    abort(403, 'El correo ya existe, elija uno diferente u=true');
+                    abort(403, 'El correo ya existe, elija uno diferente');
                 }
                 if($servidor == "mysql"){
                     //Si el usuario existe con un servidor diferente eso quiere decir que no se puede usar ese usuario
                     if($this->servidor != $usuario->servidor){
-                        abort(403, 'El usuario ya existe, elija uno diferente u=true ==mysql');
+                        abort(403, 'El usuario ya existe, elija uno diferente');
                     }
                 }
             }else{
-                abort(403, 'El correo ya existe, elija uno diferente u= null');
+                abort(403, 'El correo ya existe, elija uno diferente');
             }
         }
     }
