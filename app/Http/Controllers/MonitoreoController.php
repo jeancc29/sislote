@@ -139,7 +139,7 @@ class MonitoreoController extends Controller
         
     
 
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on(session("servidor"))->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Monitorear ticket")){
             //Datos['layout'] es un parametro que me indicara si se esta accediendo 
             // desde la ventana principal o desde otra venta, si es de la ventana principal entonces

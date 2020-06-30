@@ -538,7 +538,7 @@ class PrincipalController extends Controller
             'datos.idUsuario' => 'required'
         ])['datos'];
     
-        $usuario = Users::whereId($datos['idUsuario'])->first();
+        $usuario = Users::on(session("servidor"))->whereId($datos['idUsuario'])->first();
         if(!$usuario->tienePermiso("Marcar ticket como pagado")){
             return Response::json([
                 'errores' => 1,
@@ -1333,7 +1333,7 @@ class PrincipalController extends Controller
         $idDia = Days::whereWday($fecha['wday'])->first()->id;
         $banca = Branches::whereId($datos['idBanca'])->first();
     
-        $usuario = Users::whereId($datos['idUsuario'])->whereStatus(1)->first();
+        $usuario = Users::on(session("servidor"))->whereId($datos['idUsuario'])->whereStatus(1)->first();
         if($usuario == null){
             return Response::json([
                 'errores' => 1,

@@ -58,7 +58,7 @@ class BlockslotteriesController extends Controller
                 return redirect()->route('login');
             }
 
-            $u = Users::whereId(session("idUsuario"))->first();
+            $u = Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
             if(!$u->tienePermiso("Manejar reglas") == true){
                 return redirect()->route('sinpermiso');
             }
