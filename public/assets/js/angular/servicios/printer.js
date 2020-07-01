@@ -136,6 +136,51 @@ myApp.service('printerService', function(helperService){
             // }
     }
 
+    this.closeApp = async function(datos){
+        
+		
+        var data = [];
+        data.push("CLOSE_APP");
+        // Crea una nueva conexión.
+        const socket = new WebSocket('ws://localhost:8999');
+
+        // Abre la conexión
+        socket.addEventListener('open', function (event) {
+            console.log("Conectado");
+            data.unshift(localStorage.getItem("impresora"));
+            socket.send(data);
+        });
+
+        // Escucha por mensajes
+        socket.addEventListener('message', function (event) {
+            console.log('Message from server', event.data);
+            if(event.data == true)
+                socket.close();
+        });
+
+        socket.addEventListener('onerror', function (event) {
+            console.log('Error from server', event.data);
+        });
+
+        socket.addEventListener('onclose', function (event) {
+            console.log('Close from server', event.data);
+        });
+
+            // qz.print(config, data).catch(function(e) { console.error(e); });
+            // if(!qz.websocket.isActive())
+            // {
+            //     qz.websocket.connect().then(function() {
+            //     var config = qz.configs.create(localStorage.getItem("impresora"));
+            //     return qz.print(config, data);
+            //     }).catch(function(err) { console.error(err); });
+            // }else{
+            //     // await qz.websocket.disconnect()
+            //     var config = qz.configs.create(localStorage.getItem("impresora"));
+            //     // await qz.websocket.connect(config)
+            //     return qz.print(config, data);
+            // }
+    }
+
     
 
     this.probarImpresora = async function(){
@@ -264,8 +309,9 @@ myApp.service('printerService', function(helperService){
             data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "\n\n");
             }
 
-            data.push(CMD.PAPER.PAPER_FULL_CUT);
-            data.push("\x1b\x69");
+            data.push("CUT_PAPER");
+            // data.push(CMD.PAPER.PAPER_FULL_CUT);
+            // data.push("\x1b\x69");
 
         return data;
     }
@@ -374,8 +420,9 @@ myApp.service('printerService', function(helperService){
             data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "\n\n");
             }
 
-            data.push(CMD.PAPER.PAPER_FULL_CUT);
-            data.push("\x1b\x69");
+            // data.push(CMD.PAPER.PAPER_FULL_CUT);
+            // data.push("\x1b\x69");
+            data.push("CUT_PAPER");
 
         return data;
     }
@@ -416,8 +463,9 @@ myApp.service('printerService', function(helperService){
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "neto: " + String(datos.neto));
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance mas ventas: " + String(datos.balanceActual));
         // data.push("\n\n");
-        data.push(CMD.PAPER.PAPER_FULL_CUT);
-        data.push("\x1b\x69");
+        data.push("CUT_PAPER");
+        // data.push(CMD.PAPER.PAPER_FULL_CUT);
+        // data.push("\x1b\x69");
         console.log("cuadre: ", data);
         
         return data;

@@ -1667,6 +1667,15 @@ if(session('idUsuario') == null && $controlador != 'login'){
                             </div>
                         </div>
 
+                        <div class="row justify-content-center">
+                            <div class="col-2 mt-3">
+                                <p>Detener app</p>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <input id="btnImpresoraDetener" type="submit" class="btn btn-outline-warning" value="Detener version anterior para actualizar">   
+                            </div>
+                        </div>
+
                     <div class="container">
 
                         <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
