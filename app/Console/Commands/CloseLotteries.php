@@ -11,7 +11,7 @@ class CloseLotteries extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'cerrar:loterias';
 
     /**
      * The console command description.
@@ -37,6 +37,11 @@ class CloseLotteries extends Command
      */
     public function handle()
     {
-        //
+        $servidores = \App\Server::on("mysql")->get();
+
+        foreach ($servidores as $ser):
+            $servidor = $ser->descripcion;
+            
+        endforeach;
     }
 }
