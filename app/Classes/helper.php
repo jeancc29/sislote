@@ -282,6 +282,7 @@ class Helper{
             session()->forget('servidores');
             session()->forget('usuario');
             session()->forget('tipoUsuario');
+            session()->forget('socketKey');
             
             redirect()->route('login');
         }

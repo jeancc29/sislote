@@ -133,6 +133,7 @@ class LoginController extends Controller
         session(['idBanca' => $idBanca]);
         session(['permisos' => $u->permisos]);
         session(['tipoUsuario' => $tipoUsuario]);
+        session(['socketKey' => \config("data.socketKey")]);
 
        
       

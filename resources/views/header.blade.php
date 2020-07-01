@@ -70,6 +70,7 @@ if($controlador != "login"){
     window.idUsuario = "<?php echo session('idUsuario') ?>";
     window.idUsuarioGlobal = "<?php echo session('idUsuario') ?>";
     window.apiKeyGlobal = "<?php echo session('apiKey') ?>";
+    window.socketKeyGlobal = "<?php echo session('socketKey') ?>";
     window.servidorGlobal = "<?php echo session('servidor') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
