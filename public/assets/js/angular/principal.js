@@ -124,7 +124,7 @@ myApp
         $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':jwt, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
                  
-                
+                console.log("indexPostBanca: ", response.data.loterias);
                 
 
                 if(response.data.errores == 1){
