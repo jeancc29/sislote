@@ -182,7 +182,7 @@ myApp
             // console.log('helper: ', helperService.empty($scope.datos.selectedBancas));
             // console.log('helper1: ', $scope.datos.selectedBancas);
            
-            
+            connectSocket();
             $scope.datos.idVenta = 0;
             $scope.datos.total = 0;
             $scope.datos.subTotal = 0;
@@ -1703,6 +1703,35 @@ myApp
             return i;
           }
 
+          function connectSocket()
+          {
+              var signedToken = helperService.createJWT({}, socketKeyGlobal);
+              var socket = io.connect('ws://pruebass.ml:3000', {query: 'auth_token='+signedToken +'&room=' + servidorGlobal});
+                socket.on('connect', function(data) {
+                    console.log('se conecto: ' + data);
+                    socket.on("test-channel:App\\Events\\EventName", function(data) {
+                    console.log('seMessage: ' + data);
+                    // socket.emit('join', 'Hello World from client');
+                });
+                    socket.on("realtime-stock:App\\Events\\RealtimeStockEvent", function(data) {
+                    console.log('seMessage: ' + data);
+                    // socket.emit('join', 'Hello World from client');
+                });
+                    socket.emit('join', 'Hello World from client');
+                });
+
+                // Connection failed
+                socket.on('error', function(err) {
+                    throw new Error(err);
+                });
+
+                // Connection succeeded
+                socket.on('success', function(data) {
+                    console.log(data.message);
+                    console.log('user info: ' + data.user);
+                    console.log('logged in: ' + data.user.logged_in)
+                })
+          }
 
     })
 

@@ -257,8 +257,7 @@ myApp.service('helperService', function(){
         return encodedSource;
       }
 
-    this.createJWT = function(data){
-        var key = apiKeyGlobal;
+    this.createJWT = function(data, key = apiKeyGlobal){
         var header = {
         "alg": "HS256",
         "typ": "JWT"

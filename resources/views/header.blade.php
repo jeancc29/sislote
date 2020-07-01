@@ -152,6 +152,7 @@ if($controlador != "login"){
     <?php endif; ?>
     <?php if($controlador == "principal"):?>
         <script src="{{asset('assets/js/angular/principal.js'). '?'.rand(1,50)}}" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <?php endif; ?>
 
     <?php if($controlador == "principal.pruebahttp" ):?>
