@@ -308,7 +308,8 @@ myApp
             $scope.datos.idUsuario = idUsuario;
             $scope.datos.servidor = servidorGlobal;
             $scope.inicializarDatos();
-          $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
+            $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
+            // window.setTimeout(quitarLoteriasCerradas, 1000);
 
         //   $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
           //$scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
@@ -1739,7 +1740,12 @@ myApp
                 var horaCierre = array[index].horaCierre.split(":");
                 var fechaActual = Date.now();
                 var fechaLoteria = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate(), horaCierre[0], horaCierre[1], 0); 
-              });
+                var fechaFinal = Date.now();
+                var seconds = helperService.millisToSeconds(fechaFinal - fechaLoteria.getTime());
+                if(seconds >= 0){
+                    $scope.datos.optionsLoterias.splice(index, 1);
+                }
+            });
           }
 
     })
