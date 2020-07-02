@@ -532,19 +532,33 @@ class PrincipalController extends Controller
 
     public function buscarTicket()
     {
-        $datos = request()->validate([
-            'datos.codigoBarra' => '',
-            'datos.codigoQr' => '',
-            'datos.idUsuario' => 'required'
-        ])['datos'];
-    
-        $usuario = Users::on(session("servidor"))->whereId($datos['idUsuario'])->first();
-        if(!$usuario->tienePermiso("Marcar ticket como pagado")){
+        // $datos = request()->validate([
+        //     'datos.codigoBarra' => '',
+        //     'datos.codigoQr' => '',
+        //     'datos.idUsuario' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+
+            //    return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'Token incorrecto',
+            //     'datos' =>  $codigoBarra,
+            // ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
             return Response::json([
                 'errores' => 1,
-                'mensaje' => 'No tiene permisos para realizar esta accion'
+                'mensaje' => 'Token incorrecto',
             ], 201);
         }
+    
+        $usuario = Users::on($datos["servidor"])->whereId($datos['idUsuario'])->first();
+        
 
         if(isset($datos['codigoBarra'])){
             if(!(new Helper)->isNumber($datos['codigoBarra'])){
@@ -571,17 +585,17 @@ class PrincipalController extends Controller
     
     
         if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
-            $idTicket = Tickets::where('codigoBarra', $datos['codigoBarra'])->value('id');
+            $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
-            $venta = Sales::where('idTicket', $idTicket)->whereNotIn('status', [0,5])->get()->first();
+            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [0,5])->get()->first();
             
             if($venta != null){
                 
                     return Response::json([
                         'errores' => 0,
                         'mensaje' => '',
-                        'venta' =>  new SalesResource($venta)
+                        'venta' =>  (new SalesResource($venta))->servidor($datos["servidor"])
                     ], 201);
     
             }else{
