@@ -444,7 +444,7 @@ myApp.service('printerService', function(helperService){
         }
     }
 
-     this.generateCuadre = function(datos){
+     this.generateCuadreNuevo = function(datos){
         var data = [];
         data.push(CMD.TEXT_FORMAT.TXT_ALIGN_CT);
         console.log("printerService generateCUadre: ", datos);
@@ -470,7 +470,7 @@ myApp.service('printerService', function(helperService){
         
         return data;
       }
-     this.generateCuadreViejo = function(datos){
+     this.generateCuadre = function(datos){
         var data = [];
         data.push(CMD.TEXT_FORMAT.TXT_ALIGN_CT);
         console.log("printerService generateCUadre: ", datos);
