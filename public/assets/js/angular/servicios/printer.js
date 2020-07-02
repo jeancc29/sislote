@@ -464,6 +464,7 @@ myApp.service('printerService', function(helperService){
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Balance mas ventas: " + String(datos.balanceActual));
         // data.push("\n\n");
         data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "\n\n");
+        data = this.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "\n");
         data.push("CUT_PAPER");
         // data.push(CMD.PAPER.PAPER_FULL_CUT);
         // data.push("\x1b\x69");
