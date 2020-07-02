@@ -1733,6 +1733,15 @@ myApp
                 })
           }
 
+          function quitarLoteriasCerradas()
+          {
+              $scope.datos.optionsLoterias.forEach(function(value, index, array){
+                var horaCierre = array[index].horaCierre.split(":");
+                var fechaActual = Date.now();
+                var fechaLoteria = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate(), horaCierre[0], horaCierre[1], 0); 
+              });
+          }
+
     })
 
     var map = {9: false, 16: false};

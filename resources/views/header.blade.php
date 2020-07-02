@@ -74,6 +74,7 @@ if($controlador != "login"){
     window.servidorGlobal = "<?php echo session('servidor') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
+    window.permisosGlobal = "<?php echo session('permisos') ?>";
     window.monedasGlobal = <?php if(isset($monedas)) echo $monedas; else echo 'null'; ?>;
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
     window.bancosGlobal = <?php if(isset($bancos)) echo $bancos; else echo 'null'; ?>;

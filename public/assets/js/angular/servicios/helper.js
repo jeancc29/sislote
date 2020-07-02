@@ -283,6 +283,8 @@ myApp.service('helperService', function(){
         return signedToken;
     }
 
-    
+   this.tienePermiso = function(permiso){
+       return permisosGlobal.findIndex(c => c.descripcion == permiso) != -1;
+   } 
 
 });
