@@ -764,7 +764,7 @@ class PrincipalController extends Controller
             
             
             if($venta != null){
-                if($usuario->roles->descripcion != "Administrador" || $usuario->roles->descripcion != "Programador" && $venta->compartido == 1){
+                if(($usuario->roles->descripcion != "Administrador" && $usuario->roles->descripcion != "Programador") && $venta->compartido == 1){
                     return Response::json([
                         'errores' => 1,
                         'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
@@ -922,7 +922,7 @@ class PrincipalController extends Controller
                 if(($usuario->roles->descripcion != "Administrador" && $usuario->roles->descripcion != "Programador") && $venta->compartido == 1){
                     return Response::json([
                         'errores' => 1,
-                        'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador " . $usuario->roles->descripcion
+                        'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
                     ], 201);
                 }
                 $banca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->first();
