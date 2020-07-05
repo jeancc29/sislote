@@ -126,7 +126,7 @@
                                             ng-blur="monto_disponible(true)"
                                             ng-model="datos.jugada"
                                             ng-keyup="inputJugadaKeyup($event)"
-                                            
+                                            autocomplete="off"
                                             class="form-control h4" 
                                             id="inputJugada" 
                                             type="text" name="text" 

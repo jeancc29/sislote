@@ -125,13 +125,16 @@ class LoginController extends Controller
 
         $rol = $u->roles;
         $tipoUsuario = ($rol != null) ? $rol->descripcion : "Banquero";
+        $permisos = collect($u->permisos);
+        
+        // $permisos = \App\Permissions::on($u->servidor)->whereIn("id", $permisos)->get();
         session(['apiKey' => \config("data.apiKey")]);
         session(['servidor' => $u->servidor]);
         session(['servidores' => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get()]);
         session(['idUsuario' => $u->id]);
         session(['usuario' => $u->usuario]);
         session(['idBanca' => $idBanca]);
-        session(['permisos' => $u->permisos]);
+        session(['permisos' => json_encode($permisos)]);
         session(['tipoUsuario' => $tipoUsuario]);
         session(['socketKey' => \config("data.socketKey")]);
 

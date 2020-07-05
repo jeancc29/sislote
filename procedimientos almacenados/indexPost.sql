@@ -1,4 +1,4 @@
-use loterias;
+use valentin;
 DROP PROCEDURE IF EXISTS `indexPost`;
 delimiter ;;
 CREATE PROCEDURE `indexPost` (IN pidUsuario varchar(30), pidBanca int)
@@ -107,7 +107,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 			then
 				INSERT INTO TempTable(loterias) select JSON_OBJECT(
 					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', 
-                    l.abreviatura, 'horaCierre', dl.horaCierre, 
+                    l.abreviatura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
                     'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
@@ -116,7 +116,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
 				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 
-                'horaCierre', dl.horaCierre,
+                'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
                 'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id

@@ -1315,6 +1315,8 @@ class Helper{
             //Si puede jugar fuera de horario entonces solo nos retornamos las loterias que no tengan premios registrados
             if($usuario->tienePermiso('Jugar fuera de horario') && $retornarSoloAbiertas == false)
                 return Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
+            if($usuario->tienePermiso('Jugar minutos extras'))
+                return $loteria->cerrada(true) &&  Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
             else
                 return $loteria->cerrada() != true &&  Helper::loteriaTienePremiosRegistradosHoy($servidor, $loteria->id) != true;
         });
@@ -1332,8 +1334,11 @@ class Helper{
             ->orderBy('day_lottery.horaCierre', 'asc')
             ->get();
 
-            $loterias = collect($loterias)->map(function($l){
-                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaCierre' => $l['horaCierre']];
+            $loterias = collect($loterias)->map(function($l) use($servidor){
+                $loteria = Lotteries::on($servidor)->whereId($l["idLoteria"])->first();
+                $fecha = getdate();
+                $dia = $loteria->dias()->whereWday($fecha['wday'])->first();
+                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaCierre' => $dia->pivot->horaCierre, 'minutosExtras' => $dia->pivot->minutosExtras];
             });
 
         return $loterias;

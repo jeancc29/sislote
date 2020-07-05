@@ -1,7 +1,7 @@
 
 -- quitar COLLATE utf8mb4_unicode_ci del mysql del servidor linux de digitalocean porque eso no funciona ahi
 
-use loterias;
+use valentin;
 DROP PROCEDURE IF EXISTS `guardarVenta`;
 delimiter ;;
 CREATE PROCEDURE `guardarVenta` (IN pidUsuario varchar(30), idBanca int, idVentaHash varchar(200), compartido int, descuentoMonto int, hayDescuento boolean, total decimal(20, 2), jugadas json)
@@ -625,7 +625,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
      if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and (p.descripcion = 'Jugar fuera de horario' or p.descripcion = 'Jugar minutos extras'))
 			then
 				INSERT INTO TempTable(loterias) select JSON_OBJECT(
-					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre,
+					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
                     'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
@@ -633,7 +633,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
-				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre,
+				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
                 'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id

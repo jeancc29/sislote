@@ -284,6 +284,8 @@ myApp.service('helperService', function(){
     }
 
    this.tienePermiso = function(permiso){
+    //    console.log("helper.js tienePermiso: ", permisosGlobal.find(c => c.descripcion == permiso));
+       
        return permisosGlobal.findIndex(c => c.descripcion == permiso) != -1;
    } 
 
@@ -296,5 +298,9 @@ myApp.service('helperService', function(){
     var seconds = ((millis % 60000) / 1000).toFixed(0);
     return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
   }
+
+  this.addMinutes = function(date, minutes) {
+    return new Date(date.getTime() + minutes*60000);
+}
 
 });
