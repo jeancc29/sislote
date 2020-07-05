@@ -764,7 +764,7 @@ class PrincipalController extends Controller
             
             
             if($venta != null){
-                if($usuario->roles->descripcion != "Administrador" && $venta->compartido == 1){
+                if($usuario->roles->descripcion != "Administrador" || $usuario->roles->descripcion != "Programador" && $venta->compartido == 1){
                     return Response::json([
                         'errores' => 1,
                         'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
@@ -919,7 +919,7 @@ class PrincipalController extends Controller
             
             
             if($venta != null){
-                if($usuario->roles->descripcion != "Administrador" && $venta->compartido == 1){
+                if($usuario->roles->descripcion != "Administrador" || $usuario->roles->descripcion != "Programador" && $venta->compartido == 1){
                     return Response::json([
                         'errores' => 1,
                         'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
