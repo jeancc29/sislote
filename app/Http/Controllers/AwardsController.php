@@ -37,6 +37,8 @@ use App\Http\Resources\UsersResource;
 
 use Illuminate\Support\Facades\Crypt;
 use App\Classes\Helper;
+use \App\Events\LotteriesEvent;
+
 
 class AwardsController extends Controller
 {
@@ -433,6 +435,9 @@ class AwardsController extends Controller
             }
     
         $loterias = AwardsClass::getLoterias($datos["servidor"]);
+        $loterias = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
+        // $loterias = LotteriesSmallResource::collection($loterias);
+        event(new LotteriesEvent($datos["servidor"], $loterias));
 
         return Response::json([
             'errores' => 0,

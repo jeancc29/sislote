@@ -73,12 +73,16 @@ class Lotteries extends Model
     }
 
 
-    public function cerrada(){
+    public function cerrada($calcularHoraCierreMasMinutosExtras = false){
         $cerrado = false;
         $fecha = getdate();
 
         if($this->abreHoy()){
-            $hora = explode(':',$this->dias()->whereWday($fecha['wday'])->first()->pivot->horaCierre);
+            // $hora = explode(':',$this->dias()->whereWday($fecha['wday'])->first()->pivot->horaCierre);
+            $dia = $this->dias()->whereWday($fecha['wday'])->first();
+            $hora = explode(":", $dia->pivot->horaCierre);
+            if($calcularHoraCierreMasMinutosExtras)
+                $hora[1] = (int)$hora[1] + $dia->pivot->minutosExtras; //Sumamos minutos extras a los minutos normales de la hora de cierre
             if((int)$fecha['hours'] > (int)$hora[0])
                 $cerrado = true;
             else if((int)$hora[0] == (int)$fecha['hours']){

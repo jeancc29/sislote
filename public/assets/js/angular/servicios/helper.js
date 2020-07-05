@@ -257,8 +257,7 @@ myApp.service('helperService', function(){
         return encodedSource;
       }
 
-    this.createJWT = function(data){
-        var key = apiKeyGlobal;
+    this.createJWT = function(data, key = apiKeyGlobal){
         var header = {
         "alg": "HS256",
         "typ": "JWT"
@@ -284,6 +283,24 @@ myApp.service('helperService', function(){
         return signedToken;
     }
 
-    
+   this.tienePermiso = function(permiso){
+    //    console.log("helper.js tienePermiso: ", permisosGlobal.find(c => c.descripcion == permiso));
+       
+       return permisosGlobal.findIndex(c => c.descripcion == permiso) != -1;
+   } 
+
+   this.millisToSeconds = function(millis){
+    return ((millis % 60000) / 1000).toFixed(0);
+   }
+
+    this.millisToMinutesAndSeconds = function(millis) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = ((millis % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+  }
+
+  this.addMinutes = function(date, minutes) {
+    return new Date(date.getTime() + minutes*60000);
+}
 
 });

@@ -30,10 +30,12 @@ use App\Commissions;
 use App\Permissions;
 
 use App\Http\Resources\LotteriesResource;
+use App\Http\Resources\LotteriesSmallResource;
 use App\Http\Resources\SalesResource;
 use App\Http\Resources\BranchesResource;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
+use \App\Events\LotteriesEvent;
 
 
 class HorariosController extends Controller
@@ -164,11 +166,12 @@ class HorariosController extends Controller
     
             
     
-    
-         
+        $loterias = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
+        // $loterias = LotteriesSmallResource::collection($loterias);
+        event(new LotteriesEvent($datos["servidor"], $loterias));
         return Response::json([
             'errores' => 0,
-            'mensaje' => "Se ha guardado correctamente"
+            'mensaje' => "Se ha guardado correctamente",
         ], 201);
     }
 

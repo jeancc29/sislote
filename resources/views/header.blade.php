@@ -74,6 +74,7 @@ if($controlador != "login"){
     window.servidorGlobal = "<?php echo session('servidor') ?>";
     window.idBanca = "<?php echo session('idBanca') ?>";
     window.idBancaGlobal = "<?php echo session('idBanca') ?>";
+    window.permisosGlobal = <?php echo session('permisos') ?>;
     window.monedasGlobal = <?php if(isset($monedas)) echo $monedas; else echo 'null'; ?>;
     window.bancasGlobal = <?php if(isset($bancas)) echo $bancas; else echo 'null'; ?>;
     window.bancosGlobal = <?php if(isset($bancos)) echo $bancos; else echo 'null'; ?>;
@@ -152,6 +153,7 @@ if($controlador != "login"){
     <?php endif; ?>
     <?php if($controlador == "principal"):?>
         <script src="{{asset('assets/js/angular/principal.js'). '?'.rand(1,50)}}" ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <?php endif; ?>
 
     <?php if($controlador == "principal.pruebahttp" ):?>

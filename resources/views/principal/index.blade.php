@@ -126,7 +126,7 @@
                                             ng-blur="monto_disponible(true)"
                                             ng-model="datos.jugada"
                                             ng-keyup="inputJugadaKeyup($event)"
-                                            
+                                            autocomplete="off"
                                             class="form-control h4" 
                                             id="inputJugada" 
                                             type="text" name="text" 
@@ -1817,14 +1817,7 @@
 <script src="{{asset('assets/js/core/bootstrap-material-design.min.js')}}" type="text/javascript"></script>
 
 <script src="{{asset('assets/js/plugins/perfect-scrollbar.jquery.min.js')}}" ></script>
-<script>
-    const ps = new
-        PerfectScrollbar('body', {
-        wheelSpeed: 2,
-        wheelPropagation: true,
-        minScrollbarLength: 20
-        });
-</script>
+
 
 
 <!-- Plugin for the momentJs  -->

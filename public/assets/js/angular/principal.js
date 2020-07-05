@@ -116,7 +116,7 @@ myApp
     $scope.bancasChanged = function(klk){
         // console.log('bancasChanged:', $scope.datos.optionsBancas);
         $scope.datos.selectedBancas = $scope.datos.optionsBancas.find(x => x.id == klk.id);
-        console.log('Bancas changed:', $scope.datos.selectedBancas);
+        // console.log('Bancas changed:', $scope.datos.selectedBancas);
         $scope.datos.idBanca = $scope.datos.selectedBancas.id;
 
 
@@ -143,7 +143,7 @@ myApp
                 $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
                 $scope.datos.idBanca = response.data.idBanca;
 
-                console.log('idBanca:', response.data );
+                // console.log('idBanca:', response.data );
 
                 $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
                 $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
@@ -182,7 +182,7 @@ myApp
             // console.log('helper: ', helperService.empty($scope.datos.selectedBancas));
             // console.log('helper1: ', $scope.datos.selectedBancas);
            
-            
+            connectSocket();
             $scope.datos.idVenta = 0;
             $scope.datos.total = 0;
             $scope.datos.subTotal = 0;
@@ -245,7 +245,7 @@ myApp
                 $http.post(rutaGlobal+"/api/principal/indexPost", {'datos':jwt, 'action':'sp_jugadas_obtener_montoDisponible'})
              .then(function(response){
                 
-                console.log(response.data);
+                // console.log(response.data);
                 
                 if(response.data.errores == 1){
                     alert('Error: ' + response.data.mensaje);
@@ -263,7 +263,7 @@ myApp
                 $scope.datos.selectedBancas = $scope.datos.optionsBancas[helperService.retornarIndexPorId($scope.datos.selectedBancas, $scope.datos.optionsBancas, response.data.idBanca)];
                 $scope.datos.idBanca = response.data.idBanca;
 
-                console.log('idBanca:', response.data );
+                // console.log('idBanca:', response.data );
 
                 $scope.datos.optionsVentas = (response.data.ventas != undefined) ? response.data.ventas : [{'id': 1, 'codigoBarra' : 'No hay ventas'}];
                 $scope.datos.selectedVentas = $scope.datos.optionsVentas[0];
@@ -308,7 +308,8 @@ myApp
             $scope.datos.idUsuario = idUsuario;
             $scope.datos.servidor = servidorGlobal;
             $scope.inicializarDatos();
-          $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
+            $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
+            window.setInterval(quitarLoteriasCerradas, 1000);
 
         //   $scope.datos.idUsuario = idUsuario; //parseInt(codigo_usuario);
           //$scope.datos.idBanca = idBanca; //parseInt(codigo_usuario);
@@ -484,7 +485,7 @@ myApp
                     var jwt = helperService.createJWT($scope.datos.montoDisponible);
                     $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':jwt, 'action':'sp_jugadas_obtener_montoDisponible'})
                     .then(function(response){
-                          console.log(response);
+                        //   console.log(response);
                         
                         var indexJugada = $scope.datos.jugadas.findIndex(indexOfLoteriaYJugadaActual);
                         if(indexJugada != -1){
@@ -652,7 +653,7 @@ myApp
                 $scope.jugada = null;
 
                 $scope.calcularTotal();
-                console.log('jugada_insertar:',$scope.datos.jugadas);
+                // console.log('jugada_insertar:',$scope.datos.jugadas);
                 } // END IF PRINCIPAL
             
             
@@ -969,7 +970,7 @@ myApp
                 $http.post(rutaGlobal+"/api/principal/guardar",{'datos':jwt, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 
-                    console.log('Principal.js venta_guardar : ', response.data);
+                    // console.log('Principal.js venta_guardar : ', response.data);
  
                     if(response.data.errores == 0)
                         {
@@ -1070,7 +1071,7 @@ myApp
           var jwt = helperService.createJWT($scope.datos.monitoreo);
           $http.post(rutaGlobal+"/api/reportes/monitoreo", {'action':'sp_ventas_buscar', 'datos': jwt})
              .then(function(response){
-                console.log('monitoreo ',response);
+                // console.log('monitoreo ',response);
                 if(response.data.errores == 0){
                     $scope.datos.monitoreo.ventas = response.data.monitoreo;
 
@@ -1178,7 +1179,7 @@ myApp
             var jwt = helperService.createJWT($scope.datos.duplicar);
             $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': jwt})
              .then(function(response){
-                console.log(response.data);
+                // console.log(response.data);
                
                 if(response.data.errores == 1){
                     alert(response.data.mensaje);
@@ -1273,7 +1274,7 @@ myApp
             $http.post(rutaGlobal+"/api/principal/duplicar", {'action':'sp_ventas_obtenerpor_numeroticket', 'datos': jwt})
              .then(function(response){
 
-               console.log(response.data);
+            //    console.log(response.data);
                
                 if(response.data.errores == 0){
                     $('#modal-duplicar').modal('toggle');
@@ -1362,7 +1363,7 @@ myApp
             $scope.datos.duplicar.jugadas = [];
             $scope.calcularTotal();
             $('#modal-duplicar-avanzado').modal('toggle');
-            console.log('duplicarInsertar:', $scope.datos.jugadas);
+            // console.log('duplicarInsertar:', $scope.datos.jugadas);
         }
 
         $scope.buscar_jugadas = function(){
@@ -1432,7 +1433,7 @@ myApp
                     return;
                 }else if(response.data.errores == 0){
                     $scope.datos.pagar.codigoBarra = null;
-                    console.log("pagar ticket: ", response.data);
+                    // console.log("pagar ticket: ", response.data);
                     if(tieneJugadasPendientes(response.data.venta))
                         printerService.printTicket(response.data.venta, CMD.TICKET_PAGADO);
                     alert(response.data.mensaje);
@@ -1445,15 +1446,15 @@ myApp
         var tieneJugadasPendientes = function(venta){
             var tienePendientes = false;
             for(var c=0; c < venta.jugadas.length; c++){
-                console.log("tieneJugadasPendientes j: ", venta.jugadas[c]);
-                console.log("tieneJugadasPendientes js: ", venta.jugadas[c].status);
+                // console.log("tieneJugadasPendientes j: ", venta.jugadas[c]);
+                // console.log("tieneJugadasPendientes js: ", venta.jugadas[c].status);
                 
                 if(venta.jugadas[c].status == 0){
                     tienePendientes = true;
                     break;
                 }
             }
-            console.log("tieneJugadasPendientes: ", tienePendientes);
+            // console.log("tieneJugadasPendientes: ", tienePendientes);
             
             return tienePendientes;
         }
@@ -1472,12 +1473,13 @@ myApp
             $scope.datos.ventasReporte.layout = 'Principal';
           
             $scope.datos.ventasReporte.servidor = $scope.datos.servidor;
+            $scope.datos.ventasReporte.idBanca = $scope.datos.selectedBancas.id;
 
           var jwt = helperService.createJWT($scope.datos.ventasReporte);
           $http.post(rutaGlobal+"/api/reportes/ventas", {'action':'sp_reporteVentas_buscar', 'datos': jwt})
              .then(function(response){
 
-                console.log('ventasReporte_buscar: ', response.datos);
+                // console.log('ventasReporte_buscar: ', response.datos);
 
                 if(response.data.errores == 0){
                     $scope.datos.ventasReporte.loterias =response.data.loterias;
@@ -1669,7 +1671,7 @@ myApp
         }
 
         $scope.keyPressGuardarVenta = function(event){
-            console.log("keyPressGuardarVenta evento: ", event.keyCode);
+            // console.log("keyPressGuardarVenta evento: ", event.keyCode);
             if(helperService.empty(String(event.keyCode), "string") == false){
                 if(event.keyCode == 42){
                     quitarAsteriscoInputJugada();
@@ -1703,6 +1705,131 @@ myApp
             return i;
           }
 
+          function connectSocket()
+          {
+              var signedToken = helperService.createJWT({}, socketKeyGlobal);
+            //   var socket = io.connect('ws://pruebass.ml:3000', {query: 'auth_token='+signedToken +'&room=' + servidorGlobal});
+              var socket = io.connect('ws://loteriasdo.gq:3000', {query: 'auth_token='+signedToken +'&room=' + servidorGlobal});
+                socket.on('connect', function(data) {
+                    // console.log('se conecto: ' + data);
+                    socket.on("test-channel:App\\Events\\EventName", function(data) {
+                        // console.log('seMessage: ' + data);
+                        // socket.emit('join', 'Hello World from client');
+                    });
+                    socket.on("realtime-stock:App\\Events\\RealtimeStockEvent", function(data) {
+                        // console.log('seMessage: ' + data);
+                        // socket.emit('join', 'Hello World from client');
+                    });
+                    socket.on("lotteries:App\\Events\\LotteriesEvent", function(data) {
+                        // console.log('seMessage: ' + data);
+                        // console.log('seMessage: ' + JSON.stringify(data));
+                        if(!helperService.empty(data, "object")){
+                            if(!helperService.empty(data.lotteries, "object")){
+                                $scope.datos.optionsLoterias = data.lotteries;
+                                $timeout(function() {
+                                    // anything you want can go here and will safely be run on the next digest.
+                                    //$('#multiselect').selectpicker('val', []);
+                                    $scope.seleccionarPrimeraLoteria();
+                                    $('#multiselect').selectpicker("refresh");
+                                    $('.selectpicker').selectpicker("refresh");
+                                    //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+                                })
+                            }
+                        }
+                        // console.log('seMessage: ' + data.lotteries[0].descripcion);
+                        // socket.emit('join', 'Hello World from client');
+                    });
+                    socket.emit('join', 'Hello World from client');
+                });
+
+                // Connection failed
+                socket.on('error', function(err) {
+                    throw new Error(err);
+                });
+
+                // Connection succeeded
+                socket.on('success', function(data) {
+                    // console.log(data.message);
+                    // console.log('user info: ' + data.user);
+                    // console.log('logged in: ' + data.user.logged_in)
+                })
+          }
+
+          function quitarLoteriasCerradas()
+          {
+            //   console.log("Dentro quitarLoterias");
+              
+              $scope.datos.optionsLoterias.forEach(function(value, index, array){
+                
+                var stringFechaActualRd = new Date().toLocaleString("es-ES", {timeZone: 'America/Santo_Domingo'});
+                var stringFechaActualRdArray = stringFechaActualRd.split(" ");
+                var fecha = stringFechaActualRdArray[0].split("/");
+                var fechaLoteria = new Date(fecha[2] + "/" + fecha[1] + "/" + fecha[0] + " " + array[index].horaCierre); 
+                var fechaFinalRd = new Date(new Date().toLocaleString("en-US", {timeZone: 'America/Santo_Domingo'}));
+                var milliSeconds = fechaFinalRd.getTime() - fechaLoteria.getTime(); //Resta de milisegundos
+                // console.log("fechaFinal: ", fechaLoteria);
+                if(milliSeconds >= 0){
+                   if(!helperService.tienePermiso("Jugar fuera de horario")) 
+                   {
+                        if(helperService.tienePermiso("Jugar minutos extras")) 
+                        {
+                            var minutosExtras = (!helperService.empty(array[index].minutosExtras, "string")) ? parseInt(array[index].minutosExtras) : 0;
+                            var fechaLoteriaMasMinutosExtras = helperService.addMinutes(fechaLoteria, minutosExtras);
+                            milliSeconds = fechaFinalRd.getTime() - fechaLoteriaMasMinutosExtras.getTime(); //Resta de milisegundos
+                            if(milliSeconds >= 0)
+                                cerrarLoteria(index);
+
+                        }else{
+                            cerrarLoteria(index);
+                        }
+                        // console.log("milliSeconds: ", milliSeconds, " hour: ", horaCierre, " fechaLoteria:", fechaLoteria);
+                   }
+                }
+            });
+          }
+
+          function quitarLoteriasCerradasViejo()
+          {
+            //   console.log("Dentro quitarLoterias");
+              
+              $scope.datos.optionsLoterias.forEach(function(value, index, array){
+                var horaCierre = array[index].horaCierre.split(":");
+                var fechaActual = new Date();
+                var fechaLoteria = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), fechaActual.getDate(), horaCierre[0], horaCierre[1], 0); 
+                var fechaFinal = new Date();
+                var milliSeconds = fechaFinal.getTime() - fechaLoteria.getTime(); //Resta de milisegundos
+                
+                if(milliSeconds >= 0){
+                   if(!helperService.tienePermiso("Jugar fuera de horario")) 
+                   {
+                        if(helperService.tienePermiso("Jugar minutos extras")) 
+                        {
+                            var minutosExtras = (helperService.empty(array[index].minutosExtras, "string")) ? 0 : parseInt(array[index].minutosExtras);
+                            var fechaLoteriaMasMinutosExtras = helperService.addMinutes(fechaLoteria, minutosExtras);
+                            milliSeconds = fechaFinal.getTime() - fechaLoteriaMasMinutosExtras.getTime(); //Resta de milisegundos
+                            if(milliSeconds >= 0)
+                                cerrarLoteria(index);
+
+                        }else{
+                            cerrarLoteria(index);
+                        }
+                        // console.log("milliSeconds: ", milliSeconds, " hour: ", horaCierre, " fechaLoteria:", fechaLoteria);
+                   }
+                }
+            });
+          }
+
+          function cerrarLoteria(index){
+            $scope.datos.optionsLoterias.splice(index, 1);
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                //$('#multiselect').selectpicker('val', []);
+                $scope.seleccionarPrimeraLoteria();
+                $('#multiselect').selectpicker("refresh");
+                $('.selectpicker').selectpicker("refresh");
+                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+            })
+          }
 
     })
 
