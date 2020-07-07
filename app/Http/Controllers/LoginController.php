@@ -145,7 +145,7 @@ class LoginController extends Controller
            'esCelular' => false
        ]);
        $role = Roles::on($u->servidor)->whereId($u->idRole)->first();
-       if($role->descripcion == "Administrador" || $role->descripcion == "Supervisor")
+       if(Helper::tienePermiso($u->id, "Ver Dashboard"))
             return redirect()->route('dashboard');
         else
             return redirect()->route('principal');
