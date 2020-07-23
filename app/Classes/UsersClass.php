@@ -48,7 +48,11 @@ class UsersClass{
     public function save()
     {
         $usuario = Users::on($this->servidor)->whereId($this->datos['id'])->get()->first();
-        $usuarioDBPrincipal = Users::on("mysql")->whereUsuario($usuario->usuario)->get()->first();
+        if($usuario != null)
+            $usuarioDBPrincipal = Users::on("mysql")->whereUsuario($usuario->usuario)->get()->first();
+        else
+            $usuarioDBPrincipal = null;
+
         if($usuario != null){
             $this->validarCorreo($this->servidor, $usuario);
             $this->validarUsuario($this->servidor, $usuario);
