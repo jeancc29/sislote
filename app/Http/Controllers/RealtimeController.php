@@ -176,11 +176,11 @@ class RealtimeController extends Controller
             // ]);
         }
 
-            $fecha = getdate();
-  
-       
-            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
-            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        $fecha = getdate();
+
+    
+        $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
         
 
         $maxId = Realtime::on($datos["servidor"])->max('id');

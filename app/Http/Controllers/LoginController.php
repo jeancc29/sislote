@@ -241,6 +241,8 @@ class LoginController extends Controller
             $administrador = false;
 
         $h = array('email' => $u->usuario, 'password' => $datos['password']);
+
+        $realtime = App\Classes\RealtimeClass::todos($u->servidor);
       
        return Response::json([
         'errores' => 0,
@@ -254,7 +256,8 @@ class LoginController extends Controller
         'bancaObject' => new BranchesResourceSmall($banca),
         "apiKey" => \config("data.apiKey"),
         "tipoUsuario" => $tipoUsuario,
-        "servidores" => \App\Server::on("mysql")->get()
+        "servidores" => \App\Server::on("mysql")->get(),
+        "realtime" => $realtime
     ], 201);
     }
 
