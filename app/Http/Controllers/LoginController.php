@@ -242,7 +242,7 @@ class LoginController extends Controller
 
         $h = array('email' => $u->usuario, 'password' => $datos['password']);
 
-        $realtime = App\Classes\RealtimeClass::todos($u->servidor);
+        $realtime = \App\Classes\RealtimeClass::todos($u->servidor);
       
        return Response::json([
         'errores' => 0,
