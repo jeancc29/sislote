@@ -1685,7 +1685,7 @@ class PrincipalController extends Controller
         }
        
 
-    $bloqueo = (new Helper)->montoDisponibleFuncion($datos['servidor'], $datos['jugada'], $datos['idLoteria'], $datos['idBanca']);
+    $bloqueo = (new Helper)->montoDisponibleFuncion($datos['servidor'], $datos['jugada'], $datos['idLoteria'], $datos['idBanca'], $datos['idLoteriaSuperpale']);
     
        
     

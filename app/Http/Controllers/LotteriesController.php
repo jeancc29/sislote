@@ -151,12 +151,12 @@ class LotteriesController extends Controller
                 $es_superpale = true;
         }
 
-        if($es_superpale == true && count($sorteoCollection) > 1){
-            return Response::json([
-                'errores' => 1,
-                'mensaje' => 'Cuando el sorteo Super pale esta seleccionado no se permiten mas sorteos'
-            ], 201);
-        }
+        // if($es_superpale == true && count($sorteoCollection) > 1){
+        //     return Response::json([
+        //         'errores' => 1,
+        //         'mensaje' => 'Cuando el sorteo Super pale esta seleccionado no se permiten mas sorteos'
+        //     ], 201);
+        // }
     
         $errores = 0;
         $mensaje = '';

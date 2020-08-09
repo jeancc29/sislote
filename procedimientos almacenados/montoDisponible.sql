@@ -91,11 +91,10 @@ BEGIN
                 
                 -- MONTO DISPONIBLE NUEVO
                 
-               -- Debo ordenar de menor a mayor los idloteria y idloteriaSuperpale, 
-               -- el idLoteria tendra el numero menor y el idLoteriaSuper tendra el numero mayor
+               
                
 			
-            if(sorteo = 'Super pale')
+            if(sorteo != 'Super pale')
             then
                 select s.monto from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = idLoteria and s.jugada = jugada COLLATE utf8mb4_unicode_ci and s.idSorteo = idSorteo and s.esGeneral = 0 and s.idMoneda = idMoneda into montoDisponible;
                 if montoDisponible is not null then
@@ -166,6 +165,10 @@ BEGIN
                 end if;
 			else
 				-- MONTO SUPER PALE
+                -- Debo ordenar de menor a mayor los idloteria y idloteriaSuperpale, 
+               -- el idLoteria tendra el numero menor y el idLoteriaSuper tendra el numero mayor
+               
+               
 				select s.monto from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = idLoteria and s.idLoteriaSuperpale = idLoteriaSuperpale and s.jugada = jugada COLLATE utf8mb4_unicode_ci and s.idSorteo = idSorteo and s.esGeneral = 0 and s.idMoneda = idMoneda into montoDisponible;
                 if montoDisponible is not null then
 					if exists(select s.monto from stocks s where date(s.created_at) = date(now()) and s.idLoteria = idLoteria and s.idLoteriaSuperpale = idLoteriaSuperpale and s.jugada = jugada COLLATE utf8mb4_unicode_ci and s.idSorteo = idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1 and s.idMoneda = idMoneda)

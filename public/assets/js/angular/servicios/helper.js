@@ -303,4 +303,8 @@ myApp.service('helperService', function(){
     return new Date(date.getTime() + minutes*60000);
 }
 
+this.esSuperpale = function(jugada) {
+    return (jugada.length == 5 && jugada.substr(jugada.length - 1) == "s");
+}
+
 });

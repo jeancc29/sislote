@@ -198,11 +198,17 @@
                       
                       <div ng-repeat="d in datos.ckbSorteos" class="form-check form-check-inline">
                         <label class="form-check-label">
-                          <input 
+                          <!-- <input 
                             ng-disabled="superPaleEstaSeleccionado() && d.descripcion != 'Super pale'" 
                             ng-model="d.existe" 
                             ng-change="ckbSorteos_changed(ckbDias, d)" 
-                            class="form-check-input" type="checkbox" value=""> @{{d.descripcion}}
+                            class="form-check-input" type="checkbox" value="">  -->
+                            <input 
+                            
+                            ng-model="d.existe" 
+                            ng-change="ckbSorteos_changed(ckbDias, d)" 
+                            class="form-check-input" type="checkbox" value="">
+                            @{{d.descripcion}}
                           <span class="form-check-sign">
                             <span class="check"></span>
                           </span>

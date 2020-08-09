@@ -330,10 +330,10 @@ myApp
                 alert("El abreviatura no debe estar vacio");
                 return;
             }
-            if(Object.keys($scope.datos.sorteos).length == 0){
-                alert("Debe seleccionar los sorteos perteneciente a esta loteria");
-                return;
-            }
+            // if(Object.keys($scope.datos.sorteos).length == 0){
+            //     alert("Debe seleccionar los sorteos perteneciente a esta loteria");
+            //     return;
+            // }
             
             console.log('actualizar count:', $scope.loteriasSeleccionadasCount());
             if($scope.superPaleEstaSeleccionado()){
@@ -554,16 +554,16 @@ myApp
                     }
                 });
             }else{
-                $scope.datos.sorteos = [];
-                $scope.datos.ckbSorteos.forEach(function(valor, indice, array){
-                    if(excepto != null){
-                        if(array[indice].descripcion != excepto){
-                            array[indice].existe = false;
-                        }
-                    }else{
-                        array[indice].existe = false;
-                    }
-                });
+                // $scope.datos.sorteos = [];
+                // $scope.datos.ckbSorteos.forEach(function(valor, indice, array){
+                //     if(excepto != null){
+                //         if(array[indice].descripcion != excepto){
+                //             array[indice].existe = false;
+                //         }
+                //     }else{
+                //         array[indice].existe = false;
+                //     }
+                // });
             }
         }
 

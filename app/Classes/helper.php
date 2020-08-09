@@ -1812,8 +1812,8 @@ class Helper{
         return DB::connection($servidor)->select('call guardarVenta(?, ?, ?, ?, ?, ?, ?, ?)', array($idUsuario, $idBanca, $idVentaHash, $compartido, $descuentoMonto, $hayDescuento, $total, $jugadas));
     }
 
-    public static function montoDisponibleFuncion($servidor, $jugada, $idLoteria, $idBanca){
-        return DB::connection($servidor)->select('select montoDisponible(?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca));    
+    public static function montoDisponibleFuncion($servidor, $jugada, $idLoteria, $idBanca, $idLoteriaSuperpale){
+        return DB::connection($servidor)->select('select montoDisponible(?, ?, ?, ?) as monto', array($jugada, $idLoteria, $idBanca, $idLoteriaSuperpale));    
     }
 
     public static function getEquivalenciaDeUnDolar($idBanca){

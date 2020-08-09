@@ -444,16 +444,20 @@ myApp
                         return;
                     }
                     
-                    if(Object.keys($scope.datos.loterias).length > 1){
+                    if(Object.keys($scope.datos.loterias).length > 1 && helperService.esSuperpale($scope.datos.jugada) == false){
                         $scope.datos.montoExistente = 'X';
                         $('#inputMonto').focus();
                         $('#inputMonto').select();
                         return;
                     }
+
+                    
+                    
                     
                     $scope.datos.jugada = $scope.datos.jugada;
                     $scope.datos.idLoteria = $scope.datos.loterias[0].id;
                     $scope.datos.idBanca = $scope.datos.selectedBancas.id;
+                    
                     $('#inputMonto').focus();
                     $('#inputMonto').select();
 
@@ -473,6 +477,24 @@ myApp
                     $scope.datos.montoDisponible.idLoteria = $scope.datos.idLoteria;
                     $scope.datos.montoDisponible.idBanca = $scope.datos.idBanca;
                     $scope.datos.montoDisponible.servidor = $scope.datos.servidor;
+
+                    if(helperService.esSuperpale($scope.datos.jugada)){
+                        if($scope.datos.loterias.length != 2){
+                            alert("Debes seleccionar dos loterias");
+                            return;
+                        }
+
+                        //Ordeno de menor a mayor las variables idLoteria y idLoteriaSuperpale
+                        //La variable idLoteria tendra el valor menor y la variable idLoteriaSuperpale el valor mayor
+                        if($scope.datos.loterias[0].id > $scope.datos.loterias[1].id){
+                            $scope.datos.montoDisponible.idLoteria = $scope.datos.loterias[1].id;
+                            $scope.datos.montoDisponible.idLoteriaSuperpale = $scope.datos.loterias[0].id;
+                        }else{
+                            $scope.datos.montoDisponible.idLoteriaSuperpale = $scope.datos.loterias[1].id;
+                        }
+                    }else{
+                        $scope.datos.montoDisponible.idLoteriaSuperpale = null;
+                    }
                    
                     // $http.post(rutaGlobal+"/api/principal/montodisponible",{'datos':$scope.datos, 'action':'sp_jugadas_obtener_montoDisponible'})
                     //   .then(function(response){
@@ -857,7 +879,7 @@ myApp
 
             
             
-            if(($scope.datos.jugada != null && evento.keyCode == 13) || ($scope.datos.jugada != null && evento.key == '+') || ($scope.datos.jugada != null && evento.key == '-')){
+            if(($scope.datos.jugada != null && evento.keyCode == 13) || ($scope.datos.jugada != null && evento.key == '+') || ($scope.datos.jugada != null && evento.key == '-') || ($scope.datos.jugada != null && evento.key == 's')){
                 // console.log('inputJugadaKeyup: ', $scope.datos.jugada.length);
                 $scope.monto_disponible();
             }
