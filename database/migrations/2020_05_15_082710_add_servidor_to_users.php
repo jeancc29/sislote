@@ -14,7 +14,7 @@ class AddServidorToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string("servidor");
+            // $table->string("servidor");
         });
     }
 
@@ -26,7 +26,7 @@ class AddServidorToUsers extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('servidor');
+            // $table->dropColumn('servidor');
         });
     }
 }

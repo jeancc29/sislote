@@ -166,6 +166,8 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 	while @contadorJugadas < JSON_LENGTH(jugadas) do
 		 set @idLoteriaJugada = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteria'));
          set @idLoteriaJugada = JSON_UNQUOTE(@idLoteriaJugada);
+         set @idLoteriaSuperpale = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteriaSuperpale'));
+         set @idLoteriaSuperpale = JSON_UNQUOTE(@idLoteriaSuperpale);
 		 if @idLoteria = @idLoteriaJugada
 			then
 				if exists(select id from awards where idLoteria = @idLoteria and date(created_at) = date(now()) )
@@ -186,19 +188,22 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					if instr(@jugada, '+') = 4 then
 						select id from draws where descripcion = 'Pick 3 Box' into @idSorteo;
 					else 
+						set @idSorteo = 2;
 						-- Validamos de que la loteria tenga el sorteo super pale y que el drawsrealations sea mayor que 1
-						if exists(select d.id from draws d inner join draw_lottery dl on dl.idSorteo = d.id where dl.idLoteria = @idLoteria and d.descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci) and (select count(id) from drawsrelations where idLoteriaPertenece = @idLoteria) > 1
-                        then
-							set @idSorteo = 4;
-						else
-							set @idSorteo = 2;
-						end if;
+						-- if exists(select d.id from draws d inner join draw_lottery dl on dl.idSorteo = d.id where dl.idLoteria = @idLoteria and d.descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci) and (select count(id) from drawsrelations where idLoteriaPertenece = @idLoteria) > 1
+                        -- then
+							-- set @idSorteo = 4;
+						-- else
+							-- set @idSorteo = 2;
+						-- end if;
 					end if;
 				elseif length(@jugada) = 5 then
 					if instr(@jugada, '+') = 5 then
 						select id from draws where descripcion = 'Pick 4 Box' into @idSorteo;
 					elseif instr(@jugada, '-') = 5 then
 						select id from draws where descripcion = 'Pick 4 Straight' into @idSorteo;
+					elseif instr(@jugada, 's') = 5 then
+						select id from draws where descripcion = 'Super pale' into @idSorteo;
 					end if;
 				elseif length(@jugada) = 6 then
 					set @idSorteo = 3;
@@ -247,12 +252,19 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 			
 			-- VERIFICAMOS SI EL SORTEO PERTENECE A ESTA LOTERIA
 				if not exists (select d.id from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = @idLoteria and dl.idSorteo = @idSorteo)
-				then
+					then
 					set @errores = 1;
 					select 1 as errores, concat('El sorteo no existe para la loteria ' , (select descripcion from lotteries where id = @idLoteria)) as mensaje; 
 					-- select 1 as errores, 'El sorteo no existe para la loteria es incorrecto' as mensaje, @idSorteo, JSON_UNQUOTE(@idLoteria); 
 					-- select d.id as existe from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = JSON_UNQUOTE(@idLoteria) and dl.idSorteo = @idSorteo;
-				end if;
+				-- VERIFICAMOS SI EL SORTEO PERTENECE A la LOTERIA SUPER PALE
+                elseif @idSorteo = 4 then
+					if not exists (select d.id from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = @idLoteriaSuperpale and dl.idSorteo = @idSorteo)
+					then
+						set @errores = 1;
+						select 1 as errores, concat('El sorteo no existe para la loteria ' , (select descripcion from lotteries where id = @idLoteria)) as mensaje; 
+					end if;
+                end if;
 			-- END sorteoEXISTE
 			
 			-- VERIFICAMOS SI LA LOTERIA ABRE HOY Y QUE ESTE ABIERTA
@@ -290,9 +302,9 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 			
 		   
 			-- GET MONTO DISPONIBLE
-            set @montoDisponible = (select montoDisponible(@jugada, @idLoteria, idBanca));
+            set @montoDisponible = (select montoDisponible(@jugada, @idLoteria, idBanca, @idLoteriaSuperpale));
 			-- quitarUltimoCaracter
-			if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
+			if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' || @sorteo = 'Super pale' 
 				then
 					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
 				end if;
@@ -334,6 +346,8 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 	while @contadorJugadas < JSON_LENGTH(jugadas) do
 		 set @idLoteriaJugada = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteria'));
          set @idLoteriaJugada = JSON_UNQUOTE(@idLoteriaJugada);
+         set @idLoteriaSuperpale = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteriaSuperpale'));
+         set @idLoteriaSuperpale = JSON_UNQUOTE(@idLoteriaSuperpale);
 		 if @idLoteria = @idLoteriaJugada
 			then
 				
@@ -355,20 +369,24 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 						select id, descripcion  from draws where descripcion = 'Pick 3 Box' COLLATE utf8mb4_unicode_ci into @idSorteo, @sorteo;
 					else 
 						-- Validamos de que la loteria tenga el sorteo super pale y que el drawsrealations sea mayor que 1
-						if exists(select d.id from draws d inner join draw_lottery dl on dl.idSorteo = d.id where dl.idLoteria = @idLoteria and d.descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci) and (select count(id) from drawsrelations where idLoteriaPertenece = @idLoteria) > 1
-                        then
-							set @idSorteo = 4;
-                            set @sorteo = 'Super pale';
-						else
-							set @idSorteo = 2;
-                            set @sorteo = 'Pale';
-						end if;
+						-- if exists(select d.id from draws d inner join draw_lottery dl on dl.idSorteo = d.id where dl.idLoteria = @idLoteria and d.descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci) and (select count(id) from drawsrelations where idLoteriaPertenece = @idLoteria) > 1
+                        -- then
+							-- set @idSorteo = 4;
+                            -- set @sorteo = 'Super pale';
+						-- else
+							-- set @idSorteo = 2;
+                            -- set @sorteo = 'Pale';
+						-- end if;
+                        set @idSorteo = 2;
+                        set @sorteo = 'Pale';
 					end if;
 				elseif length(@jugada) = 5 then
 					if instr(@jugada, '+') = 5 then
 						select id, descripcion from draws where descripcion = 'Pick 4 Box' COLLATE utf8mb4_unicode_ci into @idSorteo, @sorteo;
 					elseif instr(@jugada, '-') = 5 then
 						select id, descripcion from draws where descripcion = 'Pick 4 Straight' COLLATE utf8mb4_unicode_ci into @idSorteo, @sorteo;
+					elseif instr(@jugada, 's') = 5 then
+						select id, descripcion from draws where descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci into @idSorteo, @sorteo;
 					end if;
 				elseif length(@jugada) = 6 then
 					set @idSorteo = 3;
@@ -380,101 +398,14 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
                 
                 
                 /****************** quitarUltimoCaracter *******************/
-                if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
+                if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' || @sorteo = 'Super pale' 
 				then
 					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
 				end if;
 				/******** END QUITAR ULTIMO CARACTER ******************/
 				
                 /******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
-                set @idStock = null;
-                set @idMoneda = (select b.idMoneda from branches b where b.id = idBanca);
-                if exists(select id from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0 and s.idMoneda = @idMoneda)
-                then
-					set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1 and s.idMoneda = @idMoneda);
-					-- if exists(select id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1)
-                    if @idStock is not null
-                    then 
-						-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.ignorarDemasBloqueos = 1;
-                        update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
-					elseif exists(select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.ignorarDemasBloqueos = 1 and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1)
-					then
-                        set @montoBloqueo = (select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.ignorarDemasBloqueos = 1 and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1);
-                        insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.esGeneral, stocks.ignorarDemasBloqueos, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(1, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, 1, 1, now(), now(), @idMoneda);
-						set @idStock = (SELECT LAST_INSERT_ID());
-                    else
-						set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0 and s.idMoneda = @idMoneda);
-                        -- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 0;
-						update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
-                    end if;
-                elseif exists(select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.idMoneda = @idMoneda)
-                then
-					set @ignorarDemasBloqueos = (select s.ignorarDemasBloqueos from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.idMoneda = @idMoneda);
-					if @ignorarDemasBloqueos != 1
-                    then
-						set @montoBloqueo = (select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1);
-						if @montoBloqueo is not null then
-							insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now(), @idMoneda);
-							set @idStock = (SELECT LAST_INSERT_ID());
-                        else
-							set @montoBloqueo = (select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo and b.idMoneda = @idMoneda);
-							if @montoBloqueo is not null then
-								insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, now(), now(), @idMoneda);
-								set @idStock = (SELECT LAST_INSERT_ID());
-                            else
-								-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
-								set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.idMoneda = @idMoneda);
-								update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
-                            end if;
-                        end if;
-                    else
-						-- update stocks s set s.monto = s.monto - @monto where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1;
-						set @idStock = (select s.id from stocks s where date(s.created_at) = date(now()) and s.idLoteria = @idLoteria and s.jugada = @jugada and s.idSorteo = @idSorteo and s.esGeneral = 1 and s.idMoneda = @idMoneda);
-						update stocks s set s.monto = s.monto - @monto where s.id = @idStock;
-                    end if;
-                else
-					
-                    if exists(select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.ignorarDemasBloqueos = 1 and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1)
-					then	
-						set @montoBloqueo = (select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1);
-						insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.esGeneral, stocks.ignorarDemasBloqueos, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(1, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, 1, 1, now(), now(), @idMoneda);
-						set @idStock = (SELECT LAST_INSERT_ID());
-                    else
-						
-                        /************* OBTENEMOS EL STOCK DE LA TABLA BLOQUEOS JUGADAS *************/
-						set @montoBloqueo = (select b.monto from blocksplays b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idBanca = idBanca and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1);
-						if @montoBloqueo is not null then
-							insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now(), @idMoneda);
-							set @idStock = (SELECT LAST_INSERT_ID());
-                        else
-							/**************** OBTENEMOS EL STOCK DE LA TABLA BLOCKSPLAYSGENERALS *******/
-							set @montoBloqueo = (select b.monto from blocksplaysgenerals b where date(b.fechaDesde) <= date(now()) and date(b.fechaHasta) >= date(now()) and b.idLoteria = @idLoteria and b.jugada = @jugada and b.idSorteo = @idSorteo and b.status = 1 and b.idMoneda = @idMoneda order by b.id desc limit 1);
-							if @montoBloqueo is not null then
-								insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esBloqueoJugada, stocks.esGeneral, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(1, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, 1, now(), now(), @idMoneda);
-								set @idStock = (SELECT LAST_INSERT_ID());
-                            end if;
-							
-							 if @montoBloqueo is null then
-							/**************** OBTENEMOS EL STOCK POR BANCA DE LA TABLA BLOCKLOTTERIES *******/
-								set @montoBloqueo = (select b.monto from blockslotteries b where b.idBanca = idBanca and b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo and b.idMoneda = @idMoneda);
-								if @montoBloqueo is not null then
-									insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, now(), now(), @idMoneda);
-									set @idStock = (SELECT LAST_INSERT_ID());
-                                else
-									set @montoBloqueo = (select b.monto from blocksgenerals b where b.idLoteria = @idLoteria and b.idDia = @idDia and b.idSorteo = @idSorteo and b.idMoneda = @idMoneda);
-									insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esGeneral, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(idBanca, @idLoteria, @idSorteo, @jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now(), @idMoneda);
-									set @idStock = (SELECT LAST_INSERT_ID());
-                            end if;
-                        end if;
-                        
-                        
-                    
-                    end if;
-				end if;
-                    
-                    
-                   
-                end if;
+                set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale));
 				/************ END INSERTAR BLOQUEO O ACTUALIZAR ***************/
                 set @comision = 0;
                 set @datosComisiones = (select JSON_OBJECT('directo', c.directo, 'pale', c.pale, 'tripleta', c.tripleta, 'superPale', c.superPale, 'pick3Straight', c.pick3Straight, 'pick3Box', c.pick3Box, 'pick4Straight', c.pick4Straight, 'pick4Box', c.pick4Box) from commissions c where c.idBanca = idBanca and c.idLoteria = @idLoteria);
@@ -501,7 +432,7 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				end if;
                 -- select @sorteo, @monto, @comision, JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo')));
                 insert into realtimes(idAfectado, tabla) values(@idStock, 'stocks');
-                insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.idStock, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, @idStock, now(), now()); 
+                insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.idStock, salesdetails.idLoteriaSuperpale, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, @idStock, @idLoteriaSuperpale, now(), now()); 
 			end if;
             /************** END IDLOTERIA = IDLOTERIAJUGADAS ***************/
             

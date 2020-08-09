@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateServersTable extends Migration
+class AddIdloteriasuperpaleToSalesdetails extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateServersTable extends Migration
      */
     public function up()
     {
-        // Schema::create('servers', function (Blueprint $table) {
-        //     $table->increments('id');
-        //     $table->string('descripcion');
-        //     $table->boolean('pordefecto');
-        //     $table->timestamps();
-        // });
+        Schema::table('salesdetails', function (Blueprint $table) {
+            $table->integer("idLoteriaSuperpale")->nullable();
+        });
     }
 
     /**
@@ -28,6 +25,8 @@ class CreateServersTable extends Migration
      */
     public function down()
     {
-        // Schema::dropIfExists('servers');
+        Schema::table('salesdetails', function (Blueprint $table) {
+            $table->dropColumn('idLoteriaSuperpale');
+        });
     }
 }
