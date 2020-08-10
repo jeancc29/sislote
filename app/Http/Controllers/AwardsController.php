@@ -340,11 +340,17 @@ class AwardsController extends Controller
                     }
                     $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
                 }
-                else if($sorteo->descripcion == "Pale" || $sorteo->descripcion == "Super pale"){
+                else if($sorteo->descripcion == "Pale"){
                     if(!is_numeric($awardsClass->numerosGanadores)){
                         return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
                     }
                     $j['premio'] = $awardsClass->paleBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], $j['idSorteo']);
+                }
+                else if($sorteo->descripcion == "Super pale"){
+                    if(!is_numeric($awardsClass->numerosGanadores)){
+                        return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+                    }
+                    $j['premio'] = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j['idLoteriaSuperpale'], $j['jugada'], $j['monto'], $j['idSorteo']);
                 }
                 else if($sorteo->descripcion == "Tripleta"){
                     if(!is_numeric($awardsClass->numerosGanadores)){

@@ -317,34 +317,6 @@ class AwardsClass{
         $idBanca = Branches::on($this->servidor)->whereId($venta->idBanca)->first()->id;
         $sorteo = Draws::on($this->servidor)->whereId($idSorteo)->first();
 
-    //    //Si el sorteo es diferente de super pale entonces es un pale normal
-    //     if($sorteo['descripcion'] != "Super pale"){
-    //         //Verificamos que los tipos de datos de las busquedas sean enteros
-    //         if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
-    //             //Primera y segunda
-    //             if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
-    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
-    //             }
-    //             //Primera y tercera
-    //             else if($busqueda1 == 0 && $busqueda2 == 4 || $busqueda2 == 0 && $busqueda1 == 4){
-    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraTercera');
-    //             }
-    //             //Segunda y tercera
-    //             else if($busqueda1 == 2 && $busqueda2 == 4 || $busqueda2 == 2 && $busqueda1 == 4){
-    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('segundaTercera');
-    //             }
-    //         }else $premio = 0;
-    //     }else{
-    //         //Verificamos que los tipos de datos de las busquedas sean enteros
-    //         if(gettype($busqueda1) == "integer" && gettype($busqueda2) == "integer"){
-    //             if($busqueda1 == 0 && $busqueda2 == 2 || $busqueda2 == 0 && $busqueda1 == 2){
-    //                 $premio = $monto * Payscombinations::where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
-    //             }
-    //         }else $premio = 0;
-    //     }
-
-
-
         $primerParDeNumeros = substr($jugada, 0, 2);
         $segundoParDeNumeros = substr($jugada, 2, 2);
         $hayPremiadoEnPrimera = false;
@@ -549,6 +521,66 @@ class AwardsClass{
 
         return $premio;
         // return $premio . ":" . $contador . "1ra:".$hayPremiadoEnPrimera." 2da:" .$hayPremiadoEnSegunda ." 3ra:".$hayPremiadoEnTercera;
+    }
+
+    public function superPaleBuscarPremio($idVenta, $idLoteria, $idLoteriaSuperpale, $jugada, $monto, $idSorteo){
+        // return Response::json(['numGanador' => $numeroGanador['numeroGanador'],'juada' => substr('jean', 0, 2)], 201);
+        $premio = 0;
+        $contador = 0;
+        $busqueda1 = strpos($this->numerosGanadores, substr($jugada, 0, 2));
+        $busqueda2 = strpos($this->numerosGanadores, substr($jugada, 2, 2));
+
+        $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
+        $idBanca = Branches::on($this->servidor)->whereId($venta->idBanca)->first()->id;
+        $sorteo = Draws::on($this->servidor)->whereId($idSorteo)->first();
+
+        $primerParDeNumeros = substr($jugada, 0, 2);
+        $segundoParDeNumeros = substr($jugada, 2, 2);
+        $hayPremiadoEnPrimera = false;
+        $hayPremiadoEnSegunda = false;
+        $hayPremiadoEnTercera = false;
+
+     //Si el sorteo es diferente de super pale entonces es un pale normal
+     
+    
+        
+        switch ($primerParDeNumeros) {
+            case $this->primera:
+                $hayPremiadoEnPrimera = true;
+                $contador++;
+                break;
+            case $this->segunda:
+                $hayPremiadoEnSegunda = true;
+                $contador++;
+                break;
+        }
+
+        
+
+        switch ($segundoParDeNumeros) {
+            case $this->primera:
+                if($hayPremiadoEnPrimera == false){
+                    $hayPremiadoEnPrimera = true;
+                    $contador++;
+                }
+                break;
+            case $this->segunda:
+                if($hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                break;
+        }
+
+        if($hayPremiadoEnPrimera == true && $hayPremiadoEnSegunda == true){
+            $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
+        }
+
+       
+
+    
+
+        return $premio;
     }
 
     public function pick3BuscarPremio($idVenta, $idLoteria, $jugada, $monto, $esStraight = true){

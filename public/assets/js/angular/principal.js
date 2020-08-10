@@ -535,7 +535,7 @@ myApp
                 return false;
               var jugada = '';
               for (let index = 0; index < $scope.datos.jugada.length; index++) {
-                  if($scope.datos.jugada[index] != '+' && $scope.datos.jugada[index] != '-')
+                  if($scope.datos.jugada[index] != '+' && $scope.datos.jugada[index] != '-' && $scope.datos.jugada[index] != 's')
                    jugada += $scope.datos.jugada[index];
                   
               }
@@ -589,195 +589,137 @@ myApp
                 }
 
                 if($scope.datos.jugada != null && evento.keyCode == 13){
-                    $scope.datos.loterias.forEach(function(valor, indice, array){
-                        
-                    // if(Number($scope.datos.jugada) != $scope.datos.jugada)
-                    // {
-                    //     $('#inputJugada').focus();
-                    //     $scope.datos.monto = null;
-                    //     $scope.datos.jugada = null;
-                    //     $scope.jugada = null;
-                        
-    
-                    //     return;
-                    // }
-                    // console.log('insertar, foreach: ', array[indice], ' monto: ', $scope.datos.monto, ' jugada: ', $scope.datos.jugada);
-                    
-                    if($scope.datos.monto > 0){
-                        
-                        //Verificamos que se haya seleccionado una loteria
-                        if(Object.keys($scope.datos.loterias).length > 0){
-                            //Verificamos que la jugada sea numerica
-                            
-                            if($scope.jugadaCorrecta() == false){
-                                alert("Jugada incorrecta");
-                                return;
-                            }
-                            //if(Number($scope.datos.jugada) == $scope.datos.jugada){
-                                /*Verificamos que el monto sea menor que el montoExistentte cuando las loterias seleccionadas sea una
-                                o verificamos que las loterias seleccionadas sean mas de una y el monto existente sea igual a X,
-                                Si se cumple unas de estas dos condiciones entonces se insertara o actualizara la jugada, de lo contrario
-                                Se le indicara al usuario que no hay existencia suficiente */
-                                
-                                 if(Number($scope.datos.montoExistente) < $scope.datos.monto && Object.keys($scope.datos.loterias).length == 1){
-                                    //  console.log('existente: ', $scope.datos.montoExistente, ' montojugar: ', $scope.datos.monto);
-                                    alert("No hay existencia suficiente para ese monto");
-                                    $('#inputJugada').focus();
-                                    $scope.monto = 0;
-                                    return;
-                                }
-                                else{
-                                    $scope.datos.jugada =helperService.ordenarMenorAMayor($scope.datos.jugada);
-                                    if($scope.datos.jugadas.find(x => (x.jugada == $scope.datos.jugada && x.idLoteria == array[indice].id)) != undefined){
-                                        
-                                        let idx = $scope.datos.jugadas.findIndex(x => (x.jugada == $scope.datos.jugada && x.idLoteria == array[indice].id));
-                                        $scope.datos.jugadas[idx].monto = parseFloat($scope.datos.jugadas[idx].monto)+ parseFloat($scope.datos.monto);
-                                        $('#inputJugada').focus();
-                                        //$scope.monto = 0;
-                                    }
-                                    else{
-                                    //    console.log('insertar, foreach: ', array[indice]);
-                                        $scope.datos.jugadas.push({'jugada':$scope.datos.jugada, 'monto':$scope.datos.monto, 
-                                                                    'tam': $scope.datos.jugada.length, 'idLoteria': array[indice].id,
-                                                                    'descripcion':array[indice].descripcion, 'abreviatura' : array[indice].abreviatura});
-                                        $('#inputJugada').focus();
-                                        //$scope.datos.monto = 0;
-                                    }
-                                }
-                                // if(( Object.keys($scope.datos.loterias).length == 1 && $scope.datos.montoExistente > $scope.datos.monto) || (Object.keys($scope.datos.loterias).length > 1 && $scope.datos.montoExistente == 'X')){
-                                    
-                                // }
-                                // else{
-                                //     alert("No hay existencia suficiente para ese monto");
-                                // }
-                            // }
-                            // else{
-                            //     alert("La jugada debe ser numerica");
-                            // }
+                    if(helperService.esSuperpale($scope.datos.jugada)){
+                        if($scope.datos.loterias.length != 2){
+                            alert("Debe seleccionar dos loterias para super pale");
+                            return;
                         }
-                        else{
-                            alert("Debes seleccionar una loteria");
-                        }
+
+                        jugadaAdd($scope.datos.loterias[0], $scope.datos.loterias[1]);
+                    }else{
+                        $scope.datos.loterias.forEach(function(valor, indice, array){
+                            jugadaAdd(array[indice]);
+                         }); //END FOREACH
                     }
-                   
-                    
-                    
-                    
-                    
-                    
-                    //Verificamos si la jugada existe, si es asi entonces se le sumara el monto nuevo
-                   
-                }); //END FOREACH
 
                 //$('#inputJugada').focus();
                 // $scope.datos.monto = null;
-                $scope.datos.jugada = null;
-                $scope.jugada = null;
-
-                $scope.calcularTotal();
-                // console.log('jugada_insertar:',$scope.datos.jugadas);
+                
+                    $scope.datos.jugada = null;
+                    $scope.jugada = null;
+                    $scope.calcularTotal();
                 } // END IF PRINCIPAL
             
             
-             return;
-            if($scope.datos.jugada != null && evento.keyCode == 13){
-                if(Number($scope.datos.jugada) != $scope.datos.jugada)
-                {
-                    $('#inputJugada').focus();
-                    $scope.datos.monto = null;
-                    $scope.datos.jugada = null;
-                    $scope.jugada = null;
+        }
 
-                    return;
-                }
-                // if(Object.keys($scope.datos.loterias).length <= 0){
-                //     alert("Debes seleccionar una loteria");
-                //     $('#inputJugada').focus();
-                //     $scope.monto = 0;
-                //     return;
-                // }
-                // if(Number($scope.datos.jugada) === NaN){
-                //     alert("La jugada debe ser numerica");
-                //     $('#inputJugada').focus();
-                //     $scope.monto = 0;
-                //     return;
-                // }
-                // if($scope.montoExistente < monto && Object.keys($scope.datos.loterias).length == 1){
-                //     alert("La jugada debe ser numerica");
-                //     $('#inputJugada').focus();
-                //     $scope.monto = 0;
-                //     return;
-                // }
-
-                // console.log('jugada insertar monto: ',
-                //                 $scope.datos.monto, 
-                //                 ' lengh: ', Object.keys($scope.datos.loterias).length,
-                //                  ' Existente: ', $scope.datos.montoExistente,
-                //                 'condicion: ', (Number($scope.datos.montoExistente) > $scope.datos.monto),
-                //             ' juagada: ', Number($scope.datos.jugada) );
-                //Verificamos que el monto a jugar sea mayor que cero
-                if($scope.datos.monto > 0){
-                    //Verificamos que se haya seleccionado una loteria
-                    if(Object.keys($scope.datos.loterias).length > 0){
-                        //Verificamos que la jugada sea numerica
-                        if(Number($scope.datos.jugada) == $scope.datos.jugada){
-                            /*Verificamos que el monto sea menor que el montoExistentte cuando las loterias seleccionadas sea una
-                            o verificamos que las loterias seleccionadas sean mas de una y el monto existente sea igual a X,
-                            Si se cumple unas de estas dos condiciones entonces se insertara o actualizara la jugada, de lo contrario
-                            Se le indicara al usuario que no hay existencia suficiente */
-                             if(Number($scope.datos.montoExistente) < $scope.datos.monto && Object.keys($scope.datos.loterias).length == 1){
-                                //  console.log('existente: ', $scope.datos.montoExistente, ' montojugar: ', $scope.datos.monto);
-                                alert("No hay existencia suficiente para ese monto");
-                                $('#inputJugada').focus();
-                                $scope.monto = 0;
-                                return;
-                            }
-                            else{
-                                if($scope.datos.jugadas.find(x => x.jugada == $scope.datos.jugada) != undefined){
-    
-                                    let idx = $scope.datos.jugadas.findIndex(x => x.jugada == $scope.datos.jugada);
-                                    $scope.datos.jugadas[idx].monto = parseFloat($scope.datos.jugadas[idx].monto)+ parseFloat($scope.datos.monto);
-                                    $('#inputJugada').focus();
-                                    $scope.monto = 0;
-                                }
-                                else{
-                                    $scope.datos.jugadas.push({'jugada':$scope.datos.jugada, 'monto':$scope.datos.monto, 'tam': $scope.datos.jugada.length});
-                                    $('#inputJugada').focus();
-                                    $scope.datos.monto = 0;
-                                }
-                            }
-                            // if(( Object.keys($scope.datos.loterias).length == 1 && $scope.datos.montoExistente > $scope.datos.monto) || (Object.keys($scope.datos.loterias).length > 1 && $scope.datos.montoExistente == 'X')){
-                                
-                            // }
-                            // else{
-                            //     alert("No hay existencia suficiente para ese monto");
-                            // }
+        var jugadaAdd = function(loteria, loteriaSuperpale = null){
+            
+            if($scope.datos.monto > 0){
+                        
+                //Verificamos que se haya seleccionado una loteria
+                if(Object.keys($scope.datos.loterias).length > 0){
+                    //Verificamos que la jugada sea numerica
+                    
+                    if($scope.jugadaCorrecta() == false){
+                        alert("Jugada incorrecta");
+                        return;
+                    }
+                    //if(Number($scope.datos.jugada) == $scope.datos.jugada){
+                        /*Verificamos que el monto sea menor que el montoExistentte cuando las loterias seleccionadas sea una
+                        o verificamos que las loterias seleccionadas sean mas de una y el monto existente sea igual a X,
+                        Si se cumple unas de estas dos condiciones entonces se insertara o actualizara la jugada, de lo contrario
+                        Se le indicara al usuario que no hay existencia suficiente */
+                        
+                         if(Number($scope.datos.montoExistente) < $scope.datos.monto && Object.keys($scope.datos.loterias).length == 1){
+                            //  console.log('existente: ', $scope.datos.montoExistente, ' montojugar: ', $scope.datos.monto);
+                            alert("No hay existencia suficiente para ese monto");
+                            $('#inputJugada').focus();
+                            $scope.monto = 0;
+                            return;
                         }
                         else{
-                            alert("La jugada debe ser numerica");
+                            if(helperService.esSuperpale($scope.datos.jugada)){
+                                $scope.datos.jugada =helperService.ordenarMenorAMayor($scope.datos.jugada);
+                                if($scope.datos.jugadas.find(x => (x.jugada == $scope.datos.jugada && x.idLoteria == loteria.id && x.idLoteriaSuperpale == loteriaSuperpale.id)) != undefined){
+                                    
+                                    let idx = $scope.datos.jugadas.findIndex(x => (x.jugada == $scope.datos.jugada && x.idLoteria == loteria.id && x.idLoteriaSuperpale == loteriaSuperpale.id));
+                                    $scope.datos.jugadas[idx].monto = parseFloat($scope.datos.jugadas[idx].monto)+ parseFloat($scope.datos.monto);
+                                    $('#inputJugada').focus();
+                                    //$scope.monto = 0;
+                                }
+                                else{
+                                //    console.log('insertar, foreach: ', loteria);
+                                    $scope.datos.jugadas.push(
+                                        {'jugada':$scope.datos.jugada, 
+                                        'monto':$scope.datos.monto, 
+                                        'tam': $scope.datos.jugada.length, 
+                                        'idLoteria': loteria.id,
+                                        'descripcion':loteria.descripcion, 
+                                        'abreviatura' : loteria.abreviatura,
+                                        'idLoteriaSuperpale': loteriaSuperpale.id,
+                                        'descripcionSuperpale':loteriaSuperpale.descripcion, 
+                                        'abreviaturaSuperpale' : loteriaSuperpale.abreviatura,
+                                    });
+                                    $('#inputJugada').focus();
+                                    //$scope.datos.monto = 0;
+                                }
+                            }else{
+                                $scope.datos.jugada =helperService.ordenarMenorAMayor($scope.datos.jugada);
+                                if($scope.datos.jugadas.find(x => (x.jugada == $scope.datos.jugada && x.idLoteria == loteria.id)) != undefined){
+                                    
+                                    let idx = $scope.datos.jugadas.findIndex(x => (x.jugada == $scope.datos.jugada && x.idLoteria == loteria.id));
+                                    $scope.datos.jugadas[idx].monto = parseFloat($scope.datos.jugadas[idx].monto)+ parseFloat($scope.datos.monto);
+                                    $('#inputJugada').focus();
+                                    //$scope.monto = 0;
+                                }
+                                else{
+                                //    console.log('insertar, foreach: ', loteria);
+                                    $scope.datos.jugadas.push(
+                                        {'jugada':$scope.datos.jugada, 
+                                        'monto':$scope.datos.monto, 
+                                        'tam': $scope.datos.jugada.length, 
+                                        'idLoteria': loteria.id,
+                                        'descripcion':loteria.descripcion, 
+                                        'abreviatura' : loteria.abreviatura
+                                    });
+                                    $('#inputJugada').focus();
+                                    //$scope.datos.monto = 0;
+                                }
+                            }
+                            
                         }
-                    }
-                    else{
-                        alert("Debes seleccionar una loteria");
-                    }
+                        // if(( Object.keys($scope.datos.loterias).length == 1 && $scope.datos.montoExistente > $scope.datos.monto) || (Object.keys($scope.datos.loterias).length > 1 && $scope.datos.montoExistente == 'X')){
+                            
+                        // }
+                        // else{
+                        //     alert("No hay existencia suficiente para ese monto");
+                        // }
+                    // }
+                    // else{
+                    //     alert("La jugada debe ser numerica");
+                    // }
                 }
-               
-                //$('#inputJugada').focus();
-                $scope.datos.monto = null;
-                $scope.datos.jugada = null;
-                $scope.jugada = null;
-
-                $scope.calcularTotal();
-                
-                    
-                
-                //Verificamos si la jugada existe, si es asi entonces se le sumara el monto nuevo
-               
-                
+                else{
+                    alert("Debes seleccionar una loteria");
+                }
             }
-                   
+           
 
-            //$scope.calcularTotal();
+        }
+
+        $scope.esSuperpale = function(jugada){
+            return helperService.esSuperpale(jugada);
+        }
+
+        $scope.getAbreviaturaSuperpale = function(jugada){
+            var abreviatura = "";
+            if(helperService.esSuperpale(jugada.jugada))
+                abreviatura += jugada.abreviatura.substring(0, 2) + "/" + jugada.abreviaturaSuperpale.substring(0, 2);
+            else
+                abreviatura += jugada.abreviatura;
+            
+            return abreviatura;
         }
 
         $scope.jugada_eliminar = function(jugada, idLoteria){

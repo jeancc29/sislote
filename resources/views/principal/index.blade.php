@@ -649,8 +649,8 @@
                         </tr>
                     </thead>
                     <tbody class="">
-                        <tr ng-if="(c.tam == 4 || c.tam == 6) && esPick3Pick4UOtro(c.jugada) == 'otro'" ng-repeat="c in datos.jugadas ">
-                            <td class="col-sm-3" style="font-size: 12px;">@{{c.abreviatura}}</td>
+                        <tr ng-if="(c.tam == 4 || c.tam == 5 || c.tam == 6) && esPick3Pick4UOtro(c.jugada) == 'otro'" ng-repeat="c in datos.jugadas ">
+                            <td class="col-sm-3" style="font-size: 12px;">@{{getAbreviaturaSuperpale(c)}}</td>
                             <td class="col-4">@{{agregar_guion(c.jugada)}}</td>
                             <td class="text-right col-4">
                                 @{{c.monto}}
@@ -658,11 +658,6 @@
                                         <i class="material-icons">close</i>
                                 </button>
                             </td>
-                        <!-- <td class="td-actions text-center col-1">
-                            <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
-                                <i class="material-icons">close</i>
-                            </button>
-                            </td> -->
                         </tr>
                         
                     </tbody>

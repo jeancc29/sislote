@@ -406,7 +406,8 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 				
                 /******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
                 set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale));
-				/************ END INSERTAR BLOQUEO O ACTUALIZAR ***************/
+				-- set @idStock = 1;
+                /************ END INSERTAR BLOQUEO O ACTUALIZAR ***************/
                 set @comision = 0;
                 set @datosComisiones = (select JSON_OBJECT('directo', c.directo, 'pale', c.pale, 'tripleta', c.tripleta, 'superPale', c.superPale, 'pick3Straight', c.pick3Straight, 'pick3Box', c.pick3Box, 'pick4Straight', c.pick4Straight, 'pick4Box', c.pick4Box) from commissions c where c.idBanca = idBanca and c.idLoteria = @idLoteria);
                 if @sorteo = 'Directo' then
