@@ -194,7 +194,71 @@ myApp
       
         $scope.seleccionarTicket = function(ticket){
             $scope.mostrarVentanaTicket = true;
-            $scope.datos.selectedTicket = ticket;
+            getTicketVerTicket(ticket.codigoBarra);
+        }
+
+        getTicketVerTicket = function(codigoBarra){
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.codigoBarra = codigoBarra;
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $scope.cargandoVentanaTicket = true;
+          $http.post(rutaGlobal+"/api/principal/buscarTicket", {'action':'sp_ventas_buscar', 'datos': jwt})
+             .then(function(response){
+                console.log('monitoreo ',response);
+                if(response.data.errores == 0){
+                    $scope.datos.selectedTicket = response.data.venta;
+                    $scope.cargandoVentanaTicket = false;
+
+                }else{
+                    $scope.cargandoVentanaTicket = false;
+                    alert(response.data.mensaje);
+                    return;
+                }
+
+                // if(response.data[0].errores == 0){
+                //     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
+                //     alert("Se ha guardado correctamente");
+                // }
+            }
+            ,
+            function(){
+                $scope.cargandoVentanaTicket = false;
+                alert("error");
+            }
+            );
+        }
+
+        getTicketImprimir = function(codigoBarra){
+            $scope.datos.idUsuario = idUsuarioGlobal;
+            $scope.datos.codigoBarra = codigoBarra;
+            $scope.datos.servidor = servidorGlobal;
+            var jwt = helperService.createJWT($scope.datos);
+            $scope.cargando = true;
+          $http.post(rutaGlobal+"/api/principal/buscarTicket", {'action':'sp_ventas_buscar', 'datos': jwt})
+             .then(function(response){
+                console.log('monitoreo ',response);
+                if(response.data.errores == 0){
+                    
+                    $scope.cargando = false;
+                    printerService.printTicket(response.data.venta, CMD.TICKET_COPIA);
+                }else{
+                    $scope.cargando = false;
+                    alert(response.data.mensaje);
+                    return;
+                }
+
+                // if(response.data[0].errores == 0){
+                //     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);
+                //     alert("Se ha guardado correctamente");
+                // }
+            }
+            ,
+            function(){
+                $scope.cargando = false;
+                alert("error");
+            }
+            );
         }
 
        
@@ -268,10 +332,10 @@ myApp
                 // }
             }
             ,
-            function(){
-                $scope.cargando = false;
-                alert("error");
-            }
+            // function(){
+            //     $scope.cargando = false;
+            //     alert("error");
+            // }
             );
         }
 
@@ -298,8 +362,8 @@ myApp
         }
 
         $scope.imprimirTicket = function(ticket, es_movil){
-            printerService.printTicket(ticket, CMD.TICKET_COPIA);
-
+            // printerService.printTicket(ticket, CMD.TICKET_COPIA);
+            getTicketImprimir(ticket.codigoBarra);
         }
 
 

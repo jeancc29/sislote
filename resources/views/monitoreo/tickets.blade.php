@@ -261,17 +261,27 @@
         <div class="row">
             <div class="col-12">
                 <div style="cursor:pointer" class="bg-success w-25 p-2 text-white text-center font-weight-bold" ng-click="mostrarVentanaTicket = !mostrarVentanaTicket">
-                    Cerrar
+                    Cerrar 
+                    <div ng-show="cargandoVentanaTicket == true" class="ml-2 spinner-border" style="width: 1.7rem; height: 1.7rem;" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
                 </div>
             </div>
             <div class="col-12">
             <div class="card my-0 mx-0 d-inline-block mx-0" style="min-height: 350px; max-height: 350px; width: 100%; background: #dddddd; overflow-y: auto;"> <!-- min-height: 455px; max-height: 455px; -->
-                <div class="card-header card-header-info card-header-icon">
+                
+                <div  class="card-header card-header-info card-header-icon">
                 
                   <!-- <h4 class="card-title">Pick4</h4> -->
                 </div>
                 <div class="card-body"> <!-- aqui va el overflow-y y el div con el precio va despues de la etiqueta table-->
-                <div class="table-responsive">
+                <div class="justify-content-center text-center">
+                <!-- <div ng-show="cargandoVentanaTicket == true" class="ml-2 spinner-border" style="width: 1.7rem; height: 1.7rem;" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div> -->
+                </div>
+
+                <div ng-show="cargandoVentanaTicket != true" class="table-responsive">
                   <h4 class="card-title text-center font-weight-bold">Ticket:@{{datos.selectedTicket.codigo}}-@{{toSecuencia(datos.selectedTicket.idTicket)}}</h4>
                   <div class="row justify-content-center">
                     <div class="col-12 text-center">

@@ -31,6 +31,7 @@ use App\Classes\Helper;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
+use App\Http\Resources\SalesSmallResource;
 use App\Http\Resources\BranchesResource;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
@@ -389,7 +390,7 @@ class MonitoreoController extends Controller
     public function tickets()
     {
         $controlador = Route::getCurrentRoute()->getName();
-        $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
+        
         if(!strpos(Request::url(), '/api/')){
            
             if(!Helper::existe_sesion()){
@@ -403,6 +404,7 @@ class MonitoreoController extends Controller
             // if(!$u->tienePermiso("Manejar transacciones") == true){
             //     return redirect()->route('principal');
             // }
+            $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
             $bancas = Branches::on(session("servidor"))->whereStatus(1)->get()->toJson();
             $loterias = Lotteries::on(session("servidor"))->whereStatus(1)->get()->toJson();
             $sorteos = Draws::on(session("servidor"))->whereStatus(1)->get()->toJson();
@@ -533,7 +535,7 @@ class MonitoreoController extends Controller
         
     
         return Response::json([
-            'monitoreo' => SalesResource::collection($monitoreo)->servidor($datos["servidor"]),
+            'monitoreo' => SalesSmallResource::collection($monitoreo),
             'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
             'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get(),
             'sorteos' => Draws::on($datos["servidor"])->get(),

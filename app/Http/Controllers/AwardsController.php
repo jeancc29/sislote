@@ -404,14 +404,48 @@ class AwardsController extends Controller
     
                 $c++;
             }
+
+
+            //Buscar jugadas super pale de esa loteria, ya sea esta la loteria primaria o loteria superpale de la tabla salesdetails
+            foreach($awardsClass->getJugadasSuperpaleDeFechaDada($l['id']) as $j){
+    
+                $j['premio'] = 0;
+                $contador = 0;
+                $busqueda1 = false;
+                $busqueda2 = false;
+                $busqueda3 = false;
+
+                if(!is_numeric($awardsClass->numerosGanadores)){
+                    return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+                }
+
+                //Si el premio superpale es igual a -1 entonces eso quiere decir que la otra loteria no ha salido, 
+                //por lo tanto el status de la jugada seguira siendo igual a cero, indicando que todavia la jugada estara pendiente
+                $premioSuperpale = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j);
+                if($premioSuperpale != -1){
+                    $j['premio'] = $premioSuperpale;
+                    $j['status'] = 1;
+                    $j->save();
+                }else{
+                    $j['premio'] = 0;
+                    $j['status'] = 0;
+                    $j->save();
+                }
+                
+    
+                $c++;
+            }
     
         endforeach;
-    
-    
-    
-            $ventas = Sales::on($datos["servidor"])->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->whereNotIn('status', [0,5])
-            ->get();
+
+
+        foreach($datos['loterias'] as $l):
+            // $ventas = Sales::on($datos["servidor"])
+            // ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            // ->whereNotIn('status', [0,5])
+            // ->get();
+
+            $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $l["id"], $fecha);
     
             foreach($ventas as $v){
                 $todas_las_jugadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
@@ -439,6 +473,8 @@ class AwardsController extends Controller
                     $v->save();
                 }
             }
+
+        endforeach;
     
         $loterias = AwardsClass::getLoterias($datos["servidor"]);
         $loteriasOrdenadasPorHoraCierre = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
@@ -532,13 +568,21 @@ class AwardsController extends Controller
                 $j->save();
             }
 
+            foreach($awardsClass->getJugadasSuperpaleDeFechaDada($datos['idLoteria']) as $j){
+                $j['premio'] = 0;
+                $j['status'] = 0;
+                $j->save();
+            }
+
 
             //Aqui buscaremos todos los tickets creados en el dia de hoy y vamos a 
             //asignarles el estado pendiente a los tickets en los cuales sus loterias aun no han salido
     
-            $ventas = Sales::on($datos["servidor"])->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-            ->whereNotIn('status', [0,5])
-            ->get();
+            // $ventas = Sales::on($datos["servidor"])->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+            // ->whereNotIn('status', [0,5])
+            // ->get();
+
+            $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $datos["idLoteria"], $fecha);
     
             foreach($ventas as $v){
                 $todas_las_jugadas_realizadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();

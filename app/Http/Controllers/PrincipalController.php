@@ -54,7 +54,7 @@ class PrincipalController extends Controller
     public function index()
     {
         $controlador = Route::getCurrentRoute()->getName();
-        $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
+        // $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
         if(!strpos(Request::url(), '/api/')){
             if(!Helper::existe_sesion()){
                 return redirect()->route('login');
@@ -63,6 +63,7 @@ class PrincipalController extends Controller
             if(!$u->tienePermiso("Vender tickets") == true){
                 return redirect()->route('dashboard');
             }
+            $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
             return view('principal.index', compact('controlador', 'usuario'));
         }
 
