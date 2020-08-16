@@ -297,7 +297,9 @@ class AwardsClass{
         })
         ->get();
 
-        $jugadas = Salesdetails::on($this->servidor)->whereIn('idVenta', $idVentas)->where('idLoteria', $idLoteria)
+        // return $idVentas;
+
+        $jugadas = Salesdetails::on($this->servidor)->whereIn('idVenta', $idVentas)
             ->orderBy('jugada', 'asc')
             ->where('salesdetails.idSorteo', '=', $idSuperpale)
             ->get();
@@ -589,6 +591,7 @@ class AwardsClass{
             $idOtraLoteria = $jugada["idLoteria"];
 
         
+        
         $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
         $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
@@ -597,6 +600,8 @@ class AwardsClass{
         ->where('idLoteria', $idOtraLoteria)
         // ->where('idSorteo', $jugada["idSorteo"])
         ->first();
+
+        
 
         if($premiosDeLaOtraLoteria == null)
             return -1;
@@ -644,6 +649,7 @@ class AwardsClass{
                 break;
         }
 
+        // return $this->numerosGanadores. " " .$jugada["jugada"] . " " . $hayPremiadoEnPrimera.":".$hayPremiadoEnPrimeraDeLaOtraLoteria;
         if($hayPremiadoEnPrimera == true && $hayPremiadoEnPrimeraDeLaOtraLoteria == true){
             $premio = $jugada["monto"] * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primerPago');
         }

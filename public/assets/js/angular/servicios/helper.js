@@ -109,6 +109,19 @@ myApp.service('helperService', function(){
                 return jugada;
             }
         }
+        // console.log("Dentro super pale");
+
+        if(jugada.length == 5 && isNaN(Number(jugada.substr(0, jugada.length - 1))) != true && jugada.substr(jugada.length - 1) == "s"){
+            var ultimoCaracter = jugada.substr(jugada.length - 1);
+            var primerParNumeros = jugada.substr(0, 2);
+            var segundoParNumeros = jugada.substr(2, 2);
+            if(Number(primerParNumeros) < Number(segundoParNumeros)){
+                return jugada;
+            }else{
+                jugada = segundoParNumeros + primerParNumeros + ultimoCaracter;
+                return jugada;
+            }
+        }
 
         return jugada;
     }

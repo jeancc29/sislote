@@ -254,12 +254,49 @@ myApp
                 // }
             }
             ,
-            function(){
-                $scope.cargando = false;
-                alert("error");
-            }
+            // function(){
+            //     $scope.cargando = false;
+            //     alert("error");
+            // }
             );
         }
+
+        $scope.getJugadasPertenecienteALoteria = function(idLoteria, jugadas){
+            // console.log("Dentro jugadas idLoteria: ", idLoteria);
+            // console.log("Dentro jugadas: ", jugadas);
+            
+            var a = jugadas.filter(j => j.idLoteria == idLoteria && j.sorteo != "Super pale");
+            console.log("jugadas: ", a);
+            return a;
+        }
+
+        $scope.getJugadasPertenecienteALoteriaLength = function(idLoteria, jugadas){
+            // console.log("Dentro jugadas idLoteria: ", idLoteria);
+            // console.log("Dentro jugadas: ", jugadas);
+            
+            var a = jugadas.filter(j => j.idLoteria == idLoteria && j.sorteo != "Super pale");
+            console.log("jugadas: ", a);
+            return a.length;
+        }
+
+        $scope.getJugadasSuperpalePertenecienteALoteria = function(idLoteria, idLoteriaSuperpale, jugadas){
+            console.log("Dentro jugadas idLoteria: ", idLoteria);
+            console.log("Dentro jugadas: ", jugadas);
+            
+            var a = jugadas.filter(j => j.idLoteria == idLoteria && j.idLoteriaSuperpale == idLoteriaSuperpale && j.sorteo == "Super pale");
+            console.log("jugadasSuper: ", a);
+            return a;
+        }
+
+        $scope.getJugadasSuperpalePertenecienteALoteriaLength = function(idLoteria, idLoteriaSuperpale, jugadas){
+            console.log("Dentro jugadas idLoteria: ", idLoteria);
+            console.log("Dentro jugadas: ", jugadas);
+            
+            var a = jugadas.filter(j => j.idLoteria == idLoteria && j.idLoteriaSuperpale == idLoteriaSuperpale && j.sorteo == "Super pale");
+            console.log("jugadasSuper: ", a);
+            return a.length;
+        }
+
 
        
         $scope.buscar = function(){

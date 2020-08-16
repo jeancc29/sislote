@@ -1,11 +1,13 @@
-use valentin;
-DROP FUNCTION IF EXISTS `insertarBloqueo`;
-DELIMITER $$
+USE `valentin`;
+DROP function IF EXISTS `insertarBloqueo`;
 
-CREATE FUNCTION insertarBloqueo(jugada varchar(8), idLoteria int, idSorteo int, sorteo varchar(50), idBanca int, idLoteriaSuperpale int) RETURNS Bigint
-     READS SQL DATA
-DETERMINISTIC
+DELIMITER $$
+USE `valentin`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `insertarBloqueo`(jugada varchar(8), idLoteria int, idSorteo int, sorteo varchar(50), idBanca int, idLoteriaSuperpale int) RETURNS bigint(20)
+    READS SQL DATA
+    DETERMINISTIC
 BEGIN
+
 	
 	/******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
 	set @idStock = null;
@@ -204,4 +206,6 @@ BEGIN
     
     return @idStock;
     END$$
-DELIMITER $$
+
+DELIMITER ;
+

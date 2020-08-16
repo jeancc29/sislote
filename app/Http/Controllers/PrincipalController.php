@@ -405,11 +405,17 @@ class PrincipalController extends Controller
                 });
     
                 $loterias = Lotteries::on($codigoBarra["servidor"])->whereIn('id', $idLoterias)->whereStatus(1)->get();
+                $loterias = collect($loterias)->map(function($e) use($idVenta, $codigoBarra){
+                    $idLoteriaSuperpale = Salesdetails::on($codigoBarra["servidor"])->select("idLoteriaSuperpale")->where(['idVenta' => $idVenta, 'idLoteria' => $e["id"]])->whereNotNull("idLoteriaSuperpale")->get();
+                    $loteriaSuperpale = Lotteries::on($codigoBarra["servidor"])->whereIn("id", $idLoteriaSuperpale)->get();
+                    return ["id" => $e["id"], "descripcion" => $e["descripcion"], "abreviatura" => $e["abreviatura"], "loteriaSuperpale" => $loteriaSuperpale];
+                });
                 // $jugadas = Salesdetails::where('idVenta', $idVenta)->get();
                 
                 $jugadas = collect(Salesdetails::on($codigoBarra["servidor"])->where('idVenta', $idVenta)->get())->map(function($d) use($codigoBarra){
                     $sorteo = Draws::on($codigoBarra["servidor"])->whereId($d['idSorteo'])->first()->descripcion;
-                    return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
+                    $loteriaSuperpale = Lotteries::on($codigoBarra["servidor"])->whereId($d["idLoteriaSuperpale"])->first();
+                    return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idLoteriaSuperpale' => $d['idLoteriaSuperpale'], 'loteriaSuperpale' => $loteriaSuperpale, 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'status' => $d['status'], 'sorteo' => $sorteo];
                 });
             }else{
                 $errores = 1;

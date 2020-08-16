@@ -271,6 +271,57 @@ myApp.service('printerService', function(helperService){
                 
             }
 
+
+            arrayLoterias[indice].loteriaSuperpale.forEach(function(valor, indiceSuperpale, arrayLoteriaSuperpale){
+                primerCicloJugadas = true;
+                contadorCicleJugadas = 0;
+                totalPorLoteria = 0;
+                console.log("Dentro superpale arrayIdLoteriaSuperpale");
+                jugadas = self.getJugadasSuperpalePertenecienteALoteria(arrayLoterias[indice].id, arrayLoteriaSuperpale[indiceSuperpale].id, venta.jugadas, typeTicket);
+                if(jugadas.length > 0){
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Super pale("+ arrayLoterias[indice].abreviatura + "/" + arrayLoteriaSuperpale[indiceSuperpale].abreviatura + ")");
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
+                
+                    jugadas.forEach(function(valor, indiceJugadas, arrayJugadas){
+                        var jugada = arrayJugadas[indiceJugadas];
+                        var espaciosPrimerMonto = "         ";
+                        var espaciosSegundaJugada = "       ";
+                        var espaciosSegundoMonto = "         ";
+                        total += helperService.redondear(jugada.monto);
+                        totalPorLoteria += helperService.redondear(jugada.monto);
+    
+                        // map[map.length] = _getMapNuevo(cmd: CMD.left);
+                        if(primerCicloJugadas){
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "JUGADA   MONTO  JUGADA   MONTO");
+                            primerCicloJugadas = false;
+                        }
+    
+                        if(((indiceJugadas + 1) % 2) == 0){ //PAR
+                            var jugadaAnterior = helperService.agregarSignoYletrasParaImprimir(jugadas[indiceJugadas - 1].jugada, jugadas[indiceJugadas - 1].sorteo);
+                            var montoAnterior = jugadas[indiceJugadas - 1].monto;
+                            // espaciosPrimerMonto = self.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado(espaciosPrimerMonto, jugadaAnterior) + montoAnterior;
+                            
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, self.quitarOPonerEspaciosJugada(false, montoAnterior, espaciosSegundaJugada) + helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), 0);
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, self.quitarOPonerEspaciosMonto(false, helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), espaciosSegundoMonto) + jugada.monto + self.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("     ", jugada.monto));
+                          }else{
+                            // data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, "", 0);
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), 0);
+                            
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_OFF, "", 0);
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, self.quitarOPonerEspaciosMonto(true, helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), espaciosPrimerMonto) + jugada.monto + self.siEsUltimaJugadaDarSaltoDeLinea(indiceJugadas, jugadas.length, jugada.monto), 0);
+                          }
+                    });
+    
+                    var loteriasLength = (typeTicket == CMD.TICKET_PAGADO) ? venta.loterias.length - 1 : venta.loterias.length;
+                    if(loteriasLength > 1){
+                        data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "total: " + String(totalPorLoteria), 2);
+                    }
+                    
+                }
+            });
+            
+
             
         });
 
@@ -301,8 +352,8 @@ myApp.service('printerService', function(helperService){
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, banca.piepagina3);
             if(banca.piepagina4 != null)
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, banca.piepagina4);
-            if(banca.imprimirCodigoQr == 1)
-                data = CMD.QR(data, venta.codigoQr);
+            // if(banca.imprimirCodigoQr == 1)
+            //     data = CMD.QR(data, venta.codigoQr);
             
             data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "\n\n");
             }else{
@@ -382,6 +433,59 @@ myApp.service('printerService', function(helperService){
                 
             }
 
+            arrayLoterias[indice].loteriaSuperpale.forEach(function(valor, indiceSuperpale, arrayLoteriaSuperpale){
+                primerCicloJugadas = true;
+                contadorCicleJugadas = 0;
+                totalPorLoteria = 0;
+                console.log("Dentro superpale arrayIdLoteriaSuperpale");
+                jugadas = self.getJugadasSuperpalePertenecienteALoteria(arrayLoterias[indice].id, arrayLoteriaSuperpale[indiceSuperpale].id, venta.jugadas, typeTicket);
+                if(jugadas.length > 0){
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "Super pale("+ arrayLoterias[indice].abreviatura + "/" + arrayLoteriaSuperpale[indiceSuperpale].abreviatura + ")");
+                    data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_4SQUARE, "---------------");
+                
+                    jugadas.forEach(function(valor, indiceJugadas, arrayJugadas){
+                        var jugada = arrayJugadas[indiceJugadas];
+                        var espaciosPrimerMonto = "            ";
+                        var espaciosSegundaJugada = "             ";
+                        var espaciosSegundoMonto = "            ";
+                        total += helperService.redondear(jugada.monto);
+                        totalPorLoteria += helperService.redondear(jugada.monto);
+    
+                        // map[map.length] = _getMapNuevo(cmd: CMD.left);
+                        if(primerCicloJugadas){
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "JUGADA      MONTO        JUGADA      MONTO");
+                            primerCicloJugadas = false;
+                        }
+    
+                        if(((indiceJugadas + 1) % 2) == 0){ //PAR
+                            var jugadaAnterior = helperService.agregarSignoYletrasParaImprimir(jugadas[indiceJugadas - 1].jugada, jugadas[indiceJugadas - 1].sorteo);
+                            var montoAnterior = jugadas[indiceJugadas - 1].monto;
+                            // espaciosPrimerMonto = self.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado(espaciosPrimerMonto, jugadaAnterior) + montoAnterior;
+                            
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, self.quitarOPonerEspaciosJugada(false, montoAnterior, espaciosSegundaJugada) + helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), 0);
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, self.quitarOPonerEspaciosMonto(false, helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), espaciosSegundoMonto) + jugada.monto + self.quitarEspaciosDeAcuerdoAlTamanoDeLaJugadaOMontoDado("     ", jugada.monto));
+                          }else{
+                            // data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, "", 0);
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_ON, helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), 0);
+                            
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_BOLD_OFF, "", 0);
+                            data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, self.quitarOPonerEspaciosMonto(true, helperService.agregarSignoYletrasParaImprimir(jugada.jugada, jugada.sorteo), espaciosPrimerMonto) + jugada.monto + self.siEsUltimaJugadaDarSaltoDeLinea(indiceJugadas, jugadas.length, jugada.monto), 0);
+                          }
+                    });
+    
+                    // var loteriasLength = (typeTicket == CMD.TICKET_PAGADO) ? venta.loterias.length - 1 : venta.loterias.length;
+                    // if(loteriasLength > 1){
+                    //     data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "total: " + String(totalPorLoteria), 2);
+                    // }
+                    var loteriasLength = (typeTicket == CMD.TICKET_PAGADO) ? venta.loterias.length - 1 : venta.loterias.length;
+                    if(loteriasLength > 1){
+                        data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "total: " + String(totalPorLoteria));
+                    }
+                    
+                }
+            });
+
             
         });
 
@@ -412,8 +516,8 @@ myApp.service('printerService', function(helperService){
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_NORMAL, banca.piepagina3);
             if(banca.piepagina4 != null)
                 data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_NORMAL, banca.piepagina4);
-            if(banca.imprimirCodigoQr == 1)
-                data = CMD.QR(data, venta.codigoQr);
+            // if(banca.imprimirCodigoQr == 1)
+            //     data = CMD.QR(data, venta.codigoQr);
             
             data = self.addCommandAndTextToData(data, CMD.TEXT_FORMAT.TXT_2HEIGHT, "\n\n");
             }else{
@@ -514,9 +618,19 @@ myApp.service('printerService', function(helperService){
         console.log("Dentro jugadas: ", jugadas);
         
         if(typeTicket == CMD.TICKET_PAGADO)
-            return jugadas.filter(j => j.idLoteria == idLoteria && j.status == 0);
+            return jugadas.filter(j => j.idLoteria == idLoteria && j.status == 0 && j.sorteo != "Super pale");
         else
-            return jugadas.filter(j => j.idLoteria == idLoteria);
+            return jugadas.filter(j => j.idLoteria == idLoteria && j.sorteo != "Super pale");
+    }
+
+    this.getJugadasSuperpalePertenecienteALoteria = function(idLoteria, idLoteriaSuperpale, jugadas, typeTicket = CMD.TICKET_ORIGINAL){
+        console.log("Dentro jugadas idLoteria: ", idLoteria);
+        console.log("Dentro jugadas: ", jugadas);
+        
+        if(typeTicket == CMD.TICKET_PAGADO)
+            return jugadas.filter(j => j.idLoteria == idLoteria && j.idLoteriaSuperpale == idLoteriaSuperpale && j.status == 0 && j.sorteo == "Super pale");
+        else
+            return jugadas.filter(j => j.idLoteria == idLoteria && j.idLoteriaSuperpale == idLoteriaSuperpale && j.sorteo == "Super pale");
     }
     
     

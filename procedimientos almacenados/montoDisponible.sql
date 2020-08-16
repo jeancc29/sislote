@@ -1,11 +1,13 @@
-use valentin;
-DROP FUNCTION IF EXISTS `montoDisponible`;
-DELIMITER $$
+USE `valentin`;
+DROP function IF EXISTS `montoDisponible`;
 
-CREATE FUNCTION montoDisponible(jugada varchar(8), idLoteria int, idBanca int, idLoteriaSuperpale int) RETURNS DECIMAL(10,2)
-     READS SQL DATA
-DETERMINISTIC
+DELIMITER $$
+USE `valentin`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `montoDisponible`(jugada varchar(8), idLoteria int, idBanca int, idLoteriaSuperpale int) RETURNS decimal(10,2)
+    READS SQL DATA
+    DETERMINISTIC
 BEGIN
+
     
 		declare wday int;
         declare idSorteo int;
@@ -253,8 +255,6 @@ BEGIN
 	-- select 'hola';
       return montoDisponible; -- (select s.monto from stocks s where date(s.created_at) = date(now()) and s.idBanca = idBanca and s.idLoteria = idLoteria and s.jugada = jugada COLLATE utf8mb4_unicode_ci and s.idSorteo = idSorteo);
 END$$
-DELIMITER $$
 
+DELIMITER ;
 
--- select montoDisponible("1234+", 10, 11)
--- select s.monto from stocks s where date(s.created_at) = date(now()) and s.idBanca = 11 and s.idLoteria = 10 and s.jugada = "123" COLLATE utf8mb4_unicode_ci and s.idSorteo = 6;

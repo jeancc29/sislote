@@ -320,53 +320,104 @@
 
                   
 
-                  <div ng-repeat="l in datos.selectedTicket.loterias">
+                  <div ng-repeat="l in datos.selectedTicket.loterias" >
                   <!-- <div class='loterias col-xs-12 text-center mx-3' style='border-top-style: dashed; border-bottom-style: dashed; font-weight: lighter'> -->
-                    <h5 style=' padding: 8px; width: 75%; margin: auto; '  class='text-center font-weight-bold py-1 mt-2 mb-0'>@{{l.descripcion}}</h5>
-                  <!-- </div> -->
+                    
+                  <div ng-if="getJugadasPertenecienteALoteriaLength(l.id, datos.selectedTicket.jugadas) > 0">
+                        <h5 style=' padding: 8px; width: 75%; margin: auto; '  class='text-center font-weight-bold py-1 mt-2 mb-0'>@{{l.descripcion}}</h5>
+                      <!-- </div> -->
 
-                    <table id="mytable" class="table table-sm">
-                    <thead>
-                        <tr>
-                        <th class="text-center font-weight-bold" style="font-size: 12px">tipo sorteo</th>
-                        <th class="text-center font-weight-bold" style="font-size: 12px">jugada</th>
-                        <th class="text-center font-weight-bold " style="font-size: 12px">monto</th>
-                        <th class="text-center font-weight-bold" style="font-size: 12px">premio</th>
-                        <th class="text-center font-weight-bold" style="font-size: 12px">pagado</th>
-                        <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
-                        </tr>
-                    </thead>
-                    <tbody class="">
-                        <tr ng-if="l.id == c.idLoteria" class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in datos.selectedTicket.jugadas ">
-                        <td class="text-center" style="font-size: 12px;">@{{c.sorteo}}</td>
-                        <td class="text-center" style="font-size: 12px;">
-                            @{{agregar_guion(c.jugada, c.sorteo)}}
-                            <!-- <small ng-if="c.sorteo == 'Pick 3 Box' || c.sorteo == 'Pick 4 Box'" class="text-danger font-weight-bold">B</small>
-                            <small ng-if="c.sorteo == 'Pick 3 Straight' || c.sorteo == 'Pick 4 Straight'" class="text-primary font-weight-bold">S</small> -->
-                        </td>
-                        <td class="text-center" style="font-size: 12px;">
-                            @{{c.monto}}
-                        </td>
-                        <td class="text-center" style="font-size: 12px;">
-                            @{{c.premio}}
-                        </td>
-                        <td class="text-center" style="font-size: 12px;">
-                        @{{(c.pagado == 1) ? 'si' : 'no'}}
-                          <a ng-show="c.pagado == 1" style="cursor: pointer;" ng-click="eliminar(c)" class="d-inline   " data-toggle="tooltip" data-placement="top" title="Pagado por @{{c.pagadoPor}} el @{{toFecha(c.fechaPagado.date) | date:'dd/MM/yyyy hh:mm a'}}"><i class="material-icons" style="font-size: 18px!important;">info</i></a>
-                        </td>
-                        
-                        <!-- <td class="td-actions text-center col-1">
-                            <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
-                                <i class="material-icons">close</i>
-                            </button>
-                            </td> -->
-                        </tr>
-                        
-                    </tbody>
-                    </table>
-                    <hr class="mb-0">
+                        <table id="mytable" class="table table-sm">
+                        <thead>
+                            <tr>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">tipo sorteo</th>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">jugada</th>
+                            <th class="text-center font-weight-bold " style="font-size: 12px">monto</th>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">premio</th>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">pagado</th>
+                            <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
+                            </tr>
+                        </thead>
+                        <tbody class="">
+                            <tr ng-if="l.id == c.idLoteria" class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in getJugadasPertenecienteALoteria(l.id, datos.selectedTicket.jugadas)">
+                              <td class="text-center" style="font-size: 12px;">@{{c.sorteo}}</td>
+                              <td class="text-center" style="font-size: 12px;">
+                                  @{{agregar_guion(c.jugada, c.sorteo)}}
+                                  <!-- <small ng-if="c.sorteo == 'Pick 3 Box' || c.sorteo == 'Pick 4 Box'" class="text-danger font-weight-bold">B</small>
+                                  <small ng-if="c.sorteo == 'Pick 3 Straight' || c.sorteo == 'Pick 4 Straight'" class="text-primary font-weight-bold">S</small> -->
+                              </td>
+                              <td class="text-center" style="font-size: 12px;">
+                                  @{{c.monto}}
+                              </td>
+                              <td class="text-center" style="font-size: 12px;">
+                                  @{{c.premio}}
+                              </td>
+                              <td class="text-center" style="font-size: 12px;">
+                              @{{(c.pagado == 1) ? 'si' : 'no'}}
+                                <a ng-show="c.pagado == 1" style="cursor: pointer;" ng-click="eliminar(c)" class="d-inline   " data-toggle="tooltip" data-placement="top" title="Pagado por @{{c.pagadoPor}} el @{{toFecha(c.fechaPagado.date) | date:'dd/MM/yyyy hh:mm a'}}"><i class="material-icons" style="font-size: 18px!important;">info</i></a>
+                              </td>
+                              
+                              <!-- <td class="td-actions text-center col-1">
+                                  <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                      <i class="material-icons">close</i>
+                                  </button>
+                                  </td> -->
+                            </tr>
+                            
+                        </tbody>
+                        </table>
+                        <hr class="mb-0">
+                      </div>
 
-                    </div> <!-- END DIV NG-REPEAT LOTERIAS -->
+                    <div ng-repeat="ls in l.loteriaSuperpale">
+                      <div ng-if="getJugadasSuperpalePertenecienteALoteriaLength(l.id, ls.id, datos.selectedTicket.jugadas) > 0">
+                        <h5 style=' padding: 8px; width: 75%; margin: auto; '  class='text-center font-weight-bold py-1 mt-2 mb-0'>Super pale(@{{l.descripcion}}/@{{ls.descripcion}})</h5>
+                      <!-- </div> -->
+
+                        <table id="mytable" class="table table-sm">
+                        <thead>
+                            <tr>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">tipo sorteo</th>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">jugada</th>
+                            <th class="text-center font-weight-bold " style="font-size: 12px">monto</th>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">premio</th>
+                            <th class="text-center font-weight-bold" style="font-size: 12px">pagado</th>
+                            <!-- <th class="text-center col-1 col-sm-2" style="font-size: 15px">..</th> -->
+                            </tr>
+                        </thead>
+                        <tbody class="">
+                            <tr ng-if="l.id == c.idLoteria" class="font-weight-bold" ng-class="{'bg-rosa ': (c.status == 1 && c.premio <=0), 'bg-info': (c.status == 1 && c.premio >0)}" ng-repeat="c in getJugadasSuperpalePertenecienteALoteria(l.id, l.loteriaSuperpale[0].id, datos.selectedTicket.jugadas)">
+                              <td class="text-center" style="font-size: 12px;">@{{c.sorteo}}</td>
+                              <td class="text-center" style="font-size: 12px;">
+                                  @{{agregar_guion(c.jugada, c.sorteo)}}
+                                  <!-- <small ng-if="c.sorteo == 'Pick 3 Box' || c.sorteo == 'Pick 4 Box'" class="text-danger font-weight-bold">B</small>
+                                  <small ng-if="c.sorteo == 'Pick 3 Straight' || c.sorteo == 'Pick 4 Straight'" class="text-primary font-weight-bold">S</small> -->
+                              </td>
+                              <td class="text-center" style="font-size: 12px;">
+                                  @{{c.monto}}
+                              </td>
+                              <td class="text-center" style="font-size: 12px;">
+                                  @{{c.premio}}
+                              </td>
+                              <td class="text-center" style="font-size: 12px;">
+                              @{{(c.pagado == 1) ? 'si' : 'no'}}
+                                <a ng-show="c.pagado == 1" style="cursor: pointer;" ng-click="eliminar(c)" class="d-inline   " data-toggle="tooltip" data-placement="top" title="Pagado por @{{c.pagadoPor}} el @{{toFecha(c.fechaPagado.date) | date:'dd/MM/yyyy hh:mm a'}}"><i class="material-icons" style="font-size: 18px!important;">info</i></a>
+                              </td>
+                              
+                              <!-- <td class="td-actions text-center col-1">
+                                  <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                      <i class="material-icons">close</i>
+                                  </button>
+                                  </td> -->
+                            </tr>
+                            
+                        </tbody>
+                        </table>
+                        <hr class="mb-0">
+                      </div>
+                    </div>
+
+                  </div> <!-- END DIV NG-REPEAT LOTERIAS -->
                     
                     <!-- <div class="float-right">
                             <div style="font-size: 16px;" class="font-weight-bold">

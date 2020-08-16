@@ -595,7 +595,10 @@ myApp
                             return;
                         }
 
-                        jugadaAdd($scope.datos.loterias[0], $scope.datos.loterias[1]);
+                        if($scope.datos.loterias[0].id > $scope.datos.loterias[1].id)
+                            jugadaAdd($scope.datos.loterias[1], $scope.datos.loterias[0]);
+                        else
+                            jugadaAdd($scope.datos.loterias[0], $scope.datos.loterias[1]);
                     }else{
                         $scope.datos.loterias.forEach(function(valor, indice, array){
                             jugadaAdd(array[indice]);

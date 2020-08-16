@@ -346,12 +346,12 @@ class AwardsController extends Controller
                     }
                     $j['premio'] = $awardsClass->paleBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], $j['idSorteo']);
                 }
-                else if($sorteo->descripcion == "Super pale"){
-                    if(!is_numeric($awardsClass->numerosGanadores)){
-                        return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
-                    }
-                    $j['premio'] = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j['idLoteriaSuperpale'], $j['jugada'], $j['monto'], $j['idSorteo']);
-                }
+                // else if($sorteo->descripcion == "Super pale"){
+                //     if(!is_numeric($awardsClass->numerosGanadores)){
+                //         return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+                //     }
+                //     $j['premio'] = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j['idLoteriaSuperpale'], $j['jugada'], $j['monto'], $j['idSorteo']);
+                // }
                 else if($sorteo->descripcion == "Tripleta"){
                     if(!is_numeric($awardsClass->numerosGanadores)){
                         return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
@@ -407,6 +407,7 @@ class AwardsController extends Controller
 
 
             //Buscar jugadas super pale de esa loteria, ya sea esta la loteria primaria o loteria superpale de la tabla salesdetails
+            // return Response::json(['errores' => 1,'mensaje' => $awardsClass->getJugadasSuperpaleDeFechaDada($l['id'])], 201);
             foreach($awardsClass->getJugadasSuperpaleDeFechaDada($l['id']) as $j){
     
                 $j['premio'] = 0;

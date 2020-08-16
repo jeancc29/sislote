@@ -55,12 +55,17 @@ class SalesResource extends JsonResource
             'razon' => Cancellations::on($this->servidor)->where('idTicket', $this->idTicket)->value('razon'),
             'usuarioCancelacion' => Users::on($this->servidor)->whereId(Cancellations::on($this->servidor)->where('idTicket', $this->idTicket)->value('idUsuario'))->first(),
             'fechaCancelacion' => Cancellations::on($this->servidor)->where('idTicket', $this->idTicket)->value('created_at'),
-            'loterias' => Lotteries::on($this->servidor)->whereIn(
+            'loterias' => collect(Lotteries::on($this->servidor)->whereIn(
                             'id',
                             Salesdetails::on($this->servidor)->distinct()->select('idLoteria')->where('idVenta', $this->id)->get()->map(function($id){
                                 return $id->idLoteria;
                             }) 
-                        )->get(),
+                        )->get())
+                        ->map(function($e){
+                            $sa = Salesdetails::on($this->servidor)->distinct()->select('idLoteriaSuperpale')->where('idVenta', $this->id)->get();
+                            $sp = Lotteries::on($this->servidor)->whereIn("id", $sa)->get();
+                            return ["id" => $e["id"], "descripcion" => $e["descripcion"], "abreviatura" => $e["abreviatura"], "loteriaSuperpale" => $sp];
+                        }),
             'jugadas' => collect(Salesdetails::on($this->servidor)->where('idVenta', $this->id)->get())->map(function($d){
                 $sorteo = Draws::on($this->servidor)->whereId($d['idSorteo'])->first()->descripcion;
                 $pagadoPor = null;
@@ -72,7 +77,7 @@ class SalesResource extends JsonResource
                         $fechaPagado = $logs->created_at;
                     }
                 }
-                return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'pagado' => $d['pagado'], 'status' => $d['status'], 'sorteo' => $sorteo, 'pagadoPor' => $pagadoPor, 'fechaPagado' => $fechaPagado];
+                return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idLoteriaSuperpale' => $d['idLoteriaSuperpale'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'pagado' => $d['pagado'], 'status' => $d['status'], 'sorteo' => $sorteo, 'pagadoPor' => $pagadoPor, 'fechaPagado' => $fechaPagado];
             }),
             'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A'),
             'img' =>  (new TicketPrintClass($this->servidor, $this->id))->generate(),

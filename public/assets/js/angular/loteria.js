@@ -337,8 +337,8 @@ myApp
             
             console.log('actualizar count:', $scope.loteriasSeleccionadasCount());
             if($scope.superPaleEstaSeleccionado()){
-                if($scope.loteriasSeleccionadasCount() != 2){
-                    alert("Debe seleccionar las dos loterias pertenecientes al supe pale");
+                if($scope.loteriasSeleccionadasCount() <= 0){
+                    alert("Debe seleccionar las loterias pertenecientes al supe pale");
                 return;
                 }
             }
