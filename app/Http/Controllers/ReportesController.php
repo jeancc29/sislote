@@ -1150,7 +1150,7 @@ class ReportesController extends Controller
         $ticket = (new SalesResource($ticket))->servidor($datos["servidor"]);
         $img = new TicketToHtmlClass("valentin", $ticket);
         $img = $img->generate();
-        $ticket["img"] = $img;
+        $ticket->push(["testImage" => $img]);
         return Response::json([
             'ticket' => $ticket,
             'errores' => 0,
