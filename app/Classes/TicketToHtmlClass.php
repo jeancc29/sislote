@@ -163,7 +163,7 @@ class TicketToHtmlClass{
                             $yaAbrioSegundaTabla = false;
                             
                             $total = $this->getTotalLoteriaSuperpale($jugadas);
-                            $this->setLoteriaTotal($l->descripcion . "/". $loteriaSuperpale->descripcion, $total);
+                            $this->setLoteriaTotal("Super pale (". $l->descripcion . "/". $loteriaSuperpale->descripcion . ")", $total);
 
                             $this->openColXs6();
                             $this->openTable();
