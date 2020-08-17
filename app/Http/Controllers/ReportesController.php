@@ -34,6 +34,7 @@ use App\Classes\TicketToHtmlClass;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
+use App\Http\Resources\SalesImageResource;
 use App\Http\Resources\BranchesResource;
 use App\Http\Resources\RolesResource;
 use App\Http\Resources\UsersResource;
@@ -1147,10 +1148,8 @@ class ReportesController extends Controller
             ], 201);
         }
     
-        $ticket = (new SalesResource($ticket))->servidor($datos["servidor"]);
-        $img = new TicketToHtmlClass("valentin", $ticket);
-        $img = $img->generate();
-        $ticket->push(["testImage" => $img]);
+        $ticket = (new SalesImageResource($ticket))->servidor($datos["servidor"]);
+        
         return Response::json([
             'ticket' => $ticket,
             'errores' => 0,

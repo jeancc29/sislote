@@ -15,7 +15,7 @@ use App\Classes\TicketPrintClass;
 use App\Classes\TicketToHtmlClass;
 use App\Logs;
 
-class SalesResource extends JsonResource
+class SalesImageResource extends JsonResource
 {
     protected $servidor;
 
@@ -82,17 +82,17 @@ class SalesResource extends JsonResource
             }),
             'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A'),
             // 'img' =>  (new TicketPrintClass($this->servidor, $this->id))->generate(),
-            // 'img' =>  (new TicketToHtmlClass($this->servidor, \App\Sales::on($this->servidor)->whereId($this->id)->first()))->generate(),
+            'img' =>  (new TicketToHtmlClass($this->servidor, \App\Sales::on($this->servidor)->whereId($this->id)->first()))->generate(),
         ];
     }
 
     public static function collection($resource){
-        return new SalesResourceCollection($resource, get_called_class());
+        return new SalesImageResourceCollection($resource, get_called_class());
     }
     
 }
 
-class SalesResourceCollection extends ResourceCollection {
+class SalesImageResourceCollection extends ResourceCollection {
 
     protected $servidor;
 
@@ -102,7 +102,7 @@ class SalesResourceCollection extends ResourceCollection {
     }
 
     public function toArray($request){
-        return $this->collection->map(function(SalesResource $resource) use($request){
+        return $this->collection->map(function(SalesImageResource $resource) use($request){
             return $resource->servidor($this->servidor)->toArray($request);
     })->all();
 
