@@ -403,6 +403,7 @@ class PrincipalController extends Controller
                 $idLoterias = collect($idLoterias)->map(function($id){
                     return $id->idLoteria;
                 });
+                
     
                 $loterias = Lotteries::on($codigoBarra["servidor"])->whereIn('id', $idLoterias)->whereStatus(1)->get();
                 $loterias = collect($loterias)->map(function($e) use($idVenta, $codigoBarra){
