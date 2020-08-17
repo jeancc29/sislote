@@ -89,78 +89,131 @@ class TicketToHtmlClass{
                 foreach($loterias as $l){
                     $contadorJugadasLoteria = 0;
                     $yaAbrioSegundaTabla = false;
-                    if($idLoteria != $l->id){
-                        $idLoteria = $l->id;
-                        $total = $this->getTotalLoteria($l->id);
-                        $this->setLoteriaTotal($l->descripcion, $total);
-                    }
+                    // if($idLoteria != $l->id){
+                    //     $idLoteria = $l->id;
+                    //     $total = $this->getTotalLoteria($l->id);
+                    //     $this->setLoteriaTotal($l->descripcion, $total);
+                    // }
                     
-                        $this->openColXs6();
+                        
                     
+                    $jugadas = $this->getJugadasPertenecientesALoteria($l->id);
+                    if(count($jugadas) > 0){
+                        
+                        $total = $this->getTotalLoteria($jugadas);
+                        $this->setLoteriaTotal($l->descripcion . " ". count($jugadas), $total);
 
-                    $this->openTable();
-                                $this->setTableHead();
-                                $this->openTableBody();
-                    foreach($this->ventasDetalles as $d){
-                        if($l->id == $d->idLoteria){
+                        $this->openColXs6();
+                        $this->openTable();
+                        $this->setTableHead();
+                        $this->openTableBody();
+
+                        
+                        foreach($jugadas as $d){
+                            
                             $loteria = $l;
-                        $contadorJugadasLoteria++;
-                        //Si la variable $idLoteria es diferente de $loteria->id entonces agregamos el header con el nombre de la loteria y su total
-                        // if($idLoteria != $loteria->id){
-                        //     $idLoteria = $loteria->id;
-                        //     $total = $this->getTotalLoteria($loteria->id);
-                        //     $this->setLoteriaTotal($loteria->descripcion, $total);
-                        // }
-                        
-                        
-                        // if($this->contadorJugadas > 3 && $contadorJugadasLoteria == 1){
-                        //     $this->openColXs6();
-                        // }
-                        if($this->contadorJugadas >= 2 && $yaAbrioSegundaTabla == false && $contadorJugadasLoteria > round($this->contadorJugadas / 2)){
+                            $contadorJugadasLoteria++;
+                            
+                            if(count($jugadas) && $yaAbrioSegundaTabla == false && $contadorJugadasLoteria > round(count($jugadas) / 2)){
                                 $this->closeTableBody();
                                 $this->closeTable();
-                            $this->closeCol();
+                                $this->closeCol();
 
+                                $this->openColXs6();
+                                $this->openTable();
+                                $this->setTableHead();
+                                $this->openTableBody();
+                                $yaAbrioSegundaTabla = true;
+                            }
                             
+                            $jugada = Helper::agregarGuion($this->servidor, $d->jugada, $d->idSorteo);
+                            $this->setJugada($jugada, $d->monto);
+                            
+                            
+                        } //END foreach
+
+                        
+
+                        $this->closeTableBody();
+                        $this->closeTable();
+                        $this->closeCol();
+
+                        if(count($jugadas) < 2){
+                            $this->openColXs6();
+                            $this->openTable();
+                            $this->setTableHead();
+                            $this->openTableBody();
+
+                            $this->closeTableBody();
+                            $this->closeTable();
+                            $this->closeCol();
+                        }
+                    }
+
+
+                    if($l->loteriaSuperpale == null)
+                        continue;
+
+
+                    
+                    foreach($l->loteriaSuperpale as $loteriaSuperpale){
+                        $jugadas = $this->getJugadasSuperpalePertenecientesALoteria($l->id, $loteriaSuperpale->id);
+                        if(count($jugadas) > 0){
+                            $contadorJugadasLoteria = 0;
+                            $yaAbrioSegundaTabla = false;
+                            
+                            $total = $this->getTotalLoteriaSuperpale($jugadas);
+                            $this->setLoteriaTotal($l->descripcion . "/". $loteriaSuperpale->descripcion, $total);
 
                             $this->openColXs6();
                             $this->openTable();
-                                $this->setTableHead();
-                                $this->openTableBody();
-                            $yaAbrioSegundaTabla = true;
-                        }
-                        // else{
-                        //     $this->openColXs12();
-                        // }
-                            // $this->openTable();
-                            //     $this->setTableHead();
-                            //     $this->openTableBody();
-                                    $jugada = Helper::agregarGuion($this->servidor, $d->jugada, $d->idSorteo);
-                                    $this->setJugada($jugada, $d->monto);
-                        //         $this->closeTableBody();
-                        //     $this->closeTable();
-                        // $this->closeCol();
+                            $this->setTableHead();
+                            $this->openTableBody();
 
-                        }//END IF loteria
-                        
-                    } //END foreach
+                            
+                            foreach($jugadas as $d){
+                                
+                                $loteria = $l;
+                                $contadorJugadasLoteria++;
+                                
+                                if(count($jugadas) && $yaAbrioSegundaTabla == false && $contadorJugadasLoteria > round(count($jugadas) / 2)){
+                                    $this->closeTableBody();
+                                    $this->closeTable();
+                                    $this->closeCol();
 
-                    
+                                    $this->openColXs6();
+                                    $this->openTable();
+                                    $this->setTableHead();
+                                    $this->openTableBody();
+                                    $yaAbrioSegundaTabla = true;
+                                }
+                                
+                                $jugada = Helper::agregarGuion($this->servidor, $d->jugada, $d->idSorteo);
+                                $this->setJugada($jugada, $d->monto);
+                                
+                                
+                            } //END foreach
 
-                    $this->closeTableBody();
-                    $this->closeTable();
-                $this->closeCol();
+                            
 
-                if($this->contadorJugadas < 2){
-                        $this->openColXs6();
+                            $this->closeTableBody();
+                            $this->closeTable();
+                            $this->closeCol();
+
+                            if(count($jugadas) < 2){
+                                $this->openColXs6();
                                 $this->openTable();
                                 $this->setTableHead();
                                 $this->openTableBody();
 
                                 $this->closeTableBody();
                                 $this->closeTable();
-                            $this->closeCol();
+                                $this->closeCol();
+                            }
+                        }
                     }
+                    
+                    
                 }
 
                 
@@ -209,19 +262,51 @@ class TicketToHtmlClass{
         return $this->html;
     }
 
-    function getTotalLoteria($id){
+    function getTotalLoteria($jugadas){
         $total = 0;
         $contadorJugadas = 0;
-        foreach($this->ventasDetalles as $d){
-            if($d->idLoteria == $id){
-                $total += $d->monto;
-                $contadorJugadas++;
-            }
+        foreach($jugadas as $d){
+            $total += $d->monto;
+            $contadorJugadas++;
         }
 
         $this->contadorJugadas = $contadorJugadas;
 
         return (float)$total;
+    }
+
+    function getTotalLoteriaSuperpale($jugadas){
+        $total = 0;
+        $contadorJugadas = 0;
+        foreach($jugadas as $d){
+            $total += $d->monto;
+            $contadorJugadas++;
+        }
+
+        $this->contadorJugadas = $contadorJugadas;
+
+        return (float)$total;
+    }
+
+    function getJugadasPertenecientesALoteria($id){
+        $total = 0;
+        $contadorJugadas = 0;
+        list($jugadasLoterias, $no) = $this->ventasDetalles->partition(function($j) use($id){
+            return $j->idLoteria == $id && $j->sorteo != "Super pale";
+        });
+
+        return $jugadasLoterias;
+    }
+
+    function getJugadasSuperpalePertenecientesALoteria($id, $idSuperpale){
+        $total = 0;
+        $contadorJugadas = 0;
+        list($jugadasLoterias, $no) = $this->ventasDetalles->partition(function($j) use($id, $idSuperpale){
+            // abort(203, $j->idLoteriaSuperpale);
+            return $j->idLoteria == $id && $j->idLoteriaSuperpale == $idSuperpale && $j->sorteo == "Super pale";
+        });
+
+        return $jugadasLoterias;
     }
 
     function openHeader()

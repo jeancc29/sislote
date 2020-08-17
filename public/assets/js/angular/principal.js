@@ -937,7 +937,7 @@ myApp
                 $http.post(rutaGlobal+"/api/principal/guardar",{'datos':jwt, 'action':'sp_ventas_actualiza'})
                 .then(function(response){
 
-                    // console.log('Principal.js venta_guardar : ', response.data);
+                    console.log('Principal.js venta_guardar : ', response.data.img);
  
                     if(response.data.errores == 0)
                         {
