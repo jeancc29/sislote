@@ -12,6 +12,7 @@ use App\Lotteries;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt; 
 use App\Classes\TicketPrintClass;
+use App\Classes\TicketToHtmlClass;
 use App\Logs;
 
 class SalesResource extends JsonResource
@@ -80,7 +81,8 @@ class SalesResource extends JsonResource
                 return ['id' => $d['id'], 'idVenta' => $d['idVenta'], 'jugada' => $d['jugada'], 'idLoteria' => $d['idLoteria'], 'idLoteriaSuperpale' => $d['idLoteriaSuperpale'], 'idSorteo' => $d['idSorteo'], 'monto' => $d['monto'], 'premio' => $d['premio'], 'pagado' => $d['pagado'], 'status' => $d['status'], 'sorteo' => $sorteo, 'pagadoPor' => $pagadoPor, 'fechaPagado' => $fechaPagado];
             }),
             'fecha' => (new Carbon($this->created_at))->toDateString() . " " . (new Carbon($this->created_at))->format('g:i A'),
-            'img' =>  (new TicketPrintClass($this->servidor, $this->id))->generate(),
+            // 'img' =>  (new TicketPrintClass($this->servidor, $this->id))->generate(),
+            // 'img' =>  (new TicketToHtmlClass($this->servidor, (new SalesResource($this))->servidor($this->servidor)))->generate(),
         ];
     }
 

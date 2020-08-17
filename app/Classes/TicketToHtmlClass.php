@@ -48,9 +48,17 @@ class TicketToHtmlClass{
     private $codigoBarra;
 
     function __construct($servidor, $data){
-        if($data[0]->venta != null){
+        if(isset($data[0]->venta)){
             $this->venta = json_decode($data[0]->venta);
             $this->venta = $this->venta[0];
+        }else{
+            $venta = (new SalesResource($data))->servidor($servidor);
+            //Llamamos al metodo toArray(true) para traer todos los datos del resource
+            $ventaToArray = $venta->toArray(true);
+            //Convertimos ventasToArray to ventasToJsonString para asi convertir los valores a json
+            $ventaToJsonString = json_encode($ventaToArray);
+            //Por ultimo convertimos jsonString to json porque esta la clase TicketTOHtmlClass maneja las ventas en formato json
+            $this->venta = json_decode($ventaToJsonString);
         }
 
         
@@ -58,7 +66,7 @@ class TicketToHtmlClass{
         $this->banca = $this->venta->banca;
         $this->ventasDetalles = $this->venta->jugadas;
         $this->ventasDetalles = collect($this->ventasDetalles);
-        $this->usuario = $this->venta->usuarioObject;
+        // $this->usuario = $this->venta->usuarioObject;
         $this->codigoBarra = $this->venta->codigoBarra;
     }
 
@@ -72,8 +80,9 @@ class TicketToHtmlClass{
         $this->openTicket();
             if(!$this->copia)
                 $this->setOriginal();
-
+        
             $this->setFirstFecha();
+            // return;
             $this->setTicket();
             $this->setSecondFecha();
 
@@ -84,6 +93,7 @@ class TicketToHtmlClass{
                 $ventasDetallesOrdenadasPorLoteria = $this->ventasDetalles->sortByDesc('idLoteria');
                 $idLoteria = 0;
                 $loterias = $this->venta->loterias;
+                // return $this->venta;
                 //$loterias = collect($loterias);
                 //return $loterias;
                 foreach($loterias as $l){
@@ -101,7 +111,7 @@ class TicketToHtmlClass{
                     if(count($jugadas) > 0){
                         
                         $total = $this->getTotalLoteria($jugadas);
-                        $this->setLoteriaTotal($l->descripcion . " ". count($jugadas), $total);
+                        $this->setLoteriaTotal($l->descripcion, $total);
 
                         $this->openColXs6();
                         $this->openTable();
@@ -407,7 +417,7 @@ class TicketToHtmlClass{
     }
 
     function setFirstFecha(){
-        $fecha = new Carbon($this->venta->created_at);
+        $fecha = (gettype($this->venta->created_at) == "object") ? new Carbon(strval($this->venta->created_at->date)) : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;
@@ -415,7 +425,7 @@ class TicketToHtmlClass{
     }
 
     function setSecondFecha(){
-        $fecha = new Carbon($this->venta->created_at);
+        $fecha = (gettype($this->venta->created_at) == "object") ? new Carbon(strval($this->venta->created_at->date)) : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;

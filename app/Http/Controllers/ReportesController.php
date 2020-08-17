@@ -30,6 +30,7 @@ use App\Commissions;
 use App\Permissions;
 use App\Coins;
 use App\Classes\Helper;
+use App\Classes\TicketToHtmlClass;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
@@ -1146,9 +1147,12 @@ class ReportesController extends Controller
             ], 201);
         }
     
-    
+        $ticket = (new SalesResource($ticket))->servidor($datos["servidor"]);
+        $img = new TicketToHtmlClass("valentin", $venta);
+        $img = $img->generate();
+        $ticket["img"] = $img;
         return Response::json([
-            'ticket' => (new SalesResource($ticket))->servidor($datos["servidor"]),
+            'ticket' => $ticket,
             'errores' => 0,
             'mensaje' => "El ticket no existe",
         ], 201);
