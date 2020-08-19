@@ -1216,9 +1216,14 @@ class PrincipalController extends Controller
         if($data[0]->errores == 1){
             return Response::json([
                 'errores' => 1,
-                'mensaje' => $data[0]->mensaje
+                'mensaje' => $data[0]->mensaje,
+                'data' => $data,
             ], 201);
         }
+        // return Response::json([
+        //     'errores' => 1,
+        //     'mensaje' => $data[0]
+        // ], 201);
 
         $img = new TicketToHtmlClass($datos["servidor"], $data);
         event(new RealtimeStockEvent($datos["servidor"], true));

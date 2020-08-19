@@ -51,6 +51,7 @@ class TicketToHtmlClass{
         if(isset($data[0]->venta)){
             $this->venta = json_decode($data[0]->venta);
             $this->venta = $this->venta[0];
+            // abort(203, "Dentro isset data");
         }else{
             $venta = (new SalesResource($data))->servidor($servidor);
             //Llamamos al metodo toArray(true) para traer todos los datos del resource
