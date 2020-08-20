@@ -13,12 +13,12 @@ class CreateServersTable extends Migration
      */
     public function up()
     {
-        // Schema::create('servers', function (Blueprint $table) {
-        //     $table->increments('id');
-        //     $table->string('descripcion');
-        //     $table->boolean('pordefecto');
-        //     $table->timestamps();
-        // });
+        Schema::create('servers', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('descripcion');
+            $table->boolean('pordefecto');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -28,6 +28,6 @@ class CreateServersTable extends Migration
      */
     public function down()
     {
-        // Schema::dropIfExists('servers');
+        Schema::dropIfExists('servers');
     }
 }
