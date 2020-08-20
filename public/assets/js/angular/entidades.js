@@ -49,7 +49,7 @@ myApp
                 $timeout(function() {
                     // anything you want can go here and will safely be run on the next digest.
                     $('.selectpicker').selectpicker("refresh");
-                    
+                    helperService.actualizarScrollBar();
                   })
             }else{
                 var jwt = helperService.createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
@@ -69,7 +69,7 @@ myApp
                         $timeout(function() {
                             // anything you want can go here and will safely be run on the next digest.
                             $('.selectpicker').selectpicker("refresh");
-                            
+                            helperService.actualizarScrollBar();
                           })
                         
                     });

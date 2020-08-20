@@ -24,6 +24,11 @@ myApp
                console.log(response.data);
                $scope.datos.sesiones = response.data.sesiones;
               
+               $timeout(function() {
+                $scope.$digest();
+                helperService.actualizarScrollBar();
+               // $('.selectpicker').selectpicker('val', [])
+            });
                
            });
                

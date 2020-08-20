@@ -404,6 +404,7 @@ myApp
                     //$('#multiselect').selectpicker('val', []);
                     $('#multiselect').selectpicker("refresh");
                     $('.selectpicker').selectpicker("refresh");
+                    helperService.actualizarScrollBar();
                     // $('.selectpicker').selectpicker('val', [])
                   })
                

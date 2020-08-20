@@ -67,17 +67,17 @@
           </div><!-- END CARD HEADER -->
           <div class="wizard-navigation">
             <ul class="nav nav-pills">
-              <li ng-init="tabActiva = 1" class="nav-item">
+              <li ng-click="tabChange(tabActiva)" ng-init="tabActiva = 1" class="nav-item">
                 <a ng-click="tabActiva = 1" class="nav-link" href="#buscar" data-toggle="tab" role="tab">
                   Buscar
                 </a>
               </li>
-              <li class="nav-item">
+              <li ng-click="tabChange(tabActiva)" class="nav-item">
                 <a ng-click="tabActiva = 2" class="nav-link" href="#loterias" data-toggle="tab" role="tab">
                   Loterias
                 </a>
               </li>
-              <li class="nav-item">
+              <li ng-click="tabChange(tabActiva)" class="nav-item">
                 <a ng-click="tabActiva = 3" class="nav-link" href="#jugadas" data-toggle="tab" role="tab">
                   Jugadas
                 </a>

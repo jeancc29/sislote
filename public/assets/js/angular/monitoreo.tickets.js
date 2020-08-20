@@ -65,28 +65,29 @@ myApp
         $scope.inicializarDatos = function(response = null){
 
             
-           //console.log('bancasGlobal', bancasGlobal);
+           console.log('bancasGlobal', bancasGlobal);
             
-            // $scope.datos.optionsBancas = bancasGlobal;
-            // $scope.datos.optionsLoterias = loteriasGlobal;
-            // $scope.datos.optionsSorteos = sorteosGlobal;
-            // $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
-            // $scope.datos.optionsLoterias.unshift({'id' : 0, 'descripcion' : 'N/A'});
-            // $scope.datos.optionsSorteos.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsBancas = bancasGlobal;
+            $scope.datos.optionsLoterias = loteriasGlobal;
+            $scope.datos.optionsSorteos = sorteosGlobal;
+            $scope.datos.optionsBancas.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsLoterias.unshift({'id' : 0, 'descripcion' : 'N/A'});
+            $scope.datos.optionsSorteos.unshift({'id' : 0, 'descripcion' : 'N/A'});
 
-            // $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
-            // $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
-            // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+            $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
+            $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
+            $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
             
-            // $timeout(function() {
-            //     // anything you want can go here and will safely be run on the next digest.
-            //     //$('#multiselect').selectpicker('val', []);
-            //     $('#multiselect').selectpicker("refresh");
-            //     $('.selectpicker').selectpicker("refresh");
-            //     //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
-            //   })
+            $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                //$('#multiselect').selectpicker('val', []);
+                $('#multiselect').selectpicker("refresh");
+                $('.selectpicker').selectpicker("refresh");
+                helperService.actualizarScrollBar();
+                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+              })
 
-            getMonitoreo(true);
+            // getMonitoreo(true);
            
        
         }
@@ -362,6 +363,14 @@ myApp
                     alert(response.data.mensaje);
                     return;
                 }
+
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    //$('#multiselect').selectpicker('val', []);
+                    helperService.actualizarScrollBar();
+                    //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+                  })
+
 
                 // if(response.data[0].errores == 0){
                 //     $scope.inicializarDatos($scope.datos.idLoteria, $scope.datos.idSorteo);

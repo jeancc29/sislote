@@ -353,8 +353,8 @@ class ReportesController extends Controller
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
 
-            $idMonedaPordefecto = Coins::wherePordefecto(1)->first()->id;
-            $idBancas = Branches::where(['status' => 1, 'idMoneda' => $idMonedaPordefecto])->get();
+            $idMonedaPordefecto = Coins::on(session("servidor"))->wherePordefecto(1)->first()->id;
+            $idBancas = Branches::on(session("servidor"))->where(['status' => 1, 'idMoneda' => $idMonedaPordefecto])->get();
             $idBancas = collect($idBancas)->map(function($b){
                 return $b->id;
             });

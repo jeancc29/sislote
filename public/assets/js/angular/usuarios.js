@@ -74,6 +74,7 @@ myApp
                     $scope.$digest();
                     $('#multiselect').selectpicker("refresh");
                     $('.selectpicker').selectpicker("refresh");
+                    helperService.actualizarScrollBar();
                    // $('.selectpicker').selectpicker('val', [])
                 });
                

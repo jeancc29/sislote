@@ -108,6 +108,7 @@ myApp
                             $('.selectpicker').selectpicker("refresh");
                             $('#entidad1').selectpicker('val', [])
                             $('#entidad2').selectpicker('val', [])
+                            helperService.actualizarScrollBar();
                             
                           })
 

@@ -260,6 +260,7 @@ myApp
                         //$('#multiselect').selectpicker('val', []);
                         $('#multiselect').selectpicker("refresh");
                         $('.selectpicker').selectpicker("refresh");
+                        helperService.actualizarScrollBar();
                         //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
                     });
                    }

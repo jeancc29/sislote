@@ -36,6 +36,12 @@ myApp
                         console.log('Loteria ajav: ', response.data);
                         limpiar();
                         $scope.datos.monedas = response.data.monedas;
+
+                        $timeout(function() {
+                            $scope.$digest();
+                            helperService.actualizarScrollBar();
+                           // $('.selectpicker').selectpicker('val', [])
+                        });
                 });
             }
         }
@@ -55,6 +61,14 @@ myApp
             }
 
             $scope.datos.mostrarFormEditar = true;
+
+
+
+            $timeout(function() {
+                $scope.$digest();
+                helperService.actualizarScrollBar();
+               // $('.selectpicker').selectpicker('val', [])
+            });
         }
 
         $scope.actualizar = function(){

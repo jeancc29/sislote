@@ -1448,7 +1448,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
             </li>
             @endif
 
-            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar prestamos"))
+            <!-- @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar prestamos"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('prestamos')}}">
                     <i class="material-icons">format_list_numbered</i>
@@ -1457,7 +1457,7 @@ if(session('idUsuario') == null && $controlador != 'login'){
                     </p>
                 </a>
             </li>
-            @endif
+            @endif -->
 
             @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar entidades contables"))
             <li class="nav-item ">

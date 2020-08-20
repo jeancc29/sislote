@@ -273,6 +273,7 @@ myApp
                     //$('#multiselect').selectpicker('val', []);
                     $('#multiselect').selectpicker("refresh");
                     $('.selectpicker').selectpicker("refresh");
+                    helperService.actualizarScrollBar();
                     // $('#cbxBanca').selectpicker('val', [])
                   })
 
@@ -318,6 +319,7 @@ myApp
                     //$('#multiselect').selectpicker('val', []);
                     $('#multiselect').selectpicker("refresh");
                     $('.selectpicker').selectpicker("refresh");
+                    helperService.actualizarScrollBar();
                     // $('#cbxBanca').selectpicker('val', [])
                   })
 
@@ -401,6 +403,7 @@ myApp
                     //$('#multiselect').selectpicker('val', []);
                     $('#multiselect').selectpicker("refresh");
                     $('.selectpicker').selectpicker("refresh");
+                    helperService.actualizarScrollBar();
                     // $('#cbxBanca').selectpicker('val', [])
                   })
                
@@ -421,6 +424,15 @@ myApp
         }
 
 
+        $scope.tabChange = function(tab){
+            if(tab != 1){
+                $timeout(function() {
+                    // anything you want can go here and will safely be run on the next digest.
+                    helperService.actualizarScrollBar();
+                    // $('#cbxBanca').selectpicker('val', [])
+                  })
+            }
+        }
         
 
 

@@ -1,5 +1,5 @@
 myApp
-    .controller("myController", function($scope, $http, helperService){
+    .controller("myController", function($scope, $http, $timeout, helperService){
         $scope.busqueda = "";
         // $scope.optionsTipoUsuario = [{name:"Cliente", id:1}, {name:"Garante", id:2}, {name:"Usuario", id:3}];
         // $scope.selectedTipoUsuario = $scope.optionsTipoUsuario[0];
@@ -89,8 +89,19 @@ myApp
                 })
                // $scope.datos.loterias =response.data.loterias;
             
-                
+               $timeout(function() {
+                // anything you want can go here and will safely be run on the next digest.
+                //$('#multiselect').selectpicker('val', []);
+                $('#multiselect').selectpicker("refresh");
+                $('.selectpicker').selectpicker("refresh");
+                helperService.actualizarScrollBar();
+                //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
+              })
+
             });
+
+           
+
        
         }
         

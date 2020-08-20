@@ -75,15 +75,20 @@ myApp
             
             $scope.datos.selectedBanca = $scope.datos.optionsBancas[0];
             $scope.optionsMonedas = monedasGlobal;
+            console.log("monedas: ", $scope.optionsMonedas);
+            
             $scope.selectedMoneda = $scope.optionsMonedas[0];
             // $scope.datos.selectedLoteria = $scope.datos.optionsLoterias[0];
             // $scope.datos.selectedSorteo = $scope.datos.optionsSorteos[0];
+            
+            console.log("Dentro inicializar datos");
             
             $timeout(function() {
                 // anything you want can go here and will safely be run on the next digest.
                 //$('#multiselect').selectpicker('val', []);
                 $('#multiselect').selectpicker("refresh");
                 $('.selectpicker').selectpicker("refresh");
+                helperService.actualizarScrollBar();
                 //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
               })
        
@@ -190,8 +195,11 @@ myApp
                             //$('#multiselect').selectpicker('val', []);
                             $('#multiselect').selectpicker("refresh");
                             $('.selectpicker').selectpicker("refresh");
+                            helperService.actualizarScrollBar();
                             //$('#cbxLoteriasBuscarJugada').selectpicker('val', [])
                           })
+
+                          
 
                         
                     // }else{
