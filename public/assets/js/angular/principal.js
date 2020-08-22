@@ -1342,8 +1342,9 @@ myApp
             $scope.datos.jugadasReporte.idLoteria = $scope.datos.jugadasReporte.selectedLoteria.id;
             $scope.datos.jugadasReporte.bancas = [];
             $scope.datos.jugadasReporte.bancas.push($scope.datos.selectedBancas);
-          
-          $http.post(rutaGlobal+"/api/reportes/jugadas", {'action':'sp_jugadas_buscar', 'datos': $scope.datos.jugadasReporte})
+            $scope.datos.jugadasReporte.servidor = $scope.datos.servidor;
+            var jwt = helperService.createJWT($scope.datos.jugadasReporte);
+          $http.post(rutaGlobal+"/api/reportes/jugadas", {'action':'sp_jugadas_buscar', 'datos': jwt})
              .then(function(response){
 
                 

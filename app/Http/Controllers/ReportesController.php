@@ -62,11 +62,24 @@ class ReportesController extends Controller
         }
 
         
-        $datos = request()->validate([
-            'datos.idLoteria' => '',
-            'datos.fecha' => '',
-            'datos.bancas' => ''
-        ])['datos'];
+        // $datos = request()->validate([
+        //     'datos.idLoteria' => '',
+        //     'datos.fecha' => '',
+        //     'datos.bancas' => ''
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
     
         $fecha = getdate(strtotime($datos['fecha']));
     
@@ -83,7 +96,7 @@ class ReportesController extends Controller
             });
 
 
-            $idVentas = Sales::select('id')
+            $idVentas = Sales::on($datos["servidor"])->select('id')
                 ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                 ->whereNotIn('status', [0,5])
                 ->whereIn('idBanca', $idBancas)
@@ -95,7 +108,8 @@ class ReportesController extends Controller
         
         
             $jugadas = Salesdetails::
-                        where('idLoteria', $datos['idLoteria'])
+            on($datos["servidor"])
+                        ->where('idLoteria', $datos['idLoteria'])
                         ->whereIn('idVenta', $idVentas)
                         ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
                         ->get();
@@ -111,8 +125,8 @@ class ReportesController extends Controller
             'jugadas' => $jugadas,
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'loterias' => Lotteries::whereStatus(1)->get(),
-            'bancas' => Branches::whereStatus(1)->get()
+            'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
+            // 'bancas' => Branches::whereStatus(1)->get()
         ], 201);
     }
 
