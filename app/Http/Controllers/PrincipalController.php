@@ -688,7 +688,8 @@ class PrincipalController extends Controller
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
-            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
+            // $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
+            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereIn('status', [1,2])->get()->first();
             
             if($venta != null){
                 
