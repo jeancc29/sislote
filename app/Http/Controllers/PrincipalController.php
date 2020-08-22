@@ -693,18 +693,24 @@ class PrincipalController extends Controller
             
             if($venta != null){
                 
-                if(Helper::verificarTicketHaSidoPagado($datos["servidor"], $venta->id)){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => 'El ticket ya ha sido pagado'
-                    ], 201);
-                }else{
-                    return Response::json([
-                        'errores' => 0,
-                        'mensaje' => '',
-                        'venta' =>  (new SalesResource($venta))->servidor($datos["servidor"])
-                    ], 201);
-                }
+                // if(Helper::verificarTicketHaSidoPagado($datos["servidor"], $venta->id)){
+                //     return Response::json([
+                //         'errores' => 1,
+                //         'mensaje' => 'El ticket ya ha sido pagado'
+                //     ], 201);
+                // }else{
+                //     return Response::json([
+                //         'errores' => 0,
+                //         'mensaje' => '',
+                //         'venta' =>  (new SalesResource($venta))->servidor($datos["servidor"])
+                //     ], 201);
+                // }
+
+                return Response::json([
+                    'errores' => 0,
+                    'mensaje' => '',
+                    'venta' =>  (new SalesResource($venta))->servidor($datos["servidor"])
+                ], 201);
     
             }else{
                 
