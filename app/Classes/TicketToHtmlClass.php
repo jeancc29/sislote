@@ -419,7 +419,7 @@ class TicketToHtmlClass{
 
     function setFirstFecha(){
         try {
-            $fecha = (gettype($this->venta->created_at) == "object") 
+            $fecha = (gettype($this->venta->created_at) == "object" || gettype($this->venta->created_at) == "array") 
         ? new Carbon(strval($this->venta->created_at->date)) 
         : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
