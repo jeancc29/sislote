@@ -48,7 +48,7 @@ class SalesResource extends JsonResource
             'codigoBarra' => $this->ticket->codigoBarra,
             'codigoQr' => base64_encode($this->ticket->codigoBarra),
             'status' => $this->status, 
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->toDateTimeString(),
             'pagado' => $this->pagado,
             'montoPagado' => Salesdetails::on($this->servidor)->where(['idVenta' => $this->id, 'pagado' => 1])->sum('premio'),
             'premio' => Salesdetails::on($this->servidor)->where('idVenta', $this->id)->sum('premio'),
