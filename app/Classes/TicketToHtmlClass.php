@@ -425,7 +425,7 @@ class TicketToHtmlClass{
         : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
         } catch (\Throwable $th) {
-            // throw $this->venta->created_at;
+            throw $th;
             abort(402, json_encode($this->venta->created_at));
         }
 
