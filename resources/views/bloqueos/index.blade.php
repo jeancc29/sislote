@@ -82,6 +82,11 @@
                   Jugadas
                 </a>
               </li>
+              <!-- <li  class="nav-item">
+                <a  class="nav-link" href="#jugadasSucias" data-toggle="tab" role="tab">
+                  Jugadas sucias
+                </a>
+              </li> -->
             </ul>
           </div>
           <div class="card-body">
@@ -1152,7 +1157,11 @@
                 </div> <!-- END ROW PRINCIPAL -->
               </div> <!-- END TAB 3 -->
 
-            
+            <!-- TAB JUGADAS SUCIAS -->
+            <!-- <div class="tab-pane" id="jugadasSucias">
+                <div id="containerJugadasSucias">
+                </div>
+            </div> -->
 
 
             </div>
@@ -1194,7 +1203,7 @@
 
 
 
-
+  <!-- <script src="{{asset('js/myflutterframework.js' . '?' . '1.0.0' )}}" type="text/javascript"></script> -->
 
 
 <!--   Core JS Files   -->
