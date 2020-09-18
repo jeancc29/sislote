@@ -56,7 +56,7 @@ class TicketToHtmlClass{
             $venta = (new SalesResource($data))->servidor($servidor);
             //Llamamos al metodo toArray(true) para traer todos los datos del resource
             $ventaToArray = $venta->toArray(true);
-            abort(402, json_encode($ventaToArray->created_at));
+            // abort(402, json_encode($ventaToArray->created_at));
             //Convertimos ventasToArray to ventasToJsonString para asi convertir los valores a json
             $ventaToJsonString = json_encode($ventaToArray);
             //Por ultimo convertimos jsonString to json porque esta la clase TicketTOHtmlClass maneja las ventas en formato json
@@ -421,7 +421,7 @@ class TicketToHtmlClass{
     function setFirstFecha(){
         try {
             $fecha = (gettype($this->venta->created_at) == "object" || gettype($this->venta->created_at) == "array") 
-        ? new Carbon(strval($this->venta->created_at->date)) 
+        ? new Carbon(strval($this->venta->created_at->toString())) 
         : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
         } catch (\Throwable $th) {
@@ -434,7 +434,7 @@ class TicketToHtmlClass{
     }
 
     function setSecondFecha(){
-        $fecha = (gettype($this->venta->created_at) == "object") ? new Carbon(strval($this->venta->created_at->date)) : new Carbon(strval($this->venta->created_at));
+        $fecha = (gettype($this->venta->created_at) == "object" || gettype($this->venta->created_at) == "array") ? new Carbon(strval($this->venta->created_at->toString())) : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;
