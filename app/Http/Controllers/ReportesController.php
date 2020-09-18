@@ -279,8 +279,8 @@ class ReportesController extends Controller
                                 (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
                                 (select substring(numeroGanador, 3, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as segunda,
                                 (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera
-                                ', [$idBanca, $fechaInicial, $fechaFinal, //Parametros para ventas
-                                    $idBanca, $fechaInicial, $fechaFinal, //Parametros para premios
+                                ', [$datos["idBanca"], $fechaInicial, $fechaFinal, //Parametros para ventas
+                                    $datos["idBanca"], $fechaInicial, $fechaFinal, //Parametros para premios
                                     $fechaInicial, $fechaFinal, //Parametros primera
                                     $fechaInicial, $fechaFinal, //Parametros segunda
                                     $fechaInicial, $fechaFinal //Parametros tercera
