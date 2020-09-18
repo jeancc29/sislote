@@ -418,10 +418,15 @@ class TicketToHtmlClass{
     }
 
     function setFirstFecha(){
-        $fecha = (gettype($this->venta->created_at) == "object") 
+        try {
+            $fecha = (gettype($this->venta->created_at) == "object") 
         ? new Carbon(strval($this->venta->created_at->date)) 
         : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
+        } catch (\Throwable $th) {
+            //throw $th;
+            abort(400, gettype($this->venta->created_at));
+        }
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;
         $this->html .= "<h3 class='text-center' style='margin-top: 0px; margin-bottom:0px;'><strong>". $fechaCompleta ."</strong></h3>";
