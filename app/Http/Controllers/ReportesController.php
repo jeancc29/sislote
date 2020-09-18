@@ -270,23 +270,23 @@ class ReportesController extends Controller
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
         }
     
-        $loterias = Lotteries::
-                            selectRaw('
-                                id, 
-                                descripcion, 
-                                (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and  s.idBanca = ? and s.created_at between ? and ?) as ventas,
-                                (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as premios,
-                                (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
-                                (select substring(numeroGanador, 3, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as segunda,
-                                (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera
-                                ', [$datos["idBanca"], $fechaInicial, $fechaFinal, //Parametros para ventas
-                                    $datos["idBanca"], $fechaInicial, $fechaFinal, //Parametros para premios
-                                    $fechaInicial, $fechaFinal, //Parametros primera
-                                    $fechaInicial, $fechaFinal, //Parametros segunda
-                                    $fechaInicial, $fechaFinal //Parametros tercera
-                                    ])
-                            ->where('lotteries.status', '=', '1')
-                            ->get();
+        // $loterias = Lotteries::
+        //                     selectRaw('
+        //                         id, 
+        //                         descripcion, 
+        //                         (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and  s.idBanca = ? and s.created_at between ? and ?) as ventas,
+        //                         (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as premios,
+        //                         (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
+        //                         (select substring(numeroGanador, 3, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as segunda,
+        //                         (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera
+        //                         ', [$datos["idBanca"], $fechaInicial, $fechaFinal, //Parametros para ventas
+        //                             $datos["idBanca"], $fechaInicial, $fechaFinal, //Parametros para premios
+        //                             $fechaInicial, $fechaFinal, //Parametros primera
+        //                             $fechaInicial, $fechaFinal, //Parametros segunda
+        //                             $fechaInicial, $fechaFinal //Parametros tercera
+        //                             ])
+        //                     ->where('lotteries.status', '=', '1')
+        //                     ->get();
         
         //Query para optimizar
         //Salesdetails::on("valentin")->selectRaw("sum(salesdetails.comision), sum(salesdetails.monto), sum(s.descuentoMonto), sum(salesdetails.premio), count(s.idTicket)")->join("sales as s", "s.id", "salesdetails.idVenta")->groupBy("s.idBanca")->get();
