@@ -418,7 +418,9 @@ class TicketToHtmlClass{
     }
 
     function setFirstFecha(){
-        $fecha = (gettype($this->venta->created_at) == "object") ? new Carbon(strval($this->venta->created_at->date)) : new Carbon(strval($this->venta->created_at));
+        $fecha = (gettype($this->venta->created_at) == "object") 
+        ? new Carbon(strval($this->venta->created_at->date)) 
+        : new Carbon(strval($this->venta->created_at));
         $hora = $fecha->format('g:i A');
 
         $fechaCompleta = str_replace('-', '/', $fecha->toDateString()) . " " . $hora;
