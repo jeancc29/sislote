@@ -56,6 +56,7 @@ class TicketToHtmlClass{
             $venta = (new SalesResource($data))->servidor($servidor);
             //Llamamos al metodo toArray(true) para traer todos los datos del resource
             $ventaToArray = $venta->toArray(true);
+            abort(402, json_encode($venta->created_at));
             //Convertimos ventasToArray to ventasToJsonString para asi convertir los valores a json
             $ventaToJsonString = json_encode($ventaToArray);
             //Por ultimo convertimos jsonString to json porque esta la clase TicketTOHtmlClass maneja las ventas en formato json
