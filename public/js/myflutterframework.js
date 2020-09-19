@@ -101,6 +101,37 @@ function alignItemsPrefix(element, value) {
     element.style.cssText += "align-items: " + value + ";";
     return element;
 }
+function flexDirection(element, value) {
+    if (value === void 0) { value = "row"; }
+    if (value == "row-reverse") {
+        element.style.cssText += "-webkit-box-direction: reverse";
+        element.style.cssText += "-webkit-box-orient: horizontal";
+        element.style.cssText += "-moz-box-direction: reverse";
+        element.style.cssText += "-moz-box-orient: horizontal";
+    }
+    else if (value == "column") {
+        element.style.cssText += "-webkit-box-direction: normal";
+        element.style.cssText += "-webkit-box-orient: vertical";
+        element.style.cssText += "-moz-box-direction: normal";
+        element.style.cssText += "-moz-box-orient: vertical";
+    }
+    else if (value == "column-reverse") {
+        element.style.cssText += "-webkit-box-direction: reverse";
+        element.style.cssText += "-webkit-box-orient: vertical";
+        element.style.cssText += "-moz-box-direction: reverse";
+        element.style.cssText += "-moz-box-orient: vertical";
+    }
+    else {
+        element.style.cssText += "-webkit-box-direction: normal";
+        element.style.cssText += "-webkit-box-orient: horizontal";
+        element.style.cssText += "-moz-box-direction: normal";
+        element.style.cssText += "-moz-box-orient: horizontal";
+    }
+    element.style.cssText += "-webkit-flex-direction: " + value;
+    element.style.cssText += "-ms-flex-direction: " + value;
+    element.style.cssText += "flex-direction: " + value;
+    return element;
+}
 function alignSelf(element, value) {
     if (value === void 0) { value = "auto"; }
     // No Webkit Box Fallback.
@@ -554,8 +585,11 @@ function Column(_a) {
         element.setAttribute("id", id + "-" + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     var styleJson = {};
-    element.style.display = "flex";
-    element.style.flexDirection = "column";
+    // element.setAttribute("style", "-webkit-flex-flow: column nowrap;-ms-flex-flow: column nowrap;flex-flow: column nowrap;")
+    element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element = flexDirection(element, "column");
+    // element.style.display = "flex";
+    // element.style.flexDirection = "column";
     if (mainAxisAlignment != null && mainAxisAlignment != undefined) {
         // element.style.justifyContent = mainAxisAlignment.toString();
         // styleJson.justifyContent = mainAxisAlignment.toString(); 
@@ -564,7 +598,7 @@ function Column(_a) {
     if (crossAxisAlignment != null && crossAxisAlignment != undefined) {
         // element.style.alignItems = crossAxisAlignment.toString();
         // styleJson.alignItems = crossAxisAlignment.toString(); 
-        element = justifyContentPrefix(element, crossAxisAlignment.toString());
+        element = alignItemsPrefix(element, crossAxisAlignment.toString());
     }
     return { "element": element, "style": styleJson, "type": "Column", "child": children };
 }
@@ -981,7 +1015,7 @@ function Builder(_a) {
         //     c[i].dispatchEvent(event);
         // }
         // }
-        // console.log("Resultadosssssssss id: ", element?.id);
+        console.log("builder setstate id: ", element === null || element === void 0 ? void 0 : element.id);
         var elements = builder(element === null || element === void 0 ? void 0 : element.id, setState);
         var widgetsYaCreados = Array.from(element === null || element === void 0 ? void 0 : element.childNodes);
         // console.log("Resultadooooooooooooos: ", elements.child);
@@ -996,8 +1030,13 @@ function StreamBuilder(_a) {
     var element = stream.div;
     var snapshot;
     element.addEventListener('rebuild', rebuild, false);
-    function rebuild(e) {
-        var elements = builder(element.id, e.detail);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+    function rebuild() {
+        var elements = builder(element.id, stream.data);
         console.log("streambuilder rebuild: ", elements);
         elements = Init({
             id: element.id,
@@ -1008,7 +1047,7 @@ function StreamBuilder(_a) {
         // console.log("streambuilder rebuild ya creados: ", widgetsYaCreados);
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
     }
-    var child = builder(element.id, snapshot);
+    var child = builder(element.id, stream.data);
     console.log("Resultadooooooooooooos streambuilder child: ", child);
     return { element: element, type: "StreamBuilder", child: [child] };
 }
@@ -1061,6 +1100,14 @@ function SizedBox(_a) {
         return { "element": element, "child": [child] };
     else
         return { "element": element, "child": [] };
+}
+function Padding(_a) {
+    var child = _a.child, padding = _a.padding;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'SizedBox-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    element.style.padding = padding.toString();
+    return { "element": element, "child": [child] };
 }
 function CircularProgressIndicator(_a) {
     var _b = _a.color, color = _b === void 0 ? '#3498db' : _b;
@@ -1259,6 +1306,7 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
             return;
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
+        console.log("Dentro widgetCreado == delete: ", hijo);
         // console.log("builderArrayRecursivo: ", hijo);
         if (widgetsYaCreados != null) {
             // if(widgetsYaCreados.length == null || widgetsYaCreados.length == undefined){
@@ -1298,6 +1346,7 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
                     updateStyleOfExistenteWidget(hijo, widgetCreado);
                     updateTextOfExistenteWidget(hijo, widgetCreado);
                     hijo.element = widgetCreado;
+                    // console.log("Dentro widgetCreado == update: ", hijo);
                     // console.log("builderArrayRecursivo widgetsYaCreados: ", widgetCreado);
                     // console.log("builderArrayRecursivo widgetsYaCreados: ", widgetCreado.length);
                     // console.log("builderArrayRecursivo widgetsNuevo: ", hijo);
@@ -1308,7 +1357,6 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
                     // console.log("Dentro eliminar widget diferente widgetNuevo: ", hijo);
                     // console.log("Dentroooooooo eliminarrrrrrrrrrrrrrrrr: ", widgetCreado.id);
                     // console.log("Dentroooooooo eliminarrrrrrrrrrrrrrrrr nuevo: ", hijo.element.id);
-                    console.log("Dentro widgetCreado == delete: ", hijo);
                     //Tomamos el nodo padre
                     var parent = widgetCreado.parentNode;
                     //Creamos el nuevo nodo
@@ -1318,9 +1366,12 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
                     // builderRecursivo(widget.child, false, widgetCreado.childNodes);
                 }
             }
+            else {
+                widget.element.appendChild(hijo.element);
+            }
         }
         else {
-            console.log("Dentro widgetCreado == null: ", hijo);
+            // console.log("Dentro widgetCreado == null: ", hijo);
             widget.element.appendChild(hijo.element);
         }
         // widget.element.appendChild(hijo.element);
@@ -1573,14 +1624,17 @@ var StreamController = /** @class */ (function () {
         this.div.setAttribute("id", "StreamController-" + ramdomString(7));
     }
     StreamController.prototype.add = function (data) {
+        this.data = data;
         var event = new CustomEvent("rebuild", { detail: data });
         this.div.dispatchEvent(event);
     };
     return StreamController;
 }());
 var _streamController = new StreamController();
-var listaBanca = {};
+var listaBanca = [];
 var _indexBanca = 0;
+var listaOpcion = ["General", "Por banca"];
+var _indexOpcion = 0;
 Builder({
     id: "containerJugadasSucias",
     initState: function () {
@@ -1598,28 +1652,63 @@ Builder({
             style: new TextStyle({ fontFamily: "Roboto" }),
             child: Column({
                 // style: new TextStyle({background: "blue"}),
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                    Row({
+                        children: [
+                            Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold })),
+                            SizedBox({ width: 20 }),
+                            Flexible({
+                                flex: 1,
+                                child: DropdownButton({
+                                    value: listaOpcion[_indexOpcion],
+                                    items: listaOpcion.map(function (item) {
+                                        return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
+                                    }),
+                                    onChanged: function (data) {
+                                        var index = items.indexOf("" + data);
+                                        if (index != -1) {
+                                            _index = index;
+                                            setState();
+                                        }
+                                        // console.log("onchange: " + data);
+                                    }
+                                })
+                            })
+                        ]
+                    }),
                     StreamBuilder({
                         stream: _streamController,
                         builder: function (id, snapshot) {
                             if (snapshot)
-                                return Column({
-                                    children: listaBanca.map(function (item) { return Texto(item.descripcion, new TextStyle({})); })
+                                // return Column({
+                                //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                // });
+                                return Row({
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                        Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
+                                        SizedBox({ width: 20 }),
+                                        Flexible({
+                                            flex: 1,
+                                            child: DropdownButtonMultiple({
+                                                // value: listaBanca[_indexBanca].descripcion ,
+                                                selectedValues: [],
+                                                items: listaBanca.map(function (item) {
+                                                    return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
+                                                }),
+                                                onChanged: function (data) {
+                                                    // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                    // if(index != -1){
+                                                    //     _indexBanca = index;
+                                                    //     console.log("onchange: " + data);
+                                                    //     setState();
+                                                    // }
+                                                }
+                                            })
+                                        })
+                                    ]
                                 });
-                            // DropdownButton({
-                            //     value: listaBanca[_indexBanca].descripcion ,
-                            //     items: listaBanca.map((item) => {
-                            //         return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
-                            //     }),
-                            //     onChanged: (data:string) => {
-                            //         var index = items.indexOf(`${data}`);
-                            //         if(index != -1){
-                            //             _index = index;
-                            //             setState();
-                            //         }
-                            //         // console.log("onchange: " + data);
-                            //     }
-                            // });
                             else
                                 return Texto("No hay datos", new TextStyle({}));
                             // DropdownButton({
@@ -1638,74 +1727,6 @@ Builder({
                             // });
                         }
                     }),
-                    Container({
-                        style: new TextStyle({ background: "yellow" }),
-                        child: Expanded({
-                            child: DropdownButton({
-                                value: items[_index],
-                                items: items.map(function (item) {
-                                    return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
-                                }),
-                                onChanged: function (data) {
-                                    var index = items.indexOf("" + data);
-                                    if (index != -1) {
-                                        _index = index;
-                                        setState();
-                                    }
-                                    // console.log("onchange: " + data);
-                                }
-                            })
-                        })
-                    }),
-                    Flexible({
-                        flex: 2,
-                        child: Container({
-                            style: new TextStyle({ background: "red" }),
-                            child: Expanded({
-                                child: DropdownButton({
-                                    value: items[_index],
-                                    items: items.map(function (item) {
-                                        return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
-                                    }),
-                                    onChanged: function (data) {
-                                        var index = items.indexOf("" + data);
-                                        if (index != -1) {
-                                            _index = index;
-                                            setState();
-                                        }
-                                        // console.log("onchange: " + data);
-                                    }
-                                })
-                            })
-                        })
-                    }),
-                    Row({
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                            Flexible({
-                                flex: 10,
-                                child: Container({
-                                    style: new TextStyle({ background: "blue" }),
-                                    child: Expanded({
-                                        child: DropdownButton({
-                                            value: items[_index],
-                                            items: items.map(function (item) {
-                                                return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
-                                            }),
-                                            onChanged: function (data) {
-                                                var index = items.indexOf("" + data);
-                                                if (index != -1) {
-                                                    _index = index;
-                                                    setState();
-                                                }
-                                                // console.log("onchange: " + data);
-                                            }
-                                        })
-                                    })
-                                })
-                            }),
-                        ]
-                    })
                 ]
             })
         });
