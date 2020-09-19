@@ -27,7 +27,7 @@ class TransactionsgroupsResource extends JsonResource
             'id' => $this->id,
             'usuario' => $this->usuario,
             'transacciones' => TransactionsResource::collection($this->transacciones)->servidor($this->servidor),
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at
         ];
     }

@@ -47,7 +47,7 @@ class TransactionsResource extends JsonResource
             'nota' => $this->nota,
             'nota_grupo' => $this->nota_grupo,
             'status' => $this->status,
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at->toDateTimeString()
         ];
     }
 
