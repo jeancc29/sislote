@@ -1,4 +1,3 @@
-/********************* VARIABLES  ************************************/
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,6 +34,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+//Esta funcion se lanzara cuando se hayan creados o actualizados todos los widgets
+function oncreatedOrUpdatedWidgetState() {
+    // console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    rebuildSizeFromLayoutBuilder();
+}
+/********************* VARIABLES  ************************************/
 var fontSizeUnit = "px";
 var heightUnit = "vh";
 var widthUnit = "vw";
@@ -50,6 +55,14 @@ function ramdomString(length) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+function flexbox(element) {
+    element.style.cssText += "display: -webkit-box";
+    element.style.cssText += "display: -moz-box";
+    element.style.cssText += "display: -webkit-flex";
+    element.style.cssText += "display: -ms-flexbox";
+    element.style.cssText += "display: flex";
+    return element;
 }
 function justifyContentPrefix(element, value) {
     if (value === void 0) { value = 'flex-start'; }
@@ -586,7 +599,8 @@ function Column(_a) {
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     var styleJson = {};
     // element.setAttribute("style", "-webkit-flex-flow: column nowrap;-ms-flex-flow: column nowrap;flex-flow: column nowrap;")
-    element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    // element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element = flexbox(element);
     element = flexDirection(element, "column");
     // element.style.display = "flex";
     // element.style.flexDirection = "column";
@@ -636,13 +650,14 @@ function InkWell(_a) {
     if (onTap) {
         element.addEventListener("click", onTap);
     }
-    return { "element": element, "style": {}, "type": "Visibility", "child": [child], isStateLess: isStateLess };
+    return { "element": element, "style": {}, "type": "Visibility", "child": [child] };
 }
 function TextFormField(_a) {
     var controller = _a.controller, validator = _a.validator, decoration = _a.decoration;
     var input = controller.input;
     var label = document.createElement("label");
     var parrafo = document.createElement("p");
+    var isLabelNull = false;
     // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
     label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
     input.setAttribute("id", "TextFormField-" + ramdomString(7));
@@ -655,6 +670,13 @@ function TextFormField(_a) {
         if (decoration.labelText != null && decoration.labelText != null) {
             label.innerHTML = decoration.labelText;
         }
+        else {
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
+        }
+    }
+    else {
+        isLabelNull = true;
     }
     function addActiveClassAndHisStyle() {
         label.classList.add('active');
@@ -701,13 +723,25 @@ function TextFormField(_a) {
     // container.appendChild(label);
     // container.appendChild(input);
     // container.appendChild(parrafo);
-    var container = Column({
-        children: [
-            { "element": label, "child": [] },
-            { "element": input, "child": [] },
-            { "element": parrafo, "child": [] },
-        ]
-    });
+    var container;
+    if (isLabelNull) {
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                { "element": input, "child": [] },
+                { "element": parrafo, "child": [] },
+            ]
+        });
+    }
+    else {
+        container = Column({
+            children: [
+                { "element": label, "child": [] },
+                { "element": input, "child": [] },
+                { "element": parrafo, "child": [] },
+            ]
+        });
+    }
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
     //La variable validator es una function que se invoca desde TextFormField y esta retorna null si es valido
@@ -999,7 +1033,13 @@ function Builder(_a) {
     element.innerHTML = "";
     if (initState) {
         window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
             initState();
+        };
+    }
+    else {
+        window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
         };
     }
     var setState = (function () {
@@ -1015,7 +1055,7 @@ function Builder(_a) {
         //     c[i].dispatchEvent(event);
         // }
         // }
-        console.log("builder setstate id: ", element === null || element === void 0 ? void 0 : element.id);
+        // console.log("builder setstate id: ", element?.id);
         var elements = builder(element === null || element === void 0 ? void 0 : element.id, setState);
         var widgetsYaCreados = Array.from(element === null || element === void 0 ? void 0 : element.childNodes);
         // console.log("Resultadooooooooooooos: ", elements.child);
@@ -1023,7 +1063,7 @@ function Builder(_a) {
     }).bind(element);
     var elements = builder(id, setState);
     // console.log("Resultadooooooooooooos: ", elements);
-    builderArrayRecursivo(elements);
+    builderArrayRecursivo(elements, null, true);
 }
 function StreamBuilder(_a) {
     var stream = _a.stream, builder = _a.builder;
@@ -1048,8 +1088,81 @@ function StreamBuilder(_a) {
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
     }
     var child = builder(element.id, stream.data);
-    console.log("Resultadooooooooooooos streambuilder child: ", child);
+    // console.log("Resultadooooooooooooos streambuilder child: ", child);
     return { element: element, type: "StreamBuilder", child: [child] };
+}
+window.addEventListener('resize', rebuildSizeFromLayoutBuilder);
+//Esta funcion se llama desde dos partes, desde el evento window.resize y desde el builder.initState
+//para que asi el layout builder tome el tamano del padre
+function rebuildSizeFromLayoutBuilder() {
+    var elements = document.getElementsByClassName("LayoutBuilder");
+    for (var i = 0; i < elements.length; i++) {
+        //Mandamos el id del elemento y el size con su ancho y alto
+        var size = { height: window.innerHeight, width: window.innerWidth };
+        var parentSize = getParentSize(elements[i]);
+        console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        var event_1 = new CustomEvent("rebuildSize", { detail: { id: elements[i].id, size: parentSize } });
+        elements[i].dispatchEvent(event_1);
+    }
+}
+function getParentSize(element) {
+    var parent = element.parentElement;
+    var size = { width: 0, height: 0 };
+    var vecesARecorrer = 6;
+    for (var i = 0; i < vecesARecorrer; i++) {
+        console.log("getParentSize: " + element.id + " ", parent.id, " w:", parent.offsetWidth);
+        if (parent == null || parent == undefined)
+            break;
+        if (parent.offsetWidth > 0)
+            size.width = parent.offsetWidth;
+        if (parent.offsetHeight > 0)
+            size.height = parent.offsetHeight;
+        //Si el width es > 0 entonces salimos del ciclo y retornamos la variable size
+        //de lo contrario vamos a tomar el padre del otro elemento padre y asi sucesivamente hasta
+        //que encontrar el size o hasta que el sigueinte padre sea nulo
+        if (size.width > 0)
+            break;
+        else
+            parent = parent.parentElement;
+    }
+    return size;
+}
+function LayoutBuilder(_a) {
+    var builder = _a.builder;
+    var element = document.createElement("div");
+    element.setAttribute("id", "LayoutBuilder-" + ramdomString(7));
+    element.classList.add("LayoutBuilder");
+    element.addEventListener('rebuildSize', rebuildSize, false);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+    function rebuildSize(e) {
+        //El parametro e va a container el id del layout builder y el size 
+        //de la venta, osea, window.innerWidth and window.innerHeight, pero ese size no me funciona
+        //por el size que necesito es el size del parent, asi que lo busco y lo tomo
+        var elementLayoutBuilder = document.getElementById(e.detail.id);
+        //buscamos el padre
+        // var parent = elementLayoutBuilder.parentElement;
+        //obtenemos el size del padre
+        // let sizeParent = {width: parent.clientWidth, height: parent.clientHeight};
+        //le mandamos el size del padre al builder
+        var elements = builder(e.detail.size);
+        elements = Init({
+            id: elementLayoutBuilder.id,
+            child: elements
+        });
+        // console.log("streambuilder rebuild new: ", elements);
+        var widgetsYaCreados = Array.from(elementLayoutBuilder === null || elementLayoutBuilder === void 0 ? void 0 : elementLayoutBuilder.childNodes);
+        // console.log("streambuilder rebuild ya creados: ", widgetsYaCreados);
+        builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+    }
+    var size = { width: window.innerWidth, height: window.innerHeight };
+    var child = builder(size);
+    console.log("Resultadooooooooooooos LayoutBuilder size: ", size);
+    console.log("Resultadooooooooooooos LayoutBuilder sizeParent: ", element.parentElement);
+    return { element: element, type: "LayoutBuilder", child: [child] };
 }
 function Form(_a) {
     var key = _a.key, child = _a.child;
@@ -1104,7 +1217,7 @@ function SizedBox(_a) {
 function Padding(_a) {
     var child = _a.child, padding = _a.padding;
     var element = document.createElement("div");
-    element.setAttribute("id", 'SizedBox-' + ramdomString(7));
+    element.setAttribute("id", 'Padding-' + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     element.style.padding = padding.toString();
     return { "element": element, "child": [child] };
@@ -1269,22 +1382,43 @@ function builderRecursivo(widget, isInit, widgetsYaCreados) {
         }
     }
 }
-function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCreados) {
-    // console.log("recursiveArray widget: ", widget);
+function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCreados, widgetInit) {
     if (isInit === void 0) { isInit = false; }
     if (onlyWidgetsYaCreados === void 0) { onlyWidgetsYaCreados = false; }
+    if (widgetInit === void 0) { widgetInit = null; }
+    // console.log("recursiveArray widget: ", widget);
+    if (isInit) {
+        widgetInit = widget;
+    }
     if ((widgetsYaCreados == null || widgetsYaCreados == undefined) && onlyWidgetsYaCreados == false) {
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-        if (!Array.isArray(widget.child))
+        var idWidget = (widgetInit != null) ? widgetInit.id : null;
+        // console.log("Widget termnoooooo create: ", widget.id, " ", idWidget);
+        if (!Array.isArray(widget.child)) {
+            // console.log("Widget termnoooooo create: ", widget);
             return;
+        }
         // console.log("Dentro widgetsYacreados null: ", onlyWidgetsYaCreados);
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if (widget.child.length <= 0)
+        if (widget.child.length <= 0) {
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
+            var a = false;
+            if (widgetInit != null)
+                a = widget.id == widgetInit.id;
+            console.log("Widget termnoooooo widget == widgetInit: ", a);
+            if (a)
+                oncreatedOrUpdatedWidgetState();
             return;
+        }
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
         //el atributo element es el elemento html o nodo que pertenece al widget hijo
         if (hijo.element == null) {
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
             return;
         }
         //Al widget el anadimos el widget hijo que obtuvimos y eliminamos del arreglo
@@ -1294,19 +1428,24 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
         if (hijo.child != null)
             builderRecursivo(hijo);
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget);
+        builderArrayRecursivo(widget, null, false, false, widgetInit);
     }
     else {
         // console.log("widgetNuevo: ", widget);
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-        if (!Array.isArray(widget.child))
+        if (!Array.isArray(widget.child)) {
+            // oncreatedOrUpdatedWidgetState();
+            console.log("Widget termnoooooo update: ", widget);
             return;
+        }
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if (widget.child.length <= 0)
+        if (widget.child.length <= 0) {
+            // oncreatedOrUpdatedWidgetState();
             return;
+        }
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
-        console.log("Dentro widgetCreado == delete: ", hijo);
+        // console.log("Dentro widgetCreado == delete: ", hijo);
         // console.log("builderArrayRecursivo: ", hijo);
         if (widgetsYaCreados != null) {
             // if(widgetsYaCreados.length == null || widgetsYaCreados.length == undefined){
@@ -1383,6 +1522,7 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
         builderArrayRecursivo(widget, widgetsYaCreados, false, true);
     }
+    //    console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 }
 function updateStyleOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
     // console.log("updateStyleOfExistenteWidget nuevoWidget: ", nuevoWidget);
@@ -1631,6 +1771,14 @@ var StreamController = /** @class */ (function () {
     return StreamController;
 }());
 var _streamController = new StreamController();
+var _txtDirecto = new TextEditingController();
+var _txtPale = new TextEditingController();
+var _txtTripleta = new TextEditingController();
+var _txtSuperpale = new TextEditingController();
+var _txtPick3Straight = new TextEditingController();
+var _txtPick3Box = new TextEditingController();
+var _txtPick4Straight = new TextEditingController();
+var _txtPick4Box = new TextEditingController();
 var listaBanca = [];
 var _indexBanca = 0;
 var listaOpcion = ["General", "Por banca"];
@@ -1652,80 +1800,257 @@ Builder({
             style: new TextStyle({ fontFamily: "Roboto" }),
             child: Column({
                 // style: new TextStyle({background: "blue"}),
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                    Row({
-                        children: [
-                            Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold })),
-                            SizedBox({ width: 20 }),
-                            Flexible({
-                                flex: 1,
-                                child: DropdownButton({
-                                    value: listaOpcion[_indexOpcion],
-                                    items: listaOpcion.map(function (item) {
-                                        return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
-                                    }),
-                                    onChanged: function (data) {
-                                        var index = items.indexOf("" + data);
-                                        if (index != -1) {
-                                            _index = index;
-                                            setState();
+                    Padding({
+                        padding: EdgetInsets.all(1),
+                        child: LayoutBuilder({
+                            builder: function (size) {
+                                return Container({
+                                    style: new TextStyle({ width: size.width / 2, height: 20, background: "red" }),
+                                    child: LayoutBuilder({
+                                        builder: function (size) {
+                                            return Container({
+                                                style: new TextStyle({ width: size.width / 1.7, height: 200, background: "blue" })
+                                            });
                                         }
-                                        // console.log("onchange: " + data);
-                                    }
-                                })
-                            })
-                        ]
-                    }),
-                    StreamBuilder({
-                        stream: _streamController,
-                        builder: function (id, snapshot) {
-                            if (snapshot)
-                                // return Column({
-                                //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
-                                // });
-                                return Row({
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                        Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
-                                        SizedBox({ width: 20 }),
-                                        Flexible({
-                                            flex: 1,
-                                            child: DropdownButtonMultiple({
-                                                // value: listaBanca[_indexBanca].descripcion ,
-                                                selectedValues: [],
-                                                items: listaBanca.map(function (item) {
-                                                    return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
-                                                }),
-                                                onChanged: function (data) {
-                                                    // var index = listaBanca.findIndex((value) => value.descripcion == data);
-                                                    // if(index != -1){
-                                                    //     _indexBanca = index;
-                                                    //     console.log("onchange: " + data);
-                                                    //     setState();
-                                                    // }
-                                                }
-                                            })
-                                        })
-                                    ]
+                                    })
                                 });
-                            else
-                                return Texto("No hay datos", new TextStyle({}));
-                            // DropdownButton({
-                            //     value: "No hay datos" ,
-                            //     items: [
-                            //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
-                            //     ],
-                            //     onChanged: (data:string) => {
-                            //         var index = items.indexOf(`${data}`);
-                            //         if(index != -1){
-                            //             _index = index;
-                            //             setState();
-                            //         }
-                            //         // console.log("onchange: " + data);
-                            //     }
-                            // });
-                        }
+                            }
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Flexible({
+                                    child: Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold }))
+                                }),
+                                SizedBox({ width: 20 }),
+                                Flexible({
+                                    flex: 1,
+                                    child: DropdownButton({
+                                        value: listaOpcion[_indexOpcion],
+                                        items: listaOpcion.map(function (item) {
+                                            return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
+                                        }),
+                                        onChanged: function (data) {
+                                            var index = listaOpcion.indexOf("" + data);
+                                            if (index != -1) {
+                                                _indexOpcion = index;
+                                                setState();
+                                            }
+                                            // console.log("onchange: " + data);
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: StreamBuilder({
+                            stream: _streamController,
+                            builder: function (id, snapshot) {
+                                if (snapshot)
+                                    // return Column({
+                                    //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                    // });
+                                    return Row({
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                            Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
+                                            SizedBox({ width: 20 }),
+                                            Flexible({
+                                                flex: 1,
+                                                child: DropdownButtonMultiple({
+                                                    // value: listaBanca[_indexBanca].descripcion ,
+                                                    selectedValues: [],
+                                                    items: listaBanca.map(function (item) {
+                                                        return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
+                                                    }),
+                                                    onChanged: function (data) {
+                                                        // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                        // if(index != -1){
+                                                        //     _indexBanca = index;
+                                                        //     console.log("onchange: " + data);
+                                                        //     setState();
+                                                        // }
+                                                    }
+                                                })
+                                            })
+                                        ]
+                                    });
+                                else
+                                    return Texto("No hay datos", new TextStyle({}));
+                                // DropdownButton({
+                                //     value: "No hay datos" ,
+                                //     items: [
+                                //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
+                                //     ],
+                                //     onChanged: (data:string) => {
+                                //         var index = items.indexOf(`${data}`);
+                                //         if(index != -1){
+                                //             _index = index;
+                                //             setState();
+                                //         }
+                                //         // console.log("onchange: " + data);
+                                //     }
+                                // });
+                            }
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Directo", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtDirecto,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pale", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPale,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Tripleta", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtTripleta,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Super pale", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtSuperpale,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 3 Box", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick3Box,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 3 Straight", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick3Straight,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 4 Box", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick4Box,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 4 Straight", new TextStyle({ fontWeight: FontWeight.bold })),
+                                SizedBox({ width: 20 }),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick4Straight,
+                                        validator: function (data) {
+                                            if (!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
                     }),
                 ]
             })

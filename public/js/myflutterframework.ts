@@ -1,3 +1,10 @@
+//Esta funcion se lanzara cuando se hayan creados o actualizados todos los widgets
+function oncreatedOrUpdatedWidgetState(){
+    // console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    
+    rebuildSizeFromLayoutBuilder();
+}
+
 
 /********************* VARIABLES  ************************************/
 
@@ -22,6 +29,15 @@ function ramdomString(length : number) {
     }
     return result;
  }
+
+ function flexbox(element: HTMLDivElement){
+    element.style.cssText += "display: -webkit-box";
+    element.style.cssText += "display: -moz-box";
+    element.style.cssText += "display: -webkit-flex";
+    element.style.cssText += "display: -ms-flexbox";
+    element.style.cssText += "display: flex";
+    return element;
+  }
 
  function justifyContentPrefix(element: HTMLDivElement, value: string = 'flex-start') {
     if(value == 'flex-start') {
@@ -853,8 +869,10 @@ function Column({children, mainAxisAlignment, crossAxisAlignment, id} : namedPar
     let styleJson: any = {};
     
     // element.setAttribute("style", "-webkit-flex-flow: column nowrap;-ms-flex-flow: column nowrap;flex-flow: column nowrap;")
-    element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    // element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element = flexbox(element);
     element = flexDirection(element, "column");
+    
     // element.style.display = "flex";
     // element.style.flexDirection = "column";
     if(mainAxisAlignment != null && mainAxisAlignment != undefined){
@@ -931,7 +949,7 @@ function InkWell({child, onTap} : namedParametersInkWell){
         element.addEventListener("click", onTap);
     }
 
-    return {"element" : element, "style" : {}, "type" : "Visibility", "child" : [child], isStateLess: isStateLess};
+    return {"element" : element, "style" : {}, "type" : "Visibility", "child" : [child]};
 }
 
 interface namedParametersTextFormField {
@@ -944,6 +962,7 @@ function TextFormField({controller, validator, decoration} : namedParametersText
     var input = controller.input;
     var label = document.createElement("label");
     var parrafo = document.createElement("p");
+    let isLabelNull = false;
 
     // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
     label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
@@ -959,7 +978,12 @@ function TextFormField({controller, validator, decoration} : namedParametersText
     if(decoration != null && decoration != undefined){
         if(decoration.labelText != null && decoration.labelText != null){
             label.innerHTML = decoration.labelText;
+        }else{
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
         }
+    }else{
+        isLabelNull = true;
     }
 
     function addActiveClassAndHisStyle(){
@@ -1016,15 +1040,25 @@ function TextFormField({controller, validator, decoration} : namedParametersText
     // container.appendChild(label);
     // container.appendChild(input);
     // container.appendChild(parrafo);
-    var container = Column({
-        children: [
-            {"element" : label, "child": []},
-            {"element" : input, "child": []},
-            {"element" : parrafo, "child": []},
-            // input,
-            // parrafo
-        ]
-    });
+    var container;
+    if(isLabelNull){
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                {"element" : input, "child": []},
+                {"element" : parrafo, "child": []},
+            ]
+        });
+    }else{
+        container = Column({
+            children: [
+                {"element" : label, "child": []},
+                {"element" : input, "child": []},
+                {"element" : parrafo, "child": []},
+            ]
+        });
+    }
+     
 
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
@@ -1424,7 +1458,12 @@ function Builder({id, builder, initState} : namedParametersBuilder){
 
     if(initState){
         window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
             initState();
+        };
+    }else{
+        window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
         };
     }
 
@@ -1442,7 +1481,7 @@ function Builder({id, builder, initState} : namedParametersBuilder){
             // }
             
         // }
-        console.log("builder setstate id: ", element?.id);
+        // console.log("builder setstate id: ", element?.id);
         
         var elements = builder(element?.id, setState);
         
@@ -1452,7 +1491,7 @@ function Builder({id, builder, initState} : namedParametersBuilder){
     }).bind(element);
     var elements = builder(id, setState);
     // console.log("Resultadooooooooooooos: ", elements);
-    builderArrayRecursivo(elements);
+    builderArrayRecursivo(elements, null, true);
 }
 
 interface namedParametersStreamBuilder{
@@ -1491,8 +1530,103 @@ function StreamBuilder({stream, builder} : namedParametersStreamBuilder){
     }
    
     var child = builder(element.id, stream.data);
-    console.log("Resultadooooooooooooos streambuilder child: ", child);
+    // console.log("Resultadooooooooooooos streambuilder child: ", child);
     return {element: element, type: "StreamBuilder", child: [child]}
+}
+
+interface namedParametersLayoutBuilder{
+    id?:string;
+    builder:any;
+}
+
+window.addEventListener('resize', rebuildSizeFromLayoutBuilder);
+
+//Esta funcion se llama desde dos partes, desde el evento window.resize y desde el builder.initState
+//para que asi el layout builder tome el tamano del padre
+function rebuildSizeFromLayoutBuilder(){
+    
+    var elements = document.getElementsByClassName("LayoutBuilder");
+    for(var i=0; i < elements.length; i++){
+        //Mandamos el id del elemento y el size con su ancho y alto
+        var size = {height: window.innerHeight, width: window.innerWidth};
+        var parentSize = getParentSize(elements[i]);
+        console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        
+        let event = new CustomEvent("rebuildSize", {detail: {id: elements[i].id, size:parentSize}});
+        elements[i].dispatchEvent(event)
+    }
+}
+
+function getParentSize(element:Element){
+    var parent = element.parentElement;
+    let size:any = {width: 0, height: 0};
+    let vecesARecorrer = 6;
+    for (var i=0; i < vecesARecorrer; i++) {
+        console.log(`getParentSize: ${element.id} `, parent.id, " w:", parent.offsetWidth);
+        
+        if(parent == null || parent == undefined)
+            break;
+        
+        if(parent.offsetWidth > 0)
+            size.width = parent.offsetWidth;
+        if(parent.offsetHeight > 0)
+            size.height = parent.offsetHeight;
+        
+        //Si el width es > 0 entonces salimos del ciclo y retornamos la variable size
+        //de lo contrario vamos a tomar el padre del otro elemento padre y asi sucesivamente hasta
+        //que encontrar el size o hasta que el sigueinte padre sea nulo
+        if(size.width > 0)
+            break;
+        else
+            parent = parent.parentElement;
+    }
+    
+    return size;
+}
+
+function LayoutBuilder({builder} : namedParametersLayoutBuilder){
+    var element = document.createElement("div");
+    element.setAttribute("id", `LayoutBuilder-${ramdomString(7)}`);
+    element.classList.add("LayoutBuilder");
+    
+
+    element.addEventListener('rebuildSize', rebuildSize, false);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
+
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+
+    function rebuildSize(e){
+        //El parametro e va a container el id del layout builder y el size 
+        //de la venta, osea, window.innerWidth and window.innerHeight, pero ese size no me funciona
+        //por el size que necesito es el size del parent, asi que lo busco y lo tomo
+        var elementLayoutBuilder = document.getElementById(e.detail.id);
+        //buscamos el padre
+        // var parent = elementLayoutBuilder.parentElement;
+        //obtenemos el size del padre
+        // let sizeParent = {width: parent.clientWidth, height: parent.clientHeight};
+        //le mandamos el size del padre al builder
+        var elements = builder(e.detail.size);
+        elements = Init({
+            id: elementLayoutBuilder.id,
+            child: elements
+        });
+
+        
+        
+        // console.log("streambuilder rebuild new: ", elements);
+        
+        var widgetsYaCreados = Array.from(elementLayoutBuilder?.childNodes);
+        // console.log("streambuilder rebuild ya creados: ", widgetsYaCreados);
+        builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+    }
+    var size = {width: window.innerWidth, height: window.innerHeight};
+    var child = builder(size);
+    console.log("Resultadooooooooooooos LayoutBuilder size: ", size);
+    console.log("Resultadooooooooooooos LayoutBuilder sizeParent: ", element.parentElement);
+    return {element: element, type: "LayoutBuilder", child: [child]}
 }
 
 
@@ -1586,7 +1720,7 @@ interface namedParametersPadding{
 
 function Padding({child, padding} : namedParametersPadding){
     var element = document.createElement("div");
-    element.setAttribute("id", 'SizedBox-' + ramdomString(7));
+    element.setAttribute("id", 'Padding-' + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     element.style.padding = padding.toString();
@@ -1750,26 +1884,47 @@ function builderRecursivo(widget : any, isInit = false, widgetsYaCreados : any =
 
 
 
-function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: boolean = false, onlyWidgetsYaCreados: boolean = false){
+function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: boolean = false, onlyWidgetsYaCreados: boolean = false, widgetInit = null){
     // console.log("recursiveArray widget: ", widget);
+    if(isInit){
+        widgetInit = widget;
+    }
     
    if((widgetsYaCreados == null || widgetsYaCreados == undefined) && onlyWidgetsYaCreados == false){
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
+        var idWidget = (widgetInit != null) ? widgetInit.id : null;
+        // console.log("Widget termnoooooo create: ", widget.id, " ", idWidget);
         if(!Array.isArray(widget.child))
-            return;
+            {
+                // console.log("Widget termnoooooo create: ", widget);
+                return;
+            }
 
             // console.log("Dentro widgetsYacreados null: ", onlyWidgetsYaCreados);
             
 
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if(widget.child.length <= 0)
+        if(widget.child.length <= 0){
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
+            let a:boolean = false;
+            if(widgetInit != null)
+                a = widget.id == widgetInit.id;
+            console.log("Widget termnoooooo widget == widgetInit: ", a);
+            if(a)
+                oncreatedOrUpdatedWidgetState();
             return;
+        }
 
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
 
         //el atributo element es el elemento html o nodo que pertenece al widget hijo
         if(hijo.element == null){
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
             return;
         }
 
@@ -1783,21 +1938,28 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
             builderRecursivo(hijo);
 
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget);
+        builderArrayRecursivo(widget, null, false, false, widgetInit);
    }else{
 
     // console.log("widgetNuevo: ", widget);
          //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-        if(!Array.isArray(widget.child))
+        if(!Array.isArray(widget.child)){
+            // oncreatedOrUpdatedWidgetState();
+            console.log("Widget termnoooooo update: ", widget);
+            
             return;
+        }
+            
 
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if(widget.child.length <= 0)
+        if(widget.child.length <= 0){
+            // oncreatedOrUpdatedWidgetState();
             return;
+        }
 
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
-        console.log("Dentro widgetCreado == delete: ", hijo);
+        // console.log("Dentro widgetCreado == delete: ", hijo);
         // console.log("builderArrayRecursivo: ", hijo);
         if(widgetsYaCreados != null){
             // if(widgetsYaCreados.length == null || widgetsYaCreados.length == undefined){
@@ -1895,6 +2057,8 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
         builderArrayRecursivo(widget, widgetsYaCreados, false, true);
    }
+
+//    console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 }
 
 function updateStyleOfExistenteWidget(nuevoWidget: any, widgetViejoOExistente: any){
@@ -2252,6 +2416,14 @@ class StreamController{
 }
 
 let _streamController = new StreamController();
+let _txtDirecto = new TextEditingController();
+let _txtPale = new TextEditingController();
+let _txtTripleta = new TextEditingController();
+let _txtSuperpale = new TextEditingController();
+let _txtPick3Straight = new TextEditingController();
+let _txtPick3Box = new TextEditingController();
+let _txtPick4Straight = new TextEditingController();
+let _txtPick4Box = new TextEditingController();
 let listaBanca:any[] = [];
 let _indexBanca:number = 0;
 let listaOpcion:string[] = ["General", "Por banca"];
@@ -2276,84 +2448,260 @@ Builder({
             style: new TextStyle({fontFamily: "Roboto"}),
             child: Column({
                 // style: new TextStyle({background: "blue"}),
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                    Row({
-                        children: [
-                            Texto("Opciones", new TextStyle({fontWeight: FontWeight.bold})),
-                            SizedBox({width: 20}),
-                            Flexible({
-                                flex: 1,
-                                child: DropdownButton({
-                                    value: listaOpcion[_indexOpcion] ,
-                                    items: listaOpcion.map((item) => {
-                                        return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12)})), value: item})
-                                    }),
-                                    onChanged: (data:string) => {
-                                        var index = items.indexOf(`${data}`);
-                                        if(index != -1){
-                                            _index = index;
-                                            setState();
-                                        }
-                                        // console.log("onchange: " + data);
-                                    }
-                                })
-                            })
-                        ]
-                    }),
-                    StreamBuilder({
-                        stream: _streamController,
-                        builder: (id:any, snapshot:any) => {
-                            if(snapshot)
-                                // return Column({
-                                //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
-                                // });
-                                return Row({
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                        Texto("Bancas", new TextStyle({fontWeight: FontWeight.bold})),
-                                        SizedBox({width: 20}),
-                                        Flexible({
-                                            flex: 1,
-                                            child: DropdownButtonMultiple({
-                                                // value: listaBanca[_indexBanca].descripcion ,
-                                                selectedValues: [],
-                                                items: listaBanca.map((item) => {
-                                                    return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item.descripcion});
-                                                }),
-                                                onChanged: (data:any[]) => {
-                                                    // var index = listaBanca.findIndex((value) => value.descripcion == data);
-                                                    // if(index != -1){
-                                                    //     _indexBanca = index;
-                                                    //     console.log("onchange: " + data);
-                                                    //     setState();
-                                                    // }
-                                                },
-
+                    Padding({
+                        padding: EdgetInsets.all(1),
+                        child: LayoutBuilder({
+                            builder: (size:any) => {
+                                return Container({
+                                    style: new TextStyle({width: size.width / 2, height: 20, background: "red"}),
+                                    child: LayoutBuilder({
+                                        builder: (size:any) => {
+                                            return Container({
+                                                style: new TextStyle({width: size.width / 1.7, height: 200, background: "blue"})
                                             })
-                                        })
-                                    ]
+                                        }
+                                    })
                                 })
-                            else
-                            return Texto("No hay datos", new TextStyle({}));
-                            // DropdownButton({
-                            //     value: "No hay datos" ,
-                            //     items: [
-                            //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
-
-                            //     ],
-                            //     onChanged: (data:string) => {
-                            //         var index = items.indexOf(`${data}`);
-                            //         if(index != -1){
-                            //             _index = index;
-                            //             setState();
-                            //         }
-                            //         // console.log("onchange: " + data);
-                            //     }
-                            // });
-                        }
+                            }
+                        })
                     }),
-                    
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Flexible({
+                                    child: Texto("Opciones", new TextStyle({fontWeight: FontWeight.bold})),
+                                }),
+                                SizedBox({width: 20}),
+                                Flexible({
+                                    flex: 1,
+                                    child: DropdownButton({
+                                        value: listaOpcion[_indexOpcion] ,
+                                        items: listaOpcion.map((item) => {
+                                            return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12)})), value: item})
+                                        }),
+                                        onChanged: (data:string) => {
+                                            var index = listaOpcion.indexOf(`${data}`);
+                                            if(index != -1){
+                                                _indexOpcion = index;
+                                                setState();
+                                            }
+                                            // console.log("onchange: " + data);
+                                        }
+                                    })
+                                })
+                            ]
+                        }),
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: StreamBuilder({
+                            stream: _streamController,
+                            builder: (id:any, snapshot:any) => {
+                                if(snapshot)
+                                    // return Column({
+                                    //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                    // });
+                                    return Row({
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                            Texto("Bancas", new TextStyle({fontWeight: FontWeight.bold})),
+                                            SizedBox({width: 20}),
+                                            Flexible({
+                                                flex: 1,
+                                                child: DropdownButtonMultiple({
+                                                    // value: listaBanca[_indexBanca].descripcion ,
+                                                    selectedValues: [],
+                                                    items: listaBanca.map((item) => {
+                                                        return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item.descripcion});
+                                                    }),
+                                                    onChanged: (data:any[]) => {
+                                                        // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                        // if(index != -1){
+                                                        //     _indexBanca = index;
+                                                        //     console.log("onchange: " + data);
+                                                        //     setState();
+                                                        // }
+                                                    },
+    
+                                                })
+                                            })
+                                        ]
+                                    })
+                                else
+                                return Texto("No hay datos", new TextStyle({}));
+                                // DropdownButton({
+                                //     value: "No hay datos" ,
+                                //     items: [
+                                //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
+    
+                                //     ],
+                                //     onChanged: (data:string) => {
+                                //         var index = items.indexOf(`${data}`);
+                                //         if(index != -1){
+                                //             _index = index;
+                                //             setState();
+                                //         }
+                                //         // console.log("onchange: " + data);
+                                //     }
+                                // });
+                            }
+                        }),
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Directo", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtDirecto,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pale", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPale,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Tripleta", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtTripleta,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Super pale", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtSuperpale,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 3 Box", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick3Box,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 3 Straight", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick3Straight,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 4 Box", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick4Box,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
+                    Padding({
+                        padding: EdgetInsets.all(10),
+                        child: Row({
+                            children: [
+                                Texto("Pick 4 Straight", new TextStyle({fontWeight: FontWeight.bold})),
+                                SizedBox({width: 20}),
+                                Expanded({
+                                    child: TextFormField({
+                                        controller: _txtPick4Straight,
+                                        validator: (data:string) => {
+                                            if(!data)
+                                                return "No puede estar vacio";
+                                            return null;
+                                        }
+                                    })
+                                })
+                            ]
+                        })
+                    }),
                     
                     
                 ]
