@@ -310,15 +310,15 @@ class Helper{
             }
         }
         else{
-            $sorteo = DB::connection($servidor)->table('draws')
-                ->select('draws.id')
-                ->join('draw_lottery', 'draws.id', '=', 'draw_lottery.idSorteo')
-                ->where(['draw_lottery.idLoteria' => $loteria->id, 'draws.descripcion' => 'Super pale'])->first();
-            $drawRelations = DB::connection($servidor)->table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
-            if($sorteo == null || $drawRelations <= 1)
+            // $sorteo = DB::connection($servidor)->table('draws')
+            //     ->select('draws.id')
+            //     ->join('draw_lottery', 'draws.id', '=', 'draw_lottery.idSorteo')
+            //     ->where(['draw_lottery.idLoteria' => $loteria->id, 'draws.descripcion' => 'Super pale'])->first();
+            // $drawRelations = DB::connection($servidor)->table('drawsrelations')->where('idLoteriaPertenece', $loteria->id)->count();
+            // if($sorteo == null || $drawRelations <= 1)
                 $idSorteo = 2;
-            else if($sorteo != null || $drawRelations >= 2)
-                $idSorteo = 4;
+            // else if($sorteo != null || $drawRelations >= 2)
+            //     $idSorteo = 4;
         }
    }
     else if(strlen($jugada) == 5){
@@ -330,6 +330,12 @@ class Helper{
             }
             else if(gettype(strpos($jugada, '-')) == "integer"){
                 $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Pick 4 Straight")->first();
+                if($idSorteo != null){
+                    $idSorteo = $idSorteo->id;
+                }
+            }
+            else if(gettype(strpos($jugada, 'S')) == "integer" || gettype(strpos($jugada, 's')) == "integer"){
+                $idSorteo = DB::connection($servidor)->table('draws')->whereDescripcion("Super pale")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->id;
                 }
@@ -413,10 +419,10 @@ class Helper{
                 $idSorteo = $idSorteo->descripcion;
             }
         }
-        else if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
+        // else if($loteria->sorteos()->whereDescripcion('Super pale')->first() == null || $loteria->drawRelations->count() <= 1)
             $idSorteo = "Pale";
-        else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
-            $idSorteo = "Super pale";
+        // else if($loteria->sorteos()->whereDescripcion('Super pale')->first() != null || $loteria->drawRelations->count() >= 2)
+            // $idSorteo = "Super pale";
    }
     else if(strlen($jugada) == 5){
             if(gettype(strpos($jugada, '+')) == "integer"){
@@ -427,6 +433,12 @@ class Helper{
             }
             else if(gettype(strpos($jugada, '-')) == "integer"){
                 $idSorteo = Draws::whereDescripcion("Pick 4 Straight")->first();
+                if($idSorteo != null){
+                    $idSorteo = $idSorteo->descripcion;
+                }
+            }
+            else if(gettype(strpos($jugada, 'S')) == "integer" || gettype(strpos($jugada, 's')) == "integer"){
+                $idSorteo = Draws::whereDescripcion("Super pale")->first();
                 if($idSorteo != null){
                     $idSorteo = $idSorteo->descripcion;
                 }
