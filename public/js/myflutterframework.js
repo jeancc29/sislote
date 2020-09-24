@@ -43,6 +43,27 @@ function oncreatedOrUpdatedWidgetState() {
 var fontSizeUnit = "px";
 var heightUnit = "vh";
 var widthUnit = "vw";
+var ScreenSize = /** @class */ (function () {
+    function ScreenSize() {
+    }
+    ScreenSize.isXs = function (number) {
+        return number >= 0 && number <= this.xs;
+    };
+    ScreenSize.isSm = function (number) {
+        return number >= (this.xs + 1) && number <= this.sm;
+    };
+    ScreenSize.isMd = function (number) {
+        return number >= (this.sm + 1) && number <= this.md;
+    };
+    ScreenSize.isLg = function (number) {
+        return number >= this.lg;
+    };
+    ScreenSize.xs = 567;
+    ScreenSize.sm = 791;
+    ScreenSize.md = 999;
+    ScreenSize.lg = 1000;
+    return ScreenSize;
+}());
 /********************* FUNCTIONES  ************************************/
 // function TextEditingController(){
 //     let input = document.createElement("input");
@@ -55,6 +76,32 @@ function ramdomString(length) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+function setDeviceSize(_a) {
+    var screenSize = _a.screenSize, xs = _a.xs, sm = _a.sm, md = _a.md, lg = _a.lg;
+    var width = screenSize;
+    console.log("setDeviceSize: ", width);
+    if (ScreenSize.isXs(screenSize)) {
+        console.log("setDeviceSize xs: ", width);
+        if (xs)
+            width = screenSize / xs;
+    }
+    else if (ScreenSize.isSm(screenSize)) {
+        console.log("setDeviceSize sm: ", width);
+        if (sm)
+            width = screenSize / sm;
+    }
+    else if (ScreenSize.isMd(screenSize)) {
+        console.log("setDeviceSize md: ", width);
+        if (md)
+            width = screenSize / md;
+    }
+    else if (ScreenSize.isLg(screenSize)) {
+        console.log("setDeviceSize lg: ", width);
+        if (lg)
+            width = screenSize / lg;
+    }
+    return width;
 }
 function flexbox(element) {
     element.style.cssText += "display: -webkit-box";
@@ -792,6 +839,89 @@ function TextFormField(_a) {
     return container;
     return { "element": container, "style": {}, "type": "TextFormField", "child": [] };
 }
+function TextField(_a) {
+    var onChanged = _a.onChanged, decoration = _a.decoration;
+    var input = document.createElement("input");
+    var label = document.createElement("label");
+    var isLabelNull = false;
+    // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
+    label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
+    input.setAttribute("id", "TextFormField-" + ramdomString(7));
+    label.style.cssText = "font-size: 13px";
+    label.classList.add("labelFloating");
+    input.classList.add("inputFloating");
+    if (decoration != null && decoration != undefined) {
+        if (decoration.labelText != null && decoration.labelText != null) {
+            label.innerHTML = decoration.labelText;
+        }
+        else {
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
+        }
+    }
+    else {
+        isLabelNull = true;
+    }
+    function addActiveClassAndHisStyle() {
+        label.classList.add('active');
+        _activeColor();
+    }
+    function removeActiveClassAndHisStyle() {
+        if (input.value == null || input.value == undefined || input.value == '') {
+            //Le cambiaremos el color al label e input cuando no esten enfocados, esto sucedera si la la propiedad decoration.activeColor no es nul
+            _normalColor();
+            label.classList.remove('active');
+        }
+    }
+    function _activeColor() {
+        //Si tiene asignado un activeColor pues le ponemos ese color, de lo contrario le dejamos el color por defecto
+        if (decoration != null && decoration != undefined) {
+            if (decoration.activeColor != null && decoration.activeColor != null) {
+                label.style.color = decoration.activeColor;
+                // console.log("textFormField actvieColor: ", decoration.activeColor);
+                // console.log("textFormField labelcssText: ", label.style.cssText);
+                input.style.borderBottom = "0.19px solid " + decoration.activeColor;
+            }
+        }
+    }
+    function _normalColor() {
+        label.style.color = "#bdb9b9";
+        input.style.borderBottom = "0.19px solid #bdb9b9";
+    }
+    //Events
+    input.addEventListener('focus', function () {
+        addActiveClassAndHisStyle();
+    });
+    input.addEventListener('blur', function () {
+        removeActiveClassAndHisStyle();
+    });
+    if (onChanged)
+        input.addEventListener("input", function (e) {
+            onChanged(input.value);
+        });
+    // container.appendChild(label);
+    // container.appendChild(input);
+    // container.appendChild(parrafo);
+    var container;
+    if (isLabelNull) {
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                { "element": input, "child": [] },
+            ]
+        });
+    }
+    else {
+        container = Column({
+            children: [
+                { "element": label, "child": [] },
+                { "element": input, "child": [] },
+            ]
+        });
+    }
+    return container;
+    return { "element": container, "style": {}, "type": "TextFormField", "child": [] };
+}
 function Icon(icon) {
     var element = document.createElement("span");
     element.setAttribute("id", "Icon-" + ramdomString(7));
@@ -1058,12 +1188,12 @@ function Builder(_a) {
         // console.log("builder setstate id: ", element?.id);
         var elements = builder(element === null || element === void 0 ? void 0 : element.id, setState);
         var widgetsYaCreados = Array.from(element === null || element === void 0 ? void 0 : element.childNodes);
-        // console.log("Resultadooooooooooooos: ", elements.child);
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+        oncreatedOrUpdatedWidgetState();
     }).bind(element);
     var elements = builder(id, setState);
-    // console.log("Resultadooooooooooooos: ", elements);
     builderArrayRecursivo(elements, null, true);
+    oncreatedOrUpdatedWidgetState();
 }
 function StreamBuilder(_a) {
     var stream = _a.stream, builder = _a.builder;
@@ -1098,9 +1228,10 @@ function rebuildSizeFromLayoutBuilder() {
     var elements = document.getElementsByClassName("LayoutBuilder");
     for (var i = 0; i < elements.length; i++) {
         //Mandamos el id del elemento y el size con su ancho y alto
-        var size = { height: window.innerHeight, width: window.innerWidth };
+        // var size = {height: window.innerHeight, width: window.innerWidth};
         var parentSize = getParentSize(elements[i]);
-        console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        // console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        // console.log("Size from rebuildSizeFromLayoutBuilder LayoutBuilder: ", elements[i].id);
         var event_1 = new CustomEvent("rebuildSize", { detail: { id: elements[i].id, size: parentSize } });
         elements[i].dispatchEvent(event_1);
     }
@@ -1110,13 +1241,25 @@ function getParentSize(element) {
     var size = { width: 0, height: 0 };
     var vecesARecorrer = 6;
     for (var i = 0; i < vecesARecorrer; i++) {
-        console.log("getParentSize: " + element.id + " ", parent.id, " w:", parent.offsetWidth);
+        // console.log(`getParentSize: `, parent.id, " ", parent.offsetWidth, " ", parent.style.width);
         if (parent == null || parent == undefined)
             break;
-        if (parent.offsetWidth > 0)
-            size.width = parent.offsetWidth;
-        if (parent.offsetHeight > 0)
-            size.height = parent.offsetHeight;
+        if (parent.clientWidth > 0) {
+            console.log("Dentro clienteWidth");
+            size.width = parent.clientWidth;
+        }
+        else if (parent.style.width) {
+            console.log("Dentro width");
+            size.width = parent.style.width.replace("px", "");
+        }
+        if (parent.clientHeight > 0)
+            size.height = parent.clientHeight;
+        else if (parent.style.height)
+            size.height = parent.style.height.replace("px", "");
+        // if(parent.style.width)
+        //     size.width = parent.style.width.replace("px", "");
+        // if(parent.style.height)
+        //     size.height = parent.style.height.replace("px", "");
         //Si el width es > 0 entonces salimos del ciclo y retornamos la variable size
         //de lo contrario vamos a tomar el padre del otro elemento padre y asi sucesivamente hasta
         //que encontrar el size o hasta que el sigueinte padre sea nulo
@@ -1160,8 +1303,8 @@ function LayoutBuilder(_a) {
     }
     var size = { width: window.innerWidth, height: window.innerHeight };
     var child = builder(size);
-    console.log("Resultadooooooooooooos LayoutBuilder size: ", size);
-    console.log("Resultadooooooooooooos LayoutBuilder sizeParent: ", element.parentElement);
+    // console.log("Resultadooooooooooooos LayoutBuilder size: ", size);
+    // console.log("Resultadooooooooooooos LayoutBuilder sizeParent: ", element.parentElement);
     return { element: element, type: "LayoutBuilder", child: [child] };
 }
 function Form(_a) {
@@ -1258,6 +1401,18 @@ var Utils = /** @class */ (function () {
         'Accept': 'application/json'
     };
     return Utils;
+}());
+var StreamController = /** @class */ (function () {
+    function StreamController() {
+        this.div = document.createElement("div");
+        this.div.setAttribute("id", "StreamController-" + ramdomString(7));
+    }
+    StreamController.prototype.add = function (data) {
+        this.data = data;
+        var event = new CustomEvent("rebuild", { detail: data });
+        this.div.dispatchEvent(event);
+    };
+    return StreamController;
 }());
 var http = /** @class */ (function () {
     function http() {
@@ -1404,12 +1559,13 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
             //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
             //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
             // oncreatedOrUpdatedWidgetState();
-            var a = false;
-            if (widgetInit != null)
-                a = widget.id == widgetInit.id;
-            console.log("Widget termnoooooo widget == widgetInit: ", a);
-            if (a)
-                oncreatedOrUpdatedWidgetState();
+            // let isWidgetEqualToWidgetInit:boolean = false;
+            // if(widgetInit != null)
+            //     isWidgetEqualToWidgetInit = widget.id == widgetInit.id;
+            // //Si la variable isWidgetEqualToWidgetInit == true entonces eso quiere decir
+            // //que la funcion recursiva va a terminar su ejecucion
+            // if(isWidgetEqualToWidgetInit)
+            //     oncreatedOrUpdatedWidgetState();
             return;
         }
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
@@ -1435,12 +1591,21 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
         if (!Array.isArray(widget.child)) {
             // oncreatedOrUpdatedWidgetState();
-            console.log("Widget termnoooooo update: ", widget);
             return;
         }
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
         if (widget.child.length <= 0) {
             // oncreatedOrUpdatedWidgetState();
+            var isWidgetEqualToWidgetInit = false;
+            if (widgetInit != null)
+                isWidgetEqualToWidgetInit = widget.element.id == widgetInit.element.id;
+            //Si la variable isWidgetEqualToWidgetInit == true entonces eso quiere decir
+            //que la funcion recursiva va a terminar su ejecucion
+            // console.log("isWidgetEqualToWidgetInit: ", widget.element.id, " ", widgetInit.element.id);
+            if (isWidgetEqualToWidgetInit) {
+                // console.log("Widget a crear: ", widget.element.id);
+                // oncreatedOrUpdatedWidgetState();
+            }
             return;
         }
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
@@ -1517,10 +1682,10 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
         // console.log("builderArrayRecursivo: ", hijo);
         //Si el widget hijo tiene mas hijos entonces lo recorreremos recursivamente, para eso llamamos a la funcion builderRecursvio
         if (hijo.child != null)
-            builderArrayRecursivo(hijo, widgetCreado, false, true);
+            builderArrayRecursivo(hijo, widgetCreado, false, true, widgetInit);
         // console.log("builderArrayRecursivo despues: ", hijo);
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget, widgetsYaCreados, false, true);
+        builderArrayRecursivo(widget, widgetsYaCreados, false, true, widgetInit);
     }
     //    console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 }
@@ -1533,8 +1698,11 @@ function updateStyleOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
     // Object.keys(nuevoWidget.style).forEach(key => {
     //     widgetViejoOExistente.style[key] = nuevoWidget.style[key];
     // });
-    if (nuevoWidget.isStateLess != true)
+    if (nuevoWidget.isStateLess != true) {
+        if (nuevoWidget.element.id.split("-")[0] == "LayoutBuilder")
+            console.log("viejo - nuevo: ", nuevoWidget.element.style.width, " ", widgetViejoOExistente.style.width);
         widgetViejoOExistente.style.cssText = nuevoWidget.element.style.cssText;
+    }
     // console.log("updateStyleOfExistente: ", nuevoWidget.element.style.cssText);
 }
 function updateTextOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
@@ -1758,19 +1926,8 @@ var _cargando = false;
 var jwt = createJWT({ "servidor": servidorGlobal, "idUsuario": idUsuario });
 // $http.get(rutaGlobal+"/api/bloqueos?token="+ jwt)
 // console.log("jwt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + jwt);
-var StreamController = /** @class */ (function () {
-    function StreamController() {
-        this.div = document.createElement("div");
-        this.div.setAttribute("id", "StreamController-" + ramdomString(7));
-    }
-    StreamController.prototype.add = function (data) {
-        this.data = data;
-        var event = new CustomEvent("rebuild", { detail: data });
-        this.div.dispatchEvent(event);
-    };
-    return StreamController;
-}());
 var _streamController = new StreamController();
+var _streamControllerSorteo = new StreamController();
 var _txtDirecto = new TextEditingController();
 var _txtPale = new TextEditingController();
 var _txtTripleta = new TextEditingController();
@@ -1781,6 +1938,8 @@ var _txtPick4Straight = new TextEditingController();
 var _txtPick4Box = new TextEditingController();
 var listaBanca = [];
 var _indexBanca = 0;
+var listaSorteo = [];
+var _indexSorteo = 0;
 var listaOpcion = ["General", "Por banca"];
 var _indexOpcion = 0;
 Builder({
@@ -1789,8 +1948,10 @@ Builder({
         var response = http.get({ url: rutaGlobal + "/api/bloqueos?token=" + jwt, headers: Utils.headers }).then(function (json) {
             console.log("response: ", json);
             listaBanca = json.bancas;
+            listaSorteo = json.sorteos;
             _streamController.add(listaBanca);
-            console.log("response listaBanca: ", listaBanca);
+            _streamControllerSorteo.add(listaSorteo);
+            console.log("response listaBanca: ", listaSorteo);
         });
     },
     builder: function (id, setState) {
@@ -1800,258 +1961,156 @@ Builder({
             style: new TextStyle({ fontFamily: "Roboto" }),
             child: Column({
                 // style: new TextStyle({background: "blue"}),
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    Padding({
-                        padding: EdgetInsets.all(1),
-                        child: LayoutBuilder({
-                            builder: function (size) {
-                                return Container({
-                                    style: new TextStyle({ width: size.width / 2, height: 20, background: "red" }),
-                                    child: LayoutBuilder({
-                                        builder: function (size) {
-                                            return Container({
-                                                style: new TextStyle({ width: size.width / 1.7, height: 200, background: "blue" })
-                                            });
-                                        }
-                                    })
-                                });
-                            }
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Flexible({
-                                    child: Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold }))
-                                }),
-                                SizedBox({ width: 20 }),
-                                Flexible({
-                                    flex: 1,
-                                    child: DropdownButton({
-                                        value: listaOpcion[_indexOpcion],
-                                        items: listaOpcion.map(function (item) {
-                                            return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
-                                        }),
-                                        onChanged: function (data) {
-                                            var index = listaOpcion.indexOf("" + data);
-                                            if (index != -1) {
-                                                _indexOpcion = index;
-                                                setState();
-                                            }
-                                            // console.log("onchange: " + data);
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: StreamBuilder({
-                            stream: _streamController,
-                            builder: function (id, snapshot) {
-                                if (snapshot)
-                                    // return Column({
-                                    //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
-                                    // });
-                                    return Row({
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                            Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
-                                            SizedBox({ width: 20 }),
-                                            Flexible({
-                                                flex: 1,
-                                                child: DropdownButtonMultiple({
-                                                    // value: listaBanca[_indexBanca].descripcion ,
-                                                    selectedValues: [],
-                                                    items: listaBanca.map(function (item) {
-                                                        return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
+                    // Padding({
+                    //     padding: EdgetInsets.all(1),
+                    //     child: LayoutBuilder({
+                    //         builder: (size:any) => {
+                    //             return Container({
+                    //                 style: new TextStyle({width: size.width / 2, height: 20, background: "red"}),
+                    //                 child: LayoutBuilder({
+                    //                     builder: (size:any) => {
+                    //                         return Container({
+                    //                             style: new TextStyle({width: size.width / 1.7, height: 200, background: "blue"})
+                    //                         })
+                    //                     }
+                    //                 })
+                    //             })
+                    //         }
+                    //     })
+                    // }),
+                    LayoutBuilder({
+                        builder: function (size) {
+                            return Container({
+                                style: new TextStyle({ width: setDeviceSize({ screenSize: size.width, lg: 2, md: 1.6, sm: 1.3, xs: 1 }) }),
+                                child: Column({
+                                    children: [
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: Row({
+                                                children: [
+                                                    Flexible({
+                                                        child: Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold }))
                                                     }),
-                                                    onChanged: function (data) {
-                                                        // var index = listaBanca.findIndex((value) => value.descripcion == data);
-                                                        // if(index != -1){
-                                                        //     _indexBanca = index;
-                                                        //     console.log("onchange: " + data);
-                                                        //     setState();
-                                                        // }
-                                                    }
-                                                })
+                                                    SizedBox({ width: 20 }),
+                                                    Flexible({
+                                                        flex: 1,
+                                                        child: DropdownButton({
+                                                            value: listaOpcion[_indexOpcion],
+                                                            items: listaOpcion.map(function (item) {
+                                                                return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
+                                                            }),
+                                                            onChanged: function (data) {
+                                                                var index = listaOpcion.indexOf("" + data);
+                                                                if (index != -1) {
+                                                                    _indexOpcion = index;
+                                                                    setState();
+                                                                }
+                                                                // console.log("onchange: " + data);
+                                                            }
+                                                        })
+                                                    })
+                                                ]
                                             })
-                                        ]
-                                    });
-                                else
-                                    return Texto("No hay datos", new TextStyle({}));
-                                // DropdownButton({
-                                //     value: "No hay datos" ,
-                                //     items: [
-                                //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
-                                //     ],
-                                //     onChanged: (data:string) => {
-                                //         var index = items.indexOf(`${data}`);
-                                //         if(index != -1){
-                                //             _index = index;
-                                //             setState();
-                                //         }
-                                //         // console.log("onchange: " + data);
-                                //     }
-                                // });
-                            }
-                        })
+                                        }),
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: StreamBuilder({
+                                                stream: _streamController,
+                                                builder: function (id, snapshot) {
+                                                    if (snapshot)
+                                                        // return Column({
+                                                        //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                                        // });
+                                                        return Row({
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: [
+                                                                Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
+                                                                SizedBox({ width: 20 }),
+                                                                Flexible({
+                                                                    flex: 1,
+                                                                    child: DropdownButtonMultiple({
+                                                                        // value: listaBanca[_indexBanca].descripcion ,
+                                                                        selectedValues: [],
+                                                                        items: listaBanca.map(function (item) {
+                                                                            return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
+                                                                        }),
+                                                                        onChanged: function (data) {
+                                                                            // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                                            // if(index != -1){
+                                                                            //     _indexBanca = index;
+                                                                            //     console.log("onchange: " + data);
+                                                                            //     setState();
+                                                                            // }
+                                                                        }
+                                                                    })
+                                                                })
+                                                            ]
+                                                        });
+                                                    else
+                                                        return Texto("No hay datos", new TextStyle({}));
+                                                    // DropdownButton({
+                                                    //     value: "No hay datos" ,
+                                                    //     items: [
+                                                    //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
+                                                    //     ],
+                                                    //     onChanged: (data:string) => {
+                                                    //         var index = items.indexOf(`${data}`);
+                                                    //         if(index != -1){
+                                                    //             _index = index;
+                                                    //             setState();
+                                                    //         }
+                                                    //         // console.log("onchange: " + data);
+                                                    //     }
+                                                    // });
+                                                }
+                                            })
+                                        }),
+                                    ]
+                                })
+                            });
+                        }
                     }),
                     Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Directo", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtDirecto,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
+                        padding: EdgetInsets.only({ top: 20, bottom: 20 }),
+                        child: Texto("Datos", new TextStyle({ fontSize: 25 }))
                     }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Pale", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtPale,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
+                    LayoutBuilder({
+                        builder: function (size) {
+                            return Container({
+                                style: new TextStyle({ width: setDeviceSize({ screenSize: size.width, lg: 3, md: 3, sm: 2.5, xs: 1 }) }),
+                                child: StreamBuilder({
+                                    stream: _streamControllerSorteo,
+                                    builder: function (id, snapshot) {
+                                        return Column({
+                                            children: listaSorteo.map(function (item) { return Padding({
+                                                padding: EdgetInsets.all(10),
+                                                child: Row({
+                                                    children: [
+                                                        Flexible({
+                                                            flex: 1,
+                                                            child: Texto("" + item.descripcion, new TextStyle({ fontWeight: FontWeight.bold, textAlign: TextAlign.right }))
+                                                        }),
+                                                        // SizedBox({width: 20}),
+                                                        Flexible({
+                                                            flex: 2,
+                                                            child: TextField({
+                                                                onChanged: function (data) {
+                                                                    console.log(item.descripcion + ": " + data);
+                                                                }
+                                                            })
+                                                        })
+                                                    ]
+                                                })
+                                            }); })
+                                        });
+                                    }
                                 })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Tripleta", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtTripleta,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Super pale", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtSuperpale,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Pick 3 Box", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtPick3Box,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Pick 3 Straight", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtPick3Straight,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Pick 4 Box", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtPick4Box,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
-                    Padding({
-                        padding: EdgetInsets.all(10),
-                        child: Row({
-                            children: [
-                                Texto("Pick 4 Straight", new TextStyle({ fontWeight: FontWeight.bold })),
-                                SizedBox({ width: 20 }),
-                                Expanded({
-                                    child: TextFormField({
-                                        controller: _txtPick4Straight,
-                                        validator: function (data) {
-                                            if (!data)
-                                                return "No puede estar vacio";
-                                            return null;
-                                        }
-                                    })
-                                })
-                            ]
-                        })
-                    }),
+                            });
+                        }
+                    })
                 ]
             })
         });
