@@ -364,6 +364,97 @@ class BorderRadius {
     }
 }
 
+
+class BorderStyle {
+    values : string[] = ["solid", "dashed", "dotted", "double", "groove", "ridge", "none", "800", "900", "bolder", "lighter", "normal", "bold"];
+    index : number;
+    private constructor(index : number){
+        this.index = index - 1;
+    }
+
+    
+    static solid = new BorderStyle(1);
+    static dashed = new BorderStyle(2);
+    static dotted = new BorderStyle(3);
+    static double = new BorderStyle(4);
+    static groove = new BorderStyle(5);
+    static ridge = new BorderStyle(6);
+    static none = new BorderStyle(7);
+    
+    
+    public toString = () : string => {
+        return this.values[this.index];
+    }
+}
+
+interface namedParametersBorderSide{
+    color?:string;
+    width?:number;
+    style?:BorderStyle;
+}
+
+class BorderSide {
+    color? : string;
+    width? : number;
+    style? : BorderStyle;
+
+    constructor({color = "black", width = 0, style = BorderStyle.none} : namedParametersBorderSide){
+        this.color = color;
+        this.width = width;
+        this.style = style;
+    }
+
+    
+    public toString = () : string => {
+        
+        return `${this.width}${fontSizeUnit} ${this.style.toString()} ${this.color}`;
+    }
+}
+
+interface namedParametersBorder{
+    top? : BorderSide;
+    right? : BorderSide;
+    bottom? : BorderSide;
+    left? : BorderSide;
+}
+
+interface namedParametersBorderAll{
+    width?:number;
+    color?:string;
+    style?:BorderStyle;
+}
+
+class Border {
+    top? : string;
+    right? : string;
+    bottom? : string;
+    left? : string;
+
+    private constructor({top, right, bottom, left} : namedParametersBorder){
+        this.top = top.toString();
+        this.right = right.toString();
+        this.bottom = bottom.toString();
+        this.left = left.toString();
+    }
+
+    
+    static all = ({width = 1, color = "black", style = BorderStyle.solid} : namedParametersBorderAll) => {
+        return new Border({top : new BorderSide({width, color, style}), right : new BorderSide({width, color, style}), bottom : new BorderSide({width, color, style}), left : new BorderSide({width, color, style})})
+    };
+    // static only = ({top, right, bottom, left} : namedParametersBorder) => {
+    //     return new Border({top, right, bottom, left});
+    // };
+   
+    
+    // public toString = () : string => {
+    //     this.top = (this.top != null) ? this.top : new BorderSide({});
+    //     this.right = (this.right != null) ? this.right : new BorderSide({});
+    //     this.bottom = (this.bottom != null) ? this.bottom : new BorderSide({});
+    //     this.left = (this.left != null) ? this.left : new BorderSide({});
+    //     return `${this.top}${fontSizeUnit} ${this.right}${fontSizeUnit} ${this.bottom}${fontSizeUnit} ${this.left}${fontSizeUnit}`;
+    // }
+}
+
 interface namedParametersEdgeInsets {
     top? : number;
     right? : number;
@@ -414,6 +505,25 @@ class TextAlign {
     static right = new TextAlign(2);
     static center = new TextAlign(3);
     static justify = new TextAlign(4);
+
+    
+    public toString = () : string => {
+        return this.values[this.index];
+    }
+}
+
+class Alignment {
+    values : string[] = ["left: 0;", "right: 0;"];
+    index : number;
+    private constructor(index : number){
+        this.index = index - 1;
+    }
+    
+    
+    static start = new Alignment(1);
+    static end = new Alignment(2);
+    // static center = new Alignment(3);
+    // static justify = new Alignment(4);
 
     
     public toString = () : string => {
@@ -491,6 +601,12 @@ interface namedParametersTextStyle {
     height? : number;
     fontFamily? : string;
     cursor? : string;
+    border? : Border;
+    borderTop? : string;
+    borderBottom? : string;
+    borderRight? : string;
+    borderLeft? : string;
+
 }
 
 class TextStyle{
@@ -506,8 +622,12 @@ class TextStyle{
     height? : number;
     fontFamily? : string;
     cursor? : string;
+    borderTop? : string;
+    borderBottom? : string;
+    borderRight? : string;
+    borderLeft? : string;
 
-    constructor({fontSize, fontWeight, textAlign, fontStyle, color, background, padding,borderRadius, width, height, fontFamily, cursor}: namedParametersTextStyle){
+    constructor({fontSize, fontWeight, textAlign, fontStyle, color, background, padding,borderRadius, width, height, fontFamily, cursor, border}: namedParametersTextStyle){
         this.fontSize = fontSize;
         this.fontWeight = fontWeight;
         this.textAlign = textAlign;
@@ -520,6 +640,18 @@ class TextStyle{
         this.padding = padding;
         this.fontFamily = fontFamily;
         this.cursor = cursor;
+        if(border){
+            if(border.top)
+                this.borderTop = border.top;
+            if(border.right)
+                this.borderRight = border.right;
+            if(border.bottom)
+                this.borderBottom = border.bottom;
+            if(border.left)
+                this.borderLeft = border.left;
+        }
+        
+        
     }
 
     toJson(){
@@ -1886,6 +2018,23 @@ function SizedBox({child, width, height} : namedParametersSizedBox){
         return {"element" : element, "child" : []};
 }
 
+interface namedParametersAlign{
+    child:any;
+    alignment:Alignment;
+}
+
+function Align({child, alignment} : namedParametersAlign){
+    var element = document.createElement("div");
+    element.setAttribute("id", 'Align-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    
+    element.style.position = "relative";
+    child.element.style.cssText += `position: absolute; ${alignment.toString()}`;
+    
+
+    return {"element" : element, "child" : [child]};
+}
+
 interface namedParametersPadding{
     child:any;
     padding:EdgetInsets;
@@ -2305,123 +2454,13 @@ function updateTextOfExistenteWidget(nuevoWidget: any, widgetViejoOExistente: an
 let _formKey = new FormGlobalKey();
 
 
-// var p = Init(
-//     "container", 
-//     Container(
-//         {
-//             child: Row({
-//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//             children : [
-//                 Form({
-//                     key: _formKey,
-//                     child: Row({
-//                         children: [
-//                             Flexible({
-//                                 flex: 3,
-//                                 child: TextFormField({controller: new TextEditingController(), validator: (data : string) : string => {
-//                                     console.log("Text");
-//                                     return "jean";
-//                                 }})
-//                             }),
-//                             RaisedButton({child: Texto("Jean", new TextStyle({})), onPressed: () =>{
-//                                 var v = _formKey.validate();
-//                                 console.log("RaisedButton validate: ", v);
-                                
-//                             }})
-//                         ]
-//                     })
-//                 }),//Flexible
-//                 Flexible({
-//                     flex: 1,
-//                     child: Row(
-//                     {
-//                         children : [
-//                              Texto("jean", new TextStyle({fontSize: 15})),
-//                              Texto("Contreras", new TextStyle({fontSize: 15})),
-//                         ],
-//                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                     }
-//                  )}
-//                  ),
-//                 Flexible({
-//                     flex: 3,
-//                     child: Row(
-//                         {
-//                             children : [
-//                                  Texto("jean", new TextStyle({fontSize: 15})),
-//                                  Texto("Contreras", new TextStyle({fontSize: 15})),
-//                             ],
-//                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                         }
-//                      )
-//                 }),
-//             ]
-//         })
-//         ,
-//         style: new TextStyle({background : "brown", borderRadius : BorderRadius.all(3), width: 500})
-//     }),
-// );
 
 interface namedParametersBuild{
     id: string;
 }
 declare var flutter : object;
 
-// Builder({
-//     id: "container",
-//     builder: (element: any, setState: any) => {
-        
-//         let _mensaje = "Hola soy jean carlos";
 
-//         return Init(
-//             {
-//                 initDefaultStyle: true,
-//                 id: "container",
-//                 style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
-//                 child: Form({
-//                     key: _formKey,
-//                     child: Row({
-//                         crossAxisAlignment: CrossAxisAlignment.center,
-//                         children: [
-//                             Container({
-//                                 child: Column({
-//                                     children: [
-//                                         Texto(`${flutter}`, new TextStyle({fontSize: 25})),
-//                                         TextFormField({
-//                                             controller: new TextEditingController(),
-//                                             validator: (data : string) => {
-//                                                 if(!data)
-//                                                     return "error";
-                                                
-//                                                 return null;
-//                                             }
-//                                         })
-//                                     ]
-//                                 }),
-//                             }),
-//                             SizedBox({width: 20}),
-//                             RaisedButton({
-//                                 child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
-//                                 onPressed: () => {
-//                                     console.log("onpressed: ", _formKey.validate());
-//                                     setState(() => _mensaje = "Cambie");
-//                                     if( _formKey.validate())
-//                                         console.log("valido");
-//                                     else
-//                                         console.log("Invalido errorrr");
-                                        
-                                        
-//                                 }
-//                             })
-//                         ]
-//                     })
-//                 })}
-//         );
-//     }
-        
-//     }
-// );
-// _formKey.validate();
 
 
 
@@ -2464,85 +2503,7 @@ let color = "green";
 
 
 
-// Builder({
-//     id: "container",
-//     builder:(id : string, setState : any) => {
-        
-//         return Init({
-//             id: id,
-//             child: 
-//             (_mostrarColumna)
-//             ?
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     Texto("Fila2", new TextStyle({fontSize: 20})),
-//                     Texto("Fila3", new TextStyle({fontSize: 25})),
-//                     Texto("Fila4", new TextStyle({fontSize: 30})),
-//                     Column({
-//                         children: [
-//                             Texto("Fila5", new TextStyle({fontSize: 35})),
-//                             Row({
-//                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                                 children: [
-//                                     Column({
-//                                         children: [
-//                                             Row({
-//                                                 crossAxisAlignment: CrossAxisAlignment.center,
-//                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                                                 children: [
-//                                                     Texto("Fila5.1", new TextStyle({fontSize: 35})),
-//                                                     Column({
-//                                                         children: [
-//                                                             Row({
-//                                                                 children: [
-//                                                                     Texto("Fila5.1.1", new TextStyle({fontSize: 20})),
-//                                                                     RaisedButton({
-//                                                                         color: color,
-//                                                                         child: Texto("click", new TextStyle({})),
-//                                                                         onPressed: () => {
-//                                                                             color = "red";
-//                                                                             setState();
-//                                                                         }
-//                                                                     })
-//                                                                 ]
-//                                                             }),
-//                                                             Texto("Fila5.1.2", new TextStyle({fontSize: 20})),
-//                                                         ]
-//                                                     })
-//                                                 ]
-//                                             })
-                                            
-                                            
-//                                         ]
-//                                     }),
-//                                     Texto("Fila5.2", new TextStyle({fontSize: 35})),
-//                                 ]
-//                             })
-//                         ]
-//                     })
-//                 ]
-//             })
-//             :
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     RaisedButton({
-//                         child: Texto(_mensaje, new TextStyle({})),
-//                         onPressed: () => {
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                             _mensaje = "Cambieeee";
-//                             _mostrarColumna = true;
-//                             setState();
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                         }
-//                     })
-//                 ]
-//             })
-            
-//         });
-//     }
-// })
+
 
 // var c = new Init({
 //     id: "container", 
@@ -2625,6 +2586,13 @@ let _indexSorteo:number = 0;
 let listaOpcion:string[] = ["General", "Por banca"];
 let _indexOpcion:number = 0;
 
+function _myContainer(){
+    return Container({
+        style: new TextStyle({padding: EdgetInsets.only({left: 12, right: 12, top: 2, bottom: 2}), border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
+        child: Texto("LA PRIMERA", new TextStyle({color: "#00bcd4", fontSize: 11}))
+    })
+}
+
 Builder({
     id: "containerJugadasSucias",
     initState: () => {
@@ -2649,6 +2617,7 @@ Builder({
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                    _myContainer(),
                     // Padding({
                     //     padding: EdgetInsets.all(1),
                     //     child: LayoutBuilder({
@@ -2775,20 +2744,25 @@ Builder({
                                         children: listaSorteo.map((item) => Padding({
                                             padding: EdgetInsets.all(10),
                                             child: Row({
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                    Flexible({
-                                                        flex: 1,
-                                                        child: Texto(`${item.descripcion}`, new TextStyle({fontWeight: FontWeight.bold, textAlign: TextAlign.right})),
-                                                    }),
+                                                    // Align({
+                                                        // flex: 5,
+                                                        // alignment: Alignment.start,
+                                                        // child: 
+                                                        Texto(`${item.descripcion}`, new TextStyle({fontWeight: FontWeight.bold, textAlign: TextAlign.center})),
+                                                    // }),
                                                     // SizedBox({width: 20}),
-                                                    Flexible({
-                                                        flex: 2,
-                                                        child: TextField({
+                                                    // Flexible({
+                                                        // flex: 2,
+                                                        // child: 
+                                                        TextField({
                                                             onChanged: (data:string) => {
+                                                                item.monto = data;
                                                                 console.log(`${item.descripcion}: ${data}`);
                                                             }
                                                         })
-                                                    })
+                                                    // })
                                                 ]
                                             })
                                         })
@@ -2800,8 +2774,17 @@ Builder({
                             })
                            
                        }
-                   })
-                    
+                   }),
+                    RaisedButton({
+                        color: "#47a44b",
+                        child: Texto("Guardar", new TextStyle({color: "white", fontWeight: FontWeight.w400})),
+                        onPressed: ()=>{
+                            console.log("Guardaaarrrr");
+                            listaSorteo.forEach((item)=> console.log(item));
+
+                            
+                        }
+                    })
                 ]
             })
         })

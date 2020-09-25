@@ -357,6 +357,51 @@ var BorderRadius = /** @class */ (function () {
     };
     return BorderRadius;
 }());
+var BorderStyle = /** @class */ (function () {
+    function BorderStyle(index) {
+        var _this = this;
+        this.values = ["solid", "dashed", "dotted", "double", "groove", "ridge", "none", "800", "900", "bolder", "lighter", "normal", "bold"];
+        this.toString = function () {
+            return _this.values[_this.index];
+        };
+        this.index = index - 1;
+    }
+    BorderStyle.solid = new BorderStyle(1);
+    BorderStyle.dashed = new BorderStyle(2);
+    BorderStyle.dotted = new BorderStyle(3);
+    BorderStyle.double = new BorderStyle(4);
+    BorderStyle.groove = new BorderStyle(5);
+    BorderStyle.ridge = new BorderStyle(6);
+    BorderStyle.none = new BorderStyle(7);
+    return BorderStyle;
+}());
+var BorderSide = /** @class */ (function () {
+    function BorderSide(_a) {
+        var _this = this;
+        var _b = _a.color, color = _b === void 0 ? "black" : _b, _c = _a.width, width = _c === void 0 ? 0 : _c, _d = _a.style, style = _d === void 0 ? BorderStyle.none : _d;
+        this.toString = function () {
+            return "" + _this.width + fontSizeUnit + " " + _this.style.toString() + " " + _this.color;
+        };
+        this.color = color;
+        this.width = width;
+        this.style = style;
+    }
+    return BorderSide;
+}());
+var Border = /** @class */ (function () {
+    function Border(_a) {
+        var top = _a.top, right = _a.right, bottom = _a.bottom, left = _a.left;
+        this.top = top.toString();
+        this.right = right.toString();
+        this.bottom = bottom.toString();
+        this.left = left.toString();
+    }
+    Border.all = function (_a) {
+        var _b = _a.width, width = _b === void 0 ? 1 : _b, _c = _a.color, color = _c === void 0 ? "black" : _c, _d = _a.style, style = _d === void 0 ? BorderStyle.solid : _d;
+        return new Border({ top: new BorderSide({ width: width, color: color, style: style }), right: new BorderSide({ width: width, color: color, style: style }), bottom: new BorderSide({ width: width, color: color, style: style }), left: new BorderSide({ width: width, color: color, style: style }) });
+    };
+    return Border;
+}());
 var EdgetInsets = /** @class */ (function () {
     function EdgetInsets(_a) {
         var _this = this;
@@ -396,6 +441,21 @@ var TextAlign = /** @class */ (function () {
     TextAlign.center = new TextAlign(3);
     TextAlign.justify = new TextAlign(4);
     return TextAlign;
+}());
+var Alignment = /** @class */ (function () {
+    function Alignment(index) {
+        var _this = this;
+        this.values = ["left: 0;", "right: 0;"];
+        // static center = new Alignment(3);
+        // static justify = new Alignment(4);
+        this.toString = function () {
+            return _this.values[_this.index];
+        };
+        this.index = index - 1;
+    }
+    Alignment.start = new Alignment(1);
+    Alignment.end = new Alignment(2);
+    return Alignment;
 }());
 var Icons = /** @class */ (function () {
     function Icons(index) {
@@ -444,7 +504,7 @@ var CrossAxisAlignment = /** @class */ (function () {
 }());
 var TextStyle = /** @class */ (function () {
     function TextStyle(_a) {
-        var fontSize = _a.fontSize, fontWeight = _a.fontWeight, textAlign = _a.textAlign, fontStyle = _a.fontStyle, color = _a.color, background = _a.background, padding = _a.padding, borderRadius = _a.borderRadius, width = _a.width, height = _a.height, fontFamily = _a.fontFamily, cursor = _a.cursor;
+        var fontSize = _a.fontSize, fontWeight = _a.fontWeight, textAlign = _a.textAlign, fontStyle = _a.fontStyle, color = _a.color, background = _a.background, padding = _a.padding, borderRadius = _a.borderRadius, width = _a.width, height = _a.height, fontFamily = _a.fontFamily, cursor = _a.cursor, border = _a.border;
         this.fontSize = fontSize;
         this.fontWeight = fontWeight;
         this.textAlign = textAlign;
@@ -457,6 +517,16 @@ var TextStyle = /** @class */ (function () {
         this.padding = padding;
         this.fontFamily = fontFamily;
         this.cursor = cursor;
+        if (border) {
+            if (border.top)
+                this.borderTop = border.top;
+            if (border.right)
+                this.borderRight = border.right;
+            if (border.bottom)
+                this.borderBottom = border.bottom;
+            if (border.left)
+                this.borderLeft = border.left;
+        }
     }
     TextStyle.prototype.toJson = function () {
         var jsonWithValuesNotNullToReturn = {};
@@ -1357,6 +1427,15 @@ function SizedBox(_a) {
     else
         return { "element": element, "child": [] };
 }
+function Align(_a) {
+    var child = _a.child, alignment = _a.alignment;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'Align-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    element.style.position = "relative";
+    child.element.style.cssText += "position: absolute; " + alignment.toString();
+    return { "element": element, "child": [child] };
+}
 function Padding(_a) {
     var child = _a.child, padding = _a.padding;
     var element = document.createElement("div");
@@ -1720,55 +1799,6 @@ function updateTextOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
     }
 }
 var _formKey = new FormGlobalKey();
-// Builder({
-//     id: "container",
-//     builder: (element: any, setState: any) => {
-//         let _mensaje = "Hola soy jean carlos";
-//         return Init(
-//             {
-//                 initDefaultStyle: true,
-//                 id: "container",
-//                 style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
-//                 child: Form({
-//                     key: _formKey,
-//                     child: Row({
-//                         crossAxisAlignment: CrossAxisAlignment.center,
-//                         children: [
-//                             Container({
-//                                 child: Column({
-//                                     children: [
-//                                         Texto(`${flutter}`, new TextStyle({fontSize: 25})),
-//                                         TextFormField({
-//                                             controller: new TextEditingController(),
-//                                             validator: (data : string) => {
-//                                                 if(!data)
-//                                                     return "error";
-//                                                 return null;
-//                                             }
-//                                         })
-//                                     ]
-//                                 }),
-//                             }),
-//                             SizedBox({width: 20}),
-//                             RaisedButton({
-//                                 child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
-//                                 onPressed: () => {
-//                                     console.log("onpressed: ", _formKey.validate());
-//                                     setState(() => _mensaje = "Cambie");
-//                                     if( _formKey.validate())
-//                                         console.log("valido");
-//                                     else
-//                                         console.log("Invalido errorrr");
-//                                 }
-//                             })
-//                         ]
-//                     })
-//                 })}
-//         );
-//     }
-//     }
-// );
-// _formKey.validate();
 var _mensaje = "hola";
 var _mostrarColumna = false;
 var color = "green";
@@ -1802,81 +1832,6 @@ var color = "green";
 //         })
 //     }
 // });
-// Builder({
-//     id: "container",
-//     builder:(id : string, setState : any) => {
-//         return Init({
-//             id: id,
-//             child: 
-//             (_mostrarColumna)
-//             ?
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     Texto("Fila2", new TextStyle({fontSize: 20})),
-//                     Texto("Fila3", new TextStyle({fontSize: 25})),
-//                     Texto("Fila4", new TextStyle({fontSize: 30})),
-//                     Column({
-//                         children: [
-//                             Texto("Fila5", new TextStyle({fontSize: 35})),
-//                             Row({
-//                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                                 children: [
-//                                     Column({
-//                                         children: [
-//                                             Row({
-//                                                 crossAxisAlignment: CrossAxisAlignment.center,
-//                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                                                 children: [
-//                                                     Texto("Fila5.1", new TextStyle({fontSize: 35})),
-//                                                     Column({
-//                                                         children: [
-//                                                             Row({
-//                                                                 children: [
-//                                                                     Texto("Fila5.1.1", new TextStyle({fontSize: 20})),
-//                                                                     RaisedButton({
-//                                                                         color: color,
-//                                                                         child: Texto("click", new TextStyle({})),
-//                                                                         onPressed: () => {
-//                                                                             color = "red";
-//                                                                             setState();
-//                                                                         }
-//                                                                     })
-//                                                                 ]
-//                                                             }),
-//                                                             Texto("Fila5.1.2", new TextStyle({fontSize: 20})),
-//                                                         ]
-//                                                     })
-//                                                 ]
-//                                             })
-//                                         ]
-//                                     }),
-//                                     Texto("Fila5.2", new TextStyle({fontSize: 35})),
-//                                 ]
-//                             })
-//                         ]
-//                     })
-//                 ]
-//             })
-//             :
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     RaisedButton({
-//                         child: Texto(_mensaje, new TextStyle({})),
-//                         onPressed: () => {
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                             _mensaje = "Cambieeee";
-//                             _mostrarColumna = true;
-//                             setState();
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                         }
-//                     })
-//                 ]
-//             })
-//         });
-//     }
-// })
 // var c = new Init({
 //     id: "container", 
 //     child: new Container({
@@ -1942,6 +1897,12 @@ var listaSorteo = [];
 var _indexSorteo = 0;
 var listaOpcion = ["General", "Por banca"];
 var _indexOpcion = 0;
+function _myContainer() {
+    return Container({
+        style: new TextStyle({ padding: EdgetInsets.only({ left: 12, right: 12, top: 2, bottom: 2 }), border: Border.all({ color: "#00bcd4" }), borderRadius: BorderRadius.all(3) }),
+        child: Texto("LA PRIMERA", new TextStyle({ color: "#00bcd4", fontSize: 11 }))
+    });
+}
 Builder({
     id: "containerJugadasSucias",
     initState: function () {
@@ -1964,6 +1925,7 @@ Builder({
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                    _myContainer(),
                     // Padding({
                     //     padding: EdgetInsets.all(1),
                     //     child: LayoutBuilder({
@@ -2088,20 +2050,25 @@ Builder({
                                             children: listaSorteo.map(function (item) { return Padding({
                                                 padding: EdgetInsets.all(10),
                                                 child: Row({
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                        Flexible({
-                                                            flex: 1,
-                                                            child: Texto("" + item.descripcion, new TextStyle({ fontWeight: FontWeight.bold, textAlign: TextAlign.right }))
-                                                        }),
+                                                        // Align({
+                                                        // flex: 5,
+                                                        // alignment: Alignment.start,
+                                                        // child: 
+                                                        Texto("" + item.descripcion, new TextStyle({ fontWeight: FontWeight.bold, textAlign: TextAlign.center })),
+                                                        // }),
                                                         // SizedBox({width: 20}),
-                                                        Flexible({
-                                                            flex: 2,
-                                                            child: TextField({
-                                                                onChanged: function (data) {
-                                                                    console.log(item.descripcion + ": " + data);
-                                                                }
-                                                            })
+                                                        // Flexible({
+                                                        // flex: 2,
+                                                        // child: 
+                                                        TextField({
+                                                            onChanged: function (data) {
+                                                                item.monto = data;
+                                                                console.log(item.descripcion + ": " + data);
+                                                            }
                                                         })
+                                                        // })
                                                     ]
                                                 })
                                             }); })
@@ -2109,6 +2076,14 @@ Builder({
                                     }
                                 })
                             });
+                        }
+                    }),
+                    RaisedButton({
+                        color: "#47a44b",
+                        child: Texto("Guardar", new TextStyle({ color: "white", fontWeight: FontWeight.w400 })),
+                        onPressed: function () {
+                            console.log("Guardaaarrrr");
+                            listaSorteo.forEach(function (item) { return console.log(item); });
                         }
                     })
                 ]
