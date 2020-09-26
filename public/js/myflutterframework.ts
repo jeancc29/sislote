@@ -1135,6 +1135,8 @@ function InkWell({child, onTap} : namedParametersInkWell){
     
     if(onTap){
         element.addEventListener("click", onTap);
+        element.classList.add("buttonFlatHover");
+        element.style.cursor = "pointer";
     }
 
     return {"element" : element, "style" : {}, "type" : "Visibility", "child" : [child]};
@@ -2571,6 +2573,7 @@ var jwt = createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
 
 let _streamController = new StreamController();
 let _streamControllerSorteo = new StreamController();
+let _streamControllerLoteria = new StreamController();
 let _txtDirecto = new TextEditingController();
 let _txtPale = new TextEditingController();
 let _txtTripleta = new TextEditingController();
@@ -2583,14 +2586,34 @@ let listaBanca:any[] = [];
 let _indexBanca:number = 0;
 let listaSorteo:any[] = [];
 let _indexSorteo:number = 0;
+let listaLoteria:any[] = [];
+let _indexLoteria:number = 0;
 let listaOpcion:string[] = ["General", "Por banca"];
 let _indexOpcion:number = 0;
+let _loterias:any[] = [];
 
-function _myContainer(){
+interface namedParametersMyContainer{
+    active:boolean;
+    text:string;
+}
+function _myContainer({text, active}){
+    let _background:string = (active) ? "#00bcd4" : "transparent";
+    let _color:string = (active) ? "white" : "#00bcd4";
     return Container({
-        style: new TextStyle({padding: EdgetInsets.only({left: 12, right: 12, top: 2, bottom: 2}), border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
-        child: Texto("LA PRIMERA", new TextStyle({color: "#00bcd4", fontSize: 11}))
-    })
+        style: new TextStyle({padding: EdgetInsets.only({left: 12, right: 12, top: 2, bottom: 2}), background: _background, border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
+        child: Texto(text.toUpperCase(), new TextStyle({color: _color, fontSize: 11, fontWeight: FontWeight.w500}))
+    });
+}
+
+function _selectOrDiselectLoteria(loteria:any){
+    if(_loterias.findIndex((item) => item.id == loteria.id) == -1)
+        _loterias.push(loteria);
+    else
+        _loterias.splice(_loterias.findIndex((item) => item.id == loteria.id), 1);
+}
+
+function _isLoteriaSelected(loteria){
+    return (_loterias.findIndex((item) => item.id == loteria.id) != -1);
 }
 
 Builder({
@@ -2600,9 +2623,11 @@ Builder({
             console.log("response: ", json);
             listaBanca = json.bancas;
             listaSorteo = json.sorteos;
+            listaLoteria = json.loterias;
             _streamController.add(listaBanca);
             _streamControllerSorteo.add(listaSorteo);
-            console.log("response listaBanca: ", listaSorteo);
+            _streamControllerLoteria.add(listaLoteria);
+            console.log("response listaBanca: ", listaLoteria);
 
         });
         
@@ -2617,7 +2642,7 @@ Builder({
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    _myContainer(),
+                    
                     // Padding({
                     //     padding: EdgetInsets.all(1),
                     //     child: LayoutBuilder({
@@ -2775,12 +2800,23 @@ Builder({
                            
                        }
                    }),
-                    RaisedButton({
+                   StreamBuilder({
+                       stream: _streamControllerLoteria,
+                       builder: (id:any, snapshot:any)=>{
+                           if(snapshot)
+                            return Row({
+                                children: listaLoteria.map((item) => InkWell({onTap:()=>{_selectOrDiselectLoteria(item); setState();}, child: _myContainer({text: item.descripcion, active: _isLoteriaSelected(item)})}),)
+                            });
+
+                            return SizedBox({});
+                       }
+                   }),
+                   RaisedButton({
                         color: "#47a44b",
                         child: Texto("Guardar", new TextStyle({color: "white", fontWeight: FontWeight.w400})),
                         onPressed: ()=>{
-                            console.log("Guardaaarrrr");
-                            listaSorteo.forEach((item)=> console.log(item));
+                            console.log("Guardaaarrrr: ", _loterias);
+                            // listaSorteo.forEach((item)=> console.log(item));
 
                             
                         }
