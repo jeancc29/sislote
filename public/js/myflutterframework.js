@@ -1,4 +1,3 @@
-/********************* VARIABLES  ************************************/
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,9 +34,36 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+//Esta funcion se lanzara cuando se hayan creados o actualizados todos los widgets
+function oncreatedOrUpdatedWidgetState() {
+    // console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    rebuildSizeFromLayoutBuilder();
+}
+/********************* VARIABLES  ************************************/
 var fontSizeUnit = "px";
 var heightUnit = "vh";
 var widthUnit = "vw";
+var ScreenSize = /** @class */ (function () {
+    function ScreenSize() {
+    }
+    ScreenSize.isXs = function (number) {
+        return number >= 0 && number <= this.xs;
+    };
+    ScreenSize.isSm = function (number) {
+        return number >= (this.xs + 1) && number <= this.sm;
+    };
+    ScreenSize.isMd = function (number) {
+        return number >= (this.sm + 1) && number <= this.md;
+    };
+    ScreenSize.isLg = function (number) {
+        return number >= this.lg;
+    };
+    ScreenSize.xs = 567;
+    ScreenSize.sm = 791;
+    ScreenSize.md = 999;
+    ScreenSize.lg = 1000;
+    return ScreenSize;
+}());
 /********************* FUNCTIONES  ************************************/
 // function TextEditingController(){
 //     let input = document.createElement("input");
@@ -50,6 +76,40 @@ function ramdomString(length) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+function setDeviceSize(_a) {
+    var screenSize = _a.screenSize, xs = _a.xs, sm = _a.sm, md = _a.md, lg = _a.lg;
+    var width = screenSize;
+    console.log("setDeviceSize: ", width);
+    if (ScreenSize.isXs(screenSize)) {
+        console.log("setDeviceSize xs: ", width);
+        if (xs)
+            width = screenSize / xs;
+    }
+    else if (ScreenSize.isSm(screenSize)) {
+        console.log("setDeviceSize sm: ", width);
+        if (sm)
+            width = screenSize / sm;
+    }
+    else if (ScreenSize.isMd(screenSize)) {
+        console.log("setDeviceSize md: ", width);
+        if (md)
+            width = screenSize / md;
+    }
+    else if (ScreenSize.isLg(screenSize)) {
+        console.log("setDeviceSize lg: ", width);
+        if (lg)
+            width = screenSize / lg;
+    }
+    return width;
+}
+function flexbox(element) {
+    element.style.cssText += "display: -webkit-box";
+    element.style.cssText += "display: -moz-box";
+    element.style.cssText += "display: -webkit-flex";
+    element.style.cssText += "display: -ms-flexbox";
+    element.style.cssText += "display: flex";
+    return element;
 }
 function justifyContentPrefix(element, value) {
     if (value === void 0) { value = 'flex-start'; }
@@ -99,6 +159,37 @@ function alignItemsPrefix(element, value) {
     }
     element.style.cssText += "-webkit-align-items: " + value + ";";
     element.style.cssText += "align-items: " + value + ";";
+    return element;
+}
+function flexDirection(element, value) {
+    if (value === void 0) { value = "row"; }
+    if (value == "row-reverse") {
+        element.style.cssText += "-webkit-box-direction: reverse";
+        element.style.cssText += "-webkit-box-orient: horizontal";
+        element.style.cssText += "-moz-box-direction: reverse";
+        element.style.cssText += "-moz-box-orient: horizontal";
+    }
+    else if (value == "column") {
+        element.style.cssText += "-webkit-box-direction: normal";
+        element.style.cssText += "-webkit-box-orient: vertical";
+        element.style.cssText += "-moz-box-direction: normal";
+        element.style.cssText += "-moz-box-orient: vertical";
+    }
+    else if (value == "column-reverse") {
+        element.style.cssText += "-webkit-box-direction: reverse";
+        element.style.cssText += "-webkit-box-orient: vertical";
+        element.style.cssText += "-moz-box-direction: reverse";
+        element.style.cssText += "-moz-box-orient: vertical";
+    }
+    else {
+        element.style.cssText += "-webkit-box-direction: normal";
+        element.style.cssText += "-webkit-box-orient: horizontal";
+        element.style.cssText += "-moz-box-direction: normal";
+        element.style.cssText += "-moz-box-orient: horizontal";
+    }
+    element.style.cssText += "-webkit-flex-direction: " + value;
+    element.style.cssText += "-ms-flex-direction: " + value;
+    element.style.cssText += "flex-direction: " + value;
     return element;
 }
 function alignSelf(element, value) {
@@ -266,6 +357,51 @@ var BorderRadius = /** @class */ (function () {
     };
     return BorderRadius;
 }());
+var BorderStyle = /** @class */ (function () {
+    function BorderStyle(index) {
+        var _this = this;
+        this.values = ["solid", "dashed", "dotted", "double", "groove", "ridge", "none", "800", "900", "bolder", "lighter", "normal", "bold"];
+        this.toString = function () {
+            return _this.values[_this.index];
+        };
+        this.index = index - 1;
+    }
+    BorderStyle.solid = new BorderStyle(1);
+    BorderStyle.dashed = new BorderStyle(2);
+    BorderStyle.dotted = new BorderStyle(3);
+    BorderStyle.double = new BorderStyle(4);
+    BorderStyle.groove = new BorderStyle(5);
+    BorderStyle.ridge = new BorderStyle(6);
+    BorderStyle.none = new BorderStyle(7);
+    return BorderStyle;
+}());
+var BorderSide = /** @class */ (function () {
+    function BorderSide(_a) {
+        var _this = this;
+        var _b = _a.color, color = _b === void 0 ? "black" : _b, _c = _a.width, width = _c === void 0 ? 0 : _c, _d = _a.style, style = _d === void 0 ? BorderStyle.none : _d;
+        this.toString = function () {
+            return "" + _this.width + fontSizeUnit + " " + _this.style.toString() + " " + _this.color;
+        };
+        this.color = color;
+        this.width = width;
+        this.style = style;
+    }
+    return BorderSide;
+}());
+var Border = /** @class */ (function () {
+    function Border(_a) {
+        var top = _a.top, right = _a.right, bottom = _a.bottom, left = _a.left;
+        this.top = top.toString();
+        this.right = right.toString();
+        this.bottom = bottom.toString();
+        this.left = left.toString();
+    }
+    Border.all = function (_a) {
+        var _b = _a.width, width = _b === void 0 ? 1 : _b, _c = _a.color, color = _c === void 0 ? "black" : _c, _d = _a.style, style = _d === void 0 ? BorderStyle.solid : _d;
+        return new Border({ top: new BorderSide({ width: width, color: color, style: style }), right: new BorderSide({ width: width, color: color, style: style }), bottom: new BorderSide({ width: width, color: color, style: style }), left: new BorderSide({ width: width, color: color, style: style }) });
+    };
+    return Border;
+}());
 var EdgetInsets = /** @class */ (function () {
     function EdgetInsets(_a) {
         var _this = this;
@@ -305,6 +441,21 @@ var TextAlign = /** @class */ (function () {
     TextAlign.center = new TextAlign(3);
     TextAlign.justify = new TextAlign(4);
     return TextAlign;
+}());
+var Alignment = /** @class */ (function () {
+    function Alignment(index) {
+        var _this = this;
+        this.values = ["left: 0;", "right: 0;"];
+        // static center = new Alignment(3);
+        // static justify = new Alignment(4);
+        this.toString = function () {
+            return _this.values[_this.index];
+        };
+        this.index = index - 1;
+    }
+    Alignment.start = new Alignment(1);
+    Alignment.end = new Alignment(2);
+    return Alignment;
 }());
 var Icons = /** @class */ (function () {
     function Icons(index) {
@@ -353,7 +504,7 @@ var CrossAxisAlignment = /** @class */ (function () {
 }());
 var TextStyle = /** @class */ (function () {
     function TextStyle(_a) {
-        var fontSize = _a.fontSize, fontWeight = _a.fontWeight, textAlign = _a.textAlign, fontStyle = _a.fontStyle, color = _a.color, background = _a.background, padding = _a.padding, borderRadius = _a.borderRadius, width = _a.width, height = _a.height, fontFamily = _a.fontFamily, cursor = _a.cursor;
+        var fontSize = _a.fontSize, fontWeight = _a.fontWeight, textAlign = _a.textAlign, fontStyle = _a.fontStyle, color = _a.color, background = _a.background, padding = _a.padding, borderRadius = _a.borderRadius, width = _a.width, height = _a.height, fontFamily = _a.fontFamily, cursor = _a.cursor, border = _a.border;
         this.fontSize = fontSize;
         this.fontWeight = fontWeight;
         this.textAlign = textAlign;
@@ -366,6 +517,16 @@ var TextStyle = /** @class */ (function () {
         this.padding = padding;
         this.fontFamily = fontFamily;
         this.cursor = cursor;
+        if (border) {
+            if (border.top)
+                this.borderTop = border.top;
+            if (border.right)
+                this.borderRight = border.right;
+            if (border.bottom)
+                this.borderBottom = border.bottom;
+            if (border.left)
+                this.borderLeft = border.left;
+        }
     }
     TextStyle.prototype.toJson = function () {
         var jsonWithValuesNotNullToReturn = {};
@@ -554,8 +715,12 @@ function Column(_a) {
         element.setAttribute("id", id + "-" + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     var styleJson = {};
-    element.style.display = "flex";
-    element.style.flexDirection = "column";
+    // element.setAttribute("style", "-webkit-flex-flow: column nowrap;-ms-flex-flow: column nowrap;flex-flow: column nowrap;")
+    // element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element = flexbox(element);
+    element = flexDirection(element, "column");
+    // element.style.display = "flex";
+    // element.style.flexDirection = "column";
     if (mainAxisAlignment != null && mainAxisAlignment != undefined) {
         // element.style.justifyContent = mainAxisAlignment.toString();
         // styleJson.justifyContent = mainAxisAlignment.toString(); 
@@ -564,7 +729,7 @@ function Column(_a) {
     if (crossAxisAlignment != null && crossAxisAlignment != undefined) {
         // element.style.alignItems = crossAxisAlignment.toString();
         // styleJson.alignItems = crossAxisAlignment.toString(); 
-        element = justifyContentPrefix(element, crossAxisAlignment.toString());
+        element = alignItemsPrefix(element, crossAxisAlignment.toString());
     }
     return { "element": element, "style": styleJson, "type": "Column", "child": children };
 }
@@ -602,13 +767,14 @@ function InkWell(_a) {
     if (onTap) {
         element.addEventListener("click", onTap);
     }
-    return { "element": element, "style": {}, "type": "Visibility", "child": [child], isStateLess: isStateLess };
+    return { "element": element, "style": {}, "type": "Visibility", "child": [child] };
 }
 function TextFormField(_a) {
     var controller = _a.controller, validator = _a.validator, decoration = _a.decoration;
     var input = controller.input;
     var label = document.createElement("label");
     var parrafo = document.createElement("p");
+    var isLabelNull = false;
     // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
     label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
     input.setAttribute("id", "TextFormField-" + ramdomString(7));
@@ -621,6 +787,13 @@ function TextFormField(_a) {
         if (decoration.labelText != null && decoration.labelText != null) {
             label.innerHTML = decoration.labelText;
         }
+        else {
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
+        }
+    }
+    else {
+        isLabelNull = true;
     }
     function addActiveClassAndHisStyle() {
         label.classList.add('active');
@@ -667,13 +840,25 @@ function TextFormField(_a) {
     // container.appendChild(label);
     // container.appendChild(input);
     // container.appendChild(parrafo);
-    var container = Column({
-        children: [
-            { "element": label, "child": [] },
-            { "element": input, "child": [] },
-            { "element": parrafo, "child": [] },
-        ]
-    });
+    var container;
+    if (isLabelNull) {
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                { "element": input, "child": [] },
+                { "element": parrafo, "child": [] },
+            ]
+        });
+    }
+    else {
+        container = Column({
+            children: [
+                { "element": label, "child": [] },
+                { "element": input, "child": [] },
+                { "element": parrafo, "child": [] },
+            ]
+        });
+    }
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
     //La variable validator es una function que se invoca desde TextFormField y esta retorna null si es valido
@@ -720,6 +905,89 @@ function TextFormField(_a) {
                 input.style.borderBottom = "0.19px solid #bdb9b9";
             }
         }
+    }
+    return container;
+    return { "element": container, "style": {}, "type": "TextFormField", "child": [] };
+}
+function TextField(_a) {
+    var onChanged = _a.onChanged, decoration = _a.decoration;
+    var input = document.createElement("input");
+    var label = document.createElement("label");
+    var isLabelNull = false;
+    // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
+    label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
+    input.setAttribute("id", "TextFormField-" + ramdomString(7));
+    label.style.cssText = "font-size: 13px";
+    label.classList.add("labelFloating");
+    input.classList.add("inputFloating");
+    if (decoration != null && decoration != undefined) {
+        if (decoration.labelText != null && decoration.labelText != null) {
+            label.innerHTML = decoration.labelText;
+        }
+        else {
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
+        }
+    }
+    else {
+        isLabelNull = true;
+    }
+    function addActiveClassAndHisStyle() {
+        label.classList.add('active');
+        _activeColor();
+    }
+    function removeActiveClassAndHisStyle() {
+        if (input.value == null || input.value == undefined || input.value == '') {
+            //Le cambiaremos el color al label e input cuando no esten enfocados, esto sucedera si la la propiedad decoration.activeColor no es nul
+            _normalColor();
+            label.classList.remove('active');
+        }
+    }
+    function _activeColor() {
+        //Si tiene asignado un activeColor pues le ponemos ese color, de lo contrario le dejamos el color por defecto
+        if (decoration != null && decoration != undefined) {
+            if (decoration.activeColor != null && decoration.activeColor != null) {
+                label.style.color = decoration.activeColor;
+                // console.log("textFormField actvieColor: ", decoration.activeColor);
+                // console.log("textFormField labelcssText: ", label.style.cssText);
+                input.style.borderBottom = "0.19px solid " + decoration.activeColor;
+            }
+        }
+    }
+    function _normalColor() {
+        label.style.color = "#bdb9b9";
+        input.style.borderBottom = "0.19px solid #bdb9b9";
+    }
+    //Events
+    input.addEventListener('focus', function () {
+        addActiveClassAndHisStyle();
+    });
+    input.addEventListener('blur', function () {
+        removeActiveClassAndHisStyle();
+    });
+    if (onChanged)
+        input.addEventListener("input", function (e) {
+            onChanged(input.value);
+        });
+    // container.appendChild(label);
+    // container.appendChild(input);
+    // container.appendChild(parrafo);
+    var container;
+    if (isLabelNull) {
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                { "element": input, "child": [] },
+            ]
+        });
+    }
+    else {
+        container = Column({
+            children: [
+                { "element": label, "child": [] },
+                { "element": input, "child": [] },
+            ]
+        });
     }
     return container;
     return { "element": container, "style": {}, "type": "TextFormField", "child": [] };
@@ -965,7 +1233,13 @@ function Builder(_a) {
     element.innerHTML = "";
     if (initState) {
         window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
             initState();
+        };
+    }
+    else {
+        window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
         };
     }
     var setState = (function () {
@@ -981,23 +1255,28 @@ function Builder(_a) {
         //     c[i].dispatchEvent(event);
         // }
         // }
-        // console.log("Resultadosssssssss id: ", element?.id);
+        // console.log("builder setstate id: ", element?.id);
         var elements = builder(element === null || element === void 0 ? void 0 : element.id, setState);
         var widgetsYaCreados = Array.from(element === null || element === void 0 ? void 0 : element.childNodes);
-        // console.log("Resultadooooooooooooos: ", elements.child);
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+        oncreatedOrUpdatedWidgetState();
     }).bind(element);
     var elements = builder(id, setState);
-    // console.log("Resultadooooooooooooos: ", elements);
-    builderArrayRecursivo(elements);
+    builderArrayRecursivo(elements, null, true);
+    oncreatedOrUpdatedWidgetState();
 }
 function StreamBuilder(_a) {
     var stream = _a.stream, builder = _a.builder;
     var element = stream.div;
     var snapshot;
     element.addEventListener('rebuild', rebuild, false);
-    function rebuild(e) {
-        var elements = builder(element.id, e.detail);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+    function rebuild() {
+        var elements = builder(element.id, stream.data);
         console.log("streambuilder rebuild: ", elements);
         elements = Init({
             id: element.id,
@@ -1008,9 +1287,95 @@ function StreamBuilder(_a) {
         // console.log("streambuilder rebuild ya creados: ", widgetsYaCreados);
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
     }
-    var child = builder(element.id, snapshot);
-    console.log("Resultadooooooooooooos streambuilder child: ", child);
+    var child = builder(element.id, stream.data);
+    // console.log("Resultadooooooooooooos streambuilder child: ", child);
     return { element: element, type: "StreamBuilder", child: [child] };
+}
+window.addEventListener('resize', rebuildSizeFromLayoutBuilder);
+//Esta funcion se llama desde dos partes, desde el evento window.resize y desde el builder.initState
+//para que asi el layout builder tome el tamano del padre
+function rebuildSizeFromLayoutBuilder() {
+    var elements = document.getElementsByClassName("LayoutBuilder");
+    for (var i = 0; i < elements.length; i++) {
+        //Mandamos el id del elemento y el size con su ancho y alto
+        // var size = {height: window.innerHeight, width: window.innerWidth};
+        var parentSize = getParentSize(elements[i]);
+        // console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        // console.log("Size from rebuildSizeFromLayoutBuilder LayoutBuilder: ", elements[i].id);
+        var event_1 = new CustomEvent("rebuildSize", { detail: { id: elements[i].id, size: parentSize } });
+        elements[i].dispatchEvent(event_1);
+    }
+}
+function getParentSize(element) {
+    var parent = element.parentElement;
+    var size = { width: 0, height: 0 };
+    var vecesARecorrer = 6;
+    for (var i = 0; i < vecesARecorrer; i++) {
+        // console.log(`getParentSize: `, parent.id, " ", parent.offsetWidth, " ", parent.style.width);
+        if (parent == null || parent == undefined)
+            break;
+        if (parent.clientWidth > 0) {
+            console.log("Dentro clienteWidth");
+            size.width = parent.clientWidth;
+        }
+        else if (parent.style.width) {
+            console.log("Dentro width");
+            size.width = parent.style.width.replace("px", "");
+        }
+        if (parent.clientHeight > 0)
+            size.height = parent.clientHeight;
+        else if (parent.style.height)
+            size.height = parent.style.height.replace("px", "");
+        // if(parent.style.width)
+        //     size.width = parent.style.width.replace("px", "");
+        // if(parent.style.height)
+        //     size.height = parent.style.height.replace("px", "");
+        //Si el width es > 0 entonces salimos del ciclo y retornamos la variable size
+        //de lo contrario vamos a tomar el padre del otro elemento padre y asi sucesivamente hasta
+        //que encontrar el size o hasta que el sigueinte padre sea nulo
+        if (size.width > 0)
+            break;
+        else
+            parent = parent.parentElement;
+    }
+    return size;
+}
+function LayoutBuilder(_a) {
+    var builder = _a.builder;
+    var element = document.createElement("div");
+    element.setAttribute("id", "LayoutBuilder-" + ramdomString(7));
+    element.classList.add("LayoutBuilder");
+    element.addEventListener('rebuildSize', rebuildSize, false);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+    function rebuildSize(e) {
+        //El parametro e va a container el id del layout builder y el size 
+        //de la venta, osea, window.innerWidth and window.innerHeight, pero ese size no me funciona
+        //por el size que necesito es el size del parent, asi que lo busco y lo tomo
+        var elementLayoutBuilder = document.getElementById(e.detail.id);
+        //buscamos el padre
+        // var parent = elementLayoutBuilder.parentElement;
+        //obtenemos el size del padre
+        // let sizeParent = {width: parent.clientWidth, height: parent.clientHeight};
+        //le mandamos el size del padre al builder
+        var elements = builder(e.detail.size);
+        elements = Init({
+            id: elementLayoutBuilder.id,
+            child: elements
+        });
+        // console.log("streambuilder rebuild new: ", elements);
+        var widgetsYaCreados = Array.from(elementLayoutBuilder === null || elementLayoutBuilder === void 0 ? void 0 : elementLayoutBuilder.childNodes);
+        // console.log("streambuilder rebuild ya creados: ", widgetsYaCreados);
+        builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+    }
+    var size = { width: window.innerWidth, height: window.innerHeight };
+    var child = builder(size);
+    // console.log("Resultadooooooooooooos LayoutBuilder size: ", size);
+    // console.log("Resultadooooooooooooos LayoutBuilder sizeParent: ", element.parentElement);
+    return { element: element, type: "LayoutBuilder", child: [child] };
 }
 function Form(_a) {
     var key = _a.key, child = _a.child;
@@ -1062,6 +1427,23 @@ function SizedBox(_a) {
     else
         return { "element": element, "child": [] };
 }
+function Align(_a) {
+    var child = _a.child, alignment = _a.alignment;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'Align-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    element.style.position = "relative";
+    child.element.style.cssText += "position: absolute; " + alignment.toString();
+    return { "element": element, "child": [child] };
+}
+function Padding(_a) {
+    var child = _a.child, padding = _a.padding;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'Padding-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    element.style.padding = padding.toString();
+    return { "element": element, "child": [child] };
+}
 function CircularProgressIndicator(_a) {
     var _b = _a.color, color = _b === void 0 ? '#3498db' : _b;
     var element = document.createElement("div");
@@ -1098,6 +1480,18 @@ var Utils = /** @class */ (function () {
         'Accept': 'application/json'
     };
     return Utils;
+}());
+var StreamController = /** @class */ (function () {
+    function StreamController() {
+        this.div = document.createElement("div");
+        this.div.setAttribute("id", "StreamController-" + ramdomString(7));
+    }
+    StreamController.prototype.add = function (data) {
+        this.data = data;
+        var event = new CustomEvent("rebuild", { detail: data });
+        this.div.dispatchEvent(event);
+    };
+    return StreamController;
 }());
 var http = /** @class */ (function () {
     function http() {
@@ -1222,22 +1616,44 @@ function builderRecursivo(widget, isInit, widgetsYaCreados) {
         }
     }
 }
-function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCreados) {
-    // console.log("recursiveArray widget: ", widget);
+function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCreados, widgetInit) {
     if (isInit === void 0) { isInit = false; }
     if (onlyWidgetsYaCreados === void 0) { onlyWidgetsYaCreados = false; }
+    if (widgetInit === void 0) { widgetInit = null; }
+    // console.log("recursiveArray widget: ", widget);
+    if (isInit) {
+        widgetInit = widget;
+    }
     if ((widgetsYaCreados == null || widgetsYaCreados == undefined) && onlyWidgetsYaCreados == false) {
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-        if (!Array.isArray(widget.child))
+        var idWidget = (widgetInit != null) ? widgetInit.id : null;
+        // console.log("Widget termnoooooo create: ", widget.id, " ", idWidget);
+        if (!Array.isArray(widget.child)) {
+            // console.log("Widget termnoooooo create: ", widget);
             return;
+        }
         // console.log("Dentro widgetsYacreados null: ", onlyWidgetsYaCreados);
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if (widget.child.length <= 0)
+        if (widget.child.length <= 0) {
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
+            // let isWidgetEqualToWidgetInit:boolean = false;
+            // if(widgetInit != null)
+            //     isWidgetEqualToWidgetInit = widget.id == widgetInit.id;
+            // //Si la variable isWidgetEqualToWidgetInit == true entonces eso quiere decir
+            // //que la funcion recursiva va a terminar su ejecucion
+            // if(isWidgetEqualToWidgetInit)
+            //     oncreatedOrUpdatedWidgetState();
             return;
+        }
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
         //el atributo element es el elemento html o nodo que pertenece al widget hijo
         if (hijo.element == null) {
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
             return;
         }
         //Al widget el anadimos el widget hijo que obtuvimos y eliminamos del arreglo
@@ -1247,18 +1663,33 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
         if (hijo.child != null)
             builderRecursivo(hijo);
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget);
+        builderArrayRecursivo(widget, null, false, false, widgetInit);
     }
     else {
         // console.log("widgetNuevo: ", widget);
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-        if (!Array.isArray(widget.child))
+        if (!Array.isArray(widget.child)) {
+            // oncreatedOrUpdatedWidgetState();
             return;
+        }
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if (widget.child.length <= 0)
+        if (widget.child.length <= 0) {
+            // oncreatedOrUpdatedWidgetState();
+            var isWidgetEqualToWidgetInit = false;
+            if (widgetInit != null)
+                isWidgetEqualToWidgetInit = widget.element.id == widgetInit.element.id;
+            //Si la variable isWidgetEqualToWidgetInit == true entonces eso quiere decir
+            //que la funcion recursiva va a terminar su ejecucion
+            // console.log("isWidgetEqualToWidgetInit: ", widget.element.id, " ", widgetInit.element.id);
+            if (isWidgetEqualToWidgetInit) {
+                // console.log("Widget a crear: ", widget.element.id);
+                // oncreatedOrUpdatedWidgetState();
+            }
             return;
+        }
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
+        // console.log("Dentro widgetCreado == delete: ", hijo);
         // console.log("builderArrayRecursivo: ", hijo);
         if (widgetsYaCreados != null) {
             // if(widgetsYaCreados.length == null || widgetsYaCreados.length == undefined){
@@ -1298,6 +1729,7 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
                     updateStyleOfExistenteWidget(hijo, widgetCreado);
                     updateTextOfExistenteWidget(hijo, widgetCreado);
                     hijo.element = widgetCreado;
+                    // console.log("Dentro widgetCreado == update: ", hijo);
                     // console.log("builderArrayRecursivo widgetsYaCreados: ", widgetCreado);
                     // console.log("builderArrayRecursivo widgetsYaCreados: ", widgetCreado.length);
                     // console.log("builderArrayRecursivo widgetsNuevo: ", hijo);
@@ -1308,7 +1740,6 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
                     // console.log("Dentro eliminar widget diferente widgetNuevo: ", hijo);
                     // console.log("Dentroooooooo eliminarrrrrrrrrrrrrrrrr: ", widgetCreado.id);
                     // console.log("Dentroooooooo eliminarrrrrrrrrrrrrrrrr nuevo: ", hijo.element.id);
-                    console.log("Dentro widgetCreado == delete: ", hijo);
                     //Tomamos el nodo padre
                     var parent = widgetCreado.parentNode;
                     //Creamos el nuevo nodo
@@ -1318,20 +1749,24 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
                     // builderRecursivo(widget.child, false, widgetCreado.childNodes);
                 }
             }
+            else {
+                widget.element.appendChild(hijo.element);
+            }
         }
         else {
-            console.log("Dentro widgetCreado == null: ", hijo);
+            // console.log("Dentro widgetCreado == null: ", hijo);
             widget.element.appendChild(hijo.element);
         }
         // widget.element.appendChild(hijo.element);
         // console.log("builderArrayRecursivo: ", hijo);
         //Si el widget hijo tiene mas hijos entonces lo recorreremos recursivamente, para eso llamamos a la funcion builderRecursvio
         if (hijo.child != null)
-            builderArrayRecursivo(hijo, widgetCreado, false, true);
+            builderArrayRecursivo(hijo, widgetCreado, false, true, widgetInit);
         // console.log("builderArrayRecursivo despues: ", hijo);
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget, widgetsYaCreados, false, true);
+        builderArrayRecursivo(widget, widgetsYaCreados, false, true, widgetInit);
     }
+    //    console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 }
 function updateStyleOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
     // console.log("updateStyleOfExistenteWidget nuevoWidget: ", nuevoWidget);
@@ -1342,8 +1777,11 @@ function updateStyleOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
     // Object.keys(nuevoWidget.style).forEach(key => {
     //     widgetViejoOExistente.style[key] = nuevoWidget.style[key];
     // });
-    if (nuevoWidget.isStateLess != true)
+    if (nuevoWidget.isStateLess != true) {
+        if (nuevoWidget.element.id.split("-")[0] == "LayoutBuilder")
+            console.log("viejo - nuevo: ", nuevoWidget.element.style.width, " ", widgetViejoOExistente.style.width);
         widgetViejoOExistente.style.cssText = nuevoWidget.element.style.cssText;
+    }
     // console.log("updateStyleOfExistente: ", nuevoWidget.element.style.cssText);
 }
 function updateTextOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
@@ -1361,55 +1799,6 @@ function updateTextOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
     }
 }
 var _formKey = new FormGlobalKey();
-// Builder({
-//     id: "container",
-//     builder: (element: any, setState: any) => {
-//         let _mensaje = "Hola soy jean carlos";
-//         return Init(
-//             {
-//                 initDefaultStyle: true,
-//                 id: "container",
-//                 style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
-//                 child: Form({
-//                     key: _formKey,
-//                     child: Row({
-//                         crossAxisAlignment: CrossAxisAlignment.center,
-//                         children: [
-//                             Container({
-//                                 child: Column({
-//                                     children: [
-//                                         Texto(`${flutter}`, new TextStyle({fontSize: 25})),
-//                                         TextFormField({
-//                                             controller: new TextEditingController(),
-//                                             validator: (data : string) => {
-//                                                 if(!data)
-//                                                     return "error";
-//                                                 return null;
-//                                             }
-//                                         })
-//                                     ]
-//                                 }),
-//                             }),
-//                             SizedBox({width: 20}),
-//                             RaisedButton({
-//                                 child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
-//                                 onPressed: () => {
-//                                     console.log("onpressed: ", _formKey.validate());
-//                                     setState(() => _mensaje = "Cambie");
-//                                     if( _formKey.validate())
-//                                         console.log("valido");
-//                                     else
-//                                         console.log("Invalido errorrr");
-//                                 }
-//                             })
-//                         ]
-//                     })
-//                 })}
-//         );
-//     }
-//     }
-// );
-// _formKey.validate();
 var _mensaje = "hola";
 var _mostrarColumna = false;
 var color = "green";
@@ -1443,81 +1832,6 @@ var color = "green";
 //         })
 //     }
 // });
-// Builder({
-//     id: "container",
-//     builder:(id : string, setState : any) => {
-//         return Init({
-//             id: id,
-//             child: 
-//             (_mostrarColumna)
-//             ?
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     Texto("Fila2", new TextStyle({fontSize: 20})),
-//                     Texto("Fila3", new TextStyle({fontSize: 25})),
-//                     Texto("Fila4", new TextStyle({fontSize: 30})),
-//                     Column({
-//                         children: [
-//                             Texto("Fila5", new TextStyle({fontSize: 35})),
-//                             Row({
-//                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                                 children: [
-//                                     Column({
-//                                         children: [
-//                                             Row({
-//                                                 crossAxisAlignment: CrossAxisAlignment.center,
-//                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                                                 children: [
-//                                                     Texto("Fila5.1", new TextStyle({fontSize: 35})),
-//                                                     Column({
-//                                                         children: [
-//                                                             Row({
-//                                                                 children: [
-//                                                                     Texto("Fila5.1.1", new TextStyle({fontSize: 20})),
-//                                                                     RaisedButton({
-//                                                                         color: color,
-//                                                                         child: Texto("click", new TextStyle({})),
-//                                                                         onPressed: () => {
-//                                                                             color = "red";
-//                                                                             setState();
-//                                                                         }
-//                                                                     })
-//                                                                 ]
-//                                                             }),
-//                                                             Texto("Fila5.1.2", new TextStyle({fontSize: 20})),
-//                                                         ]
-//                                                     })
-//                                                 ]
-//                                             })
-//                                         ]
-//                                     }),
-//                                     Texto("Fila5.2", new TextStyle({fontSize: 35})),
-//                                 ]
-//                             })
-//                         ]
-//                     })
-//                 ]
-//             })
-//             :
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     RaisedButton({
-//                         child: Texto(_mensaje, new TextStyle({})),
-//                         onPressed: () => {
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                             _mensaje = "Cambieeee";
-//                             _mostrarColumna = true;
-//                             setState();
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                         }
-//                     })
-//                 ]
-//             })
-//         });
-//     }
-// })
 // var c = new Init({
 //     id: "container", 
 //     child: new Container({
@@ -1567,28 +1881,38 @@ var _cargando = false;
 var jwt = createJWT({ "servidor": servidorGlobal, "idUsuario": idUsuario });
 // $http.get(rutaGlobal+"/api/bloqueos?token="+ jwt)
 // console.log("jwt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + jwt);
-var StreamController = /** @class */ (function () {
-    function StreamController() {
-        this.div = document.createElement("div");
-        this.div.setAttribute("id", "StreamController-" + ramdomString(7));
-    }
-    StreamController.prototype.add = function (data) {
-        var event = new CustomEvent("rebuild", { detail: data });
-        this.div.dispatchEvent(event);
-    };
-    return StreamController;
-}());
 var _streamController = new StreamController();
-var listaBanca = {};
+var _streamControllerSorteo = new StreamController();
+var _txtDirecto = new TextEditingController();
+var _txtPale = new TextEditingController();
+var _txtTripleta = new TextEditingController();
+var _txtSuperpale = new TextEditingController();
+var _txtPick3Straight = new TextEditingController();
+var _txtPick3Box = new TextEditingController();
+var _txtPick4Straight = new TextEditingController();
+var _txtPick4Box = new TextEditingController();
+var listaBanca = [];
 var _indexBanca = 0;
+var listaSorteo = [];
+var _indexSorteo = 0;
+var listaOpcion = ["General", "Por banca"];
+var _indexOpcion = 0;
+function _myContainer() {
+    return Container({
+        style: new TextStyle({ padding: EdgetInsets.only({ left: 12, right: 12, top: 2, bottom: 2 }), border: Border.all({ color: "#00bcd4" }), borderRadius: BorderRadius.all(3) }),
+        child: Texto("LA PRIMERA", new TextStyle({ color: "#00bcd4", fontSize: 11 }))
+    });
+}
 Builder({
     id: "containerJugadasSucias",
     initState: function () {
         var response = http.get({ url: rutaGlobal + "/api/bloqueos?token=" + jwt, headers: Utils.headers }).then(function (json) {
             console.log("response: ", json);
             listaBanca = json.bancas;
+            listaSorteo = json.sorteos;
             _streamController.add(listaBanca);
-            console.log("response listaBanca: ", listaBanca);
+            _streamControllerSorteo.add(listaSorteo);
+            console.log("response listaBanca: ", listaSorteo);
         });
     },
     builder: function (id, setState) {
@@ -1598,113 +1922,169 @@ Builder({
             style: new TextStyle({ fontFamily: "Roboto" }),
             child: Column({
                 // style: new TextStyle({background: "blue"}),
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    StreamBuilder({
-                        stream: _streamController,
-                        builder: function (id, snapshot) {
-                            if (snapshot)
-                                return Column({
-                                    children: listaBanca.map(function (item) { return Texto(item.descripcion, new TextStyle({})); })
-                                });
-                            // DropdownButton({
-                            //     value: listaBanca[_indexBanca].descripcion ,
-                            //     items: listaBanca.map((item) => {
-                            //         return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
-                            //     }),
-                            //     onChanged: (data:string) => {
-                            //         var index = items.indexOf(`${data}`);
-                            //         if(index != -1){
-                            //             _index = index;
-                            //             setState();
-                            //         }
-                            //         // console.log("onchange: " + data);
-                            //     }
-                            // });
-                            else
-                                return Texto("No hay datos", new TextStyle({}));
-                            // DropdownButton({
-                            //     value: "No hay datos" ,
-                            //     items: [
-                            //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
-                            //     ],
-                            //     onChanged: (data:string) => {
-                            //         var index = items.indexOf(`${data}`);
-                            //         if(index != -1){
-                            //             _index = index;
-                            //             setState();
-                            //         }
-                            //         // console.log("onchange: " + data);
-                            //     }
-                            // });
+                    _myContainer(),
+                    // Padding({
+                    //     padding: EdgetInsets.all(1),
+                    //     child: LayoutBuilder({
+                    //         builder: (size:any) => {
+                    //             return Container({
+                    //                 style: new TextStyle({width: size.width / 2, height: 20, background: "red"}),
+                    //                 child: LayoutBuilder({
+                    //                     builder: (size:any) => {
+                    //                         return Container({
+                    //                             style: new TextStyle({width: size.width / 1.7, height: 200, background: "blue"})
+                    //                         })
+                    //                     }
+                    //                 })
+                    //             })
+                    //         }
+                    //     })
+                    // }),
+                    LayoutBuilder({
+                        builder: function (size) {
+                            return Container({
+                                style: new TextStyle({ width: setDeviceSize({ screenSize: size.width, lg: 2, md: 1.6, sm: 1.3, xs: 1 }) }),
+                                child: Column({
+                                    children: [
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: Row({
+                                                children: [
+                                                    Flexible({
+                                                        child: Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold }))
+                                                    }),
+                                                    SizedBox({ width: 20 }),
+                                                    Flexible({
+                                                        flex: 1,
+                                                        child: DropdownButton({
+                                                            value: listaOpcion[_indexOpcion],
+                                                            items: listaOpcion.map(function (item) {
+                                                                return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
+                                                            }),
+                                                            onChanged: function (data) {
+                                                                var index = listaOpcion.indexOf("" + data);
+                                                                if (index != -1) {
+                                                                    _indexOpcion = index;
+                                                                    setState();
+                                                                }
+                                                                // console.log("onchange: " + data);
+                                                            }
+                                                        })
+                                                    })
+                                                ]
+                                            })
+                                        }),
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: StreamBuilder({
+                                                stream: _streamController,
+                                                builder: function (id, snapshot) {
+                                                    if (snapshot)
+                                                        // return Column({
+                                                        //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                                        // });
+                                                        return Row({
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: [
+                                                                Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
+                                                                SizedBox({ width: 20 }),
+                                                                Flexible({
+                                                                    flex: 1,
+                                                                    child: DropdownButtonMultiple({
+                                                                        // value: listaBanca[_indexBanca].descripcion ,
+                                                                        selectedValues: [],
+                                                                        items: listaBanca.map(function (item) {
+                                                                            return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
+                                                                        }),
+                                                                        onChanged: function (data) {
+                                                                            // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                                            // if(index != -1){
+                                                                            //     _indexBanca = index;
+                                                                            //     console.log("onchange: " + data);
+                                                                            //     setState();
+                                                                            // }
+                                                                        }
+                                                                    })
+                                                                })
+                                                            ]
+                                                        });
+                                                    else
+                                                        return Texto("No hay datos", new TextStyle({}));
+                                                    // DropdownButton({
+                                                    //     value: "No hay datos" ,
+                                                    //     items: [
+                                                    //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
+                                                    //     ],
+                                                    //     onChanged: (data:string) => {
+                                                    //         var index = items.indexOf(`${data}`);
+                                                    //         if(index != -1){
+                                                    //             _index = index;
+                                                    //             setState();
+                                                    //         }
+                                                    //         // console.log("onchange: " + data);
+                                                    //     }
+                                                    // });
+                                                }
+                                            })
+                                        }),
+                                    ]
+                                })
+                            });
                         }
                     }),
-                    Container({
-                        style: new TextStyle({ background: "yellow" }),
-                        child: Expanded({
-                            child: DropdownButton({
-                                value: items[_index],
-                                items: items.map(function (item) {
-                                    return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
-                                }),
-                                onChanged: function (data) {
-                                    var index = items.indexOf("" + data);
-                                    if (index != -1) {
-                                        _index = index;
-                                        setState();
-                                    }
-                                    // console.log("onchange: " + data);
-                                }
-                            })
-                        })
+                    Padding({
+                        padding: EdgetInsets.only({ top: 20, bottom: 20 }),
+                        child: Texto("Datos", new TextStyle({ fontSize: 25 }))
                     }),
-                    Flexible({
-                        flex: 2,
-                        child: Container({
-                            style: new TextStyle({ background: "red" }),
-                            child: Expanded({
-                                child: DropdownButton({
-                                    value: items[_index],
-                                    items: items.map(function (item) {
-                                        return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
-                                    }),
-                                    onChanged: function (data) {
-                                        var index = items.indexOf("" + data);
-                                        if (index != -1) {
-                                            _index = index;
-                                            setState();
-                                        }
-                                        // console.log("onchange: " + data);
+                    LayoutBuilder({
+                        builder: function (size) {
+                            return Container({
+                                style: new TextStyle({ width: setDeviceSize({ screenSize: size.width, lg: 3, md: 3, sm: 2.5, xs: 1 }) }),
+                                child: StreamBuilder({
+                                    stream: _streamControllerSorteo,
+                                    builder: function (id, snapshot) {
+                                        return Column({
+                                            children: listaSorteo.map(function (item) { return Padding({
+                                                padding: EdgetInsets.all(10),
+                                                child: Row({
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                        // Align({
+                                                        // flex: 5,
+                                                        // alignment: Alignment.start,
+                                                        // child: 
+                                                        Texto("" + item.descripcion, new TextStyle({ fontWeight: FontWeight.bold, textAlign: TextAlign.center })),
+                                                        // }),
+                                                        // SizedBox({width: 20}),
+                                                        // Flexible({
+                                                        // flex: 2,
+                                                        // child: 
+                                                        TextField({
+                                                            onChanged: function (data) {
+                                                                item.monto = data;
+                                                                console.log(item.descripcion + ": " + data);
+                                                            }
+                                                        })
+                                                        // })
+                                                    ]
+                                                })
+                                            }); })
+                                        });
                                     }
                                 })
-                            })
-                        })
+                            });
+                        }
                     }),
-                    Row({
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                            Flexible({
-                                flex: 10,
-                                child: Container({
-                                    style: new TextStyle({ background: "blue" }),
-                                    child: Expanded({
-                                        child: DropdownButton({
-                                            value: items[_index],
-                                            items: items.map(function (item) {
-                                                return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
-                                            }),
-                                            onChanged: function (data) {
-                                                var index = items.indexOf("" + data);
-                                                if (index != -1) {
-                                                    _index = index;
-                                                    setState();
-                                                }
-                                                // console.log("onchange: " + data);
-                                            }
-                                        })
-                                    })
-                                })
-                            }),
-                        ]
+                    RaisedButton({
+                        color: "#47a44b",
+                        child: Texto("Guardar", new TextStyle({ color: "white", fontWeight: FontWeight.w400 })),
+                        onPressed: function () {
+                            console.log("Guardaaarrrr");
+                            listaSorteo.forEach(function (item) { return console.log(item); });
+                        }
                     })
                 ]
             })

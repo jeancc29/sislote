@@ -1,9 +1,36 @@
+//Esta funcion se lanzara cuando se hayan creados o actualizados todos los widgets
+function oncreatedOrUpdatedWidgetState(){
+    // console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+    
+    rebuildSizeFromLayoutBuilder();
+}
+
 
 /********************* VARIABLES  ************************************/
 
 let fontSizeUnit : string = "px";
 let heightUnit : string = "vh";
 let widthUnit : string = "vw";
+
+class ScreenSize{
+    static xs:number = 567;
+    static sm:number = 791;
+    static md:number = 999;
+    static lg:number = 1000;
+
+    static isXs(number:number){
+        return number >= 0 && number <= this.xs;
+    }
+    static isSm(number:number){
+        return number >= (this.xs + 1) && number <= this.sm;
+    }
+    static isMd(number:number){
+        return number >= (this.sm + 1) && number <= this.md;
+    }
+    static isLg(number:number){
+        return number >= this.lg;
+    }
+}
 
 
 /********************* FUNCTIONES  ************************************/
@@ -22,6 +49,51 @@ function ramdomString(length : number) {
     }
     return result;
  }
+
+ interface namedParametersSetDeviceSize{
+     xs?:number;
+     sm?:number;
+     md?:number;
+     lg?:number;
+     screenSize?:number;
+ }
+
+ function setDeviceSize({screenSize, xs, sm, md, lg} : namedParametersSetDeviceSize){
+    let width:number = screenSize;
+    console.log("setDeviceSize: ", width);
+    
+    if(ScreenSize.isXs(screenSize)){
+        console.log("setDeviceSize xs: ", width);
+        if(xs)
+            width = screenSize / xs;
+    }
+    else if(ScreenSize.isSm(screenSize)){
+        console.log("setDeviceSize sm: ", width);
+        if(sm)
+            width = screenSize / sm;
+    }
+    else if(ScreenSize.isMd(screenSize)){
+        console.log("setDeviceSize md: ", width);
+        if(md)
+            width = screenSize / md;
+    }
+    else if(ScreenSize.isLg(screenSize)){
+        console.log("setDeviceSize lg: ", width);
+        if(lg)
+            width = screenSize / lg;
+    }
+    
+    return width;
+ }
+
+ function flexbox(element: HTMLDivElement){
+    element.style.cssText += "display: -webkit-box";
+    element.style.cssText += "display: -moz-box";
+    element.style.cssText += "display: -webkit-flex";
+    element.style.cssText += "display: -ms-flexbox";
+    element.style.cssText += "display: flex";
+    return element;
+  }
 
  function justifyContentPrefix(element: HTMLDivElement, value: string = 'flex-start') {
     if(value == 'flex-start') {
@@ -64,6 +136,34 @@ function ramdomString(length : number) {
     }
     element.style.cssText += `-webkit-align-items: ${value};`;
     element.style.cssText += `align-items: ${value};`;
+    return element;
+  }
+
+  function flexDirection(element: HTMLDivElement, value:string = "row") {
+    if (value == "row-reverse") {
+        element.style.cssText += `-webkit-box-direction: reverse`;
+        element.style.cssText += `-webkit-box-orient: horizontal`;
+        element.style.cssText += `-moz-box-direction: reverse`;
+        element.style.cssText += `-moz-box-orient: horizontal`;
+    } else if (value == "column") {
+        element.style.cssText += `-webkit-box-direction: normal`;
+        element.style.cssText += `-webkit-box-orient: vertical`;
+        element.style.cssText += `-moz-box-direction: normal`;
+        element.style.cssText += `-moz-box-orient: vertical`;
+    } else if (value == "column-reverse") {
+        element.style.cssText += `-webkit-box-direction: reverse`;
+        element.style.cssText += `-webkit-box-orient: vertical`;
+        element.style.cssText += `-moz-box-direction: reverse`;
+        element.style.cssText += `-moz-box-orient: vertical`;
+    } else {
+        element.style.cssText += `-webkit-box-direction: normal`;
+        element.style.cssText += `-webkit-box-orient: horizontal`;
+        element.style.cssText += `-moz-box-direction: normal`;
+        element.style.cssText += `-moz-box-orient: horizontal`;
+    }
+    element.style.cssText += `-webkit-flex-direction: ${value}`;
+    element.style.cssText += `-ms-flex-direction: ${value}`;
+    element.style.cssText += `flex-direction: ${value}`;
     return element;
   }
 
@@ -264,6 +364,97 @@ class BorderRadius {
     }
 }
 
+
+class BorderStyle {
+    values : string[] = ["solid", "dashed", "dotted", "double", "groove", "ridge", "none", "800", "900", "bolder", "lighter", "normal", "bold"];
+    index : number;
+    private constructor(index : number){
+        this.index = index - 1;
+    }
+
+    
+    static solid = new BorderStyle(1);
+    static dashed = new BorderStyle(2);
+    static dotted = new BorderStyle(3);
+    static double = new BorderStyle(4);
+    static groove = new BorderStyle(5);
+    static ridge = new BorderStyle(6);
+    static none = new BorderStyle(7);
+    
+    
+    public toString = () : string => {
+        return this.values[this.index];
+    }
+}
+
+interface namedParametersBorderSide{
+    color?:string;
+    width?:number;
+    style?:BorderStyle;
+}
+
+class BorderSide {
+    color? : string;
+    width? : number;
+    style? : BorderStyle;
+
+    constructor({color = "black", width = 0, style = BorderStyle.none} : namedParametersBorderSide){
+        this.color = color;
+        this.width = width;
+        this.style = style;
+    }
+
+    
+    public toString = () : string => {
+        
+        return `${this.width}${fontSizeUnit} ${this.style.toString()} ${this.color}`;
+    }
+}
+
+interface namedParametersBorder{
+    top? : BorderSide;
+    right? : BorderSide;
+    bottom? : BorderSide;
+    left? : BorderSide;
+}
+
+interface namedParametersBorderAll{
+    width?:number;
+    color?:string;
+    style?:BorderStyle;
+}
+
+class Border {
+    top? : string;
+    right? : string;
+    bottom? : string;
+    left? : string;
+
+    private constructor({top, right, bottom, left} : namedParametersBorder){
+        this.top = top.toString();
+        this.right = right.toString();
+        this.bottom = bottom.toString();
+        this.left = left.toString();
+    }
+
+    
+    static all = ({width = 1, color = "black", style = BorderStyle.solid} : namedParametersBorderAll) => {
+        return new Border({top : new BorderSide({width, color, style}), right : new BorderSide({width, color, style}), bottom : new BorderSide({width, color, style}), left : new BorderSide({width, color, style})})
+    };
+    // static only = ({top, right, bottom, left} : namedParametersBorder) => {
+    //     return new Border({top, right, bottom, left});
+    // };
+   
+    
+    // public toString = () : string => {
+    //     this.top = (this.top != null) ? this.top : new BorderSide({});
+    //     this.right = (this.right != null) ? this.right : new BorderSide({});
+    //     this.bottom = (this.bottom != null) ? this.bottom : new BorderSide({});
+    //     this.left = (this.left != null) ? this.left : new BorderSide({});
+    //     return `${this.top}${fontSizeUnit} ${this.right}${fontSizeUnit} ${this.bottom}${fontSizeUnit} ${this.left}${fontSizeUnit}`;
+    // }
+}
+
 interface namedParametersEdgeInsets {
     top? : number;
     right? : number;
@@ -314,6 +505,25 @@ class TextAlign {
     static right = new TextAlign(2);
     static center = new TextAlign(3);
     static justify = new TextAlign(4);
+
+    
+    public toString = () : string => {
+        return this.values[this.index];
+    }
+}
+
+class Alignment {
+    values : string[] = ["left: 0;", "right: 0;"];
+    index : number;
+    private constructor(index : number){
+        this.index = index - 1;
+    }
+    
+    
+    static start = new Alignment(1);
+    static end = new Alignment(2);
+    // static center = new Alignment(3);
+    // static justify = new Alignment(4);
 
     
     public toString = () : string => {
@@ -391,6 +601,12 @@ interface namedParametersTextStyle {
     height? : number;
     fontFamily? : string;
     cursor? : string;
+    border? : Border;
+    borderTop? : string;
+    borderBottom? : string;
+    borderRight? : string;
+    borderLeft? : string;
+
 }
 
 class TextStyle{
@@ -406,8 +622,12 @@ class TextStyle{
     height? : number;
     fontFamily? : string;
     cursor? : string;
+    borderTop? : string;
+    borderBottom? : string;
+    borderRight? : string;
+    borderLeft? : string;
 
-    constructor({fontSize, fontWeight, textAlign, fontStyle, color, background, padding,borderRadius, width, height, fontFamily, cursor}: namedParametersTextStyle){
+    constructor({fontSize, fontWeight, textAlign, fontStyle, color, background, padding,borderRadius, width, height, fontFamily, cursor, border}: namedParametersTextStyle){
         this.fontSize = fontSize;
         this.fontWeight = fontWeight;
         this.textAlign = textAlign;
@@ -420,6 +640,18 @@ class TextStyle{
         this.padding = padding;
         this.fontFamily = fontFamily;
         this.cursor = cursor;
+        if(border){
+            if(border.top)
+                this.borderTop = border.top;
+            if(border.right)
+                this.borderRight = border.right;
+            if(border.bottom)
+                this.borderBottom = border.bottom;
+            if(border.left)
+                this.borderLeft = border.left;
+        }
+        
+        
     }
 
     toJson(){
@@ -823,8 +1055,14 @@ function Column({children, mainAxisAlignment, crossAxisAlignment, id} : namedPar
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     let styleJson: any = {};
-    element.style.display = "flex";
-    element.style.flexDirection = "column";
+    
+    // element.setAttribute("style", "-webkit-flex-flow: column nowrap;-ms-flex-flow: column nowrap;flex-flow: column nowrap;")
+    // element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element = flexbox(element);
+    element = flexDirection(element, "column");
+    
+    // element.style.display = "flex";
+    // element.style.flexDirection = "column";
     if(mainAxisAlignment != null && mainAxisAlignment != undefined){
         // element.style.justifyContent = mainAxisAlignment.toString();
         // styleJson.justifyContent = mainAxisAlignment.toString(); 
@@ -833,7 +1071,7 @@ function Column({children, mainAxisAlignment, crossAxisAlignment, id} : namedPar
     if(crossAxisAlignment != null && crossAxisAlignment != undefined){
         // element.style.alignItems = crossAxisAlignment.toString();
         // styleJson.alignItems = crossAxisAlignment.toString(); 
-        element = justifyContentPrefix(element, crossAxisAlignment.toString());
+        element = alignItemsPrefix(element, crossAxisAlignment.toString());
     }
 
     return {"element" : element, "style" : styleJson, "type" : "Column", "child" : children};
@@ -899,7 +1137,7 @@ function InkWell({child, onTap} : namedParametersInkWell){
         element.addEventListener("click", onTap);
     }
 
-    return {"element" : element, "style" : {}, "type" : "Visibility", "child" : [child], isStateLess: isStateLess};
+    return {"element" : element, "style" : {}, "type" : "Visibility", "child" : [child]};
 }
 
 interface namedParametersTextFormField {
@@ -912,6 +1150,7 @@ function TextFormField({controller, validator, decoration} : namedParametersText
     var input = controller.input;
     var label = document.createElement("label");
     var parrafo = document.createElement("p");
+    let isLabelNull = false;
 
     // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
     label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
@@ -927,7 +1166,12 @@ function TextFormField({controller, validator, decoration} : namedParametersText
     if(decoration != null && decoration != undefined){
         if(decoration.labelText != null && decoration.labelText != null){
             label.innerHTML = decoration.labelText;
+        }else{
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
         }
+    }else{
+        isLabelNull = true;
     }
 
     function addActiveClassAndHisStyle(){
@@ -984,15 +1228,25 @@ function TextFormField({controller, validator, decoration} : namedParametersText
     // container.appendChild(label);
     // container.appendChild(input);
     // container.appendChild(parrafo);
-    var container = Column({
-        children: [
-            {"element" : label, "child": []},
-            {"element" : input, "child": []},
-            {"element" : parrafo, "child": []},
-            // input,
-            // parrafo
-        ]
-    });
+    var container;
+    if(isLabelNull){
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                {"element" : input, "child": []},
+                {"element" : parrafo, "child": []},
+            ]
+        });
+    }else{
+        container = Column({
+            children: [
+                {"element" : label, "child": []},
+                {"element" : input, "child": []},
+                {"element" : parrafo, "child": []},
+            ]
+        });
+    }
+     
 
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
@@ -1044,6 +1298,107 @@ function TextFormField({controller, validator, decoration} : namedParametersText
             
         }
     }
+
+    return container;
+    return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
+}
+
+//TextField
+interface namedParametersTextField{
+    onChanged?:any;
+    decoration?:any;
+}
+function TextField({onChanged, decoration} : namedParametersTextField){
+    var input = document.createElement("input");
+    var label = document.createElement("label");
+    let isLabelNull = false;
+
+    // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
+    label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
+    input.setAttribute("id", "TextFormField-" + ramdomString(7));
+
+    label.style.cssText = "font-size: 13px";
+
+    label.classList.add("labelFloating");
+    input.classList.add("inputFloating");
+
+    if(decoration != null && decoration != undefined){
+        if(decoration.labelText != null && decoration.labelText != null){
+            label.innerHTML = decoration.labelText;
+        }else{
+            isLabelNull = true;
+            console.log("isLabelNull nullllllllllllllllllllllllllllllllll");
+        }
+    }else{
+        isLabelNull = true;
+    }
+
+    function addActiveClassAndHisStyle(){
+        label.classList.add('active');
+        _activeColor();
+    }
+
+    
+    function removeActiveClassAndHisStyle(){
+        if(input.value == null || input.value == undefined || input.value == ''){
+            //Le cambiaremos el color al label e input cuando no esten enfocados, esto sucedera si la la propiedad decoration.activeColor no es nul
+            _normalColor();
+            label.classList.remove('active');
+        }
+    }
+
+    function _activeColor(){
+        //Si tiene asignado un activeColor pues le ponemos ese color, de lo contrario le dejamos el color por defecto
+        if(decoration != null && decoration != undefined){
+            if(decoration.activeColor != null && decoration.activeColor != null){
+                label.style.color = decoration.activeColor;
+                // console.log("textFormField actvieColor: ", decoration.activeColor);
+                // console.log("textFormField labelcssText: ", label.style.cssText);
+                input.style.borderBottom = `0.19px solid ${decoration.activeColor}`;
+            }
+        }
+    }
+
+    function _normalColor(){
+        label.style.color = "#bdb9b9";
+        input.style.borderBottom = "0.19px solid #bdb9b9";
+    }
+
+
+
+
+    //Events
+    input.addEventListener('focus', () => {
+        addActiveClassAndHisStyle();
+    });
+    input.addEventListener('blur', () => {
+        removeActiveClassAndHisStyle()
+    });
+    if(onChanged)
+        input.addEventListener("input", (e)=>{
+            onChanged(input.value);
+        });
+    // container.appendChild(label);
+    // container.appendChild(input);
+    // container.appendChild(parrafo);
+    var container;
+    if(isLabelNull){
+        input.style.padding = "0px";
+        container = Column({
+            children: [
+                {"element" : input, "child": []},
+            ]
+        });
+    }else{
+        container = Column({
+            children: [
+                {"element" : label, "child": []},
+                {"element" : input, "child": []},
+            ]
+        });
+    }
+     
+
 
     return container;
     return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
@@ -1392,7 +1747,12 @@ function Builder({id, builder, initState} : namedParametersBuilder){
 
     if(initState){
         window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
             initState();
+        };
+    }else{
+        window.onload = function () {
+            // rebuildSizeFromLayoutBuilder();
         };
     }
 
@@ -1410,17 +1770,18 @@ function Builder({id, builder, initState} : namedParametersBuilder){
             // }
             
         // }
-        // console.log("Resultadosssssssss id: ", element?.id);
+        // console.log("builder setstate id: ", element?.id);
         
         var elements = builder(element?.id, setState);
         
         var widgetsYaCreados = Array.from(element?.childNodes);
-        // console.log("Resultadooooooooooooos: ", elements.child);
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+        oncreatedOrUpdatedWidgetState();
+        
     }).bind(element);
     var elements = builder(id, setState);
-    // console.log("Resultadooooooooooooos: ", elements);
-    builderArrayRecursivo(elements);
+    builderArrayRecursivo(elements, null, true);
+    oncreatedOrUpdatedWidgetState();
 }
 
 interface namedParametersStreamBuilder{
@@ -1434,14 +1795,22 @@ function StreamBuilder({stream, builder} : namedParametersStreamBuilder){
     
 
     element.addEventListener('rebuild', rebuild, false);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
 
-    function rebuild(e){
-        var elements = builder(element.id, e.detail);
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+
+    function rebuild(){
+        var elements = builder(element.id, stream.data);
         console.log("streambuilder rebuild: ", elements);
         elements = Init({
             id: element.id,
             child: elements
         });
+
+        
         
         // console.log("streambuilder rebuild new: ", elements);
         
@@ -1450,9 +1819,119 @@ function StreamBuilder({stream, builder} : namedParametersStreamBuilder){
         builderArrayRecursivo(elements, widgetsYaCreados, true, true);
     }
    
-    var child = builder(element.id, snapshot);
-    console.log("Resultadooooooooooooos streambuilder child: ", child);
+    var child = builder(element.id, stream.data);
+    // console.log("Resultadooooooooooooos streambuilder child: ", child);
     return {element: element, type: "StreamBuilder", child: [child]}
+}
+
+interface namedParametersLayoutBuilder{
+    id?:string;
+    builder:any;
+}
+
+window.addEventListener('resize', rebuildSizeFromLayoutBuilder);
+
+//Esta funcion se llama desde dos partes, desde el evento window.resize y desde el builder.initState
+//para que asi el layout builder tome el tamano del padre
+function rebuildSizeFromLayoutBuilder(){
+    
+    var elements = document.getElementsByClassName("LayoutBuilder");
+    for(var i=0; i < elements.length; i++){
+        //Mandamos el id del elemento y el size con su ancho y alto
+        // var size = {height: window.innerHeight, width: window.innerWidth};
+        var parentSize = getParentSize(elements[i]);
+        // console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        // console.log("Size from rebuildSizeFromLayoutBuilder LayoutBuilder: ", elements[i].id);
+        
+        let event = new CustomEvent("rebuildSize", {detail: {id: elements[i].id, size:parentSize}});
+        elements[i].dispatchEvent(event)
+    }
+}
+
+function getParentSize(element:Element){
+    var parent = element.parentElement;
+    let size:any = {width: 0, height: 0};
+    let vecesARecorrer = 6;
+    for (var i=0; i < vecesARecorrer; i++) {
+        // console.log(`getParentSize: `, parent.id, " ", parent.offsetWidth, " ", parent.style.width);
+        
+        if(parent == null || parent == undefined)
+            break;
+        
+        if(parent.clientWidth > 0){
+            console.log("Dentro clienteWidth");
+            
+            size.width = parent.clientWidth;
+        }
+        else if(parent.style.width)
+            {
+                console.log("Dentro width");
+                size.width = parent.style.width.replace("px", "");}
+        if(parent.clientHeight > 0)
+            size.height = parent.clientHeight;
+        else if(parent.style.height)
+            size.height = parent.style.height.replace("px", "");
+
+        // if(parent.style.width)
+        //     size.width = parent.style.width.replace("px", "");
+        // if(parent.style.height)
+        //     size.height = parent.style.height.replace("px", "");
+        
+        //Si el width es > 0 entonces salimos del ciclo y retornamos la variable size
+        //de lo contrario vamos a tomar el padre del otro elemento padre y asi sucesivamente hasta
+        //que encontrar el size o hasta que el sigueinte padre sea nulo
+        if(size.width > 0)
+            break;
+        else
+            parent = parent.parentElement;
+    }
+    
+    return size;
+}
+
+function LayoutBuilder({builder} : namedParametersLayoutBuilder){
+    var element = document.createElement("div");
+    element.setAttribute("id", `LayoutBuilder-${ramdomString(7)}`);
+    element.classList.add("LayoutBuilder");
+    
+
+    element.addEventListener('rebuildSize', rebuildSize, false);
+    // element.addEventListener('dispose', dispose, false);
+    // var myInterval = setInterval(rebuild, 1000);
+
+    // function dispose(){
+    //     clearInterval(myInterval);
+    // }
+
+    function rebuildSize(e){
+        //El parametro e va a container el id del layout builder y el size 
+        //de la venta, osea, window.innerWidth and window.innerHeight, pero ese size no me funciona
+        //por el size que necesito es el size del parent, asi que lo busco y lo tomo
+        var elementLayoutBuilder = document.getElementById(e.detail.id);
+        //buscamos el padre
+        // var parent = elementLayoutBuilder.parentElement;
+        //obtenemos el size del padre
+        // let sizeParent = {width: parent.clientWidth, height: parent.clientHeight};
+        //le mandamos el size del padre al builder
+        var elements = builder(e.detail.size);
+        elements = Init({
+            id: elementLayoutBuilder.id,
+            child: elements
+        });
+
+        
+        
+        // console.log("streambuilder rebuild new: ", elements);
+        
+        var widgetsYaCreados = Array.from(elementLayoutBuilder?.childNodes);
+        // console.log("streambuilder rebuild ya creados: ", widgetsYaCreados);
+        builderArrayRecursivo(elements, widgetsYaCreados, true, true);
+    }
+    var size = {width: window.innerWidth, height: window.innerHeight};
+    var child = builder(size);
+    // console.log("Resultadooooooooooooos LayoutBuilder size: ", size);
+    // console.log("Resultadooooooooooooos LayoutBuilder sizeParent: ", element.parentElement);
+    return {element: element, type: "LayoutBuilder", child: [child]}
 }
 
 
@@ -1539,6 +2018,38 @@ function SizedBox({child, width, height} : namedParametersSizedBox){
         return {"element" : element, "child" : []};
 }
 
+interface namedParametersAlign{
+    child:any;
+    alignment:Alignment;
+}
+
+function Align({child, alignment} : namedParametersAlign){
+    var element = document.createElement("div");
+    element.setAttribute("id", 'Align-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    
+    element.style.position = "relative";
+    child.element.style.cssText += `position: absolute; ${alignment.toString()}`;
+    
+
+    return {"element" : element, "child" : [child]};
+}
+
+interface namedParametersPadding{
+    child:any;
+    padding:EdgetInsets;
+}
+
+function Padding({child, padding} : namedParametersPadding){
+    var element = document.createElement("div");
+    element.setAttribute("id", 'Padding-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    
+    element.style.padding = padding.toString();
+    
+    return {"element" : element, "child" : [child]};
+}
+
 interface namedParametersCircularProgressIndicator{
     color?:string;
 }
@@ -1578,6 +2089,21 @@ class Utils{
     static headers:any = {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
+    }
+}
+
+class StreamController{
+    div:HTMLDivElement;
+    data:any;
+    constructor(){
+        this.div = document.createElement("div");
+        this.div.setAttribute("id", "StreamController-" + ramdomString(7));
+    }
+
+    add(data:any){
+        this.data = data;
+        let event = new CustomEvent("rebuild", {detail: data})
+        this.div.dispatchEvent(event);
     }
 }
 
@@ -1695,26 +2221,48 @@ function builderRecursivo(widget : any, isInit = false, widgetsYaCreados : any =
 
 
 
-function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: boolean = false, onlyWidgetsYaCreados: boolean = false){
+function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: boolean = false, onlyWidgetsYaCreados: boolean = false, widgetInit = null){
     // console.log("recursiveArray widget: ", widget);
+    if(isInit){
+        widgetInit = widget;
+    }
     
    if((widgetsYaCreados == null || widgetsYaCreados == undefined) && onlyWidgetsYaCreados == false){
         //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
+        var idWidget = (widgetInit != null) ? widgetInit.id : null;
+        // console.log("Widget termnoooooo create: ", widget.id, " ", idWidget);
         if(!Array.isArray(widget.child))
-            return;
+            {
+                // console.log("Widget termnoooooo create: ", widget);
+                return;
+            }
 
             // console.log("Dentro widgetsYacreados null: ", onlyWidgetsYaCreados);
             
 
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if(widget.child.length <= 0)
+        if(widget.child.length <= 0){
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
+            // let isWidgetEqualToWidgetInit:boolean = false;
+            // if(widgetInit != null)
+            //     isWidgetEqualToWidgetInit = widget.id == widgetInit.id;
+            // //Si la variable isWidgetEqualToWidgetInit == true entonces eso quiere decir
+            // //que la funcion recursiva va a terminar su ejecucion
+            // if(isWidgetEqualToWidgetInit)
+            //     oncreatedOrUpdatedWidgetState();
             return;
+        }
 
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
 
         //el atributo element es el elemento html o nodo que pertenece al widget hijo
         if(hijo.element == null){
+            //Cuando esta condicion se cumple eso quiere decir que ya se han creados todos los elementos
+            //basicamente, es como un evento que se lanza cuando todos los elementos o cambios ya se han agregados al dom
+            // oncreatedOrUpdatedWidgetState();
             return;
         }
 
@@ -1728,20 +2276,41 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
             builderRecursivo(hijo);
 
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget);
+        builderArrayRecursivo(widget, null, false, false, widgetInit);
    }else{
-
+    
     // console.log("widgetNuevo: ", widget);
          //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-        if(!Array.isArray(widget.child))
+        if(!Array.isArray(widget.child)){
+            // oncreatedOrUpdatedWidgetState();
             return;
+        }
+            
 
         //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-        if(widget.child.length <= 0)
+        if(widget.child.length <= 0){
+            // oncreatedOrUpdatedWidgetState();
+            
+            let isWidgetEqualToWidgetInit:boolean = false;
+            if(widgetInit != null)
+                isWidgetEqualToWidgetInit = widget.element.id == widgetInit.element.id;
+            //Si la variable isWidgetEqualToWidgetInit == true entonces eso quiere decir
+            //que la funcion recursiva va a terminar su ejecucion
+            // console.log("isWidgetEqualToWidgetInit: ", widget.element.id, " ", widgetInit.element.id);
+            
+            if(isWidgetEqualToWidgetInit){
+                // console.log("Widget a crear: ", widget.element.id);
+                // oncreatedOrUpdatedWidgetState();
+            }
             return;
+        }
+
+        
+        
 
         //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
         var hijo = widget.child.shift();
+        // console.log("Dentro widgetCreado == delete: ", hijo);
         // console.log("builderArrayRecursivo: ", hijo);
         if(widgetsYaCreados != null){
             // if(widgetsYaCreados.length == null || widgetsYaCreados.length == undefined){
@@ -1793,11 +2362,14 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
             // console.log("builderArrayRecursivo ==: ", hijo.element.id.split("-")[0] == widgetCreado.id.split("-")[0], " type: ", hijo.element.id.split("-"), ":", widgetCreado.id.split("-"));
             // console.log("widget creado: ", widgetCreado);
             
+            
             if(widgetCreado.id != undefined && widgetCreado.id != null){
+                
                 if(hijo.element.id.split("-")[0] == widgetCreado.id.split("-")[0]){
                     updateStyleOfExistenteWidget(hijo, widgetCreado);
                     updateTextOfExistenteWidget(hijo, widgetCreado);
                     hijo.element = widgetCreado;
+                    // console.log("Dentro widgetCreado == update: ", hijo);
                     // console.log("builderArrayRecursivo widgetsYaCreados: ", widgetCreado);
                     // console.log("builderArrayRecursivo widgetsYaCreados: ", widgetCreado.length);
                     // console.log("builderArrayRecursivo widgetsNuevo: ", hijo);
@@ -1807,7 +2379,7 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
                     // console.log("Dentro eliminar widget diferente widgetNuevo: ", hijo);
                     // console.log("Dentroooooooo eliminarrrrrrrrrrrrrrrrr: ", widgetCreado.id);
                     // console.log("Dentroooooooo eliminarrrrrrrrrrrrrrrrr nuevo: ", hijo.element.id);
-                    console.log("Dentro widgetCreado == delete: ", hijo);
+                    
                     
                     //Tomamos el nodo padre
                     var parent = widgetCreado.parentNode;
@@ -1817,9 +2389,11 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
                     parent.removeChild(widgetCreado);
                     // builderRecursivo(widget.child, false, widgetCreado.childNodes);
                 }
+            }else{
+                widget.element.appendChild(hijo.element);
             }
         }else{
-            console.log("Dentro widgetCreado == null: ", hijo);
+            // console.log("Dentro widgetCreado == null: ", hijo);
             
             widget.element.appendChild(hijo.element);
         }
@@ -1828,12 +2402,14 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
         
         //Si el widget hijo tiene mas hijos entonces lo recorreremos recursivamente, para eso llamamos a la funcion builderRecursvio
         if(hijo.child != null)
-            builderArrayRecursivo(hijo, widgetCreado, false, true);
+            builderArrayRecursivo(hijo, widgetCreado, false, true, widgetInit);
 
             // console.log("builderArrayRecursivo despues: ", hijo);
         //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-        builderArrayRecursivo(widget, widgetsYaCreados, false, true);
+        builderArrayRecursivo(widget, widgetsYaCreados, false, true, widgetInit);
    }
+
+//    console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 }
 
 function updateStyleOfExistenteWidget(nuevoWidget: any, widgetViejoOExistente: any){
@@ -1848,8 +2424,12 @@ function updateStyleOfExistenteWidget(nuevoWidget: any, widgetViejoOExistente: a
     // Object.keys(nuevoWidget.style).forEach(key => {
     //     widgetViejoOExistente.style[key] = nuevoWidget.style[key];
     // });
-    if(nuevoWidget.isStateLess != true)
+    if(nuevoWidget.isStateLess != true){
+        if(nuevoWidget.element.id.split("-")[0] == "LayoutBuilder")
+            console.log("viejo - nuevo: ", nuevoWidget.element.style.width, " ", widgetViejoOExistente.style.width);
+            
         widgetViejoOExistente.style.cssText = nuevoWidget.element.style.cssText;
+    }
     // console.log("updateStyleOfExistente: ", nuevoWidget.element.style.cssText);
     
 }
@@ -1874,123 +2454,13 @@ function updateTextOfExistenteWidget(nuevoWidget: any, widgetViejoOExistente: an
 let _formKey = new FormGlobalKey();
 
 
-// var p = Init(
-//     "container", 
-//     Container(
-//         {
-//             child: Row({
-//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//             children : [
-//                 Form({
-//                     key: _formKey,
-//                     child: Row({
-//                         children: [
-//                             Flexible({
-//                                 flex: 3,
-//                                 child: TextFormField({controller: new TextEditingController(), validator: (data : string) : string => {
-//                                     console.log("Text");
-//                                     return "jean";
-//                                 }})
-//                             }),
-//                             RaisedButton({child: Texto("Jean", new TextStyle({})), onPressed: () =>{
-//                                 var v = _formKey.validate();
-//                                 console.log("RaisedButton validate: ", v);
-                                
-//                             }})
-//                         ]
-//                     })
-//                 }),//Flexible
-//                 Flexible({
-//                     flex: 1,
-//                     child: Row(
-//                     {
-//                         children : [
-//                              Texto("jean", new TextStyle({fontSize: 15})),
-//                              Texto("Contreras", new TextStyle({fontSize: 15})),
-//                         ],
-//                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                     }
-//                  )}
-//                  ),
-//                 Flexible({
-//                     flex: 3,
-//                     child: Row(
-//                         {
-//                             children : [
-//                                  Texto("jean", new TextStyle({fontSize: 15})),
-//                                  Texto("Contreras", new TextStyle({fontSize: 15})),
-//                             ],
-//                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                         }
-//                      )
-//                 }),
-//             ]
-//         })
-//         ,
-//         style: new TextStyle({background : "brown", borderRadius : BorderRadius.all(3), width: 500})
-//     }),
-// );
 
 interface namedParametersBuild{
     id: string;
 }
 declare var flutter : object;
 
-// Builder({
-//     id: "container",
-//     builder: (element: any, setState: any) => {
-        
-//         let _mensaje = "Hola soy jean carlos";
 
-//         return Init(
-//             {
-//                 initDefaultStyle: true,
-//                 id: "container",
-//                 style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
-//                 child: Form({
-//                     key: _formKey,
-//                     child: Row({
-//                         crossAxisAlignment: CrossAxisAlignment.center,
-//                         children: [
-//                             Container({
-//                                 child: Column({
-//                                     children: [
-//                                         Texto(`${flutter}`, new TextStyle({fontSize: 25})),
-//                                         TextFormField({
-//                                             controller: new TextEditingController(),
-//                                             validator: (data : string) => {
-//                                                 if(!data)
-//                                                     return "error";
-                                                
-//                                                 return null;
-//                                             }
-//                                         })
-//                                     ]
-//                                 }),
-//                             }),
-//                             SizedBox({width: 20}),
-//                             RaisedButton({
-//                                 child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
-//                                 onPressed: () => {
-//                                     console.log("onpressed: ", _formKey.validate());
-//                                     setState(() => _mensaje = "Cambie");
-//                                     if( _formKey.validate())
-//                                         console.log("valido");
-//                                     else
-//                                         console.log("Invalido errorrr");
-                                        
-                                        
-//                                 }
-//                             })
-//                         ]
-//                     })
-//                 })}
-//         );
-//     }
-        
-//     }
-// );
-// _formKey.validate();
 
 
 
@@ -2033,85 +2503,7 @@ let color = "green";
 
 
 
-// Builder({
-//     id: "container",
-//     builder:(id : string, setState : any) => {
-        
-//         return Init({
-//             id: id,
-//             child: 
-//             (_mostrarColumna)
-//             ?
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     Texto("Fila2", new TextStyle({fontSize: 20})),
-//                     Texto("Fila3", new TextStyle({fontSize: 25})),
-//                     Texto("Fila4", new TextStyle({fontSize: 30})),
-//                     Column({
-//                         children: [
-//                             Texto("Fila5", new TextStyle({fontSize: 35})),
-//                             Row({
-//                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                                 children: [
-//                                     Column({
-//                                         children: [
-//                                             Row({
-//                                                 crossAxisAlignment: CrossAxisAlignment.center,
-//                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                                                 children: [
-//                                                     Texto("Fila5.1", new TextStyle({fontSize: 35})),
-//                                                     Column({
-//                                                         children: [
-//                                                             Row({
-//                                                                 children: [
-//                                                                     Texto("Fila5.1.1", new TextStyle({fontSize: 20})),
-//                                                                     RaisedButton({
-//                                                                         color: color,
-//                                                                         child: Texto("click", new TextStyle({})),
-//                                                                         onPressed: () => {
-//                                                                             color = "red";
-//                                                                             setState();
-//                                                                         }
-//                                                                     })
-//                                                                 ]
-//                                                             }),
-//                                                             Texto("Fila5.1.2", new TextStyle({fontSize: 20})),
-//                                                         ]
-//                                                     })
-//                                                 ]
-//                                             })
-                                            
-                                            
-//                                         ]
-//                                     }),
-//                                     Texto("Fila5.2", new TextStyle({fontSize: 35})),
-//                                 ]
-//                             })
-//                         ]
-//                     })
-//                 ]
-//             })
-//             :
-//             Column({
-//                 children: [
-//                     Texto("Fila1 - " + _mensaje, new TextStyle({})),
-//                     RaisedButton({
-//                         child: Texto(_mensaje, new TextStyle({})),
-//                         onPressed: () => {
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                             _mensaje = "Cambieeee";
-//                             _mostrarColumna = true;
-//                             setState();
-//                             // console.log("onpressed mensaje: ", _mensaje);
-//                         }
-//                     })
-//                 ]
-//             })
-            
-//         });
-//     }
-// })
+
 
 // var c = new Init({
 //     id: "container", 
@@ -2175,22 +2567,31 @@ var jwt = createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
             // $http.get(rutaGlobal+"/api/bloqueos?token="+ jwt)
 // console.log("jwt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + jwt);
 
-class StreamController{
-    div:HTMLDivElement;
-    constructor(){
-        this.div = document.createElement("div");
-        this.div.setAttribute("id", "StreamController-" + ramdomString(7));
-    }
 
-    add(data:any){
-        let event = new CustomEvent("rebuild", {detail: data})
-        this.div.dispatchEvent(event);
-    }
-}
 
 let _streamController = new StreamController();
-let listaBanca:any = {};
+let _streamControllerSorteo = new StreamController();
+let _txtDirecto = new TextEditingController();
+let _txtPale = new TextEditingController();
+let _txtTripleta = new TextEditingController();
+let _txtSuperpale = new TextEditingController();
+let _txtPick3Straight = new TextEditingController();
+let _txtPick3Box = new TextEditingController();
+let _txtPick4Straight = new TextEditingController();
+let _txtPick4Box = new TextEditingController();
+let listaBanca:any[] = [];
 let _indexBanca:number = 0;
+let listaSorteo:any[] = [];
+let _indexSorteo:number = 0;
+let listaOpcion:string[] = ["General", "Por banca"];
+let _indexOpcion:number = 0;
+
+function _myContainer(){
+    return Container({
+        style: new TextStyle({padding: EdgetInsets.only({left: 12, right: 12, top: 2, bottom: 2}), border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
+        child: Texto("LA PRIMERA", new TextStyle({color: "#00bcd4", fontSize: 11}))
+    })
+}
 
 Builder({
     id: "containerJugadasSucias",
@@ -2198,8 +2599,10 @@ Builder({
         let response = http.get({url:`${rutaGlobal}/api/bloqueos?token=${jwt}`, headers: Utils.headers}).then((json) => {
             console.log("response: ", json);
             listaBanca = json.bancas;
+            listaSorteo = json.sorteos;
             _streamController.add(listaBanca);
-            console.log("response listaBanca: ", listaBanca);
+            _streamControllerSorteo.add(listaSorteo);
+            console.log("response listaBanca: ", listaSorteo);
 
         });
         
@@ -2211,116 +2614,176 @@ Builder({
             style: new TextStyle({fontFamily: "Roboto"}),
             child: Column({
                 // style: new TextStyle({background: "blue"}),
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    StreamBuilder({
-                        stream: _streamController,
-                        builder: (id:any, snapshot:any) => {
-                            if(snapshot)
-                                return Column({
-                                    children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
-                                });
-                                // DropdownButton({
-                                //     value: listaBanca[_indexBanca].descripcion ,
-                                //     items: listaBanca.map((item) => {
-                                //         return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
-                                //     }),
-                                //     onChanged: (data:string) => {
-                                //         var index = items.indexOf(`${data}`);
-                                //         if(index != -1){
-                                //             _index = index;
-                                //             setState();
-                                //         }
-                                //         // console.log("onchange: " + data);
-                                //     }
-                                // });
-                            else
-                            return Texto("No hay datos", new TextStyle({}));
-                            // DropdownButton({
-                            //     value: "No hay datos" ,
-                            //     items: [
-                            //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
-
-                            //     ],
-                            //     onChanged: (data:string) => {
-                            //         var index = items.indexOf(`${data}`);
-                            //         if(index != -1){
-                            //             _index = index;
-                            //             setState();
-                            //         }
-                            //         // console.log("onchange: " + data);
-                            //     }
-                            // });
+                    _myContainer(),
+                    // Padding({
+                    //     padding: EdgetInsets.all(1),
+                    //     child: LayoutBuilder({
+                    //         builder: (size:any) => {
+                    //             return Container({
+                    //                 style: new TextStyle({width: size.width / 2, height: 20, background: "red"}),
+                    //                 child: LayoutBuilder({
+                    //                     builder: (size:any) => {
+                    //                         return Container({
+                    //                             style: new TextStyle({width: size.width / 1.7, height: 200, background: "blue"})
+                    //                         })
+                    //                     }
+                    //                 })
+                    //             })
+                    //         }
+                    //     })
+                    // }),
+                    LayoutBuilder({
+                        builder: (size:any) => {
+                            return Container({
+                                style: new TextStyle({width: setDeviceSize({screenSize: size.width, lg: 2, md: 1.6, sm: 1.3, xs: 1})}),
+                                child: Column({
+                                    children: [
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: Row({
+                                                children: [
+                                                    Flexible({
+                                                        child: Texto("Opciones", new TextStyle({fontWeight: FontWeight.bold})),
+                                                    }),
+                                                    SizedBox({width: 20}),
+                                                    Flexible({
+                                                        flex: 1,
+                                                        child: DropdownButton({
+                                                            value: listaOpcion[_indexOpcion] ,
+                                                            items: listaOpcion.map((item) => {
+                                                                return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12)})), value: item})
+                                                            }),
+                                                            onChanged: (data:string) => {
+                                                                var index = listaOpcion.indexOf(`${data}`);
+                                                                if(index != -1){
+                                                                    _indexOpcion = index;
+                                                                    setState();
+                                                                }
+                                                                // console.log("onchange: " + data);
+                                                            }
+                                                        })
+                                                    })
+                                                ]
+                                            }),
+                                        }),
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: StreamBuilder({
+                                                stream: _streamController,
+                                                builder: (id:any, snapshot:any) => {
+                                                    if(snapshot)
+                                                        // return Column({
+                                                        //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                                        // });
+                                                        return Row({
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: [
+                                                                Texto("Bancas", new TextStyle({fontWeight: FontWeight.bold})),
+                                                                SizedBox({width: 20}),
+                                                                Flexible({
+                                                                    flex: 1,
+                                                                    child: DropdownButtonMultiple({
+                                                                        // value: listaBanca[_indexBanca].descripcion ,
+                                                                        selectedValues: [],
+                                                                        items: listaBanca.map((item) => {
+                                                                            return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item.descripcion});
+                                                                        }),
+                                                                        onChanged: (data:any[]) => {
+                                                                            // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                                            // if(index != -1){
+                                                                            //     _indexBanca = index;
+                                                                            //     console.log("onchange: " + data);
+                                                                            //     setState();
+                                                                            // }
+                                                                        },
+                        
+                                                                    })
+                                                                })
+                                                            ]
+                                                        })
+                                                    else
+                                                    return Texto("No hay datos", new TextStyle({}));
+                                                    // DropdownButton({
+                                                    //     value: "No hay datos" ,
+                                                    //     items: [
+                                                    //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
+                        
+                                                    //     ],
+                                                    //     onChanged: (data:string) => {
+                                                    //         var index = items.indexOf(`${data}`);
+                                                    //         if(index != -1){
+                                                    //             _index = index;
+                                                    //             setState();
+                                                    //         }
+                                                    //         // console.log("onchange: " + data);
+                                                    //     }
+                                                    // });
+                                                }
+                                            }),
+                                        }),
+                                    ]
+                                })
+                            })
                         }
                     }),
-                    Container({
-                        style: new TextStyle({background: "yellow"}),
-                        child: Expanded({
-                            child: DropdownButton({
-                                value: items[_index] ,
-                                items: items.map((item) => {
-                                    return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
-                                }),
-                                onChanged: (data:string) => {
-                                    var index = items.indexOf(`${data}`);
-                                    if(index != -1){
-                                        _index = index;
-                                        setState();
-                                    }
-                                    // console.log("onchange: " + data);
-                                }
-                            }),
-                        })
+                    Padding({
+                        padding: EdgetInsets.only({top: 20, bottom: 20}),
+                        child: Texto("Datos", new TextStyle({fontSize: 25}))
                     }),
-                    Flexible({
-                        flex: 2,
-                        child: Container({
-                            style: new TextStyle({background: "red"}),
-                            child: Expanded({
-                                child: DropdownButton({
-                                    value: items[_index] ,
-                                    items: items.map((item) => {
-                                        return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
-                                    }),
-                                    onChanged: (data:string) => {
-                                        var index = items.indexOf(`${data}`);
-                                        if(index != -1){
-                                            _index = index;
-                                            setState();
-                                        }
-                                        // console.log("onchange: " + data);
-                                    }
-                                }),
-                            })
-                        })
-                    }),
-                    Row({
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                            
-                            Flexible({
-                                flex: 10,
-                                child: Container({
-                                    style: new TextStyle({background: "blue"}),
-                                    child: Expanded({
-                                        child: DropdownButton({
-                                            value: items[_index] ,
-                                            items: items.map((item) => {
-                                                return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
-                                            }),
-                                            onChanged: (data:string) => {
-                                                var index = items.indexOf(`${data}`);
-                                                if(index != -1){
-                                                    _index = index;
-                                                    setState();
-                                                }
-                                                // console.log("onchange: " + data);
-                                            }
-                                        }),
+                   LayoutBuilder({
+                       builder: (size:any) => {
+                           return Container({
+                            style: new TextStyle({width: setDeviceSize({screenSize: size.width, lg: 3, md: 3, sm: 2.5, xs: 1})}),
+                               child: StreamBuilder({
+                                   stream: _streamControllerSorteo,
+                                   builder: (id:any, snapshot:any) => {
+                                    return Column({
+                                        children: listaSorteo.map((item) => Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: Row({
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                    // Align({
+                                                        // flex: 5,
+                                                        // alignment: Alignment.start,
+                                                        // child: 
+                                                        Texto(`${item.descripcion}`, new TextStyle({fontWeight: FontWeight.bold, textAlign: TextAlign.center})),
+                                                    // }),
+                                                    // SizedBox({width: 20}),
+                                                    // Flexible({
+                                                        // flex: 2,
+                                                        // child: 
+                                                        TextField({
+                                                            onChanged: (data:string) => {
+                                                                item.monto = data;
+                                                                console.log(`${item.descripcion}: ${data}`);
+                                                            }
+                                                        })
+                                                    // })
+                                                ]
+                                            })
+                                        })
+                                        )
                                     })
-                                })
-                            }),
+                                        
+                                   }
+                               })
+                            })
+                           
+                       }
+                   }),
+                    RaisedButton({
+                        color: "#47a44b",
+                        child: Texto("Guardar", new TextStyle({color: "white", fontWeight: FontWeight.w400})),
+                        onPressed: ()=>{
+                            console.log("Guardaaarrrr");
+                            listaSorteo.forEach((item)=> console.log(item));
+
                             
-                        ]
+                        }
                     })
                 ]
             })
