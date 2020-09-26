@@ -2600,7 +2600,7 @@ function _myContainer({text, active}){
     let _background:string = (active) ? "#00bcd4" : "transparent";
     let _color:string = (active) ? "white" : "#00bcd4";
     return Container({
-        style: new TextStyle({padding: EdgetInsets.only({left: 12, right: 12, top: 2, bottom: 2}), background: _background, border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
+        style: new TextStyle({padding: EdgetInsets.only({left: 14, right: 14, top: 2, bottom: 2}), background: _background, border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
         child: Texto(text.toUpperCase(), new TextStyle({color: _color, fontSize: 11, fontWeight: FontWeight.w500}))
     });
 }

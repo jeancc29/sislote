@@ -766,6 +766,8 @@ function InkWell(_a) {
     element.setAttribute("id", "InkWell-" + ramdomString(7));
     if (onTap) {
         element.addEventListener("click", onTap);
+        element.classList.add("buttonFlatHover");
+        element.style.cursor = "pointer";
     }
     return { "element": element, "style": {}, "type": "Visibility", "child": [child] };
 }
@@ -1883,6 +1885,7 @@ var jwt = createJWT({ "servidor": servidorGlobal, "idUsuario": idUsuario });
 // console.log("jwt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + jwt);
 var _streamController = new StreamController();
 var _streamControllerSorteo = new StreamController();
+var _streamControllerLoteria = new StreamController();
 var _txtDirecto = new TextEditingController();
 var _txtPale = new TextEditingController();
 var _txtTripleta = new TextEditingController();
@@ -1895,13 +1898,28 @@ var listaBanca = [];
 var _indexBanca = 0;
 var listaSorteo = [];
 var _indexSorteo = 0;
+var listaLoteria = [];
+var _indexLoteria = 0;
 var listaOpcion = ["General", "Por banca"];
 var _indexOpcion = 0;
-function _myContainer() {
+var _loterias = [];
+function _myContainer(_a) {
+    var text = _a.text, active = _a.active;
+    var _background = (active) ? "#00bcd4" : "transparent";
+    var _color = (active) ? "white" : "#00bcd4";
     return Container({
-        style: new TextStyle({ padding: EdgetInsets.only({ left: 12, right: 12, top: 2, bottom: 2 }), border: Border.all({ color: "#00bcd4" }), borderRadius: BorderRadius.all(3) }),
-        child: Texto("LA PRIMERA", new TextStyle({ color: "#00bcd4", fontSize: 11 }))
+        style: new TextStyle({ padding: EdgetInsets.only({ left: 14, right: 14, top: 2, bottom: 2 }), background: _background, border: Border.all({ color: "#00bcd4" }), borderRadius: BorderRadius.all(3) }),
+        child: Texto(text.toUpperCase(), new TextStyle({ color: _color, fontSize: 11, fontWeight: FontWeight.w500 }))
     });
+}
+function _selectOrDiselectLoteria(loteria) {
+    if (_loterias.findIndex(function (item) { return item.id == loteria.id; }) == -1)
+        _loterias.push(loteria);
+    else
+        _loterias.splice(_loterias.findIndex(function (item) { return item.id == loteria.id; }), 1);
+}
+function _isLoteriaSelected(loteria) {
+    return (_loterias.findIndex(function (item) { return item.id == loteria.id; }) != -1);
 }
 Builder({
     id: "containerJugadasSucias",
@@ -1910,9 +1928,11 @@ Builder({
             console.log("response: ", json);
             listaBanca = json.bancas;
             listaSorteo = json.sorteos;
+            listaLoteria = json.loterias;
             _streamController.add(listaBanca);
             _streamControllerSorteo.add(listaSorteo);
-            console.log("response listaBanca: ", listaSorteo);
+            _streamControllerLoteria.add(listaLoteria);
+            console.log("response listaBanca: ", listaLoteria);
         });
     },
     builder: function (id, setState) {
@@ -1925,7 +1945,6 @@ Builder({
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                    _myContainer(),
                     // Padding({
                     //     padding: EdgetInsets.all(1),
                     //     child: LayoutBuilder({
@@ -2078,12 +2097,22 @@ Builder({
                             });
                         }
                     }),
+                    StreamBuilder({
+                        stream: _streamControllerLoteria,
+                        builder: function (id, snapshot) {
+                            if (snapshot)
+                                return Row({
+                                    children: listaLoteria.map(function (item) { return InkWell({ onTap: function () { _selectOrDiselectLoteria(item); setState(); }, child: _myContainer({ text: item.descripcion, active: _isLoteriaSelected(item) }) }); })
+                                });
+                            return SizedBox({});
+                        }
+                    }),
                     RaisedButton({
                         color: "#47a44b",
                         child: Texto("Guardar", new TextStyle({ color: "white", fontWeight: FontWeight.w400 })),
                         onPressed: function () {
-                            console.log("Guardaaarrrr");
-                            listaSorteo.forEach(function (item) { return console.log(item); });
+                            console.log("Guardaaarrrr: ", _loterias);
+                            // listaSorteo.forEach((item)=> console.log(item));
                         }
                     })
                 ]
