@@ -112,6 +112,8 @@ Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@eliminar')
 Route::post('/bloqueosgenerales/loterias/eliminar', 'BlocksgeneralsController@eliminar');
 Route::post('/bloqueosgenerales/jugadas/eliminar', 'BlocksplaysgeneralsController@eliminar');
 
+Route::post('/bloqueos/general/sucias/guardar', 'BlocksdirtygeneralsController@store');
+
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
 Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');

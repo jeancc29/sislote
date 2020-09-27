@@ -2137,7 +2137,7 @@ class http{
     static async post({url, headers, data}:namedParametersPost){
         try {
             var myRequest = new Request(url, headers);
-            let response:any = await fetch(url, {method: "POST", body: data, headers: headers});
+            let response:any = await fetch(url, {method: "POST", body: JSON.stringify(data), headers: headers});
             let responseData:any = await response.json();
             return responseData;
         } catch (error) {
@@ -2565,7 +2565,7 @@ let items: string[] = ["Valor1", "Valor2", "Valor3", "Culo", "Ripio", "tallo", "
 var _index = 0; 
 let _cargando = false;
 
-var jwt = createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
+
             // $http.get(rutaGlobal+"/api/bloqueos?token="+ jwt)
 // console.log("jwt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + jwt);
 
@@ -2574,6 +2574,7 @@ var jwt = createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
 let _streamController = new StreamController();
 let _streamControllerSorteo = new StreamController();
 let _streamControllerLoteria = new StreamController();
+let _streamControllerMoneda = new StreamController();
 let _txtDirecto = new TextEditingController();
 let _txtPale = new TextEditingController();
 let _txtTripleta = new TextEditingController();
@@ -2588,9 +2589,12 @@ let listaSorteo:any[] = [];
 let _indexSorteo:number = 0;
 let listaLoteria:any[] = [];
 let _indexLoteria:number = 0;
+let listaMoneda:any[] = [];
+let _indexMoneda:number = 0;
 let listaOpcion:string[] = ["General", "Por banca"];
 let _indexOpcion:number = 0;
 let _loterias:any[] = [];
+let _bancas:any[] = [];
 
 interface namedParametersMyContainer{
     active:boolean;
@@ -2616,17 +2620,38 @@ function _isLoteriaSelected(loteria){
     return (_loterias.findIndex((item) => item.id == loteria.id) != -1);
 }
 
+function _guardarGeneral(){
+    let data:any = {
+        "servidor" : servidorGlobal,
+        "idUsuario" : idUsuario,
+        "bancas" : _bancas,
+        "loterias" : _loterias,
+        "sorteos" : listaSorteo
+    }
+    var jwt = createJWT(data);
+
+    http.post({url: `${rutaGlobal}/api/bloqueos/general/sucias/guardar`, data:  {"datos": jwt}, headers: Utils.headers})
+        .then((response) => {
+            console.log("Post response: ", response);
+            
+        })
+        .catch((error) => console.log(`Error: ${error}`));
+}
+
 Builder({
     id: "containerJugadasSucias",
     initState: () => {
+        var jwt = createJWT({"servidor" : servidorGlobal, "idUsuario" : idUsuario});
         let response = http.get({url:`${rutaGlobal}/api/bloqueos?token=${jwt}`, headers: Utils.headers}).then((json) => {
             console.log("response: ", json);
             listaBanca = json.bancas;
             listaSorteo = json.sorteos;
             listaLoteria = json.loterias;
+            listaMoneda = json.monedas;
             _streamController.add(listaBanca);
             _streamControllerSorteo.add(listaSorteo);
             _streamControllerLoteria.add(listaLoteria);
+            _streamControllerMoneda.add(listaMoneda);
             console.log("response listaBanca: ", listaLoteria);
 
         });
@@ -2697,40 +2722,93 @@ Builder({
                                         Padding({
                                             padding: EdgetInsets.all(10),
                                             child: StreamBuilder({
-                                                stream: _streamController,
+                                                stream: _streamControllerMoneda,
                                                 builder: (id:any, snapshot:any) => {
                                                     if(snapshot)
                                                         // return Column({
                                                         //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
                                                         // });
                                                         return Row({
-                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                            children: [
-                                                                Texto("Bancas", new TextStyle({fontWeight: FontWeight.bold})),
-                                                                SizedBox({width: 20}),
-                                                                Flexible({
-                                                                    flex: 1,
-                                                                    child: DropdownButtonMultiple({
-                                                                        // value: listaBanca[_indexBanca].descripcion ,
-                                                                        selectedValues: [],
-                                                                        items: listaBanca.map((item) => {
-                                                                            return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item.descripcion});
-                                                                        }),
-                                                                        onChanged: (data:any[]) => {
-                                                                            // var index = listaBanca.findIndex((value) => value.descripcion == data);
-                                                                            // if(index != -1){
-                                                                            //     _indexBanca = index;
-                                                                            //     console.log("onchange: " + data);
-                                                                            //     setState();
-                                                                            // }
-                                                                        },
-                        
+                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                children: [
+                                                                    Texto("Moneda", new TextStyle({fontWeight: FontWeight.bold})),
+                                                                    SizedBox({width: 20}),
+                                                                    Flexible({
+                                                                        flex: 1,
+                                                                        child: DropdownButton({
+                                                                            value: listaMoneda[_indexMoneda].descripcion ,
+                                                                            items: listaMoneda.map((item) => {
+                                                                                return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item.descripcion});
+                                                                            }),
+                                                                            onChanged: (data:string) => {
+                                                                                var index = listaMoneda.findIndex((value) => value.descripcion == data);
+                                                                                if(index != -1){
+                                                                                    _indexMoneda = index;
+                                                                                    console.log("onchange: " + data);
+                                                                                    setState();
+                                                                                }
+                                                                            },
+                            
+                                                                        })
                                                                     })
-                                                                })
-                                                            ]
-                                                        })
+                                                                ]
+                                                            });
+                                                       
                                                     else
-                                                    return Texto("No hay datos", new TextStyle({}));
+                                                        return Texto("No hay datos", new TextStyle({}));
+                                                    
+                                                }
+                                            }),
+                                        }),
+                                    
+                                        Padding({
+                                            padding: EdgetInsets.all(10),
+                                            child: StreamBuilder({
+                                                stream: _streamController,
+                                                builder: (id:any, snapshot:any) => {
+                                                    if(snapshot)
+                                                        // return Column({
+                                                        //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
+                                                        // });
+                                                        return Visibility({
+                                                            visible: listaOpcion[_indexOpcion] == "Por banca",
+                                                            child: Row({
+                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                children: [
+                                                                    Texto("Bancas", new TextStyle({fontWeight: FontWeight.bold})),
+                                                                    SizedBox({width: 20}),
+                                                                    Flexible({
+                                                                        flex: 1,
+                                                                        child: DropdownButtonMultiple({
+                                                                            // value: listaBanca[_indexBanca].descripcion ,
+                                                                            selectedValues: [],
+                                                                            items: listaBanca.map((item) => {
+                                                                                return new DropDownMenuItem({child: Texto(item.descripcion, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item.descripcion});
+                                                                            }),
+                                                                            onChanged: (data:any[]) => {
+                                                                                console.log("bancas changed: ", data);
+                                                                                _bancas = [];
+                                                                                data.forEach((dataBanca) => {
+                                                                                    if(_bancas.findIndex((banca) => banca.descripcion == dataBanca) == -1){
+                                                                                        let index:number = listaBanca.findIndex((banca) => banca.descripcion == dataBanca);
+                                                                                        _bancas.push(listaBanca[index]);
+                                                                                    }
+                                                                                })
+                                                                                // var index = listaBanca.findIndex((value) => value.descripcion == data);
+                                                                                // if(index != -1){
+                                                                                //     _indexBanca = index;
+                                                                                //     console.log("onchange: " + data);
+                                                                                //     setState();
+                                                                                // }
+                                                                            },
+                            
+                                                                        })
+                                                                    })
+                                                                ]
+                                                            })
+                                                        });
+                                                    else
+                                                        return Texto("No hay datos", new TextStyle({}));
                                                     // DropdownButton({
                                                     //     value: "No hay datos" ,
                                                     //     items: [
@@ -2749,6 +2827,7 @@ Builder({
                                                 }
                                             }),
                                         }),
+                                    
                                     ]
                                 })
                             })
@@ -2815,7 +2894,8 @@ Builder({
                         color: "#47a44b",
                         child: Texto("Guardar", new TextStyle({color: "white", fontWeight: FontWeight.w400})),
                         onPressed: ()=>{
-                            console.log("Guardaaarrrr: ", _loterias);
+                            // console.log("Guardaaarrrr: ", _loterias);
+                            _guardarGeneral();
                             // listaSorteo.forEach((item)=> console.log(item));
 
                             
