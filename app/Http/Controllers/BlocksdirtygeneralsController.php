@@ -84,6 +84,8 @@ class BlocksdirtygeneralsController extends Controller
                     ],
                 );
 
+                event(new \App\Events\BlocksdirtygeneralsEvent($bloqueo));
+
             endforeach;//End foreach sorteos
         endforeach; //End foreahc loterias
     
