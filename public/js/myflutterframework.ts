@@ -1014,8 +1014,10 @@ function Row({children, mainAxisAlignment, crossAxisAlignment, id} : namedParame
         element.setAttribute("id", `${id}-` + ramdomString(7));
 
     //Display: flexbox; prefix
+    
     element.setAttribute("style", "-webkit-flex-flow: row nowrap;-ms-flex-flow: row nowrap;flex-flow: row nowrap;")
     element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element.style.width = "100%";
     //flexDirection: row; prefix
     // element.setAttribute("style", '-webkit-box-direction: normal; -webkit-box-orient: horizontal;-moz-box-direction: normal;-moz-box-orient: horizontal; -webkit-flex-direction: row; -ms-flex-direction: row; flex-direction: row;');
     
@@ -1309,20 +1311,25 @@ function TextFormField({controller, validator, decoration} : namedParametersText
 interface namedParametersTextField{
     onChanged?:any;
     decoration?:any;
+    value?:any;
 }
-function TextField({onChanged, decoration} : namedParametersTextField){
+function TextField({onChanged, decoration, value} : namedParametersTextField){
     var input = document.createElement("input");
     var label = document.createElement("label");
     let isLabelNull = false;
 
     // container.setAttribute("id", "ContainerTextFormField-" + ramdomString(7));
     label.setAttribute("id", "LabelTextFormField-" + ramdomString(7));
-    input.setAttribute("id", "TextFormField-" + ramdomString(7));
+    input.setAttribute("id", "TextField-" + ramdomString(7));
 
     label.style.cssText = "font-size: 13px";
 
     label.classList.add("labelFloating");
     input.classList.add("inputFloating");
+    if(value)
+        input.value = value;
+    else
+        input.value = "";
 
     if(decoration != null && decoration != undefined){
         if(decoration.labelText != null && decoration.labelText != null){
@@ -2060,7 +2067,8 @@ function CircularProgressIndicator({color = '#3498db'} : namedParametersCircular
     var element = document.createElement("div");
     element.setAttribute("id", 'SizedBox-' + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
-    element.style.cssText = `border: 2px solid #f3f3f3; border-top: 2px solid ${color}; border-right: 2px solid ${color}; border-radius: 50%; width: 14px; height: 14px;`;
+    // element.style.cssText = `border: 2px solid #f3f3f3; border-top: 2px solid ${color};  border-radius: 50%; width: 18px; height: 18px;`;
+    element.style.cssText = `border-top: 2px solid ${color}; border-right: 2px solid ${color};  border-radius: 50%; width: 18px; height: 18px;`;
     element.animate([
         // keyframes
         // { transform: 'translateY(0px)' }, 
@@ -2448,6 +2456,11 @@ function updateTextOfExistenteWidget(nuevoWidget: any, widgetViejoOExistente: an
             if(nuevoWidget.isStateLess == false)
                 widgetViejoOExistente.innerHTML = nuevoWidget.element.innerHTML;
         }
+        if(nuevoWidget.element.id.split("-")[0] == "TextField"){
+            //Si no es StateLessWidget(cambia), entonces vamos a cambiar el texto, de lo contrario no podemos cambiar el texto
+            // if(nuevoWidget.isStateLess == false)
+                widgetViejoOExistente.value = nuevoWidget.element.value;
+        }
             
     }
 }
@@ -2563,14 +2576,13 @@ var _txt2 = new TextEditingController();
 var _actionColor = "blue";
 let items: string[] = ["Valor1", "Valor2", "Valor3", "Culo", "Ripio", "tallo", "la semilla"];
 var _index = 0; 
-let _cargando = false;
 
 
             // $http.get(rutaGlobal+"/api/bloqueos?token="+ jwt)
 // console.log("jwt aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + jwt);
 
 
-
+let setState:any;
 let _streamController = new StreamController();
 let _streamControllerSorteo = new StreamController();
 let _streamControllerLoteria = new StreamController();
@@ -2595,6 +2607,7 @@ let listaOpcion:string[] = ["General", "Por banca"];
 let _indexOpcion:number = 0;
 let _loterias:any[] = [];
 let _bancas:any[] = [];
+let _cargando:boolean = false;
 
 interface namedParametersMyContainer{
     active:boolean;
@@ -2620,22 +2633,95 @@ function _isLoteriaSelected(loteria){
     return (_loterias.findIndex((item) => item.id == loteria.id) != -1);
 }
 
-function _guardarGeneral(){
+function _limpiar(){
+    if(listaSorteo.length > 0){
+        listaSorteo.forEach((item) => item.cantidad = "");
+    }
+    _loterias = [];
+    _streamControllerSorteo.add(listaSorteo);
+}
+
+function _guardar(){
+    // listaSorteo.forEach((item) => console.log(item)
+    // );
+    if(_loterias.length == 0){
+        alert("Debe seleccionar loterias");
+        return;
+    }
+    
+    if(listaOpcion[_indexOpcion] == "Por banca"){
+        if(_bancas.length == 0){
+            alert("Debe seleccionar bancas");
+            return;
+        }
+    }
+
+    _cargando = true;
+    setState();
     let data:any = {
         "servidor" : servidorGlobal,
         "idUsuario" : idUsuario,
         "bancas" : _bancas,
         "loterias" : _loterias,
-        "sorteos" : listaSorteo
+        "sorteos" : listaSorteo,
+        "idMoneda" : listaMoneda[_indexMoneda].id,
+    }
+    var jwt = createJWT(data);
+
+    http.post({url: `${rutaGlobal}/api/bloqueos/sucias/guardar`, data:  {"datos": jwt}, headers: Utils.headers})
+        .then((response) => {
+            console.log("Post response: ", response);
+            _cargando = false;
+            _limpiar();
+            setState();
+            alert(response.message);
+        })
+        .catch((error) => {
+            console.log(`Error: ${error}`);
+            _cargando = false;
+            setState();
+        });
+}
+
+function _guardarGeneral(){
+    // listaSorteo.forEach((item) => console.log(item)
+    // );
+    if(_loterias.length == 0){
+        alert("Debe seleccionar loterias");
+        return;
+    }
+    
+    if(listaOpcion[_indexOpcion] == "Por banca"){
+        if(_bancas.length == 0){
+            alert("Debe seleccionar bancas");
+            return;
+        }
+    }
+    _cargando = true;
+    setState();
+    let data:any = {
+        "servidor" : servidorGlobal,
+        "idUsuario" : idUsuario,
+        "bancas" : _bancas,
+        "loterias" : _loterias,
+        "sorteos" : listaSorteo,
+        "idMoneda" : listaMoneda[_indexMoneda].id,
     }
     var jwt = createJWT(data);
 
     http.post({url: `${rutaGlobal}/api/bloqueos/general/sucias/guardar`, data:  {"datos": jwt}, headers: Utils.headers})
         .then((response) => {
             console.log("Post response: ", response);
-            
+            _cargando = false;
+            _limpiar();
+            setState();
+            alert(response.message);
         })
-        .catch((error) => console.log(`Error: ${error}`));
+        .catch((error) => {
+            console.log(`Error: ${error}`);
+            _cargando = false;
+            setState();
+        });
 }
 
 Builder({
@@ -2657,7 +2743,8 @@ Builder({
         });
         
     },
-    builder: (id:any, setState:any) => {
+    builder: (id:any, setStateFromBuilder:any) => {
+        setState = setStateFromBuilder;
         return Init({
             id: id,
             initDefaultStyle: true,
@@ -2861,8 +2948,9 @@ Builder({
                                                         // flex: 2,
                                                         // child: 
                                                         TextField({
+                                                            value: item.cantidad,
                                                             onChanged: (data:string) => {
-                                                                item.monto = data;
+                                                                item.cantidad = data;
                                                                 console.log(`${item.descripcion}: ${data}`);
                                                             }
                                                         })
@@ -2872,12 +2960,10 @@ Builder({
                                         })
                                         )
                                     })
-                                        
-                                   }
-                               })
+                                }
                             })
-                           
-                       }
+                        })
+                    }
                    }),
                    StreamBuilder({
                        stream: _streamControllerLoteria,
@@ -2890,17 +2976,37 @@ Builder({
                             return SizedBox({});
                        }
                    }),
-                   RaisedButton({
-                        color: "#47a44b",
-                        child: Texto("Guardar", new TextStyle({color: "white", fontWeight: FontWeight.w400})),
-                        onPressed: ()=>{
-                            // console.log("Guardaaarrrr: ", _loterias);
-                            _guardarGeneral();
-                            // listaSorteo.forEach((item)=> console.log(item));
-
-                            
-                        }
-                    })
+                   Row({
+                       mainAxisAlignment: MainAxisAlignment.end,
+                       children:[
+                        Padding({
+                            padding: EdgetInsets.only({top: 20, right: 10}),
+                            child: RaisedButton({
+                                color: "#47a44b",
+                                child: Row({
+                                    children: [
+                                        Visibility({
+                                            visible: _cargando, 
+                                            child: Padding({
+                                            padding: EdgetInsets.only({right: 10}),
+                                            child: CircularProgressIndicator({color: "white", })
+                                            })
+                                        }),
+                                        Texto("Guardar", new TextStyle({color: "white", fontWeight: FontWeight.w400})),
+                                    ]
+                                }),
+                                onPressed: ()=>{
+                                    // console.log("Guardaaarrrr: ", _loterias);
+                                    if(listaOpcion[_indexOpcion] == "General")
+                                        _guardarGeneral();
+                                    else
+                                        _guardar();
+                                    // listaSorteo.forEach((item)=> console.log(item));
+                                }
+                            })
+                        })
+                       ]
+                   })
                 ]
             })
         })

@@ -83,7 +83,7 @@
                 </a>
               </li>
               <li  class="nav-item">
-                <a  class="nav-link" href="#jugadasSucias" data-toggle="tab" role="tab">
+                <a ng-click="tabActiva = 4" class="nav-link" href="#jugadasSucias" data-toggle="tab" role="tab">
                   Jugadas sucias
                 </a>
               </li>
@@ -1204,6 +1204,7 @@
 
 
   <script src="{{asset('js/myflutterframework.js' . '?' . '1.0.0' )}}" type="text/javascript"></script>
+  <!-- <script src="{{asset('js/test2.js' . '?' . '1.0.0' )}}" type="text/javascript"></script> -->
 
 
 <!--   Core JS Files   -->
