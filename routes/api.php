@@ -158,3 +158,4 @@ Route::post('/monedas/pordefecto', 'CoinsController@pordefecto');
 Route::post('/servidor/servidorExiste', 'ServerController@servidorExiste');
 
 Route::get('/notifications', 'NotificationController@index');
+Route::post('/notifications/guardar', 'NotificationController@store');

@@ -70,6 +70,15 @@ class NotificationController extends Controller
             ], 201);
         }
 
+        Notification::create(
+            [
+                "titulo" => $datos["titulo"],
+                "subtitulo" => $datos["subtitulo"],
+                "contenido" => $datos["contenido"],
+                "estado" => 0,
+            ]
+        );
+
         return Response::json([
             "Mensaje" => "Se ha guardado correctamente"
         ]);
