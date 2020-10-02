@@ -112,8 +112,10 @@ class ReportesController extends Controller
                         ->where('idLoteria', $datos['idLoteria'])
                         ->whereIn('idVenta', $idVentas)
                         ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                        ->orderBy("monto", "desc")
+                        ->limit(40)
                         ->get();
-        }
+        }   
     
         
     

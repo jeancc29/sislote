@@ -255,6 +255,9 @@ myApp
                 
                 $scope.datos.idVenta = response.data.idVenta;
                 $scope.datos.optionsBancas = response.data.bancas;
+                $scope.datos.jugadasReporte.optionsBancas = response.data.bancas;
+                $scope.datos.jugadasReporte.optionsBancas.unshift({id: 0, descripcion: "Todas"});
+                $scope.datos.jugadasReporte.selectedBanca = $scope.datos.jugadasReporte.optionsBancas[0];
                 let idx = 0;
                 
                 if($scope.datos.optionsBancas.find(x => x.id == response.data.idBanca) != undefined)
@@ -270,7 +273,7 @@ myApp
                  $scope.datos.optionsLoterias =response.data.loterias;
                 //  console.log('select: ',$scope.datos.selectedVentas);
                 //  console.log($scope.datos.optionsLoterias);
-                $scope.datos.jugadasReporte.optionsLoterias = response.data.loterias;
+                $scope.datos.jugadasReporte.optionsLoterias = response.data.loteriasTodas;
                 $scope.datos.jugadasReporte.selectedLoteria = $scope.datos.jugadasReporte.optionsLoterias[0];
 
                 $scope.datos.estadisticas_ventas.total_jugadas = response.data.total_jugadas;
@@ -1341,8 +1344,21 @@ myApp
 
             $scope.datos.jugadasReporte.idLoteria = $scope.datos.jugadasReporte.selectedLoteria.id;
             $scope.datos.jugadasReporte.bancas = [];
-            $scope.datos.jugadasReporte.bancas.push($scope.datos.selectedBancas);
-            $scope.datos.jugadasReporte.servidor = $scope.datos.servidor;
+            
+            
+            if($scope.datos.jugadasReporte.selectedBanca.id == 0){
+                $scope.datos.jugadasReporte.optionsBancas.forEach(function(item){
+                    if(item.id != 0)
+                    $scope.datos.jugadasReporte.bancas.push(item);
+                })
+                // $scope.datos.jugadasReporte.bancas = $scope.datos.jugadasReporte.optionsBancas;
+            }
+                
+            else
+                $scope.datos.jugadasReporte.bancas.push($scope.datos.jugadasReporte.selectedBanca);
+            
+                console.log("reportes/jugadas bancas: ", $scope.datos.jugadasReporte.bancas);
+                $scope.datos.jugadasReporte.servidor = $scope.datos.servidor;
             var jwt = helperService.createJWT($scope.datos.jugadasReporte);
           $http.post(rutaGlobal+"/api/reportes/jugadas", {'action':'sp_jugadas_buscar', 'datos': jwt})
              .then(function(response){

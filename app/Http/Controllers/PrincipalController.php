@@ -253,7 +253,8 @@ class PrincipalController extends Controller
             'bancas' => ($data[0]->bancas != null) ? json_decode($data[0]->bancas) : [],
             'idUsuario' => $datos['idUsuario'],
             'idBanca' => $data[0]->idBanca,
-            'culo' => $idBanca
+            'culo' => $idBanca,
+            'loteriasTodas' => Lotteries::on($datos["servidor"])->select("id", "descripcion")->whereStatus(1)->get()
         ], 201);
     }
 

@@ -1221,6 +1221,29 @@
                           }
                       </style>
 
+                        <!-- <div   class="col-3 m-0 p-0"> -->
+                        <!-- o.descripcion disable when validarHora(o.horaCierre, o.descripcion) for o in datos.optionsLoterias track by o.id -->
+                                <select 
+                                style="width:auto;"
+                                
+                                ng-change="selectedBanca"
+                                    ng-model="datos.jugadasReporte.selectedBanca"
+                                    ng-options="o.descripcion for o in datos.jugadasReporte.optionsBancas track by o.id"
+                                    class="selectpicker col-12" 
+                                    data-style="select-with-transition" 
+                                    title="Seleccionar loteria"
+                                    data-size="7" aria-setsize="2">
+                                </select>
+                        <!-- </div> -->
+                      </div>
+
+                      <div class="col-3">
+                      <style>
+                          .dropdown-menu{
+                              width: 100%;
+                          }
+                      </style>
+
                         <select 
                             ng-change="cbxLoteriasChanged()"
                             ng-model="datos.jugadasReporte.selectedLoteria"
