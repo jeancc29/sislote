@@ -66,6 +66,8 @@ redis.subscribe('users', function(err, count) {
 });
 redis.subscribe('lotteries', function(err, count) {
 });
+redis.subscribe('notification', function(err, count) {
+});
 redis.on('message', function(channel, message) {
     message = JSON.parse(message);
     console.log('Message Recieved: ' + message.data.room);
