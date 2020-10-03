@@ -32,7 +32,7 @@ class NotificationController extends Controller
 
         return Response::json(
             [
-                "notificaciones" => Notification::on($datos["servidor"])->cursor()
+                "notificaciones" => Notification::on($datos["servidor"])->get()
             ],
             201
         );
@@ -70,17 +70,18 @@ class NotificationController extends Controller
             ], 201);
         }
 
-        Notification::create(
+        Notification::on($datos["servidor"])->create(
             [
-                "titulo" => $datos["titulo"],
-                "subtitulo" => $datos["subtitulo"],
-                "contenido" => $datos["contenido"],
+                "titulo" => $datos["notificacion"]["titulo"],
+                "subtitulo" => $datos["notificacion"]["subtitulo"],
+                "contenido" => $datos["notificacion"]["contenido"],
                 "estado" => 0,
             ]
         );
 
         return Response::json([
-            "Mensaje" => "Se ha guardado correctamente"
+            "Mensaje" => "Se ha guardado correctamente",
+            "hey" => $datos
         ]);
     }
 
