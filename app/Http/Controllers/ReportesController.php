@@ -34,6 +34,7 @@ use App\Classes\TicketToHtmlClass;
 
 use App\Http\Resources\LotteriesResource;
 use App\Http\Resources\SalesResource;
+use App\Http\Resources\SalesdetailsResource;
 use App\Http\Resources\SalesImageResource;
 use App\Http\Resources\BranchesResource;
 use App\Http\Resources\RolesResource;
@@ -86,7 +87,7 @@ class ReportesController extends Controller
         $errores = 0;
         $mensaje = '';
         $loterias = null;
-        $jugadas = null;
+        $jugadas = collect();
     
     
         if($datos['idLoteria'] != null && $datos['fecha'] != null && $datos['bancas'] != null){
@@ -106,15 +107,62 @@ class ReportesController extends Controller
                 return $id->id;
             });
         
-        
-            $jugadas = Salesdetails::
-            on($datos["servidor"])
-                        ->where('idLoteria', $datos['idLoteria'])
-                        ->whereIn('idVenta', $idVentas)
-                        ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-                        ->orderBy("monto", "desc")
-                        ->limit(40)
-                        ->get();
+            $jugadas = collect();
+            $sorteos = Draws::on($datos["servidor"])->get();
+            foreach ($sorteos as $sorteo) {
+                // if($jugadas == null)
+                //     $jugadas = Salesdetails::
+                //     on($datos["servidor"])
+                //     ->where('idLoteria', $datos['idLoteria'])
+                //     ->whereIn('idVenta', $idVentas)
+                //     ->where('idSorteo', $sorteo->id)
+                //     ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                //     ->orderBy("monto", "desc")
+                //     ->limit(20)
+                //     ->get();
+                // else{
+                //     $jugadasPorSorteo = Salesdetails::
+                //     on($datos["servidor"])
+                //     ->where('idLoteria', $datos['idLoteria'])
+                //     ->whereIn('idVenta', $idVentas)
+                //     ->where('idSorteo', $sorteo->id)
+                //     ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                //     ->orderBy("monto", "desc")
+                //     ->limit(20)
+                //     ->get();
+
+                    
+
+                //     if($jugadasPorSorteo->count() > 0){
+                //         $jugadas->merge($jugadasPorSorteo);
+                //         return Response::json([
+                //             "jugadasPorSorteo" => $jugadasPorSorteo,
+                //             "jugadas" => $jugadas,
+                //         ]);
+                //     }
+                        
+                // }
+
+                $jugadasPorSorteo = Salesdetails::
+                    on($datos["servidor"])
+                    ->where('idLoteria', $datos['idLoteria'])
+                    ->whereIn('idVenta', $idVentas)
+                    ->where('idSorteo', $sorteo->id)
+                    ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                    ->orderBy("monto", "desc")
+                    ->limit(20)
+                    ->get();
+
+                if($jugadasPorSorteo->count() > 0){
+                    $jugadasPorSorteo = SalesdetailsResource::collection($jugadasPorSorteo);
+                    $jugadas = $jugadas->merge($jugadasPorSorteo);
+                    // return Response::json([
+                    //     "jugadasPorSorteo" => $jugadasPorSorteo,
+                    //     "jugadas" => $jugadas,
+                    // ]);
+                }
+            }
+            
         }   
     
         

@@ -1282,7 +1282,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="">
-                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {tam: 2}">
+                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {sorteo: 'Directo'}">
                                     <td class="col-sm-5 text-center">@{{c.jugada}}</td>
                                     <td class="col-6 text-center">@{{c.monto}}</td>
                                     <!-- <td class="td-actions text-center col-1">
@@ -1310,33 +1310,20 @@
                            <h3 class="text-center">PALE</h3>
                             <div class="table-responsive">
                                 <table class="table table-fixed">
-                                <thead class="thead-dark">
-                                    <tr>
-                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">JUGADA</th>
-                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">IMPORTE</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="">
-                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {tam: 4}">
-                                    <td class="col-sm-5 text-center">@{{agregar_guion(c.jugada)}}</td>
-                                    <td class="col-6 text-center">@{{c.monto}}</td>
-                                    <!-- <td class="td-actions text-center col-1">
-                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
-                                            <i class="material-icons">close</i>
-                                        </button>
-                                        </td> -->
-                                    </tr>
-                                    
-                                </tbody>
+                                    <thead class="thead-dark">
+                                        <tr>
+                                        <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">JUGADA</th>
+                                        <th class="font-weight-bold col-6 text-center" style="font-size: 14px">IMPORTE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="">
+                                        <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {sorteo: 'Pale'}">
+                                            <td class="col-sm-5 text-center">@{{agregar_guion(c.jugada)}}</td>
+                                            <td class="col-6 text-center">@{{c.monto}}</td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                                 <hr class="mb-0">
-                                <!-- <div class="float-right mt-3">
-                                        <div style="font-size: 16px;" class="font-weight-bold">
-                                            Total
-                                            <small class="h3 ml-3">&euro;0</small>
-                                        </div> 
-                                        
-                                </div> -->
                             </div> <!-- END RESPONSIVE TABLE -->
                             <h4 class="text-right">Total: @{{datos.jugadasReporte.total_palet | currency}}</h4>
                        </div> <!-- COL-3 -->
@@ -1353,7 +1340,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="">
-                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {tam: 6}">
+                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {sorteo: 'Tripleta'}">
                                     <td class="col-sm-5 text-center">@{{agregar_guion(c.jugada)}}</td>
                                     <td class="col-6 text-center">@{{c.monto}}</td>
                                     <!-- <td class="td-actions text-center col-1">
@@ -1366,18 +1353,106 @@
                                 </tbody>
                                 </table>
                                 <hr class="mb-0">
-                                <!-- <div class="float-right mt-3">
-                                        <div style="font-size: 16px;" class="font-weight-bold">
-                                            Total
-                                            <small class="h3 ml-3">&euro;0</small>
-                                        </div> 
-                                        
-                                </div> -->
                             </div> <!-- END RESPONSIVE TABLE -->
 
                             <h4 class="text-right">Total: @{{datos.jugadasReporte.total_tripleta | currency}}</h4>
                        </div> <!-- COL-3 -->
+
+
+                       <div class="col-4 col-sm-4 col-lg-3">
+                           <h3 class="text-center">Super pale</h3>
+                            <div class="table-responsive">
+                                <table class="table table-fixed">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">JUGADA</th>
+                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">IMPORTE</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {sorteo: 'Super pale'}">
+                                    <td class="col-sm-5 text-center">@{{agregar_guion(c.jugada)}}</td>
+                                    <td class="col-6 text-center">@{{c.monto}}</td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td> -->
+                                    </tr>
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                            </div> <!-- END RESPONSIVE TABLE -->
+
+                            <h4 class="text-right">Total: @{{datos.jugadasReporte.total_superPale | currency}}</h4>
+                       </div> <!-- COL-3 -->
+
+                       <div class="col-4 col-sm-4 col-lg-3">
+                           <h3 class="text-center">Pick3</h3>
+                            <div class="table-responsive">
+                                <table class="table table-fixed">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">JUGADA</th>
+                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">IMPORTE</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {sorteo: 'Pick 3 Box' || 'Pick 3 Straight'}">
+                                    <td class="col-sm-5 text-center">@{{agregar_guion(c.jugada)}}</td>
+                                    <td class="col-6 text-center">@{{c.monto}}</td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td> -->
+                                    </tr>
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                            </div> <!-- END RESPONSIVE TABLE -->
+
+                            <h4 class="text-right">Total: @{{datos.jugadasReporte.total_pick4 | currency}}</h4>
+                       </div> <!-- COL-3 -->
+
+
+                       <div class="col-4 col-sm-4 col-lg-3">
+                           <h3 class="text-center">Pick4</h3>
+                            <div class="table-responsive">
+                                <table class="table table-fixed">
+                                <thead class="thead-dark">
+                                    <tr>
+                                    <th class="font-weight-bold col-2 col-sm-6 text-center" style="font-size: 14px">JUGADA</th>
+                                    <th class="font-weight-bold col-6 text-center" style="font-size: 14px">IMPORTE</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="">
+                                    <tr ng-repeat="c in datos.jugadasReporte.jugadas | filter: {sorteo: 'Pick 4 Box' || 'Pick 4 Straight'}">
+                                    <td class="col-sm-5 text-center">@{{agregar_guion(c.jugada)}}</td>
+                                    <td class="col-6 text-center">@{{c.monto}}</td>
+                                    <!-- <td class="td-actions text-center col-1">
+                                        <button type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                            <i class="material-icons">close</i>
+                                        </button>
+                                        </td> -->
+                                    </tr>
+                                    
+                                </tbody>
+                                </table>
+                                <hr class="mb-0">
+                            </div> <!-- END RESPONSIVE TABLE -->
+
+                            <h4 class="text-right">Total: @{{datos.jugadasReporte.total_pick4 | currency}}</h4>
+                       </div> <!-- COL-3 -->
+
+
                    </div>
+
+               
+
+
 
                     <div class="container">
 

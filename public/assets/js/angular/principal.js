@@ -744,7 +744,7 @@ myApp
         }
 
         $scope.calcularTotal = function(){
-            var monto_jugado = 0, monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, total_pick3 = 0, total_pick4 = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_monto_total = 0;
+            var monto_jugado = 0, monto_a_pagar = 0, total_palet_tripleta = 0, total_directo = 0, total_pale = 0, total_tripleta = 0, total_pick3 = 0, total_pick4 = 0, jugdada_total_palet = 0, jugada_total_directo = 0, jugada_total_tripleta = 0, jugada_total_superPale = 0, jugada_total_pick4 = 0, jugada_monto_total = 0;
              $scope.datos.jugadas.forEach(function(valor, indice, array){
 
                 if(array[indice].tam == 2) total_directo += parseFloat(array[indice].monto);
@@ -783,9 +783,12 @@ myApp
              //Calcular total jugdasReporte
              $scope.datos.jugadasReporte.jugadas.forEach(function(valor, indice, array){
 
-                if(array[indice].jugada.length == 2) jugada_total_directo += parseFloat(array[indice].monto);
-                if(array[indice].tam == 4) jugdada_total_palet += parseFloat(array[indice].monto);
-                if(array[indice].tam == 6) jugada_total_tripleta += parseFloat(array[indice].monto);
+                if(array[indice].sorteo == "Directo") jugada_total_directo += parseFloat(array[indice].monto);
+                if(array[indice].sorteo == "Pale") jugdada_total_palet += parseFloat(array[indice].monto);
+                if(array[indice].sorteo == "Tripleta") jugada_total_tripleta += parseFloat(array[indice].monto);
+                if(array[indice].sorteo == "Super pale") jugada_total_superPale += parseFloat(array[indice].monto);
+                if(array[indice].sorteo.indexOf("Pick 3") != -1) jugada_total_pick3 += parseFloat(array[indice].monto);
+                if(array[indice].sorteo.indexOf("Pick 4") != -1) jugada_total_pick4 += parseFloat(array[indice].monto);
 
                 jugada_monto_total +=  parseFloat(array[indice].monto);
              });
@@ -793,6 +796,8 @@ myApp
              $scope.datos.jugadasReporte.total_directo = jugada_total_directo;
              $scope.datos.jugadasReporte.total_palet = jugdada_total_palet;
              $scope.datos.jugadasReporte.total_tripleta = jugada_total_tripleta;
+             $scope.datos.jugadasReporte.total_superPale = jugada_total_superPale;
+             $scope.datos.jugadasReporte.total_pick4 = jugada_total_pick4;
              $scope.datos.jugadasReporte.monto_total = jugada_monto_total;
         
         }
@@ -1363,7 +1368,7 @@ myApp
           $http.post(rutaGlobal+"/api/reportes/jugadas", {'action':'sp_jugadas_buscar', 'datos': jwt})
              .then(function(response){
 
-                
+                console.log("reportes/jugadas: ", response);                
                 $scope.datos.jugadasReporte.jugadas = [];
                 $scope.datos.jugadasReporte.total_directo = 0;
                 $scope.datos.jugadasReporte.total_palet = 0;
@@ -1374,7 +1379,7 @@ myApp
                 if(response.data != undefined){
                     var jsonJugadas = response.data.jugadas;
                     jsonJugadas.forEach(function(valor, indice, array){
-                        $scope.datos.jugadasReporte.jugadas.push({'jugada':array[indice].jugada, 'monto':array[indice].monto, 'tam': array[indice].jugada.length});
+                        $scope.datos.jugadasReporte.jugadas.push(array[indice]);
                     });
                 }
 
