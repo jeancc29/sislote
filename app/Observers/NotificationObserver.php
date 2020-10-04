@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Observers;
+use App\Notification;
+use App\Events\NotificationEvent;
 
 class NotificationObserver
 {
