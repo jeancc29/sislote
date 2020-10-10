@@ -227,7 +227,7 @@ myApp
         
         $scope.inicializarDatos = function(idUsuario = 0, response = null, responseJugadas = null){
 
-            $scope.datos.buscar.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General loterias'}, {'idTipoBloqueo' : 2, 'descripcion' : 'General jugadas'}, {'idTipoBloqueo': 3, 'descripcion' : 'Por banca loterias'}, {'idTipoBloqueo': 4, 'descripcion' : 'Por banca jugadas'}];
+            $scope.datos.buscar.optionsTipoBloqueos = [{'idTipoBloqueo' : 1, 'descripcion' : 'General loterias'}, {'idTipoBloqueo' : 2, 'descripcion' : 'General jugadas'}, {'idTipoBloqueo': 3, 'descripcion' : 'Por banca loterias'}, {'idTipoBloqueo': 4, 'descripcion' : 'Por banca jugadas'}, {'idTipoBloqueo': 5, 'descripcion' : 'Jugadas sucias general'}, {'idTipoBloqueo': 6, 'descripcion' : 'Jugadas sucias por bancas'}];
             $scope.datos.buscar.selectedTipoBloqueos = $scope.datos.buscar.optionsTipoBloqueos[0];
                
             if(response != null){
@@ -634,7 +634,9 @@ myApp
            }
            else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General jugadas"){
             //    bloqueo.idBloqueo = 100000;
-                $http.post(rutaGlobal+"/api/bloqueosgenerales/jugadas/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                bloqueo.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT(bloqueo);
+                $http.post(rutaGlobal+"/api/bloqueosgenerales/jugadas/eliminar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                 .then(function(response){
                     console.log(response);
                     $scope.datos.tabSelectedLoteria.jugadas.splice(index, 1);
@@ -654,7 +656,9 @@ myApp
            else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca loterias"){
                 var block;
                 console.log(bloqueo);
-                $http.post(rutaGlobal+"/api/bloqueos/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                bloqueo.servidor =  servidorGlobal;
+                var jwt = helperService.createJWT(bloqueo);
+                $http.post(rutaGlobal+"/api/bloqueos/loterias/eliminar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                     .then(function(response){
                     console.log(response);
                     $scope.datos.tabSelectedLoteria.sorteos.splice(index, 1);
@@ -674,10 +678,33 @@ myApp
 
             else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Por banca jugadas"){
                 //    bloqueo.idBloqueo = 100000;
-                    $http.post(rutaGlobal+"/api/bloqueos/jugadas/eliminar", {'action':'sp_bancas_actualizar', 'datos': bloqueo})
+                    bloqueo.servidor =  servidorGlobal;
+                    var jwt = helperService.createJWT(bloqueo);
+                    $http.post(rutaGlobal+"/api/bloqueos/jugadas/eliminar", {'action':'sp_bancas_actualizar', 'datos': jwt})
                     .then(function(response){
                         console.log(response);
                         $scope.datos.tabSelectedLoteria.jugadas.splice(index, 1);
+                        $scope.datos.tabSelectedLoteria.cantidadDeBloqueos = $scope.datos.tabSelectedLoteria.cantidadDeBloqueos - 1;
+                        alert("Se ha eliminado correctamente");
+    
+                    },
+                    function(response) {
+                        // Handle error here
+                        // $scope.datos.cargando = false;
+                        console.log('Error jean: ', response);
+                        alert("Error");
+                    }
+                    );
+               }
+
+            else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Jugadas sucias general"){
+                //    bloqueo.idBloqueo = 100000;
+                    bloqueo.servidor =  servidorGlobal;
+                    var jwt = helperService.createJWT(bloqueo);
+                    $http.post(rutaGlobal+"/api/bloqueos/general/sucias/eliminar", {'action':'sp_bancas_actualizar', 'datos': jwt})
+                    .then(function(response){
+                        console.log(response);
+                        $scope.datos.tabSelectedLoteria.sorteos.splice(index, 1);
                         $scope.datos.tabSelectedLoteria.cantidadDeBloqueos = $scope.datos.tabSelectedLoteria.cantidadDeBloqueos - 1;
                         alert("Se ha eliminado correctamente");
     
@@ -1025,7 +1052,7 @@ myApp
 
         $scope.buscar = function(){
             
-            if($scope.datos.buscar.selectedTipoBloqueos.descripcion != "General jugadas" && $scope.datos.buscar.selectedTipoBloqueos.descripcion != "Por banca jugadas")
+            if($scope.datos.buscar.selectedTipoBloqueos.descripcion != "General jugadas" && $scope.datos.buscar.selectedTipoBloqueos.descripcion != "Por banca jugadas" && $scope.datos.buscar.selectedTipoBloqueos.descripcion != "Jugadas sucias general" )
             if(helperService.empty($scope.datos.buscar.dias, 'object') == true){
                 alert("Debe seleccionar los dias");
                 return;
@@ -1063,6 +1090,10 @@ myApp
                     $scope.tabLoteriasChanged($scope.datos.tabSelectedBanca.loterias[0]);
                 }
                 else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "General jugadas"){
+                    $scope.datos.buscar.resultados = response.data.loterias;
+                    $scope.tabLoteriasChanged($scope.datos.buscar.resultados[0]);
+                }
+                else if($scope.datos.buscar.selectedTipoBloqueos.descripcion == "Jugadas sucias general"){
                     $scope.datos.buscar.resultados = response.data.loterias;
                     $scope.tabLoteriasChanged($scope.datos.buscar.resultados[0]);
                 }

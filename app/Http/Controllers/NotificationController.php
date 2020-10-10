@@ -32,7 +32,7 @@ class NotificationController extends Controller
 
         return Response::json(
             [
-                "notificaciones" => Notification::on($datos["servidor"])->get()
+                "notificaciones" => Notification::on($datos["servidor"])->orderBy("id", "desc")->limit(10)->get()
             ],
             201
         );

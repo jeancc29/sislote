@@ -29,7 +29,7 @@ class NotificationEvent implements ShouldBroadcast
         }else{
             $this->action = "add";
         }
-        $this->notification = [$notification];
+        $this->notification = $notification;
     }
 
     /**
