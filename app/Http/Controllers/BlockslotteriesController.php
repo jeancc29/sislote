@@ -230,10 +230,33 @@ class BlockslotteriesController extends Controller
                 ], 201);
            
         }
-        
 
-        
-    
+        else if($datos['idTipoBloqueo'] == 5){
+            
+            $loterias = collect(Lotteries::on($datos["servidor"])->whereStatus(1)->get())->map(function($l) use($datos){
+                //COLLECT SORTEOS
+                $sorteos = collect($l['sorteos'])->map(function($s) use($l, $datos){
+                    $bloqueo = \App\Blocksdirtygenerals::on($datos["servidor"])->where(['idLoteria' => $l['id'], 'idSorteo' => $s['id'], "idMoneda" => $datos["idMoneda"]])->first();
+                    $montoBloqueo = 0;
+                    if($bloqueo != null)
+                        $montoBloqueo = $bloqueo['cantidad'];
+                    else
+                        $bloqueo = null;
+                    return ["id" => $s['id'], "descripcion" => $s['descripcion'], "bloqueo" => $montoBloqueo, "idBloqueo" => ($bloqueo != null) ? $bloqueo['id'] : $bloqueo];
+                });
+                //VALIDAMOS DE QUE EL BLOQUEO EXISTE PARA ELLO NOS ASEGURAMOS DE QUE EL IDBLOQUE NO SEA NULO
+                list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
+                    return $l['idBloqueo'] != null;
+                });
+                return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
+            });
+
+            return Response::json([
+                'loterias' => $loterias
+            ], 201);
+           
+        }
+
         return Response::json([
             'dias' => $dias,
             "idMoneda" => $datos["idMoneda"]

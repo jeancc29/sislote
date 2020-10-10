@@ -61,6 +61,8 @@ class RealtimeClass{
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->get();
+        $datos['blocksdirty'] = \App\Blocksdirty::on($servidor)->get();
+        $datos['blocksdirtygenerals'] = \App\Blocksdirtygenerals::on($servidor)->get();
         $datos['draws'] = Draws::on($servidor)->whereStatus(1)->get();
 
         return $datos;

@@ -195,10 +195,11 @@ class RealtimeController extends Controller
         ->where('fechaDesde', '<=', $fechaInicial)
         ->where('fechaHasta', '>=', $fechaFinal)
         ->get();
+        $blocksdirty = \App\Blocksdirty::on($datos["servidor"])->get();
+        $blocksdirtygenerals = \App\Blocksdirtygenerals::on($datos["servidor"])->get();
         $draws = Draws::on($datos["servidor"])->whereStatus(1)->get();
-        
       
-       return Response::json([
+        return Response::json([
         'errores' => 0,
         'mensaje' => '',
         'hayCambios' => true,
@@ -207,6 +208,8 @@ class RealtimeController extends Controller
         'blocksgenerals' => count($Blocksgenerals) > 0 ? $Blocksgenerals : null,
         'blocksplays' => count($blocksplays) > 0 ? $blocksplays : null,
         'blocksplaysgenerals' => count($blocksplaysgenerals) > 0 ? $blocksplaysgenerals : null,
+        'blocksdirty' => $blocksdirty,
+        'blocksdirtygenerals' => $blocksdirtygenerals,
         'draws' => count($draws) > 0 ? $draws : null,
         'version' => Androidversions::on($datos["servidor"])->whereStatus(3)->first(),
         'usuario' => new UsersResource($u)

@@ -112,6 +112,10 @@ Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@eliminar')
 Route::post('/bloqueosgenerales/loterias/eliminar', 'BlocksgeneralsController@eliminar');
 Route::post('/bloqueosgenerales/jugadas/eliminar', 'BlocksplaysgeneralsController@eliminar');
 
+Route::post('/bloqueos/general/sucias/guardar', 'BlocksdirtygeneralsController@store');
+Route::post('/bloqueos/general/sucias/eliminar', 'BlocksdirtygeneralsController@destroy');
+Route::post('/bloqueos/sucias/guardar', 'BlocksdirtyController@store');
+
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
 Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
@@ -154,3 +158,5 @@ Route::post('/monedas/pordefecto', 'CoinsController@pordefecto');
 
 Route::post('/servidor/servidorExiste', 'ServerController@servidorExiste');
 
+Route::get('/notifications', 'NotificationController@index');
+Route::post('/notifications/guardar', 'NotificationController@store');

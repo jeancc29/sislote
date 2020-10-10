@@ -19,6 +19,11 @@ use App\Observers\BlocksplaysgeneralsObserver;
 use App\Users;
 // use App\Observers\UsersObserver;
 
+use App\Observers\BlocksdirtyObserver;
+use App\Observers\BlocksdirtygeneralsObserver;
+use App\Observers\NotificationObserver;
+
+
 class EventServiceProvider extends ServiceProvider
 {
     /**
@@ -46,6 +51,9 @@ class EventServiceProvider extends ServiceProvider
         Blocksplays::observe(BlocksplaysObserver::class);
         Blocksgenerals::observe(BlocksgeneralsObserver::class);
         Blocksplaysgenerals::observe(BlocksplaysgeneralsObserver::class);
+        \App\Blocksdirty::observe(BlocksdirtyObserver::class);
+        \App\Blocksdirtygenerals::observe(BlocksdirtygeneralsObserver::class);
+        \App\Notification::observe(NotificationObserver::class);
         // Users::observe(UsersObserver::class);
     }
 }
