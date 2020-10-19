@@ -3,6 +3,7 @@ function oncreatedOrUpdatedWidgetState(){
     // console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
     
     rebuildSizeFromLayoutBuilder();
+    // $('.main-panel').perfectScrollbar('update');
 }
 
 
@@ -2739,7 +2740,6 @@ Builder({
             _streamControllerLoteria.add(listaLoteria);
             _streamControllerMoneda.add(listaMoneda);
             console.log("response listaBanca: ", listaLoteria);
-
         });
         
     },

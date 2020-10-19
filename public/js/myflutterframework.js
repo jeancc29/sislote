@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 function oncreatedOrUpdatedWidgetState() {
     // console.log("Termino terminoooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
     rebuildSizeFromLayoutBuilder();
+    // $('.main-panel').perfectScrollbar('update');
 }
 /********************* VARIABLES  ************************************/
 var fontSizeUnit = "px";
@@ -1807,7 +1808,6 @@ function updateTextOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
         if (nuevoWidget.element.id.split("-")[0] == "TextField") {
             //Si no es StateLessWidget(cambia), entonces vamos a cambiar el texto, de lo contrario no podemos cambiar el texto
             // if(nuevoWidget.isStateLess == false)
-            console.log("updateText input: ");
             widgetViejoOExistente.value = nuevoWidget.element.value;
         }
     }
