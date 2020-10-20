@@ -82,7 +82,7 @@
                   Jugadas
                 </a>
               </li>
-              <li  class="nav-item">
+              <li ng-click="tabChange(tabActiva)"  class="nav-item">
                 <a ng-click="tabActiva = 4" class="nav-link" href="#jugadasSucias" data-toggle="tab" role="tab">
                   Jugadas sucias
                 </a>
@@ -146,7 +146,7 @@
                             </div> <!-- END INPUT GROUP -->
                           </div><!-- END COL 12 -->
 
-                          <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion != 'Por banca jugadas' && datos.buscar.selectedTipoBloqueos.descripcion != 'General jugadas' && datos.buscar.selectedTipoBloqueos.descripcion != 'Jugadas sucias general'" ng-class="{'col-5': datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas', 'col-10': datos.buscar.selectedTipoBloqueos.descripcion == 'General loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'General jugadas'}" class="text-center">
+                          <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion != 'Por banca jugadas' && datos.buscar.selectedTipoBloqueos.descripcion != 'General jugadas' && datos.buscar.selectedTipoBloqueos.descripcion != 'Jugadas sucias general' && datos.buscar.selectedTipoBloqueos.descripcion != 'Jugadas sucias por bancas'" ng-class="{'col-5': datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas', 'col-10': datos.buscar.selectedTipoBloqueos.descripcion == 'General loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'General jugadas'}" class="text-center">
                               <div class="input-group">
                               <!-- <label  for="jugada" class="bmd-label-floating font-weight-bold" style="color: black;">Dias</label> -->
                                 <label class="d-none d-sm-block text-right col-sm-2 col-form-label  font-weight-bold " style="color: black;">Dias</label>                              
@@ -169,7 +169,7 @@
                               </div> <!-- END INPUT GROUP -->
                             </div><!-- END COL 5 -->
 
-                            <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas'" class="col-5">
+                            <div ng-show="datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca loterias' || datos.buscar.selectedTipoBloqueos.descripcion == 'Por banca jugadas' || datos.buscar.selectedTipoBloqueos.descripcion == 'Jugadas sucias por bancas'" class="col-5">
                               <div class="input-group">
                                 
                                 <label class="d-none d-sm-block  col-sm-3 col-form-label  font-weight-bold " style="color: black;">Bancas</label>                              
@@ -607,6 +607,94 @@
                                 </div> <!-- END CARD3 -->
                       <!-- END JUGADAS SUCIAS GENERAL -->
                       
+
+
+                      <!-- JUGADAS SUCIAS POR BANCA -->
+                      <div ng-show="datos.buscar.selectedTipoBloqueos.idTipoBloqueo == 6" class="card text-center" style="padding-top: 0px; margin-top:0px;"><!-- CARD2 -->
+                              <div class="card-header2" style="background-color: #f4f4f4;">
+                                <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                  <li ng-repeat="b in datos.buscar.resultados" 
+                                      ng-click="tabBancasChanged(b)" 
+                                      class="nav2-item" style="padding: 0px;">
+                                    <a ng-class="{'active': datos.tabSelectedBanca.id == b.id}" class="nav2-link" href="#">@{{b.descripcion}}</a>
+                                  </li>
+                                  <!-- <li class="nav2-item" style="padding: 0px;">
+                                    <a class="nav2-link" href="#">Link</a>
+                                  </li>
+                                  <li class="nav2-item" style="padding: 0px;">
+                                    <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                  </li> -->
+                                </ul>
+                              </div>
+                              <div class="card-body">
+                                
+                                <div class="card text-center" style="padding-top: 0px; margin-top:0px;"><!-- CARD3 -->
+                                  <div class="card-header2" style="background-color: #f4f4f4;">
+                                    <ul class="nav2 nav2-tabs card-header-tabs" style="padding-bottom: 0px;">
+                                      <li ng-repeat="l in datos.tabSelectedBanca.loterias" 
+                                          ng-click="tabLoteriasChanged(l)" 
+                                      class="nav2-item" style="padding: 0px;">
+                                        <a ng-class="{'active': datos.tabSelectedLoteria.id == l.id}" class="nav2-link" href="#">@{{l.descripcion}}<span ng-class="{'bg-danger text-white': l.cantidadDeBloqueos == 0}" class="rounded ml-2 p-1 font-weight-bold">@{{l.cantidadDeBloqueos}}</span></a>
+                                      </li>
+                                      <!-- <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link" href="#">Link</a>
+                                      </li>
+                                      <li class="nav2-item" style="padding: 0px;">
+                                        <a class="nav2-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                      </li> -->
+                                    </ul>
+                                  </div>
+                                  <div class="card-body">
+                                    <div class="col-12">
+                                      <table class="table table-sm table-striped">
+                                            <thead>
+                                                <tr>
+                                                <th scope="col" class="text-center">ID</th>
+                                                <th scope="col" class="text-center">SORTEO</th>
+                                                <th scope="col" class="text-center">BLOQUEO</th>
+                                                <th scope="col" class="text-center">ElIMINAR</th>
+                                                <!-- <th scope="col" class="text-center"></th> -->
+                                                <!-- <th scope="col" class="text-center">Cerrado</th> -->
+                                                
+                                                
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                              <!-- | filter:datos.monitoreo.datosBusqueda -->
+                                                <tr ng-repeat="c in datos.tabSelectedLoteria.sorteos">
+                                                    <td scope="col" class="text-center" style="font-size: 14px">@{{$index + 1}}</td>
+                                                    <!-- <td scope="col" class="text-center">@{{Cerrado}}</td> -->
+                                                    <td scope="col" class="text-center">@{{c.descripcion}}</td>
+                                                    <td scope="col" class="text-center">
+                                                      <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="d-inline  bg-primary p-1 text-white rounded">@{{c.bloqueo | currency}}</a>
+                                                    </td>
+                                                    <td class=" text-center">
+                                                      <button ng-click="eliminarBloqueo(c, $index)" type="button" rel="tooltip" data-placement="left" title="Remove item" class="btn btn-link">
+                                                          <i class="material-icons font-weight-bold">close</i>
+                                                      </button>
+                                                    </td>
+                                                    <!-- <td scope="col" class="text-center">@{{c.frecuencia.descripcion}}</td>
+                                                    <td scope="col" class="text-center">@{{toFecha(c.fechaInicio) | date:"dd/MM/yyyy"}}</td>
+                                                    <td scope="col" class="text-center">@{{toFecha(c.fechaProximoGasto) | date:"dd/MM/yyyy"}}</td>
+                                                    -->
+                                                    
+                                                    <!-- <td>
+                                                      <a style="cursor: pointer"  ng-click="gastoEditar(false, c)" class="ion-edit d-inline bg-primary py-1 text-white rounded abrir-wizard-editar"><i class="material-icons">edit</i></a>
+                                                      <a style="cursor: pointer" ng-click="gastoEliminar(c)" class="ion-android-delete d-inline  ml-2 bg-danger py-1 text-white rounded"><i class="material-icons">delete_forever</i></a>
+                                                    </td> -->
+                                                </tr>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div> <!-- END COL-12 -->
+                                  </div> <!-- END CARD-BODY -->
+                                </div> <!-- END CARD3 -->
+
+                            
+                              </div><!-- END CARD-BODY -->
+                            </div><!-- END CARD2 -->
+                      <!-- END JUGADAS SUCIAS POR BANCA -->
 
 
                     </div> <!-- END ROW SECUNDARIO PRINCIPAL -->
@@ -1268,13 +1356,13 @@
         
 
 
+  <script src="{{asset('assets/js/core/jquery.min.js')}}" type="text/javascript"></script>
 
   <script src="{{asset('js/myflutterframework.js' . '?' . '1.0.0' )}}" type="text/javascript"></script>
   <!-- <script src="{{asset('js/test2.js' . '?' . '1.0.0' )}}" type="text/javascript"></script> -->
 
 
 <!--   Core JS Files   -->
-<script src="{{asset('assets/js/core/jquery.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('assets/js/core/popper.min.js')}}" type="text/javascript"></script>
 <script src="{{asset('assets/js/core/bootstrap-material-design.min.js')}}" type="text/javascript"></script>
 

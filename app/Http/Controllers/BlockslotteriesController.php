@@ -137,12 +137,18 @@ class BlockslotteriesController extends Controller
                     list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
                         return $l['idBloqueo'] != null;
                     });
+                    if(!empty($sorteos_seleccionadas)){
+                        // $sorteos_seleccionadas = collect($sorteos_seleccionadas);
+                        $sorteos_seleccionadas = $sorteos_seleccionadas->values();
+                        $sorteos_seleccionadas = $sorteos_seleccionadas->all();
+                    }
                     return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
                 });
                 return ["id" => $d->id, "descripcion" => $d->descripcion, "wday" => $d->wday, "loterias" => $loterias];
             });
         }
         else if($datos['idTipoBloqueo'] == 3){
+            
             $idDias = collect($datos['dias'])->map(function($d){
                 return $d['id'];
             });
@@ -151,6 +157,7 @@ class BlockslotteriesController extends Controller
             });
 
             $dias = Days::on($datos["servidor"])->whereIn('id', $idDias)->get();
+           
             //COLLECT DIAS
             $dias = collect($dias)->map(function($d) use($idBancas, $datos){
                 $bancas = BranchesResource::collection($d->bancas()->wherePivotIn('idBanca', $idBancas)->get())->servidor($datos["servidor"]);
@@ -172,6 +179,11 @@ class BlockslotteriesController extends Controller
                         list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
                             return $l['idBloqueo'] != null;
                         });
+                        if(!empty($sorteos_seleccionadas)){
+                            // $sorteos_seleccionadas = collect($sorteos_seleccionadas);
+                            $sorteos_seleccionadas = $sorteos_seleccionadas->values();
+                            $sorteos_seleccionadas = $sorteos_seleccionadas->all();
+                        }
                         return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
                     });
                     return ["id" => $b['id'], "descripcion" => $b['descripcion'], "loterias" => $loterias];
@@ -248,11 +260,62 @@ class BlockslotteriesController extends Controller
                 list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
                     return $l['idBloqueo'] != null;
                 });
+                if(!empty($sorteos_seleccionadas)){
+                    // $sorteos_seleccionadas = collect($sorteos_seleccionadas);
+                    $sorteos_seleccionadas = $sorteos_seleccionadas->values();
+                    $sorteos_seleccionadas = $sorteos_seleccionadas->all();
+                }
+
                 return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
             });
 
             return Response::json([
                 'loterias' => $loterias
+            ], 201);
+           
+        }
+        else if($datos['idTipoBloqueo'] == 6){
+            $idBancas = collect($datos['bancas'])->map(function($d){
+                return $d['id'];
+            });
+
+            
+            
+                $bancas = BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('id', $idBancas)->get())->servidor($datos["servidor"]);
+                //COLLECT BANCAS
+                $bancas = collect($bancas)->map(function($b) use($datos){
+                    $loterias = collect(Lotteries::on($datos["servidor"])->whereStatus(1)->get())->map(function($l) use($datos, $b){
+                        //COLLECT SORTEOS
+                        $sorteos = collect($l['sorteos'])->map(function($s) use($l, $datos, $b){
+                            $bloqueo = \App\Blocksdirty::on($datos["servidor"])->where(['idBanca' => $b['id'], 'idLoteria' => $l['id'], 'idSorteo' => $s['id'], "idMoneda" => $datos["idMoneda"]])->first();
+                            $montoBloqueo = 0;
+                            if($bloqueo != null)
+                                $montoBloqueo = $bloqueo['cantidad'];
+                            else
+                                $bloqueo = null;
+                            return ["id" => $s['id'], "descripcion" => $s['descripcion'], "bloqueo" => $montoBloqueo, "idBloqueo" => ($bloqueo != null) ? $bloqueo['id'] : $bloqueo];
+                        });
+                        $sorteos->values();
+                        //VALIDAMOS DE QUE EL BLOQUEO EXISTE PARA ELLO NOS ASEGURAMOS DE QUE EL IDBLOQUE NO SEA NULO
+                        list($sorteos_seleccionadas, $no) = $sorteos->partition(function($l){
+                            return $l['idBloqueo'] != null;
+                        });
+                        if(!empty($sorteos_seleccionadas)){
+                            // $sorteos_seleccionadas = collect($sorteos_seleccionadas);
+                            $sorteos_seleccionadas = $sorteos_seleccionadas->values();
+                            $sorteos_seleccionadas = $sorteos_seleccionadas->all();
+                        }
+                            
+                        // else
+                        //     $sorteos_seleccionadas = [];
+
+                        return ["id" => $l['id'], "descripcion" => $l['descripcion'], "sorteos" => $sorteos_seleccionadas, "cantidadDeBloqueos" => count($sorteos_seleccionadas)];
+                    });
+                    return ["id" => $b['id'], "descripcion" => $b['descripcion'], "loterias" => $loterias];
+                });
+
+            return Response::json([
+                'bancas' => $bancas
             ], 201);
            
         }
@@ -640,6 +703,28 @@ class BlockslotteriesController extends Controller
      */
     public function destroy(Blockslotteries $blockslotteries)
     {
-        //
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        $bloqueo = Blockslotteries::on($datos["servidor"])->whereId($datos["idBloqueo"])->get()->first();
+        if($bloqueo != null){
+            $bloqueo->delete();
+            return Response::json([
+                "mensaje" => "Se ha eliminado correctamente",
+                "errores" => 0
+            ], 201);
+        }
+
+        return Response::json([
+            "mensaje" => "El bloqueo no existe",
+            "errores" => 1
+        ], 201);
     }
 }

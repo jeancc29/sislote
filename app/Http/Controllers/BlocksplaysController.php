@@ -577,7 +577,29 @@ class BlocksplaysController extends Controller
      */
     public function destroy(Blocksplays $blocksplays)
     {
-        //
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        $bloqueo = Blocksplays::on($datos["servidor"])->whereId($datos["idBloqueo"])->get()->first();
+        if($bloqueo != null){
+            $bloqueo->delete();
+            return Response::json([
+                "mensaje" => "Se ha eliminado correctamente",
+                "errores" => 0
+            ], 201);
+        }
+
+        return Response::json([
+            "mensaje" => "El bloqueo no existe",
+            "errores" => 1
+        ], 201);
     }
 
     public function eliminar(BlocksplaysRequest $request)

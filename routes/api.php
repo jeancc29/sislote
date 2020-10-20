@@ -105,16 +105,17 @@ Route::get('/bloqueos', 'BlockslotteriesController@index');
 Route::post('/bloqueos/general/loterias/guardar', 'BlockslotteriesController@storeGeneral');
 Route::post('/bloqueos/loterias/guardar', 'BlockslotteriesController@store');
 Route::post('/bloqueos/jugadas/guardar', 'BlocksplaysController@store');
-Route::post('/bloqueos/jugadas/eliminar', 'BlocksplaysController@eliminar');
+Route::post('/bloqueos/jugadas/eliminar', 'BlocksplaysController@destroy');
 Route::post('/bloqueos/general/jugadas/guardar', 'BlocksplaysController@storeGeneral');
 Route::post('/bloqueos/loterias/buscar', 'BlockslotteriesController@buscar');
-Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@eliminar');
-Route::post('/bloqueosgenerales/loterias/eliminar', 'BlocksgeneralsController@eliminar');
-Route::post('/bloqueosgenerales/jugadas/eliminar', 'BlocksplaysgeneralsController@eliminar');
+Route::post('/bloqueos/loterias/eliminar', 'BlockslotteriesController@destroy');
+Route::post('/bloqueosgenerales/loterias/eliminar', 'BlocksgeneralsController@destroy');
+Route::post('/bloqueosgenerales/jugadas/eliminar', 'BlocksplaysgeneralsController@destroy');
 
 Route::post('/bloqueos/general/sucias/guardar', 'BlocksdirtygeneralsController@store');
 Route::post('/bloqueos/general/sucias/eliminar', 'BlocksdirtygeneralsController@destroy');
 Route::post('/bloqueos/sucias/guardar', 'BlocksdirtyController@store');
+Route::post('/bloqueos/sucias/eliminar', 'BlocksdirtyController@destroy');
 
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
