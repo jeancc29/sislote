@@ -341,7 +341,32 @@ class ReportesController extends Controller
         //Query para optimizar
         //Salesdetails::on("valentin")->selectRaw("sum(salesdetails.comision), sum(salesdetails.monto), sum(s.descuentoMonto), sum(salesdetails.premio), count(s.idTicket)")->join("sales as s", "s.id", "salesdetails.idVenta")->groupBy("s.idBanca")->get();
         // Salesdetails::on("valentin")->where("jugada", "01")
+
+        Salesdetails::on("valentin")
+        ->selectRaw(
+            "
+            sum(salesdetails.comision), 
+            sum(salesdetails.monto), 
+            sum(s.descuentoMonto), 
+            sum(salesdetails.premio), 
+            count(s.idTicket)
+            "
+            )
+            ->join("sales as s", "s.id", "salesdetails.idVenta")
+            ->whereBetween('s.created_at', array($fechaInicial, $fechaFinal))
+            ->groupBy("s.idBanca")
+            ->get();
+
+
+            // Salesdetails::on("valentin")->selectRaw("sum(salesdetails.comision), sum(salesdetails.monto), sum(s.descuentoMonto), sum(salesdetails.premio), count(s.idTicket)")->join("sales as s", "s.id", "salesdetails.idVenta")->whereBetween('s.created_at', array($fechaInicial, $fechaFinal))->groupBy("s.idBanca")->get();
         
+            //Query
+            // \DB::connection("valentin")->select("select sum(s.descuentoMonto) as descuento, sum(sd.comision) as comision, sum(sd.monto) as monto, sum(sd.premio) as premio, (select count(id) from sales where sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') tickets, (select count(id) from sales where sales.status = 1 and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') ticketsPendientes,(select count(id) from sales where sales.status = 2 and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') ticketsGanadores,(select count(id) from sales where sales.status = 3 and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') ticketsPerdedores, s.idBanca from sales s inner join 
+            // salesdetails sd on s.id = sd.idVenta where s.status not in(0, 5) and s.created_at between '{$fechaInicial}' and '{$fechaFinal}' group by s.idBanca");
+
+
+
+
         $bancas = Branches::on($datos['servidor'])->whereStatus(1)->get();
         $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal, $fechaActualCarbon, $fechaFinalSinHora, $datos){
             $ventas = Helper::ventasPorBanca($datos["servidor"], $d['id'], $fechaInicial, $fechaFinal);
@@ -892,6 +917,7 @@ class ReportesController extends Controller
             ->selectRaw('
                 id, 
                 descripcion, 
+                abreviatura,
                 (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as ventas,
                 (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as premios,
                 (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
@@ -973,7 +999,7 @@ class ReportesController extends Controller
                             $d->segunda = "";
                         if($d->tercera == null)
                             $d->tercera = "";
-                        return ['id' => $d->id, 'descripcion' => $d->descripcion, 'comisiones' => $comisionesMonto, 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera,'pick3' => $d->pick3, 'pick4' => $d->pick4, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
+                        return ['id' => $d->id, 'descripcion' => $d->descripcion, 'abreviatura' => $d->abreviatura, 'comisiones' => $comisionesMonto, 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera,'pick3' => $d->pick3, 'pick4' => $d->pick4, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
                     });
     
       
