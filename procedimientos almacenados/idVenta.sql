@@ -19,10 +19,10 @@ declare idBancaIdVentaTemporal int;
 		end if;
 		set siguienteIdVenta = siguienteIdVenta + 1;
         
-        select idventatemporals.idBanca from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idBancaIdVentaTemporal;
+        select idventatemporals.idBanca from idventatemporals where idventatemporals.idVenta = siguienteIdVenta order by idventatemporals.id desc limit 1 into idBancaIdVentaTemporal;
         if idBancaIdVentaTemporal is not null then
 			if idBanca = idBancaIdVentaTemporal then
-				 select idventatemporals.idVentaHash from idventatemporals where idventatemporals.idVenta = siguienteIdVenta into idVentaHash;
+				 select idventatemporals.idVentaHash from idventatemporals where idventatemporals.idVenta = siguienteIdVenta order by idventatemporals.id desc limit 1 into idVentaHash;
             else 
 				select max(idventatemporals.idVenta) from idventatemporals into siguienteIdVenta;
                 if siguienteIdVenta is null then
