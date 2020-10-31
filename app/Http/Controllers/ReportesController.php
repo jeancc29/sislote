@@ -1034,6 +1034,7 @@ class ReportesController extends Controller
 
         return Response::json([
             'errores' => 0,
+            'fecha' => explode(" ", $fechaFinal),
             'balanceHastaLaFecha' => $balanceHastaLaFecha,
             'pendientes' => $pendientes,
             'perdedores' => $perdedores,
