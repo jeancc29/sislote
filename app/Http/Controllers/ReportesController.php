@@ -802,11 +802,14 @@ class ReportesController extends Controller
             $fecha = getdate(strtotime($datos['fecha']));
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+            $fechaParaImprimirChadreMovil = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'];
         }else{
             $fecha = getdate(strtotime($datos['fecha']));
             $fechaF = getdate(strtotime($datos['fechaFinal']));
             $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
             $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+            $fechaParaImprimirChadreMovil = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'];
+
         }
         
 
@@ -1034,7 +1037,7 @@ class ReportesController extends Controller
 
         return Response::json([
             'errores' => 0,
-            'fecha' => explode(" ", $fechaFinal),
+            'fecha' => $fechaParaImprimirChadreMovil,
             'balanceHastaLaFecha' => $balanceHastaLaFecha,
             'pendientes' => $pendientes,
             'perdedores' => $perdedores,
