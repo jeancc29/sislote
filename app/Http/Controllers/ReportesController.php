@@ -486,7 +486,7 @@ class ReportesController extends Controller
                 branches.descripcion, 
                 branches.idMoneda,
                 branches.codigo 
-                from branches where id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) limit 10");
+                from branches where id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) limit 20");
 
                 $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal, $fechaActualCarbon, $fechaFinalSinHora, $datos){
                     $ventas = $d->monto;
