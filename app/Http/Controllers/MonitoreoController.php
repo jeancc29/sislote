@@ -468,7 +468,7 @@ class MonitoreoController extends Controller
     
         $fecha = getdate(strtotime($datos['fecha']));
 
-        // \DB::connection("valentin")->select(" select s.id, s.total, s.pagado, s.status, s.idTicket, t.id, s.idUsuario, u.usuario, sum(sd.premio) as premio, (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion, from sales s  inner join salesdetails sd on s.id = sd.idVenta inner join users u on u.id = s.idUsuario inner join tickets t on t.id = s.idTicket where s.created_at between '{$fechaInicial}' and '{$fechaFinal} {$consulta} group by s.id' ");
+        // \DB::connection("valentin")->select(" select s.id, s.total, s.pagado, s.status, s.idTicket, t.id, s.idUsuario, u.usuario, sum(sd.premio) as premio, (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, (select JSON_OBJECT('id', users.id, 'usuario', users.usuario) from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion from sales s  inner join salesdetails sd on s.id = sd.idVenta inner join users u on u.id = s.idUsuario inner join tickets t on t.id = s.idTicket where s.created_at between '{$fechaInicial}' and '{$fechaFinal}' {$consulta} group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, s.idUsuario, u.usuario, razon, fechaCancelacion, usuarioCancelacion ");
     
         // $monitoreo = Sales::join('tickets', 'sales.idTicket', '=', 'tickets.id')
         //             ->join('branches', 'sales.idBanca', '=', 'branches.id')
@@ -528,49 +528,50 @@ class MonitoreoController extends Controller
         //         where s.created_at between '{$fechaInicial}' and '{$fechaFinal} {$consulta} group by s.id' 
         //     ");
 
-        
-        $idVentas = Sales::on($datos["servidor"])->select('id')
-                    ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-                    ->where($consultaVentas)
-                    ->where('status', '!=', '5') //Eliminado
-                    ->orderBy('id', 'desc')
-                    ->get();
+        /************************** QUERY VIEJO ********************************/
+    //     $idVentas = Sales::on($datos["servidor"])->select('id')
+    //                 ->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+    //                 ->where($consultaVentas)
+    //                 ->where('status', '!=', '5') //Eliminado
+    //                 ->orderBy('id', 'desc')
+    //                 ->get();
 
-                    // return Response::json([
-                    //     'ad' => $consultaVentasDetalles,
-                    //     'av' => $consultaVentas,
-                    //     'af' => $fecha,
-                    //     'idVentas' => $idVentas,
-                    //     'errores' => 1,
-                    //     'mensaje' => 'No tiene permisos para realizar esta accion'
-                    // ], 201);
 
-        $idVentas = collect($idVentas)->map(function($d){
-            return $d['id'];
-        });
+    //     $idVentas = collect($idVentas)->map(function($d){
+    //         return $d['id'];
+    //     });
 
-        $ventasDetalles = Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)
-                    ->where($consultaVentasDetalles)
-                    ->orderBy('id', 'desc')
-                    ->get();
-       // return $ventas;
+    //     $ventasDetalles = Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)
+    //                 ->where($consultaVentasDetalles)
+    //                 ->orderBy('id', 'desc')
+    //                 ->get();
+    //    // return $ventas;
 
-       $idVentas = collect($ventasDetalles)->map(function($d){
-            return $d['idVenta'];
-        });
+    //    $idVentas = collect($ventasDetalles)->map(function($d){
+    //         return $d['idVenta'];
+    //     });
 
-        $monitoreo = Sales::on($datos["servidor"])->whereIn('id', $idVentas)->orderBy('id', 'desc')->get();
+    //     $monitoreo = Sales::on($datos["servidor"])->whereIn('id', $idVentas)->orderBy('id', 'desc')->get();
 
-        
+
+        /********************************** QUERY NUEVO **********************************/
+        $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        //https://www.sqlservercentral.com/forums/topic/order-by-based-on-condition
+        //https://stackoverflow.com/questions/19529864/mysql-using-sum-and-case
+        //https://stackoverflow.com/questions/6878090/mysql-sum-with-case-statement
+        $monitoreo = \DB::connection("valentin")->select(" select s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, (select JSON_OBJECT('id', users.id, 'usuario', users.usuario) from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion from sales s  inner join salesdetails sd on s.id = sd.idVenta inner join users u on u.id = s.idUsuario inner join tickets t on t.id = s.idTicket inner join branches b on b.id = s.idBanca where s.created_at between '{$fechaInicial}' and '{$fechaFinal}' and s.status != 5 {$consulta} group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, razon, fechaCancelacion, usuarioCancelacion ");
+        // (select sum(premio) from salesdetails where salesdetails.pagado = 0 and salesdetails.idVenta = s.id) montoAPagar,
     
         return Response::json([
-            'monitoreo' => SalesSmallResource::collection($monitoreo),
+            // 'monitoreo' => SalesSmallResource::collection($monitoreo),
+            'monitoreo' => $monitoreo,
             'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
             'bancas' => Branches::on($datos["servidor"])->whereStatus(1)->get(),
             'sorteos' => Draws::on($datos["servidor"])->get(),
             'caracteristicasGenerales' =>  Generals::on($datos["servidor"])->get(),
-            'total_ventas' => Sales::on($datos["servidor"])->whereIn('id', $idVentas)->sum('total'),
-            'total_jugadas' => Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)->count('jugada'),
+            // 'total_ventas' => Sales::on($datos["servidor"])->whereIn('id', $idVentas)->sum('total'),
+            // 'total_jugadas' => Salesdetails::on($datos["servidor"])->whereIn('idVenta', $idVentas)->count('jugada'),
             'errores' => 0
         ], 201);
     }

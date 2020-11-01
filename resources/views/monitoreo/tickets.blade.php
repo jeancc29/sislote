@@ -212,13 +212,13 @@
                         <tbody>
                             <tr   ng-repeat="c in datos.monitoreo.ventas | filter:datos.monitoreo.datosBusqueda">
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.codigo}}-@{{toSecuencia(c.idTicket)}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.created_at.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.created_at) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <!-- <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{Cerrado}}</td> -->
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuario}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.total}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.premio}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuarioCancelacion.usuario}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.fechaCancelacion) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{estado(c.status)}}</td>
                                 <td scope="col" class="text-center" style="font-size: 11px">
                                   <a ng-if="c.pagado != 1 && c.premio > 0 && c.montoAPagar > 0" style="cursor: pointer;" ng-click="pagar(c)" class="d-inline   abrir-wizard-editar"><i class="material-icons text-primary " style="font-size: 18px!important;">payment</i></a>
