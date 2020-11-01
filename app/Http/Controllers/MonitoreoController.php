@@ -467,6 +467,8 @@ class MonitoreoController extends Controller
         
     
         $fecha = getdate(strtotime($datos['fecha']));
+
+        // \DB::connection("valentin")->select(" select s.id, s.total, s.pagado, s.status, s.idTicket, t.id, s.idUsuario, u.usuario, sum(sd.premio) as premio, (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion, from sales s  inner join salesdetails sd on s.id = sd.idVenta inner join users u on u.id = s.idUsuario inner join tickets t on t.id = s.idTicket where s.created_at between '{$fechaInicial}' and '{$fechaFinal} {$consulta} group by s.id' ");
     
         // $monitoreo = Sales::join('tickets', 'sales.idTicket', '=', 'tickets.id')
         //             ->join('branches', 'sales.idBanca', '=', 'branches.id')
@@ -487,18 +489,44 @@ class MonitoreoController extends Controller
         //             ->get();
         $consultaVentas = array();
         $consultaVentasDetalles = array();
+        $consulta = "";
         if(isset($datos['idBanca'])){
             $consultaVentas['idBanca'] = $datos['idBanca'];
+            $consulta .= " and s.idBanca = " . $datos['idBanca'];
         }
         if(isset($datos['idLoteria'])){
             $consultaVentasDetalles['idLoteria'] = $datos['idLoteria'];
+            $consulta .= " and sd.idLoteria = " . $datos['idLoteria'];
         }
         if(isset($datos['idSorteo'])){
             $consultaVentasDetalles['idSorteo'] = $datos['idSorteo'];
+            $consulta .= " and sd.idSorteo = " . $datos['idSorteo'];
         }
         if(isset($datos['jugada'])){
             $consultaVentasDetalles['jugada'] = $datos['jugada'];
         }
+
+        // \DB::connection($datos["servidor"])
+        //     ->select("
+        //         select 
+        //         s.id,
+        //         s.total,
+        //         s.pagado,
+        //         s.status,
+        //         s.idTicket,
+        //         t.id,
+        //         s.idUsuario,
+        //         u.usuario,
+        //         sum(sd.premio) as premio,
+        //         (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon,
+        //         (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion
+        //         (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion,
+        //         from sales s 
+        //         inner join salesdetails sd on s.id = sd.idVenta
+        //         inner join users u on u.id = s.idUsuario
+        //         inner join tickets t on t.id = s.idTicket
+        //         where s.created_at between '{$fechaInicial}' and '{$fechaFinal} {$consulta} group by s.id' 
+        //     ");
 
         
         $idVentas = Sales::on($datos["servidor"])->select('id')
@@ -532,6 +560,7 @@ class MonitoreoController extends Controller
         });
 
         $monitoreo = Sales::on($datos["servidor"])->whereIn('id', $idVentas)->orderBy('id', 'desc')->get();
+
         
     
         return Response::json([

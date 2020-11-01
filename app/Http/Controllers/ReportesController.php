@@ -452,7 +452,7 @@ class ReportesController extends Controller
         
       
         /************************** QUERY NUEVO *******************************/
-        $bancas = \DB::connection("valentin")
+        $bancas = \DB::connection($datos["servidor"])
             ->select(
                 "
                 select sum(s.descuentoMonto) as descuento, 
@@ -1228,6 +1228,7 @@ class ReportesController extends Controller
                     ->where('idBanca', $datos['idBanca'])
                     ->where('status', '!=', '5')
                     ->orderBy('id', 'desc')
+                    ->limit(100)
                     ->get();
     
        // return $ventas;
