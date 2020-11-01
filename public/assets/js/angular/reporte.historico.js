@@ -182,7 +182,7 @@ myApp
                 .then(function(response){
                     console.log('monitoreo ',response);
                     // if(response.data.errores == 0){
-
+                        console.log("reponse: ", response.data.bancas);
                         $scope.datos.bancas = response.data.bancas;
                         if(onCreate){
                             $scope.optionsMonedas = response.data.monedas;
@@ -208,11 +208,11 @@ myApp
                     // }
 
                 }
-                ,
-                function(){
-                    $scope.cargando = false;
-                    alert("Error");
-                }
+                // ,
+                // function(){
+                //     $scope.cargando = false;
+                //     alert("Error");
+                // }
                 );
 
         }
