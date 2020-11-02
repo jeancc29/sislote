@@ -295,6 +295,9 @@ function InitDefaultStyle() {
     scrollbar += '::-webkit-scrollbar-thumb {background: #c1c1c1; }'; //scrollbar thumb
     scrollbar += '::-webkit-scrollbar-thumb:hover {background: #555; }'; //scrollbar hover
     var dropdownItem = '.dropdownItem:hover{background: #f1f1f1;}';
+    var resultarFilasImpares = 'tr.resultarFilasImpares:nth-child(even){background-color: #f2f2f2}';
+    var cardTranslate3D = '.cardTranslate3D{transform: translate3d(-8px, 0px, 0px); all 0.5s cubic-bezier(0.29, 1.42, 0.79, 1) 0s;}';
+    var cardTop = '.cardTop{transform: translate3d(10px, 0px, 0px); all 0.5s cubic-bezier(0.29, 1.42, 0.79, 1) 0s;}';
     var defaultStyle = document.getElementById("defaultStyle");
     if (defaultStyle == null || defaultStyle == undefined) {
         var style = document.createElement('style');
@@ -304,6 +307,9 @@ function InitDefaultStyle() {
         style.appendChild(document.createTextNode(inputWithFloatingLabel));
         style.appendChild(document.createTextNode(scrollbar));
         style.appendChild(document.createTextNode(dropdownItem));
+        style.appendChild(document.createTextNode(resultarFilasImpares));
+        style.appendChild(document.createTextNode(cardTranslate3D));
+        style.appendChild(document.createTextNode(cardTop));
         // style.appendChild(document.createTextNode(flex));
         // style.appendChild(document.createTextNode(row));
         document.getElementsByTagName('head')[0].appendChild(style);
@@ -505,7 +511,7 @@ var CrossAxisAlignment = /** @class */ (function () {
 }());
 var TextStyle = /** @class */ (function () {
     function TextStyle(_a) {
-        var fontSize = _a.fontSize, fontWeight = _a.fontWeight, textAlign = _a.textAlign, fontStyle = _a.fontStyle, color = _a.color, background = _a.background, padding = _a.padding, borderRadius = _a.borderRadius, width = _a.width, height = _a.height, fontFamily = _a.fontFamily, cursor = _a.cursor, border = _a.border;
+        var fontSize = _a.fontSize, fontWeight = _a.fontWeight, textAlign = _a.textAlign, fontStyle = _a.fontStyle, color = _a.color, background = _a.background, padding = _a.padding, margin = _a.margin, borderRadius = _a.borderRadius, width = _a.width, height = _a.height, fontFamily = _a.fontFamily, cursor = _a.cursor, border = _a.border;
         this.fontSize = fontSize;
         this.fontWeight = fontWeight;
         this.textAlign = textAlign;
@@ -516,6 +522,7 @@ var TextStyle = /** @class */ (function () {
         this.width = width;
         this.height = height;
         this.padding = padding;
+        this.margin = margin;
         this.fontFamily = fontFamily;
         this.cursor = cursor;
         if (border) {
@@ -672,8 +679,47 @@ function Container(_a) {
     else
         return { "element": element, "style": styleJson, "type": "Container", "child": [] };
 }
+function CardTranslate3D(_a) {
+    var text = _a.text, _b = _a.color, color = _b === void 0 ? "#00bcd4" : _b;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'CardTranslate3D-' + ramdomString(7));
+    element.classList.add("cardTranslate3D");
+    element.style.cssText = "width: 100%; padding: 12px; border-radius: 4px; background: " + color + "; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);";
+    var child = Texto(text, new TextStyle({ textAlign: TextAlign.center, color: "white", fontSize: 12, fontWeight: FontWeight.w700 }));
+    element.animate([
+        // keyframes
+        // { transform: 'translateY(0px)' }, 
+        // { transform: 'translateY(50px)' }
+        { transform: 'translate3d(-8px, 0px, 0px);' },
+    ], {
+        // timing options
+        duration: 100
+    });
+    // Object.keys(style.toJson()).forEach(key => {
+    //     element.style[key] = style[key];
+    // });
+    if (child != null && child != undefined)
+        return { "element": element, "style": "", "type": "Container", "child": [child] };
+    else
+        return { "element": element, "style": "", "type": "Container", "child": [] };
+}
+function CardTop(_a) {
+    var text = _a.text, _b = _a.color, color = _b === void 0 ? "#00bcd4" : _b;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'CardTop-' + ramdomString(7));
+    element.classList.add("cardTop");
+    element.style.cssText = "display: inline; margin-top: -15px; padding: 18px 10px; border-radius: 4px; background: " + color + "; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);";
+    var child = Texto(text, new TextStyle({ textAlign: TextAlign.center, color: "white", fontSize: 17, fontWeight: FontWeight.w300 }));
+    // Object.keys(style.toJson()).forEach(key => {
+    //     element.style[key] = style[key];
+    // });
+    if (child != null && child != undefined)
+        return { "element": element, "style": "", "type": "Container", "child": [child] };
+    else
+        return { "element": element, "style": "", "type": "Container", "child": [] };
+}
 function DataTable(_a) {
-    var columns = _a.columns, rows = _a.rows;
+    var columns = _a.columns, rows = _a.rows, _b = _a.resultarFilasImpares, resultarFilasImpares = _b === void 0 ? false : _b;
     var element = document.createElement("table");
     element.setAttribute("id", "DataTable-" + ramdomString(7));
     element.style.cssText = "width: 95%; margin: 0px auto;";
@@ -698,7 +744,10 @@ function DataTable(_a) {
     var rowsToWidget = [];
     for (var _i = 0, rows_1 = rows; _i < rows_1.length; _i++) {
         var i = rows_1[_i];
-        rowsToWidget.push(i.toJson());
+        var row = i.toJson();
+        if (resultarFilasImpares)
+            row.element.classList.add("resultarFilasImpares");
+        rowsToWidget.push(row);
     }
     var bodyElementToWidget = {
         "element": body,
@@ -776,7 +825,7 @@ var DataColumn = /** @class */ (function () {
         this.element = document.createElement("td");
         this.element.setAttribute("scope", "col");
         this.element.setAttribute("id", "DataColumn-" + ramdomString(7));
-        this.element.style.cssText = "border-bottom: 1px solid #c1c1c1; padding-bottom: 10px;";
+        this.element.style.cssText = "border-bottom: 0.1px solid #c1c1c1; padding-bottom: 10px;";
         this.child = label;
     }
     DataColumn.prototype.toJson = function () {
@@ -1210,6 +1259,48 @@ function DropdownButton(_a) {
     // y retorna un String en caso contrario con un mensaje  indicando el error de validacion
     return containerDropDown;
     // return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
+}
+function CheckBox(_a) {
+    //To make checkbox widget equals to my template checkbox, i have to take the html code below as reference
+    // <div class="form-group">
+    //     <div class="form-check">
+    //         <label class="form-check-label">
+    //         <input class="form-check-input" type="checkbox" value="" checked> Activa
+    //         <span class="form-check-sign">
+    //             <span class="check"></span>
+    //         </span>
+    //         </label>
+    //     </div>
+    // </div>
+    var value = _a.value, onChanged = _a.onChanged, labelText = _a.labelText;
+    var divFormGroup = document.createElement("div");
+    var divFormCheck = document.createElement("div");
+    var label = document.createElement("label");
+    var input = document.createElement("input");
+    var spanFormCheckSign = document.createElement("span");
+    var span = document.createElement("span");
+    divFormGroup.classList.add("form-group");
+    divFormCheck.classList.add("form-check");
+    label.classList.add("form-check-label");
+    if (labelText)
+        label.innerHTML = labelText;
+    input.setAttribute("type", "checkbox");
+    input.checked = value;
+    input.onchange = function (e) {
+        onChanged(input.checked);
+    };
+    // addEventListener("onchange", function(e){
+    // })
+    input.classList.add("form-check-input");
+    spanFormCheckSign.classList.add("form-check-sign");
+    span.classList.add("check");
+    var spanWidget = { "element": span, "child": [] };
+    var spanFormCheckSignWidget = { "element": spanFormCheckSign, "child": [spanWidget] };
+    var inputWidget = { "element": input, "child": [] };
+    var labelWidget = { "element": label, "child": [inputWidget, spanFormCheckSignWidget] };
+    var divFormCheckWidget = { "element": divFormCheck, "child": [labelWidget] };
+    var divFormGroupWidget = { "element": divFormGroup, "child": [divFormCheckWidget] };
+    return divFormGroupWidget;
 }
 function DropdownButtonMultiple(_a) {
     var items = _a.items, onChanged = _a.onChanged, _b = _a.selectedValues, selectedValues = _b === void 0 ? [] : _b;

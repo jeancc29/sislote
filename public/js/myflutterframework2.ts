@@ -284,6 +284,9 @@ function InitDefaultStyle(){
     scrollbar += '::-webkit-scrollbar-thumb {background: #c1c1c1; }'; //scrollbar thumb
     scrollbar += '::-webkit-scrollbar-thumb:hover {background: #555; }'; //scrollbar hover
     var dropdownItem = '.dropdownItem:hover{background: #f1f1f1;}'
+    var resultarFilasImpares = 'tr.resultarFilasImpares:nth-child(even){background-color: #f2f2f2}'
+    var cardTranslate3D = '.cardTranslate3D{transform: translate3d(-8px, 0px, 0px); all 0.5s cubic-bezier(0.29, 1.42, 0.79, 1) 0s;}'
+    var cardTop = '.cardTop{transform: translate3d(10px, 0px, 0px); all 0.5s cubic-bezier(0.29, 1.42, 0.79, 1) 0s;}'
     var defaultStyle = document.getElementById("defaultStyle");
     if(defaultStyle == null || defaultStyle == undefined){
         var style = document.createElement('style');
@@ -293,6 +296,9 @@ function InitDefaultStyle(){
         style.appendChild(document.createTextNode(inputWithFloatingLabel));
         style.appendChild(document.createTextNode(scrollbar));
         style.appendChild(document.createTextNode(dropdownItem));
+        style.appendChild(document.createTextNode(resultarFilasImpares));
+        style.appendChild(document.createTextNode(cardTranslate3D));
+        style.appendChild(document.createTextNode(cardTop));
         // style.appendChild(document.createTextNode(flex));
         // style.appendChild(document.createTextNode(row));
         
@@ -597,6 +603,7 @@ interface namedParametersTextStyle {
     color? : string;
     background? : string;
     padding? : EdgetInsets;
+    margin? : EdgetInsets;
     borderRadius? : BorderRadius;
     width? : number;
     height? : number;
@@ -619,6 +626,7 @@ class TextStyle{
     background? : string;
     borderRadius? : BorderRadius;
     padding? : EdgetInsets;
+    margin? : EdgetInsets;
     width? : number;
     height? : number;
     fontFamily? : string;
@@ -628,7 +636,7 @@ class TextStyle{
     borderRight? : string;
     borderLeft? : string;
 
-    constructor({fontSize, fontWeight, textAlign, fontStyle, color, background, padding,borderRadius, width, height, fontFamily, cursor, border}: namedParametersTextStyle){
+    constructor({fontSize, fontWeight, textAlign, fontStyle, color, background, padding, margin, borderRadius, width, height, fontFamily, cursor, border}: namedParametersTextStyle){
         this.fontSize = fontSize;
         this.fontWeight = fontWeight;
         this.textAlign = textAlign;
@@ -639,6 +647,7 @@ class TextStyle{
         this.width = width;
         this.height = height;
         this.padding = padding;
+        this.margin = margin;
         this.fontFamily = fontFamily;
         this.cursor = cursor;
         if(border){
@@ -966,6 +975,62 @@ function Container({child, style, id}: namedParametersContainer){
         return {"element" : element, "style" : styleJson, "type" : "Container", "child" : []};
 }
 
+interface namedParametersCardTranslate3D{
+    color?:string;
+    text:string;
+}
+
+
+function CardTranslate3D({text, color = "#00bcd4"}: namedParametersCardTranslate3D){
+    var element = document.createElement("div");
+    element.setAttribute("id", 'CardTranslate3D-' + ramdomString(7));
+    element.classList.add("cardTranslate3D");
+    element.style.cssText = `width: 100%; padding: 12px; border-radius: 4px; background: ${color}; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);`;
+    let child:any = Texto(text, new TextStyle({textAlign: TextAlign.center, color: "white", fontSize: 12, fontWeight: FontWeight.w700}));
+    element.animate([
+        // keyframes
+        // { transform: 'translateY(0px)' }, 
+        // { transform: 'translateY(50px)' }
+        { transform: 'translate3d(-8px, 0px, 0px);' }, 
+        // { transform: 'scale(1)' }
+        ], 
+        { 
+            // timing options
+            duration: 100,
+            // iterations: Infinity
+        }
+    );
+    
+    // Object.keys(style.toJson()).forEach(key => {
+    //     element.style[key] = style[key];
+    // });
+    
+    
+    if(child != null && child != undefined)
+        return {"element" : element, "style" : "", "type" : "Container", "child" : [child]};
+    else
+        return {"element" : element, "style" : "", "type" : "Container", "child" : []};
+}
+
+function CardTop({text, color = "#00bcd4"}: namedParametersCardTranslate3D){
+    var element = document.createElement("div");
+    element.setAttribute("id", 'CardTop-' + ramdomString(7));
+    element.classList.add("cardTop");
+    element.style.cssText = `display: inline; margin-top: -15px; padding: 18px 10px; border-radius: 4px; background: ${color}; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);`;
+    let child:any = Texto(text, new TextStyle({textAlign: TextAlign.center, color: "white", fontSize: 17, fontWeight: FontWeight.w300}));
+   
+    
+    // Object.keys(style.toJson()).forEach(key => {
+    //     element.style[key] = style[key];
+    // });
+    
+    
+    if(child != null && child != undefined)
+        return {"element" : element, "style" : "", "type" : "Container", "child" : [child]};
+    else
+        return {"element" : element, "style" : "", "type" : "Container", "child" : []};
+}
+
 // interface namedParametersDataRow{
 //     cells:[]
 // }
@@ -974,9 +1039,10 @@ function Container({child, style, id}: namedParametersContainer){
 interface namedParametersDataTable{
     columns:DataColumn[];
     rows:DataRow[];
+    resultarFilasImpares?:boolean;
 }
 
-function DataTable({columns, rows}:namedParametersDataTable){
+function DataTable({columns, rows, resultarFilasImpares = false}:namedParametersDataTable){
     
     
     let element = document.createElement("table");
@@ -1001,9 +1067,14 @@ function DataTable({columns, rows}:namedParametersDataTable){
         ]
     }
     var bodyRow = document.createElement("tr");
+    
     var rowsToWidget:any[] = [];
     for(let i of rows){
-        rowsToWidget.push(i.toJson())
+        let row:any = i.toJson();
+        if(resultarFilasImpares)
+            row.element.classList.add("resultarFilasImpares");
+        
+        rowsToWidget.push(row)
     }
     let bodyElementToWidget:any = {
         "element" :body,
@@ -1113,7 +1184,7 @@ class DataColumn{
         this.element = document.createElement("td");
         this.element.setAttribute("scope", "col")
         this.element.setAttribute("id", "DataColumn-" + ramdomString(7));
-        this.element.style.cssText = "border-bottom: 1px solid #c1c1c1; padding-bottom: 10px;";
+        this.element.style.cssText = "border-bottom: 0.1px solid #c1c1c1; padding-bottom: 10px;";
         this.child = label;
     }
     
@@ -1716,6 +1787,63 @@ function DropdownButton({items, onChanged, value} : namedParametersDropdownButto
 
     return containerDropDown;
     // return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
+}
+
+interface namedParametersCheckBox{
+    value:boolean,
+    onChanged:any;
+    labelText?:string;
+}
+
+function CheckBox({value, onChanged, labelText} : namedParametersCheckBox){
+    //To make checkbox widget equals to my template checkbox, i have to take the html code below as reference
+    // <div class="form-group">
+    //     <div class="form-check">
+    //         <label class="form-check-label">
+    //         <input class="form-check-input" type="checkbox" value="" checked> Activa
+    //         <span class="form-check-sign">
+    //             <span class="check"></span>
+    //         </span>
+    //         </label>
+    //     </div>
+    // </div>
+
+
+
+    var divFormGroup = document.createElement("div");
+    var divFormCheck = document.createElement("div");
+    var label = document.createElement("label");
+    var input = document.createElement("input");
+    
+    
+    var spanFormCheckSign = document.createElement("span");
+    var span = document.createElement("span");
+    
+    divFormGroup.classList.add("form-group");
+    divFormCheck.classList.add("form-check");
+    label.classList.add("form-check-label");
+    if(labelText)
+        label.innerHTML = labelText;
+    input.setAttribute("type", "checkbox");
+    input.checked = value;
+    input.onchange = function(e){
+        onChanged(input.checked);
+    }
+    // addEventListener("onchange", function(e){
+        
+    // })
+    input.classList.add("form-check-input");
+    spanFormCheckSign.classList.add("form-check-sign");
+    span.classList.add("check");
+
+    var spanWidget = {"element" : span, "child" : []};
+    var spanFormCheckSignWidget = {"element" : spanFormCheckSign, "child" : [spanWidget]};
+    var inputWidget = {"element" : input, "child" : []};
+    var labelWidget = {"element" : label, "child" : [inputWidget, spanFormCheckSignWidget]};
+    var divFormCheckWidget = {"element" : divFormCheck, "child" : [labelWidget]};
+    var divFormGroupWidget = {"element" : divFormGroup, "child" : [divFormCheckWidget]};
+
+    return divFormGroupWidget;
 }
 
 interface namedParametersDropdownButtonMultiple{
