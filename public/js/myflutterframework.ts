@@ -966,6 +966,129 @@ function Container({child, style, id}: namedParametersContainer){
         return {"element" : element, "style" : styleJson, "type" : "Container", "child" : []};
 }
 
+// interface namedParametersDataRow{
+//     cells:[]
+// }
+
+
+interface namedParametersDataTable{
+    columns:DataCell[];
+    rows:DataRow[];
+}
+
+function DataTable({columns, rows}:namedParametersDataTable){
+    element:HTMLTableElement;
+    head:HTMLTableSectionElement;
+    headRow:HTMLTableRowElement;
+    body:HTMLTableSectionElement;
+    
+    this.element = document.createElement("table");
+    this.element.setAttribute("id", "DataRow-" + ramdomString(7));
+    this.head = document.createElement("thead");
+    this.body = document.createElement("tbody");
+    this.headRow = document.createElement("tr");
+
+    this.columns = columns;
+    this.rows = rows;
+    
+    
+    for(var i in this.columns){
+        this.headRow.appendChild(i.toJson())
+    }
+    this.head.appendChild(this.headRow);
+
+    var bodyRow = document.createElement("tr");
+    for(var i in this.rows){
+        bodyRow = document.createElement("tr");
+        bodyRow.appendChild(i.toJson())
+    }
+    this.body.appendChild(this.bodyRow);
+
+    if(this.child != null && this.child != undefined)
+    return {"element" : this.element, "style" : "", "type" : "Container", "child" : this.child};
+    else
+        return {"element" : this.element, "style" : "", "type" : "Container", "child" : []};
+    
+}
+
+
+interface namedParametersDataRow{
+    cells:DataCell[];
+    onSelectedChanged:any;
+}
+
+class DataRow{
+    element:HTMLTableDataCellElement;
+    cells:DataCell[];
+    child:any[];
+    private constructor({cells, onSelectedChanged}:namedParametersDataRow){
+        this.element = document.createElement("td");
+        this.element.setAttribute("id", "DataRow-" + ramdomString(7));
+        if(onSelectedChanged){
+            this.element.addEventListener("click", onSelectedChanged);
+            this.element.classList.add("buttonFlatHover");
+            this.element.style.cursor = "pointer";
+        }
+        this.cells = cells;
+    }
+    
+    toJson(){
+        for(var i in this.cells){
+            this.child.push(i.toJson())
+        }
+        if(this.child != null && this.child != undefined)
+        return {"element" : this.element, "style" : "", "type" : "Container", "child" : this.child};
+        else
+            return {"element" : this.element, "style" : "", "type" : "Container", "child" : []};
+    }
+    
+}
+
+
+class DataCell{
+    element:HTMLTableDataCellElement;
+    child:any;
+    private constructor(child:any){
+        this.element = document.createElement("td");
+        // this.element.setAttribute("scope", "col")
+        this.element.setAttribute("id", "DataCell-" + ramdomString(7));
+        this.child = child;
+    }
+    
+    toJson(){
+        if(this.child != null && this.child != undefined)
+        return {"element" : this.element, "style" : "", "type" : "Container", "child" : [this.child]};
+        else
+            return {"element" : this.element, "style" : "", "type" : "Container", "child" : []};
+    }
+    
+}
+
+interface namedParametersDataColumn{
+    label? : any;
+}
+
+class DataColumn{
+    element:HTMLTableDataCellElement;
+    child:any;
+    private constructor({label}:namedParametersDataColumn){
+        this.element = document.createElement("td");
+        this.element.setAttribute("scope", "col")
+        this.element.setAttribute("id", "DataColumn-" + ramdomString(7));
+        this.child = label;
+    }
+    
+    toJson(){
+        if(this.child != null && this.child != undefined)
+        return {"element" : this.element, "style" : "", "type" : "Container", "child" : [this.child]};
+        else
+            return {"element" : this.element, "style" : "", "type" : "Container", "child" : []};
+    }
+    
+}
+
+
+
 // class Container{
 //     child : any;
 //     style? : TextStyle;
