@@ -283,5 +283,10 @@ class PermissionSeeder extends Seeder
 
         p::on($servidor)->create(["descripcion" => "Manejar monedas", "status" => 1, "idTipo" => 9]);
         p::on($servidor)->create(["descripcion" => "Ver Dashboard", "status" => 1, "idTipo" => 6]);
+        p::on($servidor)->create([
+            'descripcion' => 'Manejar grupos',
+            'status' => 1,
+            'idTipo' => 3
+        ]);
     }
 }

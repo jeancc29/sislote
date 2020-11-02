@@ -62,7 +62,7 @@
               <h3 class="card-title">
                 Bloqueos
               </h3>
-            </div>
+              </div>
             </div>
            
           </div>

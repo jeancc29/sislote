@@ -63,3 +63,5 @@ Route::get('/test1', 'DaysController@test1')->name('prueba1');
 Route::get('/test2', 'DaysController@test2')->name('prueba2');
 Route::get('/test3', 'DaysController@test3')->name('prueba3');
 Route::get('/test4', 'DaysController@test4')->name('prueba4');
+
+Route::get('/grupos', 'GroupController@index')->name('grupos');

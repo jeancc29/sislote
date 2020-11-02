@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Group;
-use Illuminate\Http\Request;
+use Request;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Route; 
+
 
 class GroupController extends Controller
 {
@@ -14,7 +17,19 @@ class GroupController extends Controller
      */
     public function index()
     {
-        //
+        $controlador = Route::getCurrentRoute()->getName(); 
+        if(!strpos(Request::url(), '/api/')){
+            if(!\App\Classes\Helper::existe_sesion()){
+                return redirect()->route('login');
+            }
+
+            $u = \App\Users::on(session("servidor"))->whereId(session("idUsuario"))->first();
+            if(!$u->tienePermiso("Manejar loterias") == true){
+                return redirect()->route('sinpermiso');
+            }
+
+            return view('grupos.index', compact('controlador'));
+        }
     }
 
     /**

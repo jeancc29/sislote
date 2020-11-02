@@ -1501,6 +1501,16 @@ if(session('idUsuario') == null && $controlador != 'login'){
                 </div>
             </li>
             @endif
+            @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar grupos"))
+            <li class="nav-item ">
+                <a class="nav-link" href="{{route('grupos')}}">
+                    <i class="material-icons">store</i>
+                    <p> Grupos 
+                       
+                    </p>
+                </a>
+            </li>
+            @endif
             @if(\App\Classes\Helper::tienePermiso(session("idUsuario"), "Manejar bancas"))
             <li class="nav-item ">
                 <a class="nav-link" href="{{route('bancas')}}">
