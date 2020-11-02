@@ -674,34 +674,65 @@ function Container(_a) {
 }
 function DataTable(_a) {
     var columns = _a.columns, rows = _a.rows;
-    element: HTMLTableElement;
-    head: HTMLTableSectionElement;
-    headRow: HTMLTableRowElement;
-    body: HTMLTableSectionElement;
-    this.element = document.createElement("table");
-    this.element.setAttribute("id", "DataRow-" + ramdomString(7));
-    this.head = document.createElement("thead");
-    this.body = document.createElement("tbody");
-    this.headRow = document.createElement("tr");
-    this.columns = columns;
-    this.rows = rows;
-    for (var i in this.columns) {
-        this.headRow.appendChild(i.toJson());
-    }
-    this.head.appendChild(this.headRow);
+    var element = document.createElement("table");
+    element.setAttribute("id", "DataTable-" + ramdomString(7));
+    element.style.cssText = "width: 95%; margin: 0px auto;";
+    var head = document.createElement("thead");
+    head.setAttribute("id", "DataTableHead-" + ramdomString(7));
+    var body = document.createElement("tbody");
+    body.setAttribute("id", "DataTableBody-" + ramdomString(7));
+    var headRow = document.createElement("tr");
+    body.setAttribute("id", "DataTableHeadRow-" + ramdomString(7));
+    var children = [];
+    var headRowElementToWidget = {
+        "element": headRow,
+        "child": columns
+    };
+    var headElementToWidget = {
+        "element": head,
+        "child": [
+            headRowElementToWidget,
+        ]
+    };
     var bodyRow = document.createElement("tr");
-    for (var i in this.rows) {
-        this.body.appendChild(i.toJson());
+    var rowsToWidget = [];
+    for (var _i = 0, rows_1 = rows; _i < rows_1.length; _i++) {
+        var i = rows_1[_i];
+        rowsToWidget.push(i.toJson());
     }
-    // this.body.appendChild(this.bodyRow);
-    if (this.child != null && this.child != undefined)
-        return { "element": this.element, "style": "", "type": "Container", "child": this.child };
-    else
-        return { "element": this.element, "style": "", "type": "Container", "child": [] };
+    var bodyElementToWidget = {
+        "element": body,
+        "child": rowsToWidget
+    };
+    children.push(headElementToWidget);
+    children.push(bodyElementToWidget);
+    // for(let i of columns){
+    //     let columnWidget:any = i.toJson();
+    //     let columnElement = columnWidget.element; 
+    //     let columnChild = columnWidget.child[0].element; 
+    //     columnElement.appendChild(columnChild);
+    //     headRow.appendChild(columnElement)
+    // }
+    // head.appendChild(headRow);
+    // var bodyRow = document.createElement("tr");
+    // for(let i of rows){
+    //     body.appendChild(i.toJson().child[0])
+    // }
+    // element.appendChild(head);
+    if (children != null && children != undefined) {
+        console.log("Dentro iffff");
+        return { "element": element, "style": "", "type": "Container", "child": children };
+    }
+    else {
+        console.log("Dentro elllllllseeee");
+        return { "element": element, "style": "", "type": "Container", "child": [] };
+    }
+    ;
 }
 var DataRow = /** @class */ (function () {
     function DataRow(_a) {
         var cells = _a.cells, onSelectedChanged = _a.onSelectedChanged;
+        this.child = [];
         this.element = document.createElement("tr");
         this.element.setAttribute("id", "DataRow-" + ramdomString(7));
         if (onSelectedChanged) {
@@ -712,7 +743,8 @@ var DataRow = /** @class */ (function () {
         this.cells = cells;
     }
     DataRow.prototype.toJson = function () {
-        for (var i in this.cells) {
+        for (var _i = 0, _a = this.cells; _i < _a.length; _i++) {
+            var i = _a[_i];
             this.child.push(i.toJson());
         }
         if (this.child != null && this.child != undefined)
@@ -727,6 +759,7 @@ var DataCell = /** @class */ (function () {
         this.element = document.createElement("td");
         // this.element.setAttribute("scope", "col")
         this.element.setAttribute("id", "DataCell-" + ramdomString(7));
+        this.element.style.cssText += "padding: 10px; 0px;";
         this.child = child;
     }
     DataCell.prototype.toJson = function () {
@@ -743,6 +776,7 @@ var DataColumn = /** @class */ (function () {
         this.element = document.createElement("td");
         this.element.setAttribute("scope", "col");
         this.element.setAttribute("id", "DataColumn-" + ramdomString(7));
+        this.element.style.cssText = "border-bottom: 1px solid #c1c1c1; padding-bottom: 10px;";
         this.child = label;
     }
     DataColumn.prototype.toJson = function () {
@@ -2009,369 +2043,3 @@ function _myContainer(_a) {
         child: Texto(text.toUpperCase(), new TextStyle({ color: _color, fontSize: 11, fontWeight: FontWeight.w500 }))
     });
 }
-function _selectOrDiselectLoteria(loteria) {
-    if (_loterias.findIndex(function (item) { return item.id == loteria.id; }) == -1)
-        _loterias.push(loteria);
-    else
-        _loterias.splice(_loterias.findIndex(function (item) { return item.id == loteria.id; }), 1);
-}
-function _isLoteriaSelected(loteria) {
-    return (_loterias.findIndex(function (item) { return item.id == loteria.id; }) != -1);
-}
-function _limpiar() {
-    if (listaSorteo.length > 0) {
-        listaSorteo.forEach(function (item) { return item.cantidad = ""; });
-    }
-    _loterias = [];
-    _streamControllerSorteo.add(listaSorteo);
-}
-function _guardar() {
-    // listaSorteo.forEach((item) => console.log(item)
-    // );
-    if (_loterias.length == 0) {
-        alert("Debe seleccionar loterias");
-        return;
-    }
-    if (listaOpcion[_indexOpcion] == "Por banca") {
-        if (_bancas.length == 0) {
-            alert("Debe seleccionar bancas");
-            return;
-        }
-    }
-    _cargando = true;
-    setState();
-    var data = {
-        "servidor": servidorGlobal,
-        "idUsuario": idUsuario,
-        "bancas": _bancas,
-        "loterias": _loterias,
-        "sorteos": listaSorteo,
-        "idMoneda": listaMoneda[_indexMoneda].id
-    };
-    var jwt = createJWT(data);
-    http.post({ url: rutaGlobal + "/api/bloqueos/sucias/guardar", data: { "datos": jwt }, headers: Utils.headers })
-        .then(function (response) {
-        console.log("Post response: ", response);
-        _cargando = false;
-        _limpiar();
-        setState();
-        alert(response.message);
-    })["catch"](function (error) {
-        console.log("Error: " + error);
-        _cargando = false;
-        setState();
-    });
-}
-function _guardarGeneral() {
-    // listaSorteo.forEach((item) => console.log(item)
-    // );
-    if (_loterias.length == 0) {
-        alert("Debe seleccionar loterias");
-        return;
-    }
-    if (listaOpcion[_indexOpcion] == "Por banca") {
-        if (_bancas.length == 0) {
-            alert("Debe seleccionar bancas");
-            return;
-        }
-    }
-    _cargando = true;
-    setState();
-    var data = {
-        "servidor": servidorGlobal,
-        "idUsuario": idUsuario,
-        "bancas": _bancas,
-        "loterias": _loterias,
-        "sorteos": listaSorteo,
-        "idMoneda": listaMoneda[_indexMoneda].id
-    };
-    var jwt = createJWT(data);
-    http.post({ url: rutaGlobal + "/api/bloqueos/general/sucias/guardar", data: { "datos": jwt }, headers: Utils.headers })
-        .then(function (response) {
-        console.log("Post response: ", response);
-        _cargando = false;
-        _limpiar();
-        setState();
-        alert(response.message);
-    })["catch"](function (error) {
-        console.log("Error: " + error);
-        _cargando = false;
-        setState();
-    });
-}
-Builder({
-    id: "containerJugadasSucias",
-    initState: function () {
-        var jwt = createJWT({ "servidor": servidorGlobal, "idUsuario": idUsuario });
-        var response = http.get({ url: rutaGlobal + "/api/bloqueos?token=" + jwt, headers: Utils.headers }).then(function (json) {
-            console.log("response: ", json);
-            listaBanca = json.bancas;
-            listaSorteo = json.sorteos;
-            listaLoteria = json.loterias;
-            listaMoneda = json.monedas;
-            _streamController.add(listaBanca);
-            _streamControllerSorteo.add(listaSorteo);
-            _streamControllerLoteria.add(listaLoteria);
-            _streamControllerMoneda.add(listaMoneda);
-            console.log("response listaBanca: ", listaLoteria);
-        });
-    },
-    builder: function (id, setStateFromBuilder) {
-        setState = setStateFromBuilder;
-        return Init({
-            id: id,
-            initDefaultStyle: true,
-            style: new TextStyle({ fontFamily: "Roboto" }),
-            child: Column({
-                // style: new TextStyle({background: "blue"}),
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                    // Padding({
-                    //     padding: EdgetInsets.all(1),
-                    //     child: LayoutBuilder({
-                    //         builder: (size:any) => {
-                    //             return Container({
-                    //                 style: new TextStyle({width: size.width / 2, height: 20, background: "red"}),
-                    //                 child: LayoutBuilder({
-                    //                     builder: (size:any) => {
-                    //                         return Container({
-                    //                             style: new TextStyle({width: size.width / 1.7, height: 200, background: "blue"})
-                    //                         })
-                    //                     }
-                    //                 })
-                    //             })
-                    //         }
-                    //     })
-                    // }),
-                    LayoutBuilder({
-                        builder: function (size) {
-                            return Container({
-                                style: new TextStyle({ width: setDeviceSize({ screenSize: size.width, lg: 2, md: 1.6, sm: 1.3, xs: 1 }) }),
-                                child: Column({
-                                    children: [
-                                        Padding({
-                                            padding: EdgetInsets.all(10),
-                                            child: Row({
-                                                children: [
-                                                    Flexible({
-                                                        child: Texto("Opciones", new TextStyle({ fontWeight: FontWeight.bold }))
-                                                    }),
-                                                    SizedBox({ width: 20 }),
-                                                    Flexible({
-                                                        flex: 1,
-                                                        child: DropdownButton({
-                                                            value: listaOpcion[_indexOpcion],
-                                                            items: listaOpcion.map(function (item) {
-                                                                return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12) })), value: item });
-                                                            }),
-                                                            onChanged: function (data) {
-                                                                var index = listaOpcion.indexOf("" + data);
-                                                                if (index != -1) {
-                                                                    _indexOpcion = index;
-                                                                    setState();
-                                                                }
-                                                                // console.log("onchange: " + data);
-                                                            }
-                                                        })
-                                                    })
-                                                ]
-                                            })
-                                        }),
-                                        Padding({
-                                            padding: EdgetInsets.all(10),
-                                            child: StreamBuilder({
-                                                stream: _streamControllerMoneda,
-                                                builder: function (id, snapshot) {
-                                                    if (snapshot)
-                                                        // return Column({
-                                                        //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
-                                                        // });
-                                                        return Row({
-                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                            children: [
-                                                                Texto("Moneda", new TextStyle({ fontWeight: FontWeight.bold })),
-                                                                SizedBox({ width: 20 }),
-                                                                Flexible({
-                                                                    flex: 1,
-                                                                    child: DropdownButton({
-                                                                        value: listaMoneda[_indexMoneda].descripcion,
-                                                                        items: listaMoneda.map(function (item) {
-                                                                            return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
-                                                                        }),
-                                                                        onChanged: function (data) {
-                                                                            var index = listaMoneda.findIndex(function (value) { return value.descripcion == data; });
-                                                                            if (index != -1) {
-                                                                                _indexMoneda = index;
-                                                                                console.log("onchange: " + data);
-                                                                                setState();
-                                                                            }
-                                                                        }
-                                                                    })
-                                                                })
-                                                            ]
-                                                        });
-                                                    else
-                                                        return Texto("No hay datos", new TextStyle({}));
-                                                }
-                                            })
-                                        }),
-                                        Padding({
-                                            padding: EdgetInsets.all(10),
-                                            child: StreamBuilder({
-                                                stream: _streamController,
-                                                builder: function (id, snapshot) {
-                                                    if (snapshot)
-                                                        // return Column({
-                                                        //     children: listaBanca.map((item) =>  { return Texto(item.descripcion, new TextStyle({})) ;})
-                                                        // });
-                                                        return Visibility({
-                                                            visible: listaOpcion[_indexOpcion] == "Por banca",
-                                                            child: Row({
-                                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                                children: [
-                                                                    Texto("Bancas", new TextStyle({ fontWeight: FontWeight.bold })),
-                                                                    SizedBox({ width: 20 }),
-                                                                    Flexible({
-                                                                        flex: 1,
-                                                                        child: DropdownButtonMultiple({
-                                                                            // value: listaBanca[_indexBanca].descripcion ,
-                                                                            selectedValues: [],
-                                                                            items: listaBanca.map(function (item) {
-                                                                                return new DropDownMenuItem({ child: Texto(item.descripcion, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item.descripcion });
-                                                                            }),
-                                                                            onChanged: function (data) {
-                                                                                console.log("bancas changed: ", data);
-                                                                                _bancas = [];
-                                                                                data.forEach(function (dataBanca) {
-                                                                                    if (_bancas.findIndex(function (banca) { return banca.descripcion == dataBanca; }) == -1) {
-                                                                                        var index = listaBanca.findIndex(function (banca) { return banca.descripcion == dataBanca; });
-                                                                                        _bancas.push(listaBanca[index]);
-                                                                                    }
-                                                                                });
-                                                                                // var index = listaBanca.findIndex((value) => value.descripcion == data);
-                                                                                // if(index != -1){
-                                                                                //     _indexBanca = index;
-                                                                                //     console.log("onchange: " + data);
-                                                                                //     setState();
-                                                                                // }
-                                                                            }
-                                                                        })
-                                                                    })
-                                                                ]
-                                                            })
-                                                        });
-                                                    else
-                                                        return Texto("No hay datos", new TextStyle({}));
-                                                    // DropdownButton({
-                                                    //     value: "No hay datos" ,
-                                                    //     items: [
-                                                    //         new DropDownMenuItem({child: Texto("No hay", new TextStyle({})), value: "no"})
-                                                    //     ],
-                                                    //     onChanged: (data:string) => {
-                                                    //         var index = items.indexOf(`${data}`);
-                                                    //         if(index != -1){
-                                                    //             _index = index;
-                                                    //             setState();
-                                                    //         }
-                                                    //         // console.log("onchange: " + data);
-                                                    //     }
-                                                    // });
-                                                }
-                                            })
-                                        }),
-                                    ]
-                                })
-                            });
-                        }
-                    }),
-                    Padding({
-                        padding: EdgetInsets.only({ top: 20, bottom: 20 }),
-                        child: Texto("Datos", new TextStyle({ fontSize: 25 }))
-                    }),
-                    LayoutBuilder({
-                        builder: function (size) {
-                            return Container({
-                                style: new TextStyle({ width: setDeviceSize({ screenSize: size.width, lg: 3, md: 3, sm: 2.5, xs: 1 }) }),
-                                child: StreamBuilder({
-                                    stream: _streamControllerSorteo,
-                                    builder: function (id, snapshot) {
-                                        return Column({
-                                            children: listaSorteo.map(function (item) { return Padding({
-                                                padding: EdgetInsets.all(10),
-                                                child: Row({
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                        // Align({
-                                                        // flex: 5,
-                                                        // alignment: Alignment.start,
-                                                        // child: 
-                                                        Texto("" + item.descripcion, new TextStyle({ fontWeight: FontWeight.bold, textAlign: TextAlign.center })),
-                                                        // }),
-                                                        // SizedBox({width: 20}),
-                                                        // Flexible({
-                                                        // flex: 2,
-                                                        // child: 
-                                                        TextField({
-                                                            value: item.cantidad,
-                                                            onChanged: function (data) {
-                                                                item.cantidad = data;
-                                                                console.log(item.descripcion + ": " + data);
-                                                            }
-                                                        })
-                                                        // })
-                                                    ]
-                                                })
-                                            }); })
-                                        });
-                                    }
-                                })
-                            });
-                        }
-                    }),
-                    StreamBuilder({
-                        stream: _streamControllerLoteria,
-                        builder: function (id, snapshot) {
-                            if (snapshot)
-                                return Row({
-                                    children: listaLoteria.map(function (item) { return InkWell({ onTap: function () { _selectOrDiselectLoteria(item); setState(); }, child: _myContainer({ text: item.descripcion, active: _isLoteriaSelected(item) }) }); })
-                                });
-                            return SizedBox({});
-                        }
-                    }),
-                    Row({
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                            Padding({
-                                padding: EdgetInsets.only({ top: 20, right: 10 }),
-                                child: RaisedButton({
-                                    color: "#47a44b",
-                                    child: Row({
-                                        children: [
-                                            Visibility({
-                                                visible: _cargando,
-                                                child: Padding({
-                                                    padding: EdgetInsets.only({ right: 10 }),
-                                                    child: CircularProgressIndicator({ color: "white" })
-                                                })
-                                            }),
-                                            Texto("Guardar", new TextStyle({ color: "white", fontWeight: FontWeight.w400 })),
-                                        ]
-                                    }),
-                                    onPressed: function () {
-                                        // console.log("Guardaaarrrr: ", _loterias);
-                                        if (listaOpcion[_indexOpcion] == "General")
-                                            _guardarGeneral();
-                                        else
-                                            _guardar();
-                                        // listaSorteo.forEach((item)=> console.log(item));
-                                    }
-                                })
-                            })
-                        ]
-                    })
-                ]
-            })
-        });
-    }
-});
