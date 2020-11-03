@@ -1,6 +1,7 @@
 let setState2:any;
 let _checkbox:boolean = false;
 let _mostrarVentanaEditar = true;
+var _txtGrupo = new TextEditingController();
 
 function _ventanaMostrar(){
     return  Container({
@@ -83,9 +84,36 @@ function _ventanaMostrar(){
 function _ventanaEditar(){
     return Column({
         children: [
-            Texto("Grupos", new TextStyle({fontSize: 20, fontWeight: FontWeight.w300})),
-            CardTranslate3D({
-                text: "AGREGAR  |  EDITAR"
+           
+            Row({
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    Align({
+                        alignment: Alignment.start,
+                        child: Padding({
+                            padding: EdgetInsets.only({left: 20, top: 10}),
+                            child: BackRoundedButton({
+                                icon: Icon(Icons.arrow_back, "white")
+                            })
+                        })
+                    }),
+                    Padding({padding:EdgetInsets.only({bottom: 15, top: 15}),child: Texto("Grupos", new TextStyle({fontSize: 20, fontWeight: FontWeight.w300, textAlign: TextAlign.center}))})
+                ]
+            }),
+            Padding({
+                padding: EdgetInsets.only({top: 10}),
+                child: CardTranslate3D({
+                    text: "AGREGAR  |  EDITAR"
+                })
+            }),
+            SizedBox({height: 20}),
+            Center({
+                child:  MyTextFormField({
+                    controller: _txtGrupo,
+                    labelText: "Grupo",
+                    icon: Icons.group_work,
+                    sm: 1.4
+                })
             })
         ]
     })
@@ -102,6 +130,7 @@ function _ventana({grupo, editar = false} : namedParametersVentana){
     else
     return _ventanaMostrar();
 }
+
 Builder({
     id: "containerWizard",
     builder: (id:any, setStateFromBuilder:any) => {
@@ -113,7 +142,7 @@ Builder({
             initDefaultStyle: true,
             child: 
             // Container({child: Texto("Holaaa soy un tipo vacacino")})
-            _ventana({editar: true})
+            _ventana({editar: _mostrarVentanaEditar})
         });
     }
 })

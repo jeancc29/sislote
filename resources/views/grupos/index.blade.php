@@ -29,7 +29,7 @@
 
    <!--      Wizard container        -->
     <div  class="wizard-container">
-      <div class="card card-wizard" data-color="blue" id="wizardProfile">
+      <div id="containerWizard" class="card card-wizard" data-color="blue" id="wizardProfile">
       <div class="card-header">
             <div class="row">
                 <!-- <div class="col-5">
@@ -45,21 +45,15 @@
                 </div>
             </div>
         </div>
-        <div class="wizard-navigation">
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a ng-init="mostrarPagos = false" ng-click="mostrarPagos = false" class="nav-link" href="#about" data-toggle="tab" role="tab">
-                    Grupo
-                    </a>
-                </li>
-            </ul>
-          </div>
-        <div id="containerWizard">
-        </div>
+       
+        
+        
+        <!-- <div id="containerWizard">
+        </div> -->
     </div>
     <!-- wizard container -->
 <!-- TODAS LAS LOTERIAS -->
-<!-- <div  class="row justify-content-center">
+<div  class="row justify-content-center">
   <div class="col-md-12">
       <div class="card ">
         <div class="card-header card-header-info card-header-text">
@@ -72,7 +66,7 @@
         </div>
       </div>
     </div>
-  </div> -->
+  </div>
 
 
 

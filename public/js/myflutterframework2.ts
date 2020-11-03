@@ -13,6 +13,15 @@ let fontSizeUnit : string = "px";
 let heightUnit : string = "vh";
 let widthUnit : string = "vw";
 
+interface namedParametersCacularSize{
+    xs?:number;
+    sm?:number;
+    md?:number;
+    lg?:number;
+    xlg?:number;
+    screenSize:number;
+}
+
 class ScreenSize{
     static xs:number = 567;
     static sm:number = 791;
@@ -30,6 +39,30 @@ class ScreenSize{
     }
     static isLg(number:number){
         return number >= this.lg;
+    }
+
+    static calculateSize({xs, sm, md, lg, xlg, screenSize}:namedParametersCacularSize){
+        if(!xs)
+            xs = 1;
+        if(!sm)
+            sm = 2;
+        if(!md)
+            md = 3;
+        if(!lg)
+            lg = 4;
+        if(!xlg)
+            xlg = 5;
+        
+        if(this.isXs(screenSize))
+            return screenSize / xs;
+        else if(this.isSm(screenSize))
+            return screenSize / sm;
+        else if(this.isMd(screenSize))
+            return screenSize / md;
+        else if(this.isLg(screenSize))
+            return screenSize / lg;
+        else
+            return screenSize / xlg;
     }
 }
 
@@ -520,7 +553,7 @@ class TextAlign {
 }
 
 class Alignment {
-    values : string[] = ["left: 0;", "right: 0;"];
+    values : string[] = ["left: 0;", "right: 0;", "top: 0; right: 0;", "top: 0; left: 0;", "bottom: 0; right: 0;", "bottom: 0; left: 0;", "left: 50%; top: 50%;"];
     index : number;
     private constructor(index : number){
         this.index = index - 1;
@@ -529,6 +562,11 @@ class Alignment {
     
     static start = new Alignment(1);
     static end = new Alignment(2);
+    static topRight = new Alignment(3);
+    static topLeft = new Alignment(4);
+    static bottomRight = new Alignment(5);
+    static bottomLeft = new Alignment(6);
+    // static center = new Alignment(7);
     // static center = new Alignment(3);
     // static justify = new Alignment(4);
 
@@ -539,7 +577,7 @@ class Alignment {
 }
 
 class Icons {
-    values : string[] = ["arrow_drop_down", "done", "center", "justify"];
+    values : string[] = ["arrow_drop_down", "done", "arrow_back", "group_work"];
     index : number;
     private constructor(index : number){
         this.index = index - 1;
@@ -548,6 +586,8 @@ class Icons {
     
     static arrow_drop_down = new Icons(1);
     static done = new Icons(2);
+    static arrow_back = new Icons(3); 
+    static group_work = new Icons(4); 
     
 
     
@@ -1647,8 +1687,9 @@ function TextField({onChanged, decoration, value} : namedParametersTextField){
     return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
 }
 
-function Icon(icon: Icons) : Widget{
+function Icon(icon: Icons, color:string = "black") : Widget{
     var element = document.createElement("span");
+    element.style.color = color;
     element.setAttribute("id", "Icon-" + ramdomString(7));
     element.classList.add("material-icons");
     element.appendChild(document.createTextNode(icon.toString()));
@@ -1793,6 +1834,40 @@ interface namedParametersCheckBox{
     value:boolean,
     onChanged:any;
     labelText?:string;
+}
+
+interface namedParametersCenter{
+    child:any;
+}
+
+function Center({child}:namedParametersCenter){
+    // var container = Container({
+    //     child: child
+    // });
+    var div = document.createElement("div");
+    div = flexbox(div);
+    div = justifyContentPrefix(div, "center");
+    div = alignItemsPrefix(div, "center");
+    div.style.cssText += "width: 100%; height: 100%";
+
+    // container.element.style.cssText += "margin: auto; text-align: center";
+    return {"element" : div, "child" : child};
+}
+
+interface namedParametersBackRoundedButton{
+    icon:any;
+    color?:string;
+}
+
+function BackRoundedButton({icon, color = "#4caf50"} : namedParametersBackRoundedButton){
+    // icon.element.style.cssText += "margin: auto";
+    let container:any = Container({
+        style: new TextStyle({width: 40, height: 40, borderRadius: BorderRadius.all(20), background: color}),
+        child: Center({child: icon})
+    });
+    container.element.style.cssText += "box-shadow: 0 2px 2px 0 rgba(76, 175, 80, .14), 0 3px 1px -2px rgba(76, 175, 80, .2), 0 1px 5px 0 rgba(76, 175, 80, .12);"
+    
+    return container;
 }
 
 function CheckBox({value, onChanged, labelText} : namedParametersCheckBox){
@@ -2081,6 +2156,7 @@ function Builder({id, builder, initState} : namedParametersBuilder){
     }).bind(element);
     var elements = builder(id, setState);
     builderArrayRecursivo(elements, null, true);
+    addPositionRelativeToAlignWidgetParentThatHasSize();
     oncreatedOrUpdatedWidgetState();
 }
 
@@ -2187,6 +2263,60 @@ function getParentSize(element:Element){
     }
     
     return size;
+}
+
+function addPositionRelativeToAlignWidgetParentThatHasSize(){
+    
+    var elements = document.getElementsByClassName("Align");
+    for(var i=0; i < elements.length; i++){
+        //Mandamos el id del elemento y el size con su ancho y alto
+        // var size = {height: window.innerHeight, width: window.innerWidth};
+        var parentThatHasSize = getParentThatHasSize(elements[i]);
+        if(parentThatHasSize)
+            parentThatHasSize.style.cssText += " position: relative;";
+        // console.log("Size from rebuildSizeFromLayoutBuilder parentSize: ", parentSize);
+        // console.log("Size from rebuildSizeFromLayoutBuilder LayoutBuilder: ", elements[i].id);
+    }
+}
+
+function getParentThatHasSize(element:Element){
+    var parent = element.parentElement;
+    let size:any = {width: 0, height: 0};
+    let vecesARecorrer = 6;
+    let parentToReturn:any;
+    for (var i=0; i < vecesARecorrer; i++) {
+        // console.log(`getParentSize: `, parent.id, " ", parent.offsetWidth, " ", parent.style.width);
+        
+        if(parent == null || parent == undefined)
+            break;
+        
+        if(parent.clientWidth > 0){
+            // console.log("Dentro clienteWidth");
+            size.width = parent.clientWidth;
+        }
+        else if(parent.style.width){
+                parentToReturn = parent;
+            }
+            if(parent.clientHeight > 0)
+                parentToReturn = parent;
+            else if(parent.style.height)
+                parentToReturn = parent;
+
+        // if(parent.style.width)
+        //     size.width = parent.style.width.replace("px", "");
+        // if(parent.style.height)
+        //     size.height = parent.style.height.replace("px", "");
+        
+        //Si el width es > 0 entonces salimos del ciclo y retornamos la variable size
+        //de lo contrario vamos a tomar el padre del otro elemento padre y asi sucesivamente hasta
+        //que encontrar el size o hasta que el sigueinte padre sea nulo
+        if(parentToReturn)
+            break;
+        else
+            parent = parent.parentElement;
+    }
+    
+    return parentToReturn;
 }
 
 function LayoutBuilder({builder} : namedParametersLayoutBuilder){
@@ -2325,11 +2455,17 @@ interface namedParametersAlign{
 
 function Align({child, alignment} : namedParametersAlign){
     var element = document.createElement("div");
+    // var elementAbsolute = document.createElement("div");
     element.setAttribute("id", 'Align-' + ramdomString(7));
+    element.classList.add("Align");
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
-    element.style.position = "relative";
-    child.element.style.cssText += `position: absolute; ${alignment.toString()}`;
+    element.style.cssText += `position: absolute; ${alignment.toString()}`;
+    // elementAbsolute.style.cssText += `position: absolute; ${alignment.toString()}`;
+    // var elementAbsoluteToWidget = {
+    //     "element" : elementAbsolute,
+    //     "child" : [child]
+    // }
     
 
     return {"element" : element, "child" : [child]};
@@ -2910,6 +3046,47 @@ function _myContainer({text, active}){
     return Container({
         style: new TextStyle({padding: EdgetInsets.only({left: 14, right: 14, top: 2, bottom: 2}), background: _background, border: Border.all({color: "#00bcd4"}), borderRadius: BorderRadius.all(3)}),
         child: Texto(text.toUpperCase(), new TextStyle({color: _color, fontSize: 11, fontWeight: FontWeight.w500}))
+    });
+}
+
+interface namedParametersMyTextFormField{
+    controller:TextEditingController;
+    labelText?:string;
+    icon:Icons;
+    validator?:any;
+    xs?:number;
+    sm?:number;
+    md?:number;
+    lg?:number;
+    xlg?:number;
+}
+
+function MyTextFormField({controller, labelText, icon, validator = null, xs = 1, sm = 2, md = 3, lg = 4, xlg = 5}){
+    return LayoutBuilder({
+        builder: (boxconstraint) => {
+            return Container({
+                style: new TextStyle({width: ScreenSize.calculateSize({screenSize: boxconstraint.width, xs: xs, sm: sm, md: md, lg: lg, xlg: xlg})}),
+                child: Row({
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                        Padding({
+                            padding: EdgetInsets.only({top: 14, right: 10}),
+                            child: Icon(icon)
+                        }),
+                        Expanded({
+                            child: Padding({
+                                padding: EdgetInsets.only({left: 2, right: 2}),
+                                child: TextFormField({
+                                    controller: controller,
+                                    decoration: new InputDecoration({labelText: (labelText) ? labelText : ""}),
+                                    validator: validator
+                                })
+                            })
+                        })
+                    ]
+                })
+            })
+        }
     });
 }
 

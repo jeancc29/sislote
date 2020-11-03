@@ -1,6 +1,7 @@
 var setState2;
 var _checkbox = false;
 var _mostrarVentanaEditar = true;
+var _txtGrupo = new TextEditingController();
 function _ventanaMostrar() {
     return Container({
         style: new TextStyle({ padding: EdgetInsets.only({ top: 0 }) }),
@@ -77,9 +78,35 @@ function _ventanaMostrar() {
 function _ventanaEditar() {
     return Column({
         children: [
-            Texto("Grupos", new TextStyle({ fontSize: 20, fontWeight: FontWeight.w300 })),
-            CardTranslate3D({
-                text: "AGREGAR  |  EDITAR"
+            Row({
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    Align({
+                        alignment: Alignment.start,
+                        child: Padding({
+                            padding: EdgetInsets.only({ left: 20, top: 10 }),
+                            child: BackRoundedButton({
+                                icon: Icon(Icons.arrow_back, "white")
+                            })
+                        })
+                    }),
+                    Padding({ padding: EdgetInsets.only({ bottom: 15, top: 15 }), child: Texto("Grupos", new TextStyle({ fontSize: 20, fontWeight: FontWeight.w300, textAlign: TextAlign.center })) })
+                ]
+            }),
+            Padding({
+                padding: EdgetInsets.only({ top: 10 }),
+                child: CardTranslate3D({
+                    text: "AGREGAR  |  EDITAR"
+                })
+            }),
+            SizedBox({ height: 20 }),
+            Center({
+                child: MyTextFormField({
+                    controller: _txtGrupo,
+                    labelText: "Grupo",
+                    icon: Icons.group_work,
+                    sm: 1.4
+                })
             })
         ]
     });
@@ -101,7 +128,7 @@ Builder({
             initDefaultStyle: true,
             child: 
             // Container({child: Texto("Holaaa soy un tipo vacacino")})
-            _ventana({ editar: true })
+            _ventana({ editar: _mostrarVentanaEditar })
         });
     }
 });
