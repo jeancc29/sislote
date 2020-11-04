@@ -94,7 +94,7 @@
 
                   <div class="row">
                       
-                    <div class="col-9">
+                    <div class="col-7">
                         <div class="input-group form-control-lg">
                         <div class="input-group-prepend">
                             <span class="input-group-text">
@@ -115,6 +115,21 @@
                               <div class="form-check">
                                 <label class="form-check-label">
                                   <input ng-model="datos.status" class="form-check-input" type="checkbox" value="" checked> Activa
+                                  <span class="form-check-sign">
+                                    <span class="check"></span>
+                                  </span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+
+                      <div class="col-2">
+                        <div class="input-group form-control-lg">
+                            <div class="form-group">
+                              <div class="form-check">
+                                <label class="form-check-label">
+                                  <input ng-model="datos.urgente" class="form-check-input" type="checkbox" value="" checked> Urgente
                                   <span class="form-check-sign">
                                     <span class="check"></span>
                                   </span>

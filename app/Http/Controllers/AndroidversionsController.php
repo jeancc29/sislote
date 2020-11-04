@@ -58,7 +58,7 @@ class AndroidversionsController extends Controller
                 'token' => $datos
             ], 201);
         }
-        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->orderBy('id', 'desc')->get();
+        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->orderBy('id', 'desc')->limit(15)->get();
 
 
         return Response::json([
@@ -180,19 +180,21 @@ class AndroidversionsController extends Controller
         if($version != null){
             $version->status = $datos['status'];
             $version->version = $datos['version'];
+            $version->urgente = $datos['urgente'];
             $version->enlace = $datos['enlace'];
             $version->save();
         }else{
             $version = Androidversions::on($datos["servidor"])->create([
                 'version' => $datos['version'],
                 'enlace' => $datos['enlace'],
+                'urgente' => $datos['urgente'],
                 'status' => $datos['status']
             ]);
 
         }
 
 
-        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->get();
+        $versiones = Androidversions::on($datos["servidor"])->where('status', '!=', 2)->limit(15)->get();
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',

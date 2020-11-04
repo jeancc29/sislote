@@ -8,6 +8,7 @@ class Androidversions extends Model
 {
     protected $fillable = [
         'version', 
+        'urgente', 
         'enlace', 
         'status'
     ];

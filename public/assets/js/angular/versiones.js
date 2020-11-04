@@ -12,6 +12,7 @@ myApp
             "version": null,
             "enlace": null,
             "status":true,
+            "urgente":false,
             "dias": [],
             "sorteos": [],
             "horaCierre": moment().format('YYYY/MM/DD'),
@@ -25,6 +26,7 @@ myApp
             $scope.datos.version = null;
             $scope.datos.enlace = null;
             $scope.datos.status = true;
+            $scope.datos.urgente = false;
            // $scope.datos.selectedTipo = $scope.datos.optionsTipos[0];
         }
 
@@ -87,6 +89,7 @@ myApp
                 $scope.datos.version = d.version;
                 $scope.datos.enlace = d.enlace;
                 $scope.datos.status = (d.status == 1) ? true : false;
+                $scope.datos.urgente = (d.urgente == 1) ? true : false;
                 
             }
 
@@ -118,6 +121,7 @@ myApp
 
 
             $scope.datos.status = ($scope.datos.status) ? 1 : 0;
+            $scope.datos.urgente = ($scope.datos.urgente) ? 1 : 0;
             $scope.datos.idUsuario = idUsuarioGlobal; 
             $scope.datos.servidor = servidorGlobal; 
 
@@ -133,6 +137,8 @@ myApp
                         $scope.inicializarDatos(response);
                         $scope.datos.status = ($scope.datos.status == 1) ? true : false;
                     }
+
+                    $scope.datos.mostrarFormEditar = false;
                 }else{
                     alert(response.data.mensaje);
                 }
