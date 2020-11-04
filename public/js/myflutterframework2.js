@@ -128,11 +128,26 @@ function setDeviceSize(_a) {
     return width;
 }
 function flexbox(element) {
+    //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Mixins
     element.style.cssText += "display: -webkit-box";
     element.style.cssText += "display: -moz-box";
     element.style.cssText += "display: -webkit-flex";
     element.style.cssText += "display: -ms-flexbox";
     element.style.cssText += "display: flex";
+    return element;
+}
+function flexWrap(element, value) {
+    if (value === void 0) { value = 'nowrap'; }
+    // No Webkit/FF Box fallback.
+    //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Mixins
+    element.style.cssText += "-webkit-flex-wrap: " + value;
+    if (value == 'nowrap') {
+        element.style.cssText += "-ms-flex-wrap: none";
+    }
+    else {
+        element.style.cssText += "-ms-flex-wrap: " + value;
+    }
+    element.style.cssText += "flex-wrap: " + value;
     return element;
 }
 function justifyContentPrefix(element, value) {
@@ -495,7 +510,7 @@ var Alignment = /** @class */ (function () {
 var Icons = /** @class */ (function () {
     function Icons(index) {
         var _this = this;
-        this.values = ["arrow_drop_down", "done", "arrow_back", "group_work"];
+        this.values = ["arrow_drop_down", "done", "arrow_back", "group_work", "source"];
         this.toString = function () {
             return _this.values[_this.index];
         };
@@ -505,6 +520,7 @@ var Icons = /** @class */ (function () {
     Icons.done = new Icons(2);
     Icons.arrow_back = new Icons(3);
     Icons.group_work = new Icons(4);
+    Icons.source = new Icons(5);
     return Icons;
 }());
 var MainAxisAlignment = /** @class */ (function () {
@@ -895,6 +911,33 @@ function Row(_a) {
         element = justifyContentPrefix(element, mainAxisAlignment.toString());
         // console.log("Row mainAxisAligment: ", element.style.cssText);
     }
+    if (crossAxisAlignment != null && crossAxisAlignment != undefined) {
+        // element.style.alignItems = crossAxisAlignment.toString();
+        // styleJson.alignItems = crossAxisAlignment.toString(); 
+        element = alignItemsPrefix(element, crossAxisAlignment.toString());
+    }
+    return { "element": element, "style": styleJson, "type": "Row", "child": children };
+}
+function Wrap(_a) {
+    var children = _a.children, crossAxisAlignment = _a.crossAxisAlignment, id = _a.id;
+    var element = document.createElement("div");
+    if (id == null || id == undefined)
+        element.setAttribute("id", "Wrap-" + ramdomString(7));
+    else
+        element.setAttribute("id", id + "-" + ramdomString(7));
+    //Display: flexbox; prefix
+    element.setAttribute("style", "-webkit-flex-flow: row;-ms-flex-flow: row;flex-flow: row;");
+    element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element.style.width = "100%";
+    element = flexWrap(element, "wrap");
+    //flexDirection: row; prefix
+    // element.setAttribute("style", '-webkit-box-direction: normal; -webkit-box-orient: horizontal;-moz-box-direction: normal;-moz-box-orient: horizontal; -webkit-flex-direction: row; -ms-flex-direction: row; flex-direction: row;');
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    var styleJson = {};
+    // element.style.display = "flex";
+    // element.style.flexDirection = "row";
+    // element.classList.add("flex");
+    // element.classList.add("row");
     if (crossAxisAlignment != null && crossAxisAlignment != undefined) {
         // element.style.alignItems = crossAxisAlignment.toString();
         // styleJson.alignItems = crossAxisAlignment.toString(); 
@@ -2267,6 +2310,17 @@ function MyTextFormField(_a) {
                         })
                     ]
                 })
+            });
+        }
+    });
+}
+function ResizedContainer(_a) {
+    var child = _a.child, _b = _a.xs, xs = _b === void 0 ? 1 : _b, _c = _a.sm, sm = _c === void 0 ? 1.4 : _c, _d = _a.md, md = _d === void 0 ? 1.6 : _d, _e = _a.lg, lg = _e === void 0 ? 1.6 : _e, _f = _a.xlg, xlg = _f === void 0 ? 1.6 : _f;
+    return LayoutBuilder({
+        builder: function (boxconstraint) {
+            return Container({
+                style: new TextStyle({ width: ScreenSize.calculateSize({ screenSize: boxconstraint.width, xs: xs, sm: sm, md: md, lg: lg, xlg: xlg }) }),
+                child: child
             });
         }
     });

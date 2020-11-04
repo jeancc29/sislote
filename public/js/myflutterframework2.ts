@@ -121,11 +121,26 @@ function ramdomString(length : number) {
  }
 
  function flexbox(element: HTMLDivElement){
+     //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Mixins
     element.style.cssText += "display: -webkit-box";
     element.style.cssText += "display: -moz-box";
     element.style.cssText += "display: -webkit-flex";
     element.style.cssText += "display: -ms-flexbox";
     element.style.cssText += "display: flex";
+    return element;
+  }
+
+  function flexWrap(element: HTMLDivElement, value: string = 'nowrap') {
+    // No Webkit/FF Box fallback.
+    //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Mixins
+    element.style.cssText += `-webkit-flex-wrap: ${value}`;
+    if (value == 'nowrap') {
+        element.style.cssText += `-ms-flex-wrap: none`;
+    } else {
+        element.style.cssText += `-ms-flex-wrap: ${value}`;
+    }
+    element.style.cssText += `flex-wrap: ${value}`;
+
     return element;
   }
 
@@ -577,7 +592,7 @@ class Alignment {
 }
 
 class Icons {
-    values : string[] = ["arrow_drop_down", "done", "arrow_back", "group_work"];
+    values : string[] = ["arrow_drop_down", "done", "arrow_back", "group_work", "source"];
     index : number;
     private constructor(index : number){
         this.index = index - 1;
@@ -588,6 +603,7 @@ class Icons {
     static done = new Icons(2);
     static arrow_back = new Icons(3); 
     static group_work = new Icons(4); 
+    static source = new Icons(5); 
     
 
     
@@ -1313,6 +1329,45 @@ function Row({children, mainAxisAlignment, crossAxisAlignment, id} : namedParame
         // console.log("Row mainAxisAligment: ", element.style.cssText);
         
     }
+    if(crossAxisAlignment != null && crossAxisAlignment != undefined){
+        // element.style.alignItems = crossAxisAlignment.toString();
+        // styleJson.alignItems = crossAxisAlignment.toString(); 
+        element = alignItemsPrefix(element, crossAxisAlignment.toString())
+    }
+
+    return {"element" : element, "style" : styleJson, "type" : "Row", "child" : children};
+}
+
+interface namedParametersWrap {
+    children : any[];
+    crossAxisAlignment? : CrossAxisAlignment;
+    id?:string;
+}
+
+function Wrap({children, crossAxisAlignment, id} : namedParametersRow){
+    var element = document.createElement("div");
+    if(id == null || id == undefined)
+        element.setAttribute("id", "Wrap-" + ramdomString(7));
+    else
+        element.setAttribute("id", `${id}-` + ramdomString(7));
+
+    //Display: flexbox; prefix
+    
+    element.setAttribute("style", "-webkit-flex-flow: row;-ms-flex-flow: row;flex-flow: row;")
+    element.setAttribute("style", 'display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;');
+    element.style.width = "100%";
+    element = flexWrap(element, "wrap");
+    //flexDirection: row; prefix
+    // element.setAttribute("style", '-webkit-box-direction: normal; -webkit-box-orient: horizontal;-moz-box-direction: normal;-moz-box-orient: horizontal; -webkit-flex-direction: row; -ms-flex-direction: row; flex-direction: row;');
+    
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    
+    let styleJson : any = {};
+    // element.style.display = "flex";
+    // element.style.flexDirection = "row";
+    // element.classList.add("flex");
+    // element.classList.add("row");
+    
     if(crossAxisAlignment != null && crossAxisAlignment != undefined){
         // element.style.alignItems = crossAxisAlignment.toString();
         // styleJson.alignItems = crossAxisAlignment.toString(); 
@@ -3085,6 +3140,26 @@ function MyTextFormField({controller, labelText, icon, validator = null, xs = 1,
                         })
                     ]
                 })
+            })
+        }
+    });
+}
+
+interface namedParametersResizedContainer{
+    child:any;
+    xs?:number;
+    sm?:number;
+    md?:number;
+    lg?:number;
+    xlg?:number;
+}
+
+function ResizedContainer({child, xs = 1, sm = 1.4, md = 1.6, lg = 1.6, xlg = 1.6}){
+    return LayoutBuilder({
+        builder: (boxconstraint) => {
+            return Container({
+                style: new TextStyle({width: ScreenSize.calculateSize({screenSize: boxconstraint.width, xs: xs, sm: sm, md: md, lg: lg, xlg: xlg})}),
+                child: child
             })
         }
     });

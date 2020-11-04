@@ -1,7 +1,9 @@
 var setState2;
 var _checkbox = false;
+var _ckbStatus = false;
 var _mostrarVentanaEditar = true;
 var _txtGrupo = new TextEditingController();
+var _txtCodigo = new TextEditingController();
 function _ventanaMostrar() {
     return Container({
         style: new TextStyle({ padding: EdgetInsets.only({ top: 0 }) }),
@@ -101,13 +103,52 @@ function _ventanaEditar() {
             }),
             SizedBox({ height: 20 }),
             Center({
-                child: MyTextFormField({
-                    controller: _txtGrupo,
-                    labelText: "Grupo",
-                    icon: Icons.group_work,
-                    sm: 1.4
+                child: ResizedContainer({
+                    child: Wrap({
+                        children: [
+                            // Container({
+                            //     style: new TextStyle({background: "red", width: 2000, height: 50})
+                            // }),
+                            // Container({
+                            //     style: new TextStyle({background: "blue", width: 2000, height: 50})
+                            // }),
+                            MyTextFormField({
+                                controller: _txtGrupo,
+                                labelText: "Grupo",
+                                icon: Icons.group_work,
+                                sm: 1
+                            }),
+                            MyTextFormField({
+                                controller: _txtCodigo,
+                                labelText: "Codigo",
+                                icon: Icons.source,
+                                sm: 2
+                            }),
+                            Padding({
+                                padding: EdgetInsets.only({ left: 10, top: 10 }),
+                                child: CheckBox({
+                                    value: _ckbStatus,
+                                    labelText: "Activo",
+                                    onChanged: function (data) {
+                                        _ckbStatus = data;
+                                        setState2();
+                                    }
+                                })
+                            })
+                        ]
+                    })
                 })
-            })
+            }),
+            Wrap({
+                children: [
+                    Container({
+                        style: new TextStyle({ background: "red", width: 300, height: 50 })
+                    }),
+                    Container({
+                        style: new TextStyle({ background: "blue", width: 600, height: 50 })
+                    }),
+                ]
+            }),
         ]
     });
 }
