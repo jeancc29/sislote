@@ -307,7 +307,9 @@ var FormGlobalKey = /** @class */ (function () {
             // elem.dispatchEvent(event);
             //Disparamos cada uno de los eventos de cada input
             for (var i = 0; i < inputs.length; i++) {
-                inputs[i].dispatchEvent(event);
+                if (inputs[i].type != 'checkbox') {
+                    inputs[i].dispatchEvent(event);
+                }
             }
             return valid;
         }
@@ -732,30 +734,26 @@ function CardTranslate3D(_a) {
     element.classList.add("cardTranslate3D");
     element.style.cssText = "width: 100%; padding: 12px; border-radius: 4px; background: " + color + "; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);";
     var child = Texto(text, new TextStyle({ textAlign: TextAlign.center, color: "white", fontSize: 12, fontWeight: FontWeight.w700 }));
-    element.animate([
-        // keyframes
-        // { transform: 'translateY(0px)' }, 
-        // { transform: 'translateY(50px)' }
-        { transform: 'translate3d(-8px, 0px, 0px);' },
-    ], {
-        // timing options
-        duration: 100
-    });
-    // Object.keys(style.toJson()).forEach(key => {
-    //     element.style[key] = style[key];
-    // });
     if (child != null && child != undefined)
         return { "element": element, "style": "", "type": "Container", "child": [child] };
     else
         return { "element": element, "style": "", "type": "Container", "child": [] };
 }
 function CardTop(_a) {
-    var text = _a.text, _b = _a.color, color = _b === void 0 ? "#00bcd4" : _b;
+    var text = _a.text, _b = _a.cargando, cargando = _b === void 0 ? false : _b, _c = _a.color, color = _c === void 0 ? "#00bcd4" : _c;
     var element = document.createElement("div");
     element.setAttribute("id", 'CardTop-' + ramdomString(7));
     element.classList.add("cardTop");
     element.style.cssText = "display: inline; margin-top: -15px; padding: 18px 10px; border-radius: 4px; background: " + color + "; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);";
-    var child = Texto(text, new TextStyle({ textAlign: TextAlign.center, color: "white", fontSize: 17, fontWeight: FontWeight.w300 }));
+    var child = Row({
+        children: [
+            Texto(text, new TextStyle({ textAlign: TextAlign.center, color: "white", fontSize: 17, fontWeight: FontWeight.w300 })),
+            Visibility({
+                visible: cargando,
+                child: CircularProgressIndicator({})
+            })
+        ]
+    });
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
     // });
@@ -776,9 +774,15 @@ function DataTable(_a) {
     var headRow = document.createElement("tr");
     body.setAttribute("id", "DataTableHeadRow-" + ramdomString(7));
     var children = [];
+    var columnsToWidget = [];
+    for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
+        var i = columns_1[_i];
+        var column = i.toJson();
+        columnsToWidget.push(column);
+    }
     var headRowElementToWidget = {
         "element": headRow,
-        "child": columns
+        "child": columnsToWidget
     };
     var headElementToWidget = {
         "element": head,
@@ -788,8 +792,8 @@ function DataTable(_a) {
     };
     var bodyRow = document.createElement("tr");
     var rowsToWidget = [];
-    for (var _i = 0, rows_1 = rows; _i < rows_1.length; _i++) {
-        var i = rows_1[_i];
+    for (var _c = 0, rows_1 = rows; _c < rows_1.length; _c++) {
+        var i = rows_1[_c];
         var row = i.toJson();
         if (resultarFilasImpares)
             row.element.classList.add("resultarFilasImpares");
@@ -876,9 +880,9 @@ var DataColumn = /** @class */ (function () {
     }
     DataColumn.prototype.toJson = function () {
         if (this.child != null && this.child != undefined)
-            return { "element": this.element, "style": "", "type": "Container", "child": [this.child] };
+            return { "element": this.element, "style": "", "type": "DataColumn", "child": [this.child] };
         else
-            return { "element": this.element, "style": "", "type": "Container", "child": [] };
+            return { "element": this.element, "style": "", "type": "DataColumn", "child": [] };
     };
     return DataColumn;
 }());
@@ -1341,21 +1345,24 @@ function Center(_a) {
     //     child: child
     // });
     var div = document.createElement("div");
+    div.setAttribute("id", 'Center-' + ramdomString(7));
     div = flexbox(div);
     div = justifyContentPrefix(div, "center");
     div = alignItemsPrefix(div, "center");
     div.style.cssText += "width: 100%; height: 100%";
     // container.element.style.cssText += "margin: auto; text-align: center";
-    return { "element": div, "child": child };
+    return { "element": div, "style": {}, "type": "Center", "child": [child] };
 }
 function BackRoundedButton(_a) {
-    var icon = _a.icon, _b = _a.color, color = _b === void 0 ? "#4caf50" : _b;
+    var icon = _a.icon, onTap = _a.onTap, _b = _a.color, color = _b === void 0 ? "#4caf50" : _b;
     // icon.element.style.cssText += "margin: auto";
     var container = Container({
         style: new TextStyle({ width: 40, height: 40, borderRadius: BorderRadius.all(20), background: color }),
         child: Center({ child: icon })
     });
     container.element.style.cssText += "box-shadow: 0 2px 2px 0 rgba(76, 175, 80, .14), 0 3px 1px -2px rgba(76, 175, 80, .2), 0 1px 5px 0 rgba(76, 175, 80, .12);";
+    if (onTap)
+        container.element.addEventListener("click", onTap);
     return container;
 }
 function CheckBox(_a) {
@@ -1383,10 +1390,12 @@ function CheckBox(_a) {
     if (labelText)
         label.innerHTML = labelText;
     input.setAttribute("type", "checkbox");
+    input.setAttribute("id", 'CheckBox-' + ramdomString(7));
     input.checked = value;
-    input.onchange = function (e) {
+    input.addEventListener("click", function (e) {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         onChanged(input.checked);
-    };
+    });
     // addEventListener("onchange", function(e){
     // })
     input.classList.add("form-check-input");
@@ -1747,7 +1756,7 @@ function RaisedButton(_a) {
     // element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
-    var child = _a.child, onPressed = _a.onPressed, _b = _a.color, color = _b === void 0 ? "#1a73e8" : _b;
+    var child = _a.child, onPressed = _a.onPressed, _b = _a.color, color = _b === void 0 ? "#47a44b" : _b;
     var container = Container({ id: "RaisedButton", child: child, style: new TextStyle({ background: color, cursor: "pointer", padding: EdgetInsets.only({ left: 20, right: 20, bottom: 7, top: 7 }), borderRadius: BorderRadius.all(4) }) });
     if (onPressed)
         container.element.addEventListener("click", onPressed);
@@ -2117,11 +2126,13 @@ function builderArrayRecursivo(widget, widgetsYaCreados, isInit, onlyWidgetsYaCr
             }
             else {
                 widget.element.appendChild(hijo.element);
+                console.log("Else != ", hijo);
             }
         }
         else {
             // console.log("Dentro widgetCreado == null: ", hijo);
             widget.element.appendChild(hijo.element);
+            console.log("Else !===== ", hijo);
         }
         // widget.element.appendChild(hijo.element);
         // console.log("builderArrayRecursivo: ", hijo);
@@ -2286,7 +2297,7 @@ function _myContainer(_a) {
     });
 }
 function MyTextFormField(_a) {
-    var controller = _a.controller, labelText = _a.labelText, icon = _a.icon, _b = _a.validator, validator = _b === void 0 ? null : _b, _c = _a.xs, xs = _c === void 0 ? 1 : _c, _d = _a.sm, sm = _d === void 0 ? 2 : _d, _e = _a.md, md = _e === void 0 ? 3 : _e, _f = _a.lg, lg = _f === void 0 ? 4 : _f, _g = _a.xlg, xlg = _g === void 0 ? 5 : _g;
+    var controller = _a.controller, labelText = _a.labelText, icon = _a.icon, _b = _a.validator, validator = _b === void 0 ? null : _b, _c = _a.padding, padding = _c === void 0 ? EdgetInsets.only({ left: 2, right: 2, top: 5 }) : _c, _d = _a.xs, xs = _d === void 0 ? 1 : _d, _e = _a.sm, sm = _e === void 0 ? 2 : _e, _f = _a.md, md = _f === void 0 ? 3 : _f, _g = _a.lg, lg = _g === void 0 ? 4 : _g, _h = _a.xlg, xlg = _h === void 0 ? 5 : _h;
     return LayoutBuilder({
         builder: function (boxconstraint) {
             return Container({
@@ -2300,7 +2311,7 @@ function MyTextFormField(_a) {
                         }),
                         Expanded({
                             child: Padding({
-                                padding: EdgetInsets.only({ left: 2, right: 2 }),
+                                padding: padding,
                                 child: TextFormField({
                                     controller: controller,
                                     decoration: new InputDecoration({ labelText: (labelText) ? labelText : "" }),

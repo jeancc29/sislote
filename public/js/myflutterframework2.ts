@@ -295,7 +295,9 @@ class FormGlobalKey{
             // elem.dispatchEvent(event);
             //Disparamos cada uno de los eventos de cada input
             for(var i=0; i < inputs.length; i++){
-                inputs[i].dispatchEvent(event);
+                if (inputs[i].type != 'checkbox') {
+                    inputs[i].dispatchEvent(event);
+                }
             }
 
             return valid;
@@ -1043,23 +1045,6 @@ function CardTranslate3D({text, color = "#00bcd4"}: namedParametersCardTranslate
     element.classList.add("cardTranslate3D");
     element.style.cssText = `width: 100%; padding: 12px; border-radius: 4px; background: ${color}; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);`;
     let child:any = Texto(text, new TextStyle({textAlign: TextAlign.center, color: "white", fontSize: 12, fontWeight: FontWeight.w700}));
-    element.animate([
-        // keyframes
-        // { transform: 'translateY(0px)' }, 
-        // { transform: 'translateY(50px)' }
-        { transform: 'translate3d(-8px, 0px, 0px);' }, 
-        // { transform: 'scale(1)' }
-        ], 
-        { 
-            // timing options
-            duration: 100,
-            // iterations: Infinity
-        }
-    );
-    
-    // Object.keys(style.toJson()).forEach(key => {
-    //     element.style[key] = style[key];
-    // });
     
     
     if(child != null && child != undefined)
@@ -1068,12 +1053,26 @@ function CardTranslate3D({text, color = "#00bcd4"}: namedParametersCardTranslate
         return {"element" : element, "style" : "", "type" : "Container", "child" : []};
 }
 
-function CardTop({text, color = "#00bcd4"}: namedParametersCardTranslate3D){
+interface namedParametersCardTop{
+    text:string;
+    cargando:boolean;
+    color?:string;
+}
+
+function CardTop({text, cargando = false, color = "#00bcd4"}: namedParametersCardTop){
     var element = document.createElement("div");
     element.setAttribute("id", 'CardTop-' + ramdomString(7));
     element.classList.add("cardTop");
     element.style.cssText = `display: inline; margin-top: -15px; padding: 18px 10px; border-radius: 4px; background: ${color}; box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(0, 188, 212, .4);`;
-    let child:any = Texto(text, new TextStyle({textAlign: TextAlign.center, color: "white", fontSize: 17, fontWeight: FontWeight.w300}));
+    let child:any = Row({
+        children: [
+            Texto(text, new TextStyle({textAlign: TextAlign.center, color: "white", fontSize: 17, fontWeight: FontWeight.w300})),
+            Visibility({
+                visible: cargando,
+                child: CircularProgressIndicator({})
+            })
+        ]
+    })
    
     
     // Object.keys(style.toJson()).forEach(key => {
@@ -1112,9 +1111,15 @@ function DataTable({columns, rows, resultarFilasImpares = false}:namedParameters
     body.setAttribute("id", "DataTableHeadRow-" + ramdomString(7));
     let children:any[] = [];
 
+    var columnsToWidget:any[] = [];
+    for(let i of columns){
+        let column:any = i.toJson();
+        
+        columnsToWidget.push(column)
+    }
     let headRowElementToWidget:any = {
         "element" :headRow,
-        "child" : columns
+        "child" : columnsToWidget
     }
     let headElementToWidget:any = {
         "element" :head,
@@ -1246,9 +1251,9 @@ class DataColumn{
     
     public toJson(){
         if(this.child != null && this.child != undefined)
-        return {"element" : this.element, "style" : "", "type" : "Container", "child" : [this.child]};
+        return {"element" : this.element, "style" : "", "type" : "DataColumn", "child" : [this.child]};
         else
-            return {"element" : this.element, "style" : "", "type" : "Container", "child" : []};
+            return {"element" : this.element, "style" : "", "type" : "DataColumn", "child" : []};
     }
     
 }
@@ -1900,28 +1905,31 @@ function Center({child}:namedParametersCenter){
     //     child: child
     // });
     var div = document.createElement("div");
+    div.setAttribute("id", 'Center-' +  ramdomString(7));
     div = flexbox(div);
     div = justifyContentPrefix(div, "center");
     div = alignItemsPrefix(div, "center");
     div.style.cssText += "width: 100%; height: 100%";
 
     // container.element.style.cssText += "margin: auto; text-align: center";
-    return {"element" : div, "child" : child};
+    return {"element" : div, "style" : {}, "type" : "Center", "child" : [child]};
 }
 
 interface namedParametersBackRoundedButton{
     icon:any;
     color?:string;
+    onTap:any;
 }
 
-function BackRoundedButton({icon, color = "#4caf50"} : namedParametersBackRoundedButton){
+function BackRoundedButton({icon, onTap, color = "#4caf50"} : namedParametersBackRoundedButton){
     // icon.element.style.cssText += "margin: auto";
     let container:any = Container({
         style: new TextStyle({width: 40, height: 40, borderRadius: BorderRadius.all(20), background: color}),
         child: Center({child: icon})
     });
     container.element.style.cssText += "box-shadow: 0 2px 2px 0 rgba(76, 175, 80, .14), 0 3px 1px -2px rgba(76, 175, 80, .2), 0 1px 5px 0 rgba(76, 175, 80, .12);"
-    
+    if(onTap)
+        container.element.addEventListener("click", onTap);
     return container;
 }
 
@@ -1955,10 +1963,13 @@ function CheckBox({value, onChanged, labelText} : namedParametersCheckBox){
     if(labelText)
         label.innerHTML = labelText;
     input.setAttribute("type", "checkbox");
+    input.setAttribute("id", 'CheckBox-' +  ramdomString(7));
     input.checked = value;
-    input.onchange = function(e){
+    input.addEventListener("click", function(e){
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        
         onChanged(input.checked);
-    }
+    })
     // addEventListener("onchange", function(e){
         
     // })
@@ -2438,7 +2449,7 @@ interface namedParametersRaisedButton {
     color? : any;
 }
 
-function RaisedButton({child, onPressed, color = "#1a73e8"} : namedParametersRaisedButton){
+function RaisedButton({child, onPressed, color = "#47a44b"} : namedParametersRaisedButton){
     // var element = document.createElement("div");
     // element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
@@ -2880,14 +2891,18 @@ function builderArrayRecursivo(widget : any, widgetsYaCreados? : any, isInit: bo
                     //Eliminamos el viejo nodo
                     parent.removeChild(widgetCreado);
                     // builderRecursivo(widget.child, false, widgetCreado.childNodes);
+                    
+                    
                 }
             }else{
                 widget.element.appendChild(hijo.element);
+                console.log("Else != ", hijo);
             }
         }else{
             // console.log("Dentro widgetCreado == null: ", hijo);
             
             widget.element.appendChild(hijo.element);
+            console.log("Else !===== ", hijo);
         }
         // widget.element.appendChild(hijo.element);
         // console.log("builderArrayRecursivo: ", hijo);
@@ -3109,6 +3124,7 @@ interface namedParametersMyTextFormField{
     labelText?:string;
     icon:Icons;
     validator?:any;
+    padding?:EdgetInsets;
     xs?:number;
     sm?:number;
     md?:number;
@@ -3116,7 +3132,7 @@ interface namedParametersMyTextFormField{
     xlg?:number;
 }
 
-function MyTextFormField({controller, labelText, icon, validator = null, xs = 1, sm = 2, md = 3, lg = 4, xlg = 5}){
+function MyTextFormField({controller, labelText, icon, validator = null, padding = EdgetInsets.only({left: 2, right: 2, top: 5}), xs = 1, sm = 2, md = 3, lg = 4, xlg = 5}){
     return LayoutBuilder({
         builder: (boxconstraint) => {
             return Container({
@@ -3130,7 +3146,7 @@ function MyTextFormField({controller, labelText, icon, validator = null, xs = 1,
                         }),
                         Expanded({
                             child: Padding({
-                                padding: EdgetInsets.only({left: 2, right: 2}),
+                                padding: padding,
                                 child: TextFormField({
                                     controller: controller,
                                     decoration: new InputDecoration({labelText: (labelText) ? labelText : ""}),
