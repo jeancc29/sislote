@@ -560,7 +560,19 @@ class MonitoreoController extends Controller
         //https://www.sqlservercentral.com/forums/topic/order-by-based-on-condition
         //https://stackoverflow.com/questions/19529864/mysql-using-sum-and-case
         //https://stackoverflow.com/questions/6878090/mysql-sum-with-case-statement
-        $monitoreo = \DB::connection($datos["servidor"])->select(" select s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, (select JSON_OBJECT('id', users.id, 'usuario', users.usuario) from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion from sales s  inner join salesdetails sd on s.id = sd.idVenta inner join users u on u.id = s.idUsuario inner join tickets t on t.id = s.idTicket inner join branches b on b.id = s.idBanca where s.created_at between '{$fechaInicial}' and '{$fechaFinal}' and s.status != 5 {$consulta} group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, razon, fechaCancelacion, usuarioCancelacion ");
+        $monitoreo = \DB::connection($datos["servidor"])->select("select 
+        s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, 
+        t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
+        sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
+        sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
+        (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
+        (select JSON_OBJECT('id', users.id, 'usuario', users.usuario) from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
+        (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
+        from sales s  inner join salesdetails sd on s.id = sd.idVenta 
+        inner join users u on u.id = s.idUsuario 
+        inner join tickets t on t.id = s.idTicket 
+        inner join branches b on b.id = s.idBanca 
+        where s.created_at between '{$fechaInicial}' and '{$fechaFinal}' and s.status != 5 {$consulta} group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, razon, fechaCancelacion, usuarioCancelacion ");
         // (select sum(premio) from salesdetails where salesdetails.pagado = 0 and salesdetails.idVenta = s.id) montoAPagar,
     
         return Response::json([
