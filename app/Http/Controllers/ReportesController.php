@@ -455,11 +455,12 @@ class ReportesController extends Controller
         $bancas = \DB::connection($datos["servidor"])
             ->select(
                 "
-                select sum(s.descuentoMonto) as descuento, 
+                select
+                (select sum(sales.descuentoMonto) from sales where sales.status not in(0, 5) and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') descuento, 
                 sum(sd.comision) as comision, 
                 sum(sd.monto) as monto, 
                 sum(sd.premio) as premio, 
-                (select count(id) from sales where sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') tickets, 
+                (select count(id) from sales where sales.status not in(0, 5) and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') tickets, 
                 (select count(id) from sales where sales.status = 1 and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') ticketsPendientes, 
                 (select count(id) from sales where sales.status = 2 and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') ticketsGanadores, 
                 (select count(id) from sales where sales.status = 3 and sales.idBanca = s.idBanca and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}') ticketsPerdedores, 
