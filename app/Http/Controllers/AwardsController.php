@@ -278,10 +278,26 @@ class AwardsController extends Controller
         $mensaje = '';
         $idBanca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->whereStatus(1)->first();
         if($idBanca == null){
+            // $idBanca = Branches::
+            //     on($datos["servidor"])
+            //     ->where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
+            //     ->first()->id;    
             $idBanca = Branches::
                 on($datos["servidor"])
                 ->where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
-                ->first()->id;         
+                ->first();    
+            if($idBanca != null){
+                $idBanca = $idBanca->id;
+            }else{
+                $idBanca = Branches::
+                on($datos["servidor"])
+                ->where(['status' => 1])
+                ->first(); 
+                if($idBanca != null)
+                    $idBanca = $idBanca->id;
+                else
+                    $idBanca = 0;
+            }     
         }else{
             $idBanca = $idBanca->id;
         }
@@ -541,10 +557,26 @@ class AwardsController extends Controller
         $mensaje = '';
         $idBanca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->whereStatus(1)->first();
         if($idBanca == null){
+            // $idBanca = Branches::
+            //     on($datos["servidor"])
+            //     ->where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
+            //     ->first()->id;     
             $idBanca = Branches::
                 on($datos["servidor"])
                 ->where(['status' => 1, 'idUsuario' => $datos['idUsuario']])
-                ->first()->id;         
+                ->first();    
+            if($idBanca != null){
+                $idBanca = $idBanca->id;
+            }else{
+                $idBanca = Branches::
+                on($datos["servidor"])
+                ->where(['status' => 1])
+                ->first(); 
+                if($idBanca != null)
+                    $idBanca = $idBanca->id;
+                else
+                    $idBanca = 0;
+            }
         }else{
             $idBanca = $idBanca->id;
         }
