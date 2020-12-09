@@ -324,9 +324,9 @@ class AwardsController extends Controller
         if($awardsClass->combinacionesNula() == true){
             continue;
         }
-        if($awardsClass->datosValidos() == false){
-            return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
-        }
+        // if($awardsClass->datosValidos() == false){
+        //     return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
+        // }
         if(!$awardsClass->loteriaAbreDiaActual()){
             return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
         }  
