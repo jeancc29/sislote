@@ -240,9 +240,10 @@ class AwardsClass{
     public function getJugadasDeFechaDada($idLoteria){
         $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
-        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:59:00';
         $idSuperpale = Draws::on($this->servidor)->whereDescripcion("Super pale")->first()->id;
 
+        
         $idVentas = Sales::on($this->servidor)->select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
@@ -250,6 +251,8 @@ class AwardsClass{
         ->whereNotIn('sales.status', [0,5])
         ->where('salesdetails.idSorteo', '!=', $idSuperpale)
         ->get();
+
+        // abort(404, $fechaInicial . " " . $fechaFinal);
 
         $jugadas = Salesdetails::on($this->servidor)->whereIn('idVenta', $idVentas)->where('idLoteria', $idLoteria)
             ->orderBy('jugada', 'asc')
@@ -282,7 +285,7 @@ class AwardsClass{
     public function getJugadasSuperpaleDeFechaDada($idLoteria){
         $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
-        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:59:00';
         $idSuperpale = Draws::on($this->servidor)->whereDescripcion("Super pale")->first()->id;
 
         $idVentas = Sales::on($this->servidor)->select('sales.id')
@@ -310,7 +313,7 @@ class AwardsClass{
     public function existenTicketsMarcadoComoPagado($idLoteria){
         $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
-        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:59:00';
 
         $cantidadTicksMarcadoComoPagado = Sales::on($this->servidor)->select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
@@ -594,7 +597,7 @@ class AwardsClass{
         
         $fechaActual = $this->fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
-        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:59:00';
         $premiosDeLaOtraLoteria = Awards::on($this->servidor)
         ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
         ->where('idLoteria', $idOtraLoteria)
@@ -871,7 +874,7 @@ class AwardsClass{
     public static function getLoterias($servidor, $layout = null){
         $fecha = getdate();
         $fechaDesde = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
-        $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:59:00';
 
 
         $loterias = Lotteries::on($servidor)->whereStatus(1)->has('sorteos')->get();

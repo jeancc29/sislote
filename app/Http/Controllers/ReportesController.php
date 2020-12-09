@@ -1321,6 +1321,7 @@ class ReportesController extends Controller
         return Response::json([
             'monitoreo' => $monitoreo,
             'loterias' => Lotteries::on($datos["servidor"])->whereStatus(1)->get(),
+            'bancas' => Branches::on($datos["servidor"])->select("id", "descripcion", "codigo")->whereStatus(1)->get(),
             'caracteristicasGenerales' =>  Generals::on($datos["servidor"])->get(),
             'total_ventas' => Sales::on($datos["servidor"])->sum('total'),
             'total_jugadas' => Salesdetails::on($datos["servidor"])->count('jugada'),

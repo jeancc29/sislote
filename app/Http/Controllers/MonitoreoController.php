@@ -409,6 +409,30 @@ class MonitoreoController extends Controller
             $loterias = Lotteries::on(session("servidor"))->whereStatus(1)->get()->toJson();
             $sorteos = Draws::on(session("servidor"))->whereStatus(1)->get()->toJson();
             return view('monitoreo.tickets', compact('controlador', 'usuario', 'bancas', 'loterias', 'sorteos'));
+        }else{
+            $datos = request()['datos'];
+            try {
+                $datos = \Helper::jwtDecode($datos);
+                if(isset($datos["datosMovil"]))
+                    $datos = $datos["datosMovil"];
+            } catch (\Throwable $th) {
+                //throw $th;
+                return Response::json([
+                    'errores' => 1,
+                    'mensaje' => 'Token incorrecto',
+                    'token' => $datos
+                ], 201);
+            }
+            // $usuario = Users::on(session("servidor"))->whereId(session('idUsuario'))->first();
+            $bancas = Branches::on($datos["servidor"])->whereStatus(1)->get()->toJson();
+            $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->get()->toJson();
+            $sorteos = Draws::on($datos["servidor"])->whereStatus(1)->get()->toJson();
+            return Response::json([
+                'bancas' => $bancas,
+                'loterias' => $loterias,
+                'sorteos' => $sorteos,
+                'errores' => 0
+            ], 201);
         }
 
     }
@@ -428,6 +452,8 @@ class MonitoreoController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([

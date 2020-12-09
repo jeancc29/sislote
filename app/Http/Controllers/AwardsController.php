@@ -115,6 +115,8 @@ class AwardsController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -336,6 +338,9 @@ class AwardsController extends Controller
            
             $c = 0;
             $colleccion = null;
+
+            // return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
+
             
             foreach($awardsClass->getJugadasDeFechaDada($l['id']) as $j){
     
@@ -347,6 +352,7 @@ class AwardsController extends Controller
 
                 $sorteo = Draws::on($datos["servidor"])->whereId($j['idSorteo'])->first();
 
+            return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
                 
     
                 
