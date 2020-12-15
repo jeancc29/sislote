@@ -334,7 +334,6 @@ class AwardsController extends Controller
             return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
         }
 
-
            
             $c = 0;
             $colleccion = null;
@@ -431,6 +430,7 @@ class AwardsController extends Controller
             //Buscar jugadas super pale de esa loteria, ya sea esta la loteria primaria o loteria superpale de la tabla salesdetails
             // return Response::json(['errores' => 1,'mensaje' => $awardsClass->getJugadasSuperpaleDeFechaDada($l['id'])], 201);
             foreach($awardsClass->getJugadasSuperpaleDeFechaDada($l['id']) as $j){
+                
     
                 $j['premio'] = 0;
                 $contador = 0;
@@ -445,6 +445,7 @@ class AwardsController extends Controller
                 //Si el premio superpale es igual a -1 entonces eso quiere decir que la otra loteria no ha salido, 
                 //por lo tanto el status de la jugada seguira siendo igual a cero, indicando que todavia la jugada estara pendiente
                 $premioSuperpale = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j);
+                // return Response::json(['errores' => 1,'mensaje' => "Dentro jugadas super pale premio: {$premioSuperpale}"], 201);
                 if($premioSuperpale != -1){
                     $j['premio'] = $premioSuperpale;
                     $j['status'] = 1;

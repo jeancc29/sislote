@@ -606,11 +606,18 @@ class AwardsClass{
 
         
 
-        if($premiosDeLaOtraLoteria == null)
+        if($premiosDeLaOtraLoteria == null){
+            // $l = \App\Lotteries::on($this->servidor)->whereId($idOtraLoteria)->first();
+            // $d = ($l != null) ? $l->descripcion : null;
+            // abort(404, "premiosDeLaOtraLoteria estan nulos {$fechaInicial} - {$fechaFinal} - {$idOtraLoteria}");
             return -1;
+        }
+        // abort(404, "premiosDeLaOtraLoteria primera estan nulos");
         
-        if($premiosDeLaOtraLoteria->primera == null)
+        if($premiosDeLaOtraLoteria->primera == null){
+            // abort(404, "premiosDeLaOtraLoteria primera estan nulos");
             return -1;
+        }
 
         $venta = Sales::on($this->servidor)->whereId($idVenta)->first();
         $idBanca = Branches::on($this->servidor)->whereId($venta->idBanca)->first()->id;
@@ -635,7 +642,7 @@ class AwardsClass{
                 break;
         }
 
-        
+        // abort(404, "hayPremiadoEnPrimera: {$hayPremiadoEnPrimera} hayPremiadoEnPrimeraDeLaOtraLoteria: {$hayPremiadoEnPrimeraDeLaOtraLoteria}");
 
         switch ($segundoParDeNumeros) {
             case $this->primera:
