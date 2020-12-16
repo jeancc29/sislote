@@ -241,7 +241,7 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
           var jwt = helperService.createJWT($scope.datosPremiosModal);
           $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': jwt})
              .then(function(response){
-                // console.log(response);
+                console.log(response);
                 if(response.data.errores == 0){
                     $scope.inicializarDatosPremiosModal($scope.datosPremiosModal.idLoteria, $scope.datosPremiosModal.idSorteo, response);
                     alert(response.data.mensaje);

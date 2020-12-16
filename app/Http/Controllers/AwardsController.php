@@ -130,7 +130,7 @@ class AwardsController extends Controller
 
         $fecha = getdate(strtotime($datos['fecha']));
         $fechaDesde = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
-        $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        $fechaHasta = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:59:00';
 
 
         $loterias = Lotteries::on($datos["servidor"])->whereStatus(1)->has('sorteos')->get();
@@ -267,13 +267,20 @@ class AwardsController extends Controller
 
             $fechaRequest = new Carbon($datos['fecha']);
             $fechaActual = Carbon::now();
+            // $fechaActual = new Carbon("2020-12-15 23:59:00");
       
             if($fechaRequest->greaterThan($fechaActual)){
-                return Response::json(['errores' => 1,'mensaje' => 'No está permitido actualizar resultados para fechas en el futuro'], 201);
+                if($fechaRequest->day > $fechaActual->day || $fechaRequest->month > $fechaActual->month || $fechaRequest->year > $fechaActual->year)
+                    return Response::json(['errores' => 1,'mensaje' => 'No está permitido actualizar resultados para fechas en el futuro'], 201);
+                else
+                    $fecha = getdate(strtotime($datos['fecha']));
             }else{
                 $fecha = getdate(strtotime($datos['fecha']));
             }
         }
+
+        // return Response::json(['errores' => 1,'mensaje' => "Error al insertar premio: {$fecha['year']}-{$fecha['mon']}-{$fecha['mday']} {$fecha['hours']}:{$fecha['minutes']}:{$fecha['seconds']}"], 201);
+
     
         
         $errores = 0;
@@ -317,9 +324,6 @@ class AwardsController extends Controller
         $awardsClass->pick4 = $l['pick4'];
         $awardsClass->numerosGanadores = $l['primera'] . $l['segunda'] . $l['tercera'];
 
-        
-    
-    
         
         if($awardsClass->combinacionesNula() == true){
             continue;
@@ -476,18 +480,18 @@ class AwardsController extends Controller
                 $todas_las_jugadas_salientes = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
                 $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
                 
-
                 
+                // abort(404, "Error todas: {$todas_las_jugadas} salientes: {$todas_las_jugadas_salientes} status: {$v['status']}");
     
                 if($todas_las_jugadas == $todas_las_jugadas_salientes)
                 {
+
                     if($cantidad_premios > 0)
                     {
                         $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
                         $v['premios'] = $montoPremios;
                         $v['status'] = 2;
-                    }
-                        
+                    }                        
                     else{
                         $v['premios'] = 0;
                         $v['status'] = 3;

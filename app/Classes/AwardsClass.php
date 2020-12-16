@@ -271,7 +271,11 @@ class AwardsClass{
         $idVentas = Sales::on($servidor)->select('sales.id')
         ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
         ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
-        ->where('salesdetails.idLoteria', $idLoteria)
+        // ->where('salesdetails.idLoteria', $idLoteria)
+        ->where(function($query) use($idLoteria){
+            $query->where('salesdetails.idLoteria', $idLoteria)
+              ->orWhere('salesdetails.idLoteriaSuperpale', $idLoteria);
+        })
         ->whereNotIn('sales.status', [0,5])
         ->get();
 
