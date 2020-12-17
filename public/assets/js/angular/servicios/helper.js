@@ -109,6 +109,23 @@ myApp.service('helperService', function(){
                 return jugada;
             }
         }
+        if(jugada.length == 6 && isNaN(Number(jugada)) != true){
+            
+            var primerParNumeros = jugada.substr(0, 2);
+            var segundoParNumeros = jugada.substr(2, 2);
+            var tercerParNumeros = jugada.substr(4, 2);
+            var array = [primerParNumeros, segundoParNumeros, tercerParNumeros];
+            //Ordenar de manera ascendente
+            array.sort(function(a, b){return a - b;});
+            var arrayToString = array.toString();
+            return arrayToString.replaceAll(",", '');
+            // if(Number(primerParNumeros) < Number(segundoParNumeros)){
+            //     return jugada;
+            // }else{
+            //     jugada = segundoParNumeros + primerParNumeros;
+            //     return jugada;
+            // }
+        }
         // console.log("Dentro super pale");
 
         if(jugada.length == 5 && isNaN(Number(jugada.substr(0, jugada.length - 1))) != true && jugada.substr(jugada.length - 1) == "s"){

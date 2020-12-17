@@ -412,7 +412,7 @@ myApp
         }
 
         function indexOfLoteriaYJugadaActual(elemento){
-            return elemento.jugada == $scope.datos.jugada && elemento.idLoteria == $scope.datos.loterias[0].id;
+            return elemento.jugada == helperService.ordenarMenorAMayor($scope.datos.jugada) && elemento.idLoteria == $scope.datos.loterias[0].id;
         }
 
         $scope.monto_disponible = function(esBlur = false){

@@ -1876,4 +1876,39 @@ class Helper{
         return json_decode(json_encode($stdClass), true);
     }
 
+    public static function combinarPremiosPaleYConvertirAExpresionRegular($primera, $segunda, $tercera){
+        //Ejemplo expresion regular que retorna la function (^0102$|^0103$|^0203$)
+        $unirYSepararPorComa = "{$primera},{$segunda},{$tercera}";
+        $arreglo = explode(",", $unirYSepararPorComa);
+        $arreglo = collect($arreglo);
+        $arregloOrdenadoMenorAMayor = $arreglo->sort()->values()->all();
+        $expresionRegular = "";
+        // return $arregloOrdenadoMenorAMayor;
+        //Vamos a recorrer dos ciclos
+        //En el primer ciclo recorremos todos los numeros
+        //En el segundo recorremos todos los numeros que sean mayores que el numero del primer ciclo
+        for ($i=0; $i < count($arregloOrdenadoMenorAMayor); $i++) { 
+            // return "{$arregloOrdenadoMenorAMayor[$i]} {$arreglo[0]}";
+            if($i == 0)
+                $expresionRegular .= "(";
+            //Este segundo for empezara siempre con un directo mayor que el directo del primer ciclo por eso i2 = i + 1
+            for ($i2=$i+1; $i2 < count($arregloOrdenadoMenorAMayor); $i2++) { 
+                if($i == 0)
+                    $expresionRegular .= "^";
+                else if($i > 0)
+                    $expresionRegular .= "|^";
+
+                $expresionRegular .= $arregloOrdenadoMenorAMayor[$i] . $arregloOrdenadoMenorAMayor[$i2] ."$";
+                
+                if($i2 == 1)
+                    $expresionRegular .= "|";
+            }
+
+            if($i + 1 == count($arregloOrdenadoMenorAMayor))
+                $expresionRegular .=")";
+        }
+
+        return $expresionRegular;
+    }
+
 }
