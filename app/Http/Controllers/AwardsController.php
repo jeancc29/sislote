@@ -353,6 +353,8 @@ class AwardsController extends Controller
                 $busqueda2 = false;
                 $busqueda3 = false;
 
+                // abort(404, $j["jugada"]);
+
                 $sorteo = Draws::on($datos["servidor"])->whereId($j['idSorteo'])->first();
 
             // return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
@@ -473,34 +475,41 @@ class AwardsController extends Controller
             // ->whereNotIn('status', [0,5])
             // ->get();
 
-            $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $l["id"], $fecha);
-    
-            foreach($ventas as $v){
-                $todas_las_jugadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
-                $todas_las_jugadas_salientes = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
-                $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
-                
-                
-                // abort(404, "Error todas: {$todas_las_jugadas} salientes: {$todas_las_jugadas_salientes} status: {$v['status']}");
-    
-                if($todas_las_jugadas == $todas_las_jugadas_salientes)
-                {
 
-                    if($cantidad_premios > 0)
-                    {
-                        $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
-                        $v['premios'] = $montoPremios;
-                        $v['status'] = 2;
-                    }                        
-                    else{
-                        $v['premios'] = 0;
-                        $v['status'] = 3;
-                    }
+            /************** MANERA NUEVA DE CAMBIAR STATUS DE LOS TICKETS ***********/
+            AwardsClass::actualizarStatusDelTicket($datos["servidor"], $l["id"], $fecha);
+
+
+
+            /********* MANERA VIEJA DE CAMBIAR STATUS DE LOS TICKETS */
+            // $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $l["id"], $fecha);
+    
+            // foreach($ventas as $v){
+            //     $todas_las_jugadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
+            //     $todas_las_jugadas_salientes = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
+            //     $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
+                
+                
+            //     // abort(404, "Error todas: {$todas_las_jugadas} salientes: {$todas_las_jugadas_salientes} status: {$v['status']}");
+    
+            //     if($todas_las_jugadas == $todas_las_jugadas_salientes)
+            //     {
+
+            //         if($cantidad_premios > 0)
+            //         {
+            //             $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
+            //             $v['premios'] = $montoPremios;
+            //             $v['status'] = 2;
+            //         }                        
+            //         else{
+            //             $v['premios'] = 0;
+            //             $v['status'] = 3;
+            //         }
                         
     
-                    $v->save();
-                }
-            }
+            //         $v->save();
+            //     }
+            // }
 
         endforeach;
     

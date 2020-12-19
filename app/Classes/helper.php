@@ -1911,4 +1911,178 @@ class Helper{
         return $expresionRegular;
     }
 
+    public static function combinarPremiosTripletaYConvertirAExpresionRegular($primera, $segunda, $tercera){
+        //Ejemplo expresion regular que retorna la function (^0102$|^0103$|^0203$)
+        $unirYSepararPorComa = "{$primera},{$segunda},{$tercera}";
+        $arreglo = explode(",", $unirYSepararPorComa);
+        $arreglo = collect($arreglo);
+        $arregloOrdenadoMenorAMayor = $arreglo->sort()->values()->all();
+        $expresionRegular = "";
+        // return $arregloOrdenadoMenorAMayor;
+        //Vamos a recorrer dos ciclos
+        //En el primer ciclo recorremos todos los numeros
+        //En el segundo recorremos todos los numeros que sean mayores que el numero del primer ciclo
+        for ($i=0; $i < count($arregloOrdenadoMenorAMayor); $i++) { 
+            // return "{$arregloOrdenadoMenorAMayor[$i]} {$arreglo[0]}";
+            if($i == 0)
+                $expresionRegular .= "(";
+            //Este segundo for empezara siempre con un directo mayor que el directo del primer ciclo por eso i2 = i + 1
+            for ($i2=$i+1; $i2 < count($arregloOrdenadoMenorAMayor); $i2++) { 
+                if($i == 0)
+                    $expresionRegular .= "^";
+                else if($i > 0)
+                    $expresionRegular .= "|^";
+
+                $expresionRegular .= $arregloOrdenadoMenorAMayor[$i] . $arregloOrdenadoMenorAMayor[$i2] ."$";
+                
+                if($i2 == 1)
+                    $expresionRegular .= "|";
+            }
+
+            if($i + 1 == count($arregloOrdenadoMenorAMayor))
+                $expresionRegular .=")";
+        }
+
+        return $expresionRegular;
+    }
+
+   
+
+    public static function comb($alfabeto, $n, $resultados, $resultado) {
+        $resultados = [];
+        if(!$resultado) {
+            $resultado = [];
+        }
+        for($i=0; $i<$alfabeto.length; ++$i) {
+            $newResultado = $resultado.slice();
+            $newAlfabeto = $alfabeto.slice();
+            $newResultado.push($alfabeto[$i]);
+            $newAlfabeto = array_splice($array, $i, 1);
+            if(n>1) {
+                comb($newAlfabeto, n-1, $resultados, $newResultado);
+            } else {
+                $resultados.push($newResultado);
+            }
+        }
+    }
+
+//     public static function pc_permute($items, $perms = array( ), $arrayToFill = array()) {
+//         $string = "";
+//         if (empty($items)) { 
+//             // print join(' ', $perms) . "\n" . count($items) . "\n";
+//                 //  print "hola: \n";
+//             array_push($arrayToFill, join(' ', $perms));
+//         }  else {
+//             for ($i = count($items) - 1; $i >= 0; --$i) {
+//                  $newitems = $items;
+//                  $newperms = $perms;
+//                  list($foo) = array_splice($newitems, $i, 1);
+//                  array_unshift($newperms, $foo);
+//                 //  print "count: " . count($newitems) . " " . join("", $newperms) . "\n";
+//                 if(empty($newitems))
+//                     array_push($arrayToFill, join("", $newperms));
+//                 Helper::pc_permute($newitems, $newperms, $arrayToFill);
+//                  print join("", $newperms) . " - " . count($items) . "\n";
+//                 if(empty($newitems))
+//                     $string .= join("", $newperms) . "|";
+//                 //  print "count: " . count($newitems) . " " . join("", $newperms) . "\n";
+                    
+//              }
+//             //  print "Termino per: " . join(" ", $perms) . "\n";
+//              if(empty($perms))
+//                 return $arrayToFill;
+//         }
+//  }
+
+public static function pc_permute($items, $perms = array( )) {
+    if (empty($items)) {
+        $return = array($perms);
+    }  else {
+        $return = array();
+        for ($i = count($items) - 1; $i >= 0; --$i) {
+             $newitems = $items;
+             $newperms = $perms;
+         list($foo) = array_splice($newitems, $i, 1);
+             array_unshift($newperms, $foo);
+             $return = array_merge($return, Helper::pc_permute($newitems, $newperms));
+         }
+    }
+    return $return;
+}
+
+public static function pc_permuteString($items) {
+    // if (empty($items)) {
+    //     $return = "^".join("",$perms) . "$|";
+    // }  else {
+    //     $return = "";
+    //     for ($i = count($items) - 1; $i >= 0; --$i) {
+    //          $newitems = $items;
+    //          $newperms = $perms;
+    //      list($foo) = array_splice($newitems, $i, 1);
+    //          array_unshift($newperms, $foo);
+    //         //  $return = $return . "|" . join("", Helper::pc_permute($newitems, $newperms));
+    //          $return = $return . Helper::pc_permuteString($newitems, $newperms) ;
+    //         //  Helper::pc_permute($newitems, $newperms);
+    //      }
+    // }
+    // // print count($return);
+    // if(empty($perms)){
+    //     //Asi queda el string al terminar ^678$|^768$|^687$| asi que debemos poner un parentesis al inicio
+    //     // y despues quitar la ultima barra | y poner otro parentesis al final
+    //     $ponerPrimerParentesis = "(" . $return;
+    //     $quitarUlimaBarra = substr($ponerPrimerParentesis, 0, strlen($ponerPrimerParentesis) - 1);
+    //     $ponerUltimoParentesis = $quitarUlimaBarra . ")";
+    //     $return = $ponerUltimoParentesis;
+    // }
+    // return $return;
+    $array = Helper::pc_permute($items);
+    $permuteRegexString = "";
+    for ($i=0; $i < count($array); $i++) { 
+        $permuteToString = join("", $array[$i]);
+        if((strpos($permuteRegexString, $permuteToString)) == false)
+            $permuteRegexString .= "^" . join("", $array[$i]) . "$|";
+    }
+
+    //Asi queda el string al terminar ^678$|^768$|^687$| asi que debemos poner un parentesis al inicio
+    // y despues quitar la ultima barra | y poner otro parentesis al final
+    $ponerPrimerParentesis = "(" . $permuteRegexString;
+    $quitarUlimaBarra = substr($ponerPrimerParentesis, 0, strlen($ponerPrimerParentesis) - 1);
+    $ponerUltimoParentesis = $quitarUlimaBarra . ")";
+    $permuteRegexString = $ponerUltimoParentesis;
+
+    return $permuteRegexString;
+}
+
+public static function combinarPremiosParaTodosLosSorteosYconvertirlosAExpresionRegular($primera, $segunda, $tercera, $pick3, $pick4){
+    $expresionRegular = "";
+    if(!empty($primera) && !empty($segunda) && !empty($tercera)){
+        $expresionRegularQuiniela = "^{$primera}$|^{$segunda}$|^{$tercera}$";
+        $expresionRegularPale = Helper::combinarPremiosPaleYConvertirAExpresionRegular($primera, $segunda, $tercera);
+        $expresionRegularTripleta = Helper::pc_permuteString([$primera, $segunda, $tercera]);
+        $expresionRegular .= $expresionRegularQuiniela . "|" . Helper::quitarParentesis($expresionRegularPale) . "|" . Helper::quitarParentesis($expresionRegularTripleta);
+    }
+
+    if(!empty($pick3)){
+        $expresionRegularPick3 = Helper::pc_permuteString([$pick3[0], $pick3[1], $pick3[2]]);
+        $expresionRegular .= (empty($expresionRegular)) ? Helper::quitarParentesis($expresionRegularPick3) : "|" . Helper::quitarParentesis($expresionRegularPick3); 
+    }
+
+    if(!empty($pick4)){
+        $expresionRegularPick4 = Helper::pc_permuteString([$pick4[0], $pick4[1], $pick4[2], $pick4[3]]);
+        $expresionRegular .= (empty($expresionRegular)) ? Helper::quitarParentesis($expresionRegularPick4) : "|" . Helper::quitarParentesis($expresionRegularPick4); 
+    }
+
+    $ponerPrimerParentesis = "(" . $expresionRegular;
+    $ponerUltimoParentesis = $ponerPrimerParentesis . ")";
+    $expresionRegular = $ponerUltimoParentesis;
+
+    return $expresionRegular;
+}
+
+public static function quitarParentesis($data){
+    $quitarPrimerParentesis = str_replace("(", "", $data);
+    $quitarUltimoParentesis = str_replace(")", "", $quitarPrimerParentesis);
+    return $quitarUltimoParentesis;
+}
+
 }

@@ -244,21 +244,56 @@ class AwardsClass{
         $idSuperpale = Draws::on($this->servidor)->whereDescripcion("Super pale")->first()->id;
 
         
-        $idVentas = Sales::on($this->servidor)->select('sales.id')
-        ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
-        ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
-        ->where('salesdetails.idLoteria', $idLoteria)
-        ->whereNotIn('sales.status', [0,5])
-        ->where('salesdetails.idSorteo', '!=', $idSuperpale)
-        ->get();
+        // $idVentas = Sales::on($this->servidor)->select('sales.id')
+        // ->join('salesdetails', 'salesdetails.idVenta', '=', 'sales.id')
+        // ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+        // ->where('salesdetails.idLoteria', $idLoteria)
+        // ->whereNotIn('sales.status', [0,5])
+        // ->where('salesdetails.idSorteo', '!=', $idSuperpale)
+        // ->get();
 
         // abort(404, $fechaInicial . " " . $fechaFinal);
 
-        $jugadas = Salesdetails::on($this->servidor)->whereIn('idVenta', $idVentas)->where('idLoteria', $idLoteria)
-            ->orderBy('jugada', 'asc')
-            ->where('salesdetails.idSorteo', '!=', $idSuperpale)
-            ->get();
+        $regexp = \App\Classes\Helper::combinarPremiosParaTodosLosSorteosYconvertirlosAExpresionRegular($this->primera, $this->segunda, $this->tercera, $this->pick3, $this->pick4);
+        // abort(404, "Datos: \n{$regexp}");
+        $jugadas = Salesdetails::on($this->servidor)
+        ->select('salesdetails.id', 'salesdetails.idVenta', 'salesdetails.idLoteria', 'salesdetails.idSorteo', 'salesdetails.jugada', 'salesdetails.monto', 'salesdetails.premio', 'salesdetails.comision', 'salesdetails.status', 'salesdetails.pagado', 'salesdetails.idStock', 'salesdetails.idLoteriaSuperpale', 'salesdetails.created_at', 'salesdetails.updated_at')
+        ->join('sales', "sales.id", "=", "salesdetails.idVenta")
+        ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+        ->whereNotIn('sales.status', [0,5])
+        ->where('salesdetails.idLoteria', $idLoteria)
+        ->whereRaw("salesdetails.jugada regexp '{$regexp}'")
+        ->orderBy('salesdetails.jugada', 'asc')
+        ->where('salesdetails.idSorteo', '!=', $idSuperpale)
+        ->get();
 
+        // $count = count($jugadas);
+        // abort(404, "Jugadas: {$count}");
+
+        // Salesdetails::on($servidor)->join('sales', "sales.id", "=", "salesdetails.idVenta")->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))->whereNotIn('sales.status', [0,5])->where('salesdetails.idLoteria', $idLoteria)->whereRaw("salesdetails.jugada regexp '{$regexp}'")->orderBy('salesdetails.jugada', 'asc')->where('salesdetails.idSorteo', '!=', $idSuperpale)->get();
+
+        //Establecemos el estatus todas las jugadas de esta loteria como salientes
+        // Salesdetails::on($this->servidor)
+        // ->join('sales', "sales.id", "=", "salesdetails.idVenta")
+        // ->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+        // ->whereNotIn('sales.status', [0,5])
+        // ->where('salesdetails.idLoteria', $idLoteria)
+        // ->orderBy('salesdetails.jugada', 'asc')
+        // ->where('salesdetails.idSorteo', '!=', $idSuperpale)
+        // ->update(["salesdetails.status" => 1]);
+
+        \DB::connection($this->servidor)
+            ->select("
+            update salesdetails sd 
+            inner join sales s on s.id = sd.idVenta
+            set sd.status = 1, sd.premio = 0
+            where s.created_at between '{$fechaInicial}' and '{$fechaFinal}'
+            and sd.idLoteria = '{$idLoteria}'
+            and sd.idSorteo != '{$idSuperpale}'
+            and s.status not in(0,5)
+        ");
+
+        // \DB::connection("valentin")->select("select * from salesdetails sd inner join sales s on s.id = sd.idVenta where s.created_at between '{$fechaInicial}' and '{$fechaFinal}' and sd.idLoteria = '{$idLoteria}' and sd.idSorteo != '{$idSuperpale}' and s.status in(0,5)");
         return $jugadas;
     }
 
@@ -284,6 +319,29 @@ class AwardsClass{
                 ->get();
 
         return $ventas;
+    }
+
+    public static function actualizarStatusDelTicket($servidor, $idLoteria, $fecha){
+        $fechaActual = $fecha;
+        $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+        $idSuperpale = Draws::on($servidor)->whereDescripcion("Super pale")->first()->id;
+
+        \DB::connection($servidor)->select("
+        update (
+            select s.id, 
+            count(IF(sd.status = 1, 1, null)) as todas_las_jugadas_salientes, 
+            (select count(id) from salesdetails where salesdetails.idVenta = s.id) as todas_las_jugadas, 
+            sum(sd.premio) as premios 
+            from sales s inner join salesdetails sd on sd.idVenta = s.id 
+            where sd.idLoteria = {$idLoteria} 
+            and s.created_at between '{$fechaInicial}' and '{$fechaFinal}' 
+            and s.status not in(0, 5) 
+            group by s.id
+            ) as ticketsInfo 
+        inner join sales s on s.id = ticketsInfo.id 
+        set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, s.status))");
+
     }
 
     public function getJugadasSuperpaleDeFechaDada($idLoteria){
