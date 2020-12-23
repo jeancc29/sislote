@@ -2085,4 +2085,232 @@ public static function quitarParentesis($data){
     return $quitarUltimoParentesis;
 }
 
+static function microtime_float()
+{
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+}
+
+public static function pruebaDuracion($datos, $fecha){
+    $time_start = Helper::microtime_float();
+    // Dormir por un momento
+    // \App\Classes\AwardsClass::actualizarStatusDelTicket($servidor, $idLoteria, $fecha);
+    // usleep(1000000);
+        $servers = \App\Server::all();
+        foreach ($servers as $server) {
+            $datos["servidor"] = $server->descripcion;
+            Helper::save($datos, $fecha);
+        }
+    
+    $time_end = Helper::microtime_float();
+    $time = $time_end - $time_start;
+    print "No se hizo nada en $time segundos\n";
+
+}
+
+static function save($datos, $fecha){
+    foreach($datos['loterias'] as $l):
+        $loteria = \App\Lotteries::on($datos["servidor"])->whereDescripcion($l["descripcion"])->first();
+        $l['id'] = $loteria->id;
+        print "Loteria: " . $loteria->descripcion . " id: " . $l['id'] . " s: " . $datos["servidor"] . "\n";
+        // $awardsClass = new \App\Classes\AwardsClass($datos["servidor"], $l['id']);
+        // $awardsClass->fecha = $fecha;
+        // $awardsClass->idUsuario = $datos['idUsuario'];
+        // $awardsClass->primera = $l['primera'];
+        // $awardsClass->segunda = $l['segunda'];
+        // $awardsClass->tercera = $l['tercera'];
+        // $awardsClass->pick3 = $l['pick3'];
+        // $awardsClass->pick4 = $l['pick4'];
+        // $awardsClass->numerosGanadores = $l['primera'] . $l['segunda'] . $l['tercera'];
+
+        
+        // if($awardsClass->combinacionesNula() == true){
+        //     continue;
+        // }
+        // // if($awardsClass->datosValidos() == false){
+        // //     return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
+        // // }
+        // if(!$awardsClass->loteriaAbreDiaActual()){
+        //     // return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
+        // }  
+        // if($awardsClass->insertarPremio() == false){
+        //     // return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
+        // }
+
+           
+        //     $c = 0;
+        //     $colleccion = null;
+
+        //     // return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
+
+            
+        //     foreach($awardsClass->getJugadasDeFechaDada($l['id']) as $j){
+    
+        //         $j['premio'] = 0;
+        //         $contador = 0;
+        //         $busqueda1 = false;
+        //         $busqueda2 = false;
+        //         $busqueda3 = false;
+
+        //         // abort(404, $j["jugada"]);
+
+        //         $sorteo = \App\Draws::on($datos["servidor"])->whereId($j['idSorteo'])->first();
+
+        //     // return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
+                
+    
+                
+        //         if($sorteo->descripcion == "Directo"){
+        //             if(!is_numeric($awardsClass->numerosGanadores)){
+        //                 abort(404, 'Los numeros ganadores no son correctos');
+        //             }
+        //             $j['premio'] = $awardsClass->directoBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+        //         }
+        //         else if($sorteo->descripcion == "Pale"){
+        //             if(!is_numeric($awardsClass->numerosGanadores)){
+        //                 abort(404, 'Los numeros ganadores no son correctos');
+        //             }
+        //             $j['premio'] = $awardsClass->paleBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], $j['idSorteo']);
+        //         }
+        //         // else if($sorteo->descripcion == "Super pale"){
+        //         //     if(!is_numeric($awardsClass->numerosGanadores)){
+        //         //         return Response::json(['errores' => 1,'mensaje' => 'Los numeros ganadores no son correctos'], 201);
+        //         //     }
+        //         //     $j['premio'] = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j['idLoteriaSuperpale'], $j['jugada'], $j['monto'], $j['idSorteo']);
+        //         // }
+        //         else if($sorteo->descripcion == "Tripleta"){
+        //             if(!is_numeric($awardsClass->numerosGanadores)){
+        //                 abort(404, 'Los numeros ganadores no son correctos');
+        //             }
+        //             $j['premio'] = $awardsClass->tripletaBuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+        //         }
+        //         else if($sorteo->descripcion == "Pick 3 Straight"){
+        //             $j['premio'] = $awardsClass->pick3BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+        //         }
+        //         else if($sorteo->descripcion == "Pick 3 Box"){
+        //             $j['premio'] = $awardsClass->pick3BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], false);
+        //         }
+        //         else if($sorteo->descripcion == "Pick 4 Straight"){
+        //             $j['premio'] = $awardsClass->pick4BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto']);
+        //         }
+        //         else if($sorteo->descripcion == "Pick 4 Box"){
+        //             $j['premio'] = $awardsClass->pick4BuscarPremio($j['idVenta'], $l['id'], $j['jugada'], $j['monto'], false);
+        //         }
+    
+    
+        //         $j['status'] = 1;
+        //         $j->save();
+    
+    
+        //         // if($c == 0){
+        //         //     $colleccion = collect([
+        //         //         'busqueda_false' => gettype($busqueda),
+        //         //         'busqueda' => $busqueda,
+        //         //         'jugada' => $j['jugada'], 
+        //         //         'premio' => $j['premio'], 
+        //         //         'monto' => $j['monto'],
+        //         //         'contador' => $contador,
+        //         //         'busqueda1' => $busqueda1,
+        //         //         'busqueda2' => $busqueda2,
+        //         //         'busqueda3' => $busqueda3
+        //         //     ]);
+        //         // }else{
+        //         //     $colleccion->push([
+        //         //         'busqueda_false' => gettype($busqueda),
+        //         //         'busqueda' => $busqueda,
+        //         //         'jugada' => $j['jugada'], 
+        //         //         'premio' => $j['premio'], 
+        //         //         'monto' => $j['monto'],
+        //         //         'contador' => $contador,
+        //         //         'busqueda1' => $busqueda1,
+        //         //         'busqueda2' => $busqueda2,
+        //         //         'busqueda3' => $busqueda3
+        //         //     ]);
+        //         // }
+    
+        //         $c++;
+        //     }
+
+
+        //     //Buscar jugadas super pale de esa loteria, ya sea esta la loteria primaria o loteria superpale de la tabla salesdetails
+        //     // return Response::json(['errores' => 1,'mensaje' => $awardsClass->getJugadasSuperpaleDeFechaDada($l['id'])], 201);
+        //     foreach($awardsClass->getJugadasSuperpaleDeFechaDada($l['id']) as $j){
+                
+    
+        //         $j['premio'] = 0;
+        //         $contador = 0;
+        //         $busqueda1 = false;
+        //         $busqueda2 = false;
+        //         $busqueda3 = false;
+
+        //         if(!is_numeric($awardsClass->numerosGanadores)){
+        //             abort(404,'Los numeros ganadores no son correctos');
+        //         }
+
+        //         //Si el premio superpale es igual a -1 entonces eso quiere decir que la otra loteria no ha salido, 
+        //         //por lo tanto el status de la jugada seguira siendo igual a cero, indicando que todavia la jugada estara pendiente
+        //         $premioSuperpale = $awardsClass->superPaleBuscarPremio($j['idVenta'], $l['id'], $j);
+        //         // return Response::json(['errores' => 1,'mensaje' => "Dentro jugadas super pale premio: {$premioSuperpale}"], 201);
+        //         if($premioSuperpale != -1){
+        //             $j['premio'] = $premioSuperpale;
+        //             $j['status'] = 1;
+        //             $j->save();
+        //         }else{
+        //             $j['premio'] = 0;
+        //             $j['status'] = 0;
+        //             $j->save();
+        //         }
+                
+    
+        //         $c++;
+        //     }
+    
+        // endforeach;
+
+
+        // foreach($datos['loterias'] as $l):
+        //     // $ventas = Sales::on($datos["servidor"])
+        //     // ->whereBetween('created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+        //     // ->whereNotIn('status', [0,5])
+        //     // ->get();
+
+
+        //     /************** MANERA NUEVA DE CAMBIAR STATUS DE LOS TICKETS ***********/
+        //     \App\Classes\AwardsClass::actualizarStatusDelTicket($datos["servidor"], $l["id"], $fecha);
+
+
+
+        //     /********* MANERA VIEJA DE CAMBIAR STATUS DE LOS TICKETS */
+        //     // $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $l["id"], $fecha);
+    
+        //     // foreach($ventas as $v){
+        //     //     $todas_las_jugadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
+        //     //     $todas_las_jugadas_salientes = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
+        //     //     $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
+                
+                
+        //     //     // abort(404, "Error todas: {$todas_las_jugadas} salientes: {$todas_las_jugadas_salientes} status: {$v['status']}");
+    
+        //     //     if($todas_las_jugadas == $todas_las_jugadas_salientes)
+        //     //     {
+
+        //     //         if($cantidad_premios > 0)
+        //     //         {
+        //     //             $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
+        //     //             $v['premios'] = $montoPremios;
+        //     //             $v['status'] = 2;
+        //     //         }                        
+        //     //         else{
+        //     //             $v['premios'] = 0;
+        //     //             $v['status'] = 3;
+        //     //         }
+                        
+    
+        //     //         $v->save();
+        //     //     }
+        //     // }
+
+        endforeach;
+}
+
 }

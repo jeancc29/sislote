@@ -238,7 +238,9 @@ myApp.controller("controllerPremiosModal", function($scope, $http, $timeout, hel
 
             $scope.datosPremiosModal.idUsuario = idUsuarioGlobal;
             $scope.datosPremiosModal.servidor = servidorGlobal;
-          var jwt = helperService.createJWT($scope.datosPremiosModal);
+            $scope.datosPremiosModal.loterias = [$scope.datosPremiosModal.selectedLoteriaPremiosModal];
+            var jwt = helperService.createJWT($scope.datosPremiosModal);
+
           $http.post(rutaGlobal+"/api/premios/guardar", {'action':'sp_premios_actualiza', 'datos': jwt})
              .then(function(response){
                 console.log(response);

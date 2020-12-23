@@ -330,7 +330,7 @@ class AwardsClass{
         \DB::connection($servidor)->select("
         update (
             select s.id, 
-            count(IF(sd.status = 1, 1, null)) as todas_las_jugadas_salientes, 
+            (select count(IF(salesdetails.status = 1, 1, null)) from salesdetails where salesdetails.idVenta = s.id) todas_las_jugadas_salientes,
             (select count(id) from salesdetails where salesdetails.idVenta = s.id) as todas_las_jugadas, 
             sum(sd.premio) as premios 
             from sales s inner join salesdetails sd on sd.idVenta = s.id 
@@ -340,7 +340,26 @@ class AwardsClass{
             group by s.id
             ) as ticketsInfo 
         inner join sales s on s.id = ticketsInfo.id 
-        set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, s.status))");
+        set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1))");
+
+    }
+
+    public function setStatusAndPremioOfPlaysToPendientes($idLoteria){
+        $fechaActual = $this->fecha;
+        $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:59:00';
+        $idSuperpale = Draws::on($this->servidor)->whereDescripcion("Super pale")->first()->id;
+        
+        \DB::connection($this->servidor)
+            ->select("
+            update salesdetails sd 
+            inner join sales s on s.id = sd.idVenta
+            set sd.status = 0, sd.premio = 0
+            where s.created_at between '{$fechaInicial}' and '{$fechaFinal}'
+            and (sd.idLoteria = '{$idLoteria}' or sd.idLoteriaSuperpale = '{$idLoteria}')
+            and sd.idSorteo != '{$idSuperpale}'
+            and s.status not in(0,5)
+        ");
 
     }
 

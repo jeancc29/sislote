@@ -311,9 +311,24 @@ class AwardsController extends Controller
             $idBanca = $idBanca->id;
         }
 
+        // \App\Jobs\AwardsJob::dispatch($datos, $fecha);
+        // return Response::json([
+        //     'errores' => 0,
+        //     'mensaje' => 'Se ha guardado correctamente',
+        //     'loterias' => "datos"
+        //     //'colleccon' => $colleccion
+        // ], 201);
         
+    $servers = \App\Server::on("mysql")->get();
+    $a = collect();
+    foreach($servers as $server):
+    $datos["servidor"] = $server->descripcion;
     
     foreach($datos['loterias'] as $l):
+        $loteria = \App\Lotteries::on($datos["servidor"])->whereDescripcion(strtolower($l["descripcion"]))->first();
+        $l['id'] = $loteria->id;
+        $a->push(["lotieria" => $loteria->descripcion, "id" => $loteria->id, "servidor" => $datos["servidor"]]);
+        // abort(404, "Lotieria: " . $loteria->id . " id: " . $loteria->id . " servidor: " . $datos["servidor"]);
         $awardsClass = new AwardsClass($datos["servidor"], $l['id']);
         $awardsClass->fecha = $fecha;
         $awardsClass->idUsuario = $datos['idUsuario'];
@@ -512,6 +527,8 @@ class AwardsController extends Controller
             // }
 
         endforeach;
+
+        endforeach;
     
         $loterias = AwardsClass::getLoterias($datos["servidor"]);
         $loteriasOrdenadasPorHoraCierre = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
@@ -521,7 +538,8 @@ class AwardsController extends Controller
         return Response::json([
             'errores' => 0,
             'mensaje' => 'Se ha guardado correctamente',
-            'loterias' => $loterias
+            'loterias' => $loterias,
+            "guardar" => $a
             //'colleccon' => $colleccion
         ], 201);
     }
@@ -601,6 +619,15 @@ class AwardsController extends Controller
             $idBanca = $idBanca->id;
         }
 
+        $loteriaDescripcion = \App\Lotteries::on($datos["servidor"])->whereId($datos["idLoteria"])->first();
+        $loteriaDescripcion = ($loteriaDescripcion != null) ? $loteriaDescripcion->descripcion : "Real";
+
+        $servers = \App\Server::on("mysql")->get();
+        foreach($servers as $server):
+        $datos["servidor"] = $server->descripcion;
+        $loteria = \App\Lotteries::on($datos["servidor"])->whereDescripcion(strtolower($loteriaDescripcion))->first();
+        $datos["idLoteria"] = $loteria->id;
+
         $awardsClass = new AwardsClass($datos["servidor"], $datos['idLoteria']);
         $awardsClass->fecha = $fecha;
         $awardsClass->idUsuario = $datos['idUsuario'];
@@ -615,17 +642,22 @@ class AwardsController extends Controller
             return Response::json(['errores' => 1,'mensaje' => 'Error al eliminar numeros ganadores'], 201);
         }
 
-            foreach($awardsClass->getJugadasDeFechaDada($datos['idLoteria']) as $j){
-                $j['premio'] = 0;
-                $j['status'] = 0;
-                $j->save();
-            }
 
-            foreach($awardsClass->getJugadasSuperpaleDeFechaDada($datos['idLoteria']) as $j){
-                $j['premio'] = 0;
-                $j['status'] = 0;
-                $j->save();
-            }
+        $awardsClass->setStatusAndPremioOfPlaysToPendientes($datos['idLoteria']);
+        \App\Classes\AwardsClass::actualizarStatusDelTicket($datos["servidor"], $datos["idLoteria"], $fecha);
+
+        endforeach;
+            // foreach($awardsClass->getJugadasDeFechaDada($datos['idLoteria']) as $j){
+            //     $j['premio'] = 0;
+            //     $j['status'] = 0;
+            //     $j->save();
+            // }
+
+            // foreach($awardsClass->getJugadasSuperpaleDeFechaDada($datos['idLoteria']) as $j){
+            //     $j['premio'] = 0;
+            //     $j['status'] = 0;
+            //     $j->save();
+            // }
 
 
             //Aqui buscaremos todos los tickets creados en el dia de hoy y vamos a 
@@ -635,37 +667,37 @@ class AwardsController extends Controller
             // ->whereNotIn('status', [0,5])
             // ->get();
 
-            $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $datos["idLoteria"], $fecha);
+            // $ventas = AwardsClass::getVentasDeFechaDada($datos["servidor"], $datos["idLoteria"], $fecha);
     
-            foreach($ventas as $v){
-                $todas_las_jugadas_realizadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
-                $todas_las_jugadas_que_ya_salieron = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
-                $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
+            // foreach($ventas as $v){
+            //     $todas_las_jugadas_realizadas = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id']])->count();
+            //     $todas_las_jugadas_que_ya_salieron = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->count();
+            //     $cantidad_premios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->count();
                 
-                //Si la cantidad de jugadas realizadas es la que misma que la cantidad que jugadas que se 
-                //han marcado como que ya salieron los premios, entonces la venta debe cambiar de status pendiente a ganadores o perdedores
-                if($todas_las_jugadas_realizadas == $todas_las_jugadas_que_ya_salieron)
-                {
-                    if($cantidad_premios > 0)
-                    {
-                        $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
-                        $v['premios'] = $montoPremios;
-                        $v['status'] = 2;
-                    }    
-                    else{
-                        $v['premios'] = 0;
-                        $v['status'] = 3;
-                    }
+            //     //Si la cantidad de jugadas realizadas es la que misma que la cantidad que jugadas que se 
+            //     //han marcado como que ya salieron los premios, entonces la venta debe cambiar de status pendiente a ganadores o perdedores
+            //     if($todas_las_jugadas_realizadas == $todas_las_jugadas_que_ya_salieron)
+            //     {
+            //         if($cantidad_premios > 0)
+            //         {
+            //             $montoPremios = Salesdetails::on($datos["servidor"])->where(['idVenta' => $v['id'], 'status' => 1])->where('premio', '>', 0)->sum("premio");
+            //             $v['premios'] = $montoPremios;
+            //             $v['status'] = 2;
+            //         }    
+            //         else{
+            //             $v['premios'] = 0;
+            //             $v['status'] = 3;
+            //         }
                         
     
-                    $v->save();
-                }else{
-                    $v['premios'] = 0;
-                    $v['pagado'] = 0;
-                    $v['status'] = 1;
-                    $v->save();
-                }
-            }
+            //         $v->save();
+            //     }else{
+            //         $v['premios'] = 0;
+            //         $v['pagado'] = 0;
+            //         $v['status'] = 1;
+            //         $v->save();
+            //     }
+            // }
     
     
         $loterias = AwardsClass::getLoterias($datos["servidor"]);

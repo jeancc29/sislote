@@ -278,6 +278,7 @@ myApp
 
             if(vistaSencilla == true){
                 $scope.datos.layout = 'vistaSencilla';
+                $scope.datos.loterias = [$scope.datos.selectedLoteria];
             }else{
                 $scope.datos.layout = 'vistaNormal';
             }
@@ -329,7 +330,7 @@ myApp
             },
             function(response) {
                 // Handle error here
-                //console.log('Error jean: ', response);
+                console.log('Error jean: ', response);
                 alert("Error");
             });
         }
@@ -371,11 +372,12 @@ myApp
                 }
                 
             },
-            function(response) {
-                // Handle error here
-                //console.log('Error jean: ', response);
-                alert("Error");
-            });
+            // function(response) {
+            //     // Handle error here
+            //     console.log('Error jean: ', response);
+            //     alert("Error");
+            // }
+            );
         }
 
 
