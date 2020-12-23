@@ -486,10 +486,22 @@ class AwardsClass{
                     $hayPremiadoEnPrimera = true;
                     $contador++;
                 }
+                else if($this->segunda == $segundoParDeNumeros && $hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                else if($this->tercera == $segundoParDeNumeros && $hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
+                    $contador++;
+                }
                 break;
             case $this->segunda:
                 if($hayPremiadoEnSegunda == false){
                     $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                else if($this->tercera == $segundoParDeNumeros && $hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
                     $contador++;
                 }
                 break;
@@ -501,6 +513,7 @@ class AwardsClass{
                 break;
         }
 
+        // abort(404, "hayPremiadoEnPrimera: $$hayPremiadoEnPrimera hayPremiadoEnSegunda: $$hayPremiadoEnSegunda");
         if($hayPremiadoEnPrimera == true && $hayPremiadoEnSegunda == true){
             $premio = $monto * Payscombinations::on($this->servidor)->where(['idLoteria' => $idLoteria, 'idBanca' => $idBanca])->value('primeraSegunda');
         }
@@ -531,6 +544,10 @@ class AwardsClass{
             case $this->primera:
                 if($hayPremiadoEnPrimera == false){
                     $hayPremiadoEnPrimera = true;
+                    $contador++;
+                }
+                if($this->segunda == $segundoParDeNumeros && $hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
                     $contador++;
                 }
                 break;
