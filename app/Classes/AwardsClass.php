@@ -327,17 +327,39 @@ class AwardsClass{
         $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
         $idSuperpale = Draws::on($servidor)->whereDescripcion("Super pale")->first()->id;
 
+        // \DB::connection($servidor)->select("
+        // update (
+        //     select s.id, 
+        //     (select count(IF(salesdetails.status = 1, 1, null)) from salesdetails where salesdetails.idVenta = s.id) todas_las_jugadas_salientes,
+        //     (select count(id) from salesdetails where salesdetails.idVenta = s.id) as todas_las_jugadas, 
+        //     (select sum(salesdetails.premio) from salesdetails where salesdetails.idVenta = s.id) as premios 
+        //     from sales s inner join salesdetails sd on sd.idVenta = s.id 
+        //     where sd.idLoteria = {$idLoteria} 
+        //     and s.created_at between '{$fechaInicial}' and '{$fechaFinal}' 
+        //     and s.status not in(0, 5) 
+        //     group by s.id
+        //     ) as ticketsInfo 
+        // inner join sales s on s.id = ticketsInfo.id 
+        // set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1))");
+
         \DB::connection($servidor)->select("
         update (
-            select s.id, 
-            (select count(IF(salesdetails.status = 1, 1, null)) from salesdetails where salesdetails.idVenta = s.id) todas_las_jugadas_salientes,
-            (select count(id) from salesdetails where salesdetails.idVenta = s.id) as todas_las_jugadas, 
-            (select sum(salesdetails.premio) from salesdetails where salesdetails.idVenta = s.id) as premios 
-            from sales s inner join salesdetails sd on sd.idVenta = s.id 
-            where sd.idLoteria = {$idLoteria} 
-            and s.created_at between '{$fechaInicial}' and '{$fechaFinal}' 
-            and s.status not in(0, 5) 
-            group by s.id
+            select sd.idVenta as id, 
+            count(IF(sd.status = 1, 1, null)) as todas_las_jugadas_salientes,
+            count(sd.id) as todas_las_jugadas, 
+            sum(sd.premio) as premios 
+            from salesdetails sd
+            where 
+            sd.idVenta in (
+                select 
+                    sales.id
+                from sales inner join salesdetails on salesdetails.idVenta = sales.id 
+                where salesdetails.idLoteria = {$idLoteria} 
+                and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}' 
+                and sales.status not in(0, 5) 
+                group by sales.id
+            )
+            group by sd.idVenta
             ) as ticketsInfo 
         inner join sales s on s.id = ticketsInfo.id 
         set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1))");
