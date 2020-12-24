@@ -527,13 +527,13 @@ class AwardsController extends Controller
             // }
 
         endforeach;
+        $loteriasOrdenadasPorHoraCierre = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
+        event(new LotteriesEvent($datos["servidor"], $loteriasOrdenadasPorHoraCierre));
 
         endforeach;
     
         $loterias = AwardsClass::getLoterias($datos["servidor"]);
-        $loteriasOrdenadasPorHoraCierre = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
         // $loterias = LotteriesSmallResource::collection($loterias);
-        event(new LotteriesEvent($datos["servidor"], $loteriasOrdenadasPorHoraCierre));
 
         return Response::json([
             'errores' => 0,
