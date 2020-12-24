@@ -362,7 +362,7 @@ class AwardsClass{
             group by sd.idVenta
             ) as ticketsInfo 
         inner join sales s on s.id = ticketsInfo.id 
-        set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1))");
+        set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1)), s.premios = ticketsInfo.premios");
 
     }
 
