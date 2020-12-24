@@ -332,7 +332,7 @@ class AwardsClass{
             select s.id, 
             (select count(IF(salesdetails.status = 1, 1, null)) from salesdetails where salesdetails.idVenta = s.id) todas_las_jugadas_salientes,
             (select count(id) from salesdetails where salesdetails.idVenta = s.id) as todas_las_jugadas, 
-            sum(sd.premio) as premios 
+            (select sum(salesdetails.premio) from salesdetails where salesdetails.idVenta = s.id) as premios 
             from sales s inner join salesdetails sd on sd.idVenta = s.id 
             where sd.idLoteria = {$idLoteria} 
             and s.created_at between '{$fechaInicial}' and '{$fechaFinal}' 
