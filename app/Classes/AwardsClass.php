@@ -324,7 +324,7 @@ class AwardsClass{
     public static function actualizarStatusDelTicket($servidor, $idLoteria, $fecha){
         $fechaActual = $fecha;
         $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
-        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+        $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:59:00';
         $idSuperpale = Draws::on($servidor)->whereDescripcion("Super pale")->first()->id;
 
         // \DB::connection($servidor)->select("
@@ -364,6 +364,8 @@ class AwardsClass{
         inner join sales s on s.id = ticketsInfo.id 
         set s.status = IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1)), s.premios = ticketsInfo.premios");
 
+        // if($servidor == "servidor3")
+        // abort(404, "servidor: $servidor");
     }
 
     public function setStatusAndPremioOfPlaysToPendientes($idLoteria){

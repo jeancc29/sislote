@@ -492,7 +492,23 @@ class AwardsController extends Controller
 
 
             /************** MANERA NUEVA DE CAMBIAR STATUS DE LOS TICKETS ***********/
+            $loteria = \App\Lotteries::on($datos["servidor"])->whereDescripcion(strtolower($l["descripcion"]))->first();
+            $l['id'] = $loteria->id;
+
             AwardsClass::actualizarStatusDelTicket($datos["servidor"], $l["id"], $fecha);
+
+            // if($datos["servidor"] == "servidor3"){
+            //     $fechaActual = $fecha;
+            //     $fechaInicial = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 00:00:00';
+            //     $fechaFinal = $fechaActual['year'].'-'.$fechaActual['mon'].'-'.$fechaActual['mday'] . ' 23:50:00';
+            //     $data = \DB::connection($datos["servidor"])->select("select IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes and ticketsInfo.premios > 0, 2, IF(ticketsInfo.todas_las_jugadas = ticketsInfo.todas_las_jugadas_salientes, 3, 1)) as status, ticketsInfo.premios from (select sd.idVenta as id, count(IF(sd.status = 1, 1, null)) as todas_las_jugadas_salientes, count(sd.id) as todas_las_jugadas, sum(sd.premio) as premios from salesdetails sd where sd.idVenta in (select sales.id from sales inner join salesdetails on salesdetails.idVenta = sales.id where salesdetails.idLoteria = {$l['id']} and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}' and sales.status not in(0, 5) group by sales.id) group by sd.idVenta) as ticketsInfo inner join sales s on s.id = ticketsInfo.id ");
+            //     return Response::json([
+            //         "fechaInicial" => $fechaInicial, 
+            //         "fechaFinal" => $fechaFinal, 
+            //         "data" => $data,
+            //         "loteria" => $l["id"]
+            //     ]);
+            // }
 
 
 

@@ -2313,5 +2313,12 @@ static function save($datos, $fecha){
         endforeach;
 }
 
-
+    public static function prueba(){
+        $servers = \App\Server::on("mysql")->get();
+        $fecha = getdate(strtotime("2020-12-24"));
+        foreach($servers as $server):
+        $loteria = \App\Lotteries::on($server->descripcion)->whereDescripcion("La Suerte")->first();
+        \App\Classes\AwardsClass::actualizarStatusDelTicket($server->descripcion, $loteria->id, $fecha);
+        endforeach;
+    }
 }
