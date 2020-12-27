@@ -354,7 +354,7 @@ class AwardsClass{
                 select 
                     sales.id
                 from sales inner join salesdetails on salesdetails.idVenta = sales.id 
-                where salesdetails.idLoteria = {$idLoteria} 
+                where (salesdetails.idLoteria = {$idLoteria} or salesdetails.idLoteriaSuperpale = {$idLoteria} )
                 and sales.created_at between '{$fechaInicial}' and '{$fechaFinal}' 
                 and sales.status not in(0, 5) 
                 group by sales.id
@@ -381,9 +381,10 @@ class AwardsClass{
             set sd.status = 0, sd.premio = 0
             where s.created_at between '{$fechaInicial}' and '{$fechaFinal}'
             and (sd.idLoteria = '{$idLoteria}' or sd.idLoteriaSuperpale = '{$idLoteria}')
-            and sd.idSorteo != '{$idSuperpale}'
             and s.status not in(0,5)
         ");
+
+        // and sd.idSorteo != '{$idSuperpale}'
 
     }
 

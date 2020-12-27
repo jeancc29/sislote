@@ -661,7 +661,11 @@ class AwardsController extends Controller
 
         $awardsClass->setStatusAndPremioOfPlaysToPendientes($datos['idLoteria']);
         \App\Classes\AwardsClass::actualizarStatusDelTicket($datos["servidor"], $datos["idLoteria"], $fecha);
-
+        
+        $loteriasOrdenadasPorHoraCierre = Helper::loteriasOrdenadasPorHoraCierre($datos["servidor"], Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first());
+        // $loterias = LotteriesSmallResource::collection($loterias);
+        event(new LotteriesEvent($datos["servidor"], $loteriasOrdenadasPorHoraCierre));
+        
         endforeach;
             // foreach($awardsClass->getJugadasDeFechaDada($datos['idLoteria']) as $j){
             //     $j['premio'] = 0;
