@@ -2010,7 +2010,7 @@ public static function pc_permute($items, $perms = array( )) {
     return $return;
 }
 
-public static function pc_permuteString($items) {
+public static function pc_permuteString($items, $quitarPrimerElementoDeTodasLasCombinaciones = false) {
     // if (empty($items)) {
     //     $return = "^".join("",$perms) . "$|";
     // }  else {
@@ -2037,10 +2037,19 @@ public static function pc_permuteString($items) {
     // return $return;
     $array = Helper::pc_permute($items);
     $permuteRegexString = "";
-    for ($i=0; $i < count($array); $i++) { 
-        $permuteToString = join("", $array[$i]);
-        if((strpos($permuteRegexString, $permuteToString)) == false)
-            $permuteRegexString .= "^" . join("", $array[$i]) . "$|";
+
+    if($quitarPrimerElementoDeTodasLasCombinaciones == false){
+        for ($i=0; $i < count($array); $i++) { 
+            $permuteToString = join("", $array[$i]);
+            if((strpos($permuteRegexString, $permuteToString)) == false)
+                $permuteRegexString .= "^" . join("", $array[$i]) . "$|";
+        }
+    }else{
+        for ($i=0; $i < count($array); $i++) { 
+            $permuteToString = join("", $array[$i]);
+            if((strpos($permuteRegexString, $permuteToString)) == false)
+                $permuteRegexString .= substr(join("", $array[$i]), 2, 4) . "|";
+        }
     }
 
     //Asi queda el string al terminar ^678$|^768$|^687$| asi que debemos poner un parentesis al inicio
@@ -2059,7 +2068,8 @@ public static function combinarPremiosParaTodosLosSorteosYconvertirlosAExpresion
         $expresionRegularQuiniela = "^{$primera}$|^{$segunda}$|^{$tercera}$";
         $expresionRegularPale = Helper::combinarPremiosPaleYConvertirAExpresionRegular($primera, $segunda, $tercera);
         $expresionRegularTripleta = Helper::pc_permuteString([$primera, $segunda, $tercera]);
-        $expresionRegular .= $expresionRegularQuiniela . "|" . Helper::quitarParentesis($expresionRegularPale) . "|" . Helper::quitarParentesis($expresionRegularTripleta);
+        $expresionRegularTripletaDosNumeros = Helper::pc_permuteString([$primera, $segunda, $tercera], true);
+        $expresionRegular .= $expresionRegularQuiniela . "|" . Helper::quitarParentesis($expresionRegularPale) . "|" . Helper::quitarParentesis($expresionRegularTripleta) . "|" . Helper::quitarParentesis($expresionRegularTripletaDosNumeros);
     }
 
     if(!empty($pick3)){
