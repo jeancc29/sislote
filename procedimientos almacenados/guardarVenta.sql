@@ -1,12 +1,9 @@
-
--- quitar COLLATE utf8mb4_unicode_ci del mysql del servidor linux de digitalocean porque eso no funciona ahi
-
-use valentin;
-DROP PROCEDURE IF EXISTS `guardarVenta`;
-delimiter ;;
-CREATE PROCEDURE `guardarVenta` (IN pidUsuario varchar(30), idBanca int, idVentaHash varchar(200), compartido int, descuentoMonto int, hayDescuento boolean, total decimal(20, 2), jugadas json)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `guardarVenta`(IN pidUsuario varchar(30), idBanca int, idVentaHash varchar(200), compartido int, descuentoMonto int, hayDescuento boolean, total decimal(20, 2), jugadas json)
 BEGIN
+
 -- , OUT psalida nvarchar(1000)
+
+
 	declare idVenta bigint; 
     declare idTicket bigint; 
     declare codigoBarraCorrecto boolean; 
@@ -23,15 +20,22 @@ BEGIN
     declare caracteristicasGenerales varchar(200);
     declare siguienteIdVenta bigInt;
     declare idBancaIdVentaTemporal int;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+	BEGIN
+		  ROLLBACK;
+		  select 1 as errores, @mensaje as mensaje;
+	END;
+    
 	DROP TEMPORARY TABLE IF EXISTS `TempTable`;
     CREATE TEMPORARY TABLE TempTable (id int primary key auto_increment, loterias json not null); 
 	set @errores = 0;
+    
      set sql_safe_updates = 0;
      
       if not exists(select id from branches where branches.status = 1 and branches.id = idBanca)
     then
-		set @errores = 1;
-		select 1 as errores, 'Error: Esta banca esta desactivada' as mensaje;
+		set @mensaje = 'Error: Esta banca esta desactivada';
+        SIGNAL SQLSTATE '45000';
     end if;
      
     -- getIdVentaTemporal
@@ -41,8 +45,8 @@ BEGIN
    
    if idVenta is null 
 		then
-			set @errores = 1;
-			select 1 as errores, 'Error de seguridad: idVenta incorrecto' as mensaje, idVenta as idVenta, idVentaHash, idBanca;
+			set @mensaje = 'Error de seguridad: idVenta incorrecto';
+            SIGNAL SQLSTATE '45000';
         end if;
     -- END getIdVentaTemporal
     
@@ -65,14 +69,14 @@ BEGIN
     
     if not exists(select id from users where id = pidUsuario and status = 1)
 		then
-			set @errores = 1;
-			select 1 as errores, 'Error: El usuario no existe' as mensaje;
+			set @mensaje = 'Error: El usuario no existe';
+            SIGNAL SQLSTATE '45000';
         end if;
        
 	if (select count(p.descripcion) from users u inner join permission_user pu on u.id = pu.idUsuario inner join permissions p on p.id = pu.idPermiso where p.descripcion in('Vender tickets', 'Acceso al sistema') and u.id = pidUsuario) < 2
     then
-		set @errores = 1;
-		select 1 as errores, 'Error: No tiene permiso para realizar esta accion vender y acceso' as mensaje;
+		set @mensaje = 'Error: No tiene permiso para realizar esta accion vender y acceso';
+        SIGNAL SQLSTATE '45000';
     end if;
     
    
@@ -81,8 +85,8 @@ BEGIN
     then
 		if not exists(select count(p.descripcion) from users u inner join permission_user pu on u.id = pu.idUsuario inner join permissions p on p.id = pu.idPermiso where p.descripcion = 'Jugar como cualquier banca' and u.id = pidUsuario)
         then
-			set @errores = 1;
-			select 1 as errores, 'Error: No tiene permiso para realizar esta accion jugar como cualquier banca' as mensaje;
+			set @mensaje = 'Error: No tiene permiso para realizar esta accion jugar como cualquier banca';
+            SIGNAL SQLSTATE '45000';
         end if;
     end if;
     
@@ -102,36 +106,25 @@ BEGIN
     
     if DATE_FORMAT(now(),'%H:%i:%s') < (select DATE_FORMAT(concat(date(now()), ' ', bd.horaApertura),'%H:%i:%s') from branches b inner join branches_days bd on b.id = bd.idBanca inner join days d on d.id = bd.idDia where d.wday = wday and b.id = idBanca)
     then
-		set @errores = 1;
-		select 1 as errores, 'Error: la banca aun no ha abierto' as mensaje;
+		set @mensaje = 'Error: la banca aun no ha abierto';
+        SIGNAL SQLSTATE '45000';
     end if;
     
     if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', bd.horaCierre),'%H:%i:%s') from branches b inner join branches_days bd on b.id = bd.idBanca inner join days d on d.id = bd.idDia where d.wday = wday and b.id = idBanca)
     then
-		set @errores = 1;
-		select 1 as errores, 'Error: la banca ha cerrado' as mensaje;
+		set @mensaje = 'Error: la banca ha cerrado';
+        SIGNAL SQLSTATE '45000';
     end if;
     
     
     if total > (select limiteVenta from branches where id = idBanca)
     then
-		set @errores = 1;
-		select 1 as errores, 'Error: A excedido el limite de ventas de la banca' as mensaje;
+		set @mensaje = 'Error: A excedido el limite de ventas de la banca';
+        SIGNAL SQLSTATE '45000';
     end if;
+
     
-    
-    -- Generamos y guardamos codigo de barra
-    set codigoBarraCorrecto = false;
-		while codigoBarraCorrecto != true do
-			-- select ROUND((RAND() * (max-min))+min)
-			select ROUND((RAND() * (9999999999-1111111111))+1111111111) into codigoBarra;
-            if not exists(select id from tickets where tickets.codigoBarra = codigoBarra COLLATE utf8mb4_unicode_ci)
-            then
-				insert into tickets(tickets.idBanca, tickets.codigoBarra) values(idBanca, codigoBarra);
-                select id from tickets where tickets.codigoBarra = codigoBarra COLLATE utf8mb4_unicode_ci into idTicket;
-                set codigoBarraCorrecto = true;
-            end if;
-        end while;
+
     
    
 
@@ -141,222 +134,54 @@ BEGIN
 -- select JSON_SEARCH(@a,"one", '2');
 
 -- Aqui vamos a obtener las loterias
-set @contador = 0;
-set @loterias = JSON_ARRAY();
-while @contador < JSON_LENGTH(jugadas) do
-	set @idLoteria = JSON_EXTRACT(jugadas, CONCAT('$[', @contador, '].idLoteria'));
-    set @idLoteria = cast(@idLoteria as char);
-	set @idLoteria = JSON_UNQUOTE(@idLoteria);
-        
-    if JSON_SEARCH(@loterias,"one", @idLoteria) is null
-    then
-		set @loterias = JSON_ARRAY_APPEND(@loterias, '$', @idLoteria);
-	end if;
-    set @contador = @contador + 1;
-end while;
+-- Aquie termina de obtener las loterias
 
-
-
--- Validamos la existencia de la jugada
-set @contadorLoterias = 0;
-while @contadorLoterias < JSON_LENGTH(@loterias) do
-		set @contadorJugadas = 0;
-        set @idLoteria = JSON_EXTRACT(@loterias, CONCAT('$[', @contadorLoterias, ']'));
-        set @idLoteria = JSON_UNQUOTE(@idLoteria);
-	while @contadorJugadas < JSON_LENGTH(jugadas) do
-		 set @idLoteriaJugada = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteria'));
-         set @idLoteriaJugada = JSON_UNQUOTE(@idLoteriaJugada);
-         set @idLoteriaSuperpale = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteriaSuperpale'));
-         set @idLoteriaSuperpale = JSON_UNQUOTE(@idLoteriaSuperpale);
-		 if @idLoteria = @idLoteriaJugada
-			then
-				if exists(select id from awards where idLoteria = @idLoteria and date(created_at) = date(now()) )
-                then
-					set @errores = 1;
-					select 1 as errores, 'La loteria ya tiene premios registrados' as mensaje;
-                end if;
-                
-                -- DETERMINAR ID SORTEO
-                set @jugada = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].jugada'));
-                set @jugada = JSON_UNQUOTE(@jugada);
-                set @idSorteo = 0;
-                if length(@jugada) = 2 then
-					set @idSorteo = 1;
-                elseif length(@jugada) = 3 then
-					select id from draws where descripcion = 'Pick 3 Straight' into @idSorteo;
-				elseif length(@jugada) = 4 then
-					if instr(@jugada, '+') = 4 then
-						select id from draws where descripcion = 'Pick 3 Box' into @idSorteo;
-					else 
-						set @idSorteo = 2;
-						-- Validamos de que la loteria tenga el sorteo super pale y que el drawsrealations sea mayor que 1
-						-- if exists(select d.id from draws d inner join draw_lottery dl on dl.idSorteo = d.id where dl.idLoteria = @idLoteria and d.descripcion = 'Super pale' COLLATE utf8mb4_unicode_ci) and (select count(id) from drawsrelations where idLoteriaPertenece = @idLoteria) > 1
-                        -- then
-							-- set @idSorteo = 4;
-						-- else
-							-- set @idSorteo = 2;
-						-- end if;
-					end if;
-				elseif length(@jugada) = 5 then
-					if instr(@jugada, '+') = 5 then
-						select id from draws where descripcion = 'Pick 4 Box' into @idSorteo;
-					elseif instr(@jugada, '-') = 5 then
-						select id from draws where descripcion = 'Pick 4 Straight' into @idSorteo;
-					elseif instr(@jugada, 's') = 5 then
-						select id from draws where descripcion = 'Super pale' into @idSorteo;
-					end if;
-				elseif length(@jugada) = 6 then
-					set @idSorteo = 3;
-				end if;
-                -- END DETERMINAR ID SORTEO
-                
-                
-					  -- VALIDAR DECIMALES DEL MONTO ES VALIDO
-				set @montoValido = false;
-				set @monto = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].monto'));
-                set @monto = JSON_UNQUOTE(@monto);
-				if instr(@monto, '.') != 0 then
-					-- set @sorteo = (select draws.descripcion from draws where draws.id = @idSorteo);
-					-- if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 3 Straight' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' 
-					-- then
-					-- si el monto redondeado es igual al monto normal eso quiere decir que le monto tiene cero como decimales por lo tanto es correcto, ejemplo 1 == 1.00
-						
-							-- if @monto = 0.50 or round(@monto) = @monto then
-								-- set @montoValido = true;
-							-- end if;
-					-- else
-						-- if round(@monto) = @monto then
-								-- set @montoValido = true;
-							-- end if;
-					-- end if;
-                    
-                    if(@monto REGEXP '^(-|\\+){0,1}([0-9]+\\.[0-9]*|[0-9]*\\.[0-9]+|[0-9]+)$') = 1
-                    then
-						set @montoValido = true;
-					else
-						set @montoValido = false;
-                    end if;
-                    
-				else
-					set @montoValido = true;
-				end if;
-				
-				if @montoValido = false then
-					set @errores = 1;
-					select 1 as errores, concat('Error: El monto de la jugada ' , @jugada , ' es incorrecto') as mensaje;
-				end if;
-			-- END MONTO VALIDO
-			
-			-- banca-> loteriaExisteYTienePagoCombinaciones, no creo que esta valiacion sea necesaria pero voy a dejar este comentario por si acaso
-			-- END banca-> loteriaExisteYTienePagoCombinaciones
-			
-			-- VERIFICAMOS SI EL SORTEO PERTENECE A ESTA LOTERIA
-				if not exists (select d.id from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = @idLoteria and dl.idSorteo = @idSorteo)
-					then
-					set @errores = 1;
-					select 1 as errores, concat('El sorteo no existe para la loteria ' , (select descripcion from lotteries where id = @idLoteria)) as mensaje; 
-					-- select 1 as errores, 'El sorteo no existe para la loteria es incorrecto' as mensaje, @idSorteo, JSON_UNQUOTE(@idLoteria); 
-					-- select d.id as existe from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = JSON_UNQUOTE(@idLoteria) and dl.idSorteo = @idSorteo;
-				-- VERIFICAMOS SI EL SORTEO PERTENECE A la LOTERIA SUPER PALE
-                elseif @idSorteo = 4 then
-					if not exists (select d.id from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = @idLoteriaSuperpale and dl.idSorteo = @idSorteo)
-					then
-						set @errores = 1;
-						select 1 as errores, concat('El sorteo no existe para la loteria ' , (select descripcion from lotteries where id = @idLoteriaSuperpale)) as mensaje; 
-					end if;
-                end if;
-			-- END sorteoEXISTE
-			
-			-- VERIFICAMOS SI LA LOTERIA ABRE HOY Y QUE ESTE ABIERTA
-			  if DATE_FORMAT(now(),'%H:%i:%s') < (select DATE_FORMAT(concat(date(now()), ' ', dl.horaApertura),'%H:%i:%s') from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria)
-				then
-					set @errores = 1;
-					select 1 as errores, 'Error: La loteria aun no ha abierto' as mensaje;
-				end if;
-			-- END LOTERIA ABRE HOY
-			
-			-- VERIFICAMOS SI LA LOTERIA ESTA CERRADA
-            -- DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria)
-            set @horaCierre = null;
-            set @minutosExtras = null;
-            select dl.horaCierre, dl.minutosExtras from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria into @horaCierre, @minutosExtras;
-			if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', @horaCierre),'%H:%i:%s'))
-			then
-				 if not exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar fuera de horario')
-				then
-					if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar minutos extras')
-					then
-						-- verificamos si la hora actual es mayor que la hora de cierre con los minutos extras sumados
-						if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(date_add(concat(date(now()), ' ', @horaCierre), INTERVAL @minutosExtras MINUTE),'%H:%i:%s'))
-						then
-							set @errores = 1;
-							select 1 as errores, concat('Error: minutos extras han pasado, la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado') as mensaje;
-						end if;
-                    else
-						set @errores = 1;
-						select 1 as errores, concat('Error: la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado') as mensaje;
-                    end if;
-				end if;
-			end if;
-			-- END VERIFICAMOS SI LA LOTERIA ESTA CERRADA
-			
-		   
-			-- GET MONTO DISPONIBLE
-            set @montoDisponible = (select montoDisponible(@jugada, @idLoteria, idBanca, @idLoteriaSuperpale));
-			-- quitarUltimoCaracter
-			if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' || @sorteo = 'Super pale' 
-				then
-					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
-				end if;
-				
-				if (@montoDisponible <@monto) or (@montoDisponible <@monto) is null then
-                if not exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar sin disponibilidad') then
-						set @errores = 1;
-						select 1 as errores, concat('No hay existencia suficiente para la jugada ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria)) as mensaje;
-                    end if;
-				end if;
-				-- END GET MONTO DISPONIBLE
-                
-               
-			end if;
-            
-            
-          
-            
-            
-		set @contadorJugadas = @contadorJugadas + 1;
-    end while;
-    set @contadorLoterias = @contadorLoterias + 1;
-end while;
--- END VALIDAR JUGADAS
 
 if @errores = 0
 then
+	/********** INICIAMOS LA TRANSACCION *****************/    
+	start transaction;
+    
+	-- Generamos y guardamos codigo de barra
+	set codigoBarraCorrecto = false;
+	while codigoBarraCorrecto != true do
+		-- select ROUND((RAND() * (max-min))+min)
+		select ROUND((RAND() * (9999999999-1111111111))+1111111111) into codigoBarra;
+		if not exists(select id from tickets where tickets.codigoBarra = codigoBarra COLLATE utf8mb4_unicode_ci)
+		then
+			insert into tickets(tickets.idBanca, tickets.codigoBarra) values(idBanca, codigoBarra);
+			select id from tickets where tickets.codigoBarra = codigoBarra COLLATE utf8mb4_unicode_ci into idTicket;
+			set codigoBarraCorrecto = true;
+		end if;
+	end while;
+
 	insert into 
 		sales(sales.id, sales.compartido, sales.idUsuario, sales.idBanca, sales.total, sales.subTotal, sales.descuentoMonto, sales.hayDescuento, sales.idTicket, sales.created_at, sales.updated_at)
         values(idVenta, compartido, pidUsuario, idBanca, total, subTotal, descuentoMonto, hayDescuento, idTicket, now(), now());
         
-        
+       set @contadorJugadas = 0;
       -- INSERTAR JUGADAS  
-set @contadorLoterias = 0;
-while @contadorLoterias < JSON_LENGTH(@loterias) do
-		set @contadorJugadas = 0;
-        set @idLoteria = JSON_EXTRACT(@loterias, CONCAT('$[', @contadorLoterias, ']'));
-        set @idLoteria = JSON_UNQUOTE(@idLoteria);
+      
 	while @contadorJugadas < JSON_LENGTH(jugadas) do
 		 set @idLoteriaJugada = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteria'));
-         set @idLoteriaJugada = JSON_UNQUOTE(@idLoteriaJugada);
+         set @idLoteria = JSON_UNQUOTE(@idLoteriaJugada);
          set @idLoteriaSuperpale = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteriaSuperpale'));
          set @idLoteriaSuperpale = JSON_UNQUOTE(@idLoteriaSuperpale);
-		 if @idLoteria = @idLoteriaJugada
-			then
-				
+
+        
+				if exists(select id from awards where idLoteria = @idLoteria and date(created_at) = date(now()) )
+                then
+					set @mensaje = 'La loteria ya tiene premios registrados';
+                    SIGNAL SQLSTATE '45000';
+                end if;
+                
                 
                 /******************* DETERMINAR ID SORTEO ************************/
                 set @jugada = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].jugada'));
                 set @jugada = JSON_UNQUOTE(@jugada);
                 set @monto = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].monto'));
                 set @monto = JSON_UNQUOTE(@monto);
+                
                 
                 set @idSorteo = 0;
                 if length(@jugada) = 2 then
@@ -396,6 +221,69 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
                 
 				/******************* END DETERMINAR ID SORTEO *********************/
                 
+                -- VERIFICAMOS SI EL SORTEO PERTENECE A ESTA LOTERIA
+				if not exists (select d.id from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = @idLoteria and dl.idSorteo = @idSorteo)
+					then
+					set @mensaje = concat('El sorteo no existe para la loteria ' , (select descripcion from lotteries where id = @idLoteria));
+                    SIGNAL SQLSTATE '45000';
+					-- select 1 as errores, 'El sorteo no existe para la loteria es incorrecto' as mensaje, @idSorteo, JSON_UNQUOTE(@idLoteria); 
+					-- select d.id as existe from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = JSON_UNQUOTE(@idLoteria) and dl.idSorteo = @idSorteo;
+				-- VERIFICAMOS SI EL SORTEO PERTENECE A la LOTERIA SUPER PALE
+                elseif @idSorteo = 4 then
+					if not exists (select d.id from draws d inner join draw_lottery dl on d.id = dl.idSorteo where dl.idLoteria = @idLoteriaSuperpale and dl.idSorteo = @idSorteo)
+					then
+						set @mensaje = concat('El sorteo no existe para la loteria ' , (select descripcion from lotteries where id = @idLoteriaSuperpale)); 
+                        SIGNAL SQLSTATE '45000';
+					end if;
+                end if;
+			-- END sorteoEXISTE
+            
+            
+            -- VERIFICAMOS SI LA LOTERIA ABRE HOY Y QUE ESTE ABIERTA
+			  if DATE_FORMAT(now(),'%H:%i:%s') < (select DATE_FORMAT(concat(date(now()), ' ', dl.horaApertura),'%H:%i:%s') from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria)
+				then
+					set @mensaje = 'Error: La loteria aun no ha abierto';
+                    SIGNAL SQLSTATE '45000';
+				end if;
+			-- END LOTERIA ABRE HOY
+            
+            -- VERIFICAMOS SI LA LOTERIA ESTA CERRADA
+            -- DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria)
+            set @horaCierre = null;
+            set @minutosExtras = null;
+            select dl.horaCierre, dl.minutosExtras from lotteries l inner join day_lottery dl on l.id = dl.idLoteria inner join days d on d.id = dl.idDia where d.wday = wday and l.id = @idLoteria into @horaCierre, @minutosExtras;
+			if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(concat(date(now()), ' ', @horaCierre),'%H:%i:%s'))
+			then
+				 if not exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar fuera de horario')
+				then
+					if exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar minutos extras')
+					then
+						-- verificamos si la hora actual es mayor que la hora de cierre con los minutos extras sumados
+						if DATE_FORMAT(now(),'%H:%i:%s') > (select DATE_FORMAT(date_add(concat(date(now()), ' ', @horaCierre), INTERVAL @minutosExtras MINUTE),'%H:%i:%s'))
+						then
+							set @mensaje = concat('Error: minutos extras han pasado, la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado');
+                            SIGNAL SQLSTATE '45000';
+						end if;
+                    else
+						set @mensaje = concat('Error: la loteria ' , (select descripcion from lotteries where id = @idLoteria), ' ha cerrado');
+                        SIGNAL SQLSTATE '45000';
+                    end if;
+				end if;
+			end if;
+			-- END VERIFICAMOS SI LA LOTERIA ESTA CERRADA
+            
+            -- GET MONTO DISPONIBLE
+            set @montoDisponible = (select montoDisponible(@jugada, @idLoteria, idBanca, @idLoteriaSuperpale));
+			
+				
+			if (@montoDisponible <@monto) or (@montoDisponible <@monto) is null then
+			if not exists(select p.id from permissions p inner join permission_user pu on p.id = pu.idPermiso where pu.idUsuario = pidUsuario and p.descripcion = 'Jugar sin disponibilidad') then
+					set @mensaje = concat('No hay existencia suficiente para la jugada ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria));
+                    SIGNAL SQLSTATE '45000';
+				end if;
+			end if;
+			-- END GET MONTO DISPONIBLE
+            
                 
                 /****************** quitarUltimoCaracter *******************/
                 if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' || @sorteo = 'Super pale' 
@@ -403,13 +291,18 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
 					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
 				end if;
 				/******** END QUITAR ULTIMO CARACTER ******************/
+                
+                
 				
                 /******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
+                
                 set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale));
 				-- set @idStock = 1;
+               
+                
                 /************ END INSERTAR BLOQUEO O ACTUALIZAR ***************/
                 set @comision = 0;
-                set @datosComisiones = (select JSON_OBJECT('directo', c.directo, 'pale', c.pale, 'tripleta', c.tripleta, 'superPale', c.superPale, 'pick3Straight', c.pick3Straight, 'pick3Box', c.pick3Box, 'pick4Straight', c.pick4Straight, 'pick4Box', c.pick4Box) from commissions c where c.idBanca = idBanca and c.idLoteria = @idLoteria);
+                set @datosComisiones = (select JSON_OBJECT('directo', c.directo, 'pale', c.pale, 'tripleta', c.tripleta, 'superPale', c.superPale, 'pick3Straight', c.pick3Straight, 'pick3Box', c.pick3Box, 'pick4Straight', c.pick4Straight, 'pick4Box', c.pick4Box) from commissions c where c.idBanca = idBanca and c.idLoteria = @idLoteria ORDER BY c.id DESC LIMIT 1);
                 if @sorteo = 'Directo' then
 					set @comision = (JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo'))) / 100) * @monto;
 				elseif @sorteo = 'Pale' then
@@ -434,17 +327,15 @@ while @contadorLoterias < JSON_LENGTH(@loterias) do
                 -- select @sorteo, @monto, @comision, JSON_UNQUOTE(JSON_EXTRACT(@datosComisiones, CONCAT('$.directo')));
                 insert into realtimes(idAfectado, tabla) values(@idStock, 'stocks');
                 insert into salesdetails(salesdetails.idVenta, salesdetails.idLoteria, salesdetails.idSorteo, salesdetails.jugada, salesdetails.monto, salesdetails.premio, salesdetails.comision, salesdetails.idStock, salesdetails.idLoteriaSuperpale, salesdetails.created_at, salesdetails.updated_at) values(idVenta, @idLoteria, @idSorteo, @jugada, @monto, 0, @comision, @idStock, @idLoteriaSuperpale, now(), now()); 
-			end if;
-            /************** END IDLOTERIA = IDLOTERIAJUGADAS ***************/
-            
-          
-            
+			
             
 		set @contadorJugadas = @contadorJugadas + 1;
+        
     end while;
-    set @contadorLoterias = @contadorLoterias + 1;
-end while;
 -- END INSERTAR JUGADAS
+
+	commit;
+-- END TRANSACTION COMMIT
 end if;
 -- END INSERTAR VENTA
 set sql_safe_updates = 1;
@@ -562,7 +453,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
 				inner join days d on d.id = dl.idDia
-				where l.id in(select branches_lotteries.idLoteria from branches_lotteries where branches_lotteries.idBanca = idBanca) and l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
+				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
 				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
@@ -570,7 +461,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id
             inner join days d on d.id = dl.idDia
-            where l.id in(select branches_lotteries.idLoteria from branches_lotteries where branches_lotteries.idBanca = idBanca) and l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
+            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
 		
         
         -- select JSON_ARRAYAGG(JSON_OBJECT(
@@ -598,5 +489,3 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 		select  0 as errores, 'Se ha guardado correctamente' as mensaje, venta, ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
    end if;
 END
- ;;
-delimiter ;
