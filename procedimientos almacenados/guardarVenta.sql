@@ -1,3 +1,12 @@
+USE `valentin`;
+DROP procedure IF EXISTS `guardarVenta`;
+
+USE `valentin`;
+DROP procedure IF EXISTS `valentin`.`guardarVenta`;
+;
+
+DELIMITER $$
+USE `valentin`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `guardarVenta`(IN pidUsuario varchar(30), idBanca int, idVentaHash varchar(200), compartido int, descuentoMonto int, hayDescuento boolean, total decimal(20, 2), jugadas json)
 BEGIN
 
@@ -482,10 +491,14 @@ select JSON_ARRAYAGG(JSON_OBJECT(
     select json_arrayagg(TempTable.loterias) from TempTable into loterias;
     
     
-    -- 				CREAR IDVENTA TEMPORAL 
+    -- 				CREAR IDVENTA TEMPORAL .
 		select idVenta(idBanca) into idVentaHash;
          
 	if @errores = 0 then
 		select  0 as errores, 'Se ha guardado correctamente' as mensaje, venta, ventas, idBanca, total_ventas, total_jugadas, caracteristicasGenerales, pidUsuario, bancas, loterias, idVentaHash;
    end if;
-END
+END$$
+
+DELIMITER ;
+;
+
