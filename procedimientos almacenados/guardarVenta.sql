@@ -295,7 +295,7 @@ then
             
                 
                 /****************** quitarUltimoCaracter *******************/
-                if @sorteo = 'Pick 3 Box' || @sorteo = 'Pick 4 Straight' || @sorteo = 'Pick 4 Box' || @sorteo = 'Super pale' 
+                if @sorteo = 'Pick 3 Box' or @sorteo = 'Pick 4 Straight' or @sorteo = 'Pick 4 Box' or @sorteo = 'Super pale' 
 				then
 					set @jugada = substring(@jugada, 1, length(@jugada) - 1);
 				end if;
@@ -308,6 +308,10 @@ then
                 set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale));
 				-- set @idStock = 1;
                
+               if @idStock = -1 then
+					set @mensaje = concat('No hay bloqueos registrados ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria));
+                    SIGNAL SQLSTATE '45000';
+               end if;
                 
                 /************ END INSERTAR BLOQUEO O ACTUALIZAR ***************/
                 set @comision = 0;

@@ -91,7 +91,11 @@ BEGIN
 							set @idStock = (SELECT LAST_INSERT_ID());
 						else
 							set @montoBloqueo = (select b.monto from blocksgenerals b where b.idLoteria = idLoteria and b.idDia = @idDia and b.idSorteo = idSorteo and b.idMoneda = @idMoneda order by b.id desc limit 1);
-							-- return 29;
+							
+                            if @montoBloqueo is null then
+								return -1;
+                            end if;
+                            -- return 29;
                             insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esGeneral, stocks.created_at, stocks.updated_at, stocks.idMoneda) values(idBanca, idLoteria, idSorteo, jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now(), @idMoneda);
 							set @idStock = (SELECT LAST_INSERT_ID());
 					end if;
@@ -193,7 +197,12 @@ BEGIN
 							set @idStock = (SELECT LAST_INSERT_ID());
 						else
 							set @montoBloqueo = (select b.monto from blocksgenerals b where b.idLoteria = idLoteria and b.idDia = @idDia and b.idSorteo = idSorteo and b.idMoneda = @idMoneda order by b.id desc limit 1);
-							insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esGeneral, stocks.created_at, stocks.updated_at, stocks.idMoneda, stocks.idLoteriaSuperpale) values(idBanca, idLoteria, idSorteo, jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now(), @idMoneda, idLoteriaSuperpale);
+							
+                            if @montoBloqueo is null then
+								return -1;
+                            end if;
+                            
+                            insert into stocks(stocks.idBanca, stocks.idLoteria, stocks.idSorteo, stocks.jugada, stocks.montoInicial, stocks.monto, stocks.esGeneral, stocks.created_at, stocks.updated_at, stocks.idMoneda, stocks.idLoteriaSuperpale) values(idBanca, idLoteria, idSorteo, jugada, @montoBloqueo, @montoBloqueo - @monto, 1, now(), now(), @idMoneda, idLoteriaSuperpale);
 							set @idStock = (SELECT LAST_INSERT_ID());
 					end if;
 				end if;
