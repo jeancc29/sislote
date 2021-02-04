@@ -258,6 +258,11 @@ class PermissionSeeder extends Seeder
             'status' => 1,
             'idTipo' => 9
         ]);
+        p::on($servidor)->create([
+            'descripcion' => 'Manejar grupos',
+            'status' => 1,
+            'idTipo' => 9
+        ]);
         // p::on($servidor)->create([
         //     'descripcion' => 'Manejar correos',
         //     'status' => 1,

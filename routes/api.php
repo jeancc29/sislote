@@ -161,3 +161,8 @@ Route::post('/servidor/servidorExiste', 'ServerController@servidorExiste');
 
 Route::get('/notifications', 'NotificationController@index');
 Route::post('/notifications/guardar', 'NotificationController@store');
+
+Route::get('/grupos', 'GroupController@index');
+Route::post('/grupos/guardar', 'GroupController@store');
+Route::post('/grupos/eliminar', 'GroupController@destroy');
+Route::post('/grupos/pordefecto', 'GroupController@pordefecto');
