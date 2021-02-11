@@ -2047,8 +2047,19 @@ public static function pc_permuteString($items, $quitarPrimerElementoDeTodasLasC
     }else{
         for ($i=0; $i < count($array); $i++) { 
             $permuteToString = join("", $array[$i]);
-            if((strpos($permuteRegexString, $permuteToString)) == false)
-                $permuteRegexString .= substr(join("", $array[$i]), 2, 4) . "|";
+            if((strpos($permuteRegexString, $permuteToString)) == false){
+                // este era el codigo anterior -> $permuteRegexString .= substr(join("", $array[$i]), 2, 4) . "|";
+
+                //to match strings which have letters cat followed by mat, you can try: 
+                //cat.*mat 
+                //The above regular expression will match cat  and mat anywhere in the string
+                // ['01', '02', '03'] convert to 01.*02.*03
+                $arrayToString = join(".*", $array[$i]);
+                //quitamos el primer par de numeros 01.* y quedara asi 02.*03 y asi se buscara el segundo numero sin importar su orden, osea, 
+                //sin importar si el segundo numero esta ubicado en 2da o en 3ra
+                $quitamosElPrimerCaracter = substr($arrayToString, 4, 8) . "|";
+                $permuteRegexString .= $quitamosElPrimerCaracter;
+            }
         }
     }
 
