@@ -69,7 +69,7 @@ BEGIN
 		-- delete from tickets where id = idTicket;
         
         -- eliminamos el ticket asignandole el status = 5
-        update sales set status = 5 where sales.id = idVenta;
+        -- update sales set status = 5 where sales.id = idVenta;
         select idVenta(idBanca) into idVentaHash;
         set idVenta = (select idventatemporals.idVenta from idventatemporals where idventatemporals.idVentaHash = idVentaHash COLLATE utf8mb4_unicode_ci and idventatemporals.idBanca = idBanca);
     end if;
