@@ -54,6 +54,38 @@ class ReportesController extends Controller
         //
     }
 
+    public function reporteJugadas(){
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
+
+        $consultaLoteria = isset($datos["loteria"]) ? " AND s.idLoteria = {$datos['loteria']['id']}" : '';
+        $consultaSorteo = isset($datos["sorteo"]) ? " AND s.idSorteo = {$datos['sorteo']['id']}" : '';
+        $data = \DB::connection($datos["servidor"])->select("
+            SELECT 
+            * 
+            FROM salesdetails AS s 
+            WHERE 
+                s.created_at BETWEEN '$fechaInicial' and '$fechaFinal'
+                $consultaLoteria
+                $consultaSorteo
+        ");
+
+        return Response::json([
+            "data" => $data
+        ]);
+
+    }
+
     public function jugadas()
     {
         $controlador = Route::getCurrentRoute()->getName();
