@@ -126,7 +126,7 @@ Route::post('/reportes/historico/', 'ReportesController@historico');
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
 Route::post('/reportes/ticketsPendientesDePago/', 'ReportesController@ticketsPendientesDePago');
 Route::post('/reportes/ticketsPendientesDePagoIndex/', 'ReportesController@ticketsPendientesDePagoIndex');
-Route::post('/reportes/reporteJugadas/', 'ReportesController@reporteJugadas')->name("reportes.jugadas");
+Route::post('/reportes/reporteJugadas/', 'ReportesController@reporteJugadas')->name("reporte.jugadas");
 
 Route::get('/entidades', 'EntityController@index');
 Route::post('/entidades/guardar', 'EntityController@store');

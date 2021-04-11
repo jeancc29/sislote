@@ -1871,6 +1871,20 @@ class Helper{
         return \Firebase\JWT\JWT::encode($token, $key);
     }
 
+    public static function jwtEncoder($data = [])
+    {
+        $time = time();
+        $key = \config('data.apiKey');
+
+        $token = array(
+            'iat' => $time, // Tiempo que inició el token
+            'exp' => $time + (60*60), // Tiempo que expirará el token (+1 hora)
+            'data' => $data
+        );
+
+        return \Firebase\JWT\JWT::encode($token, $key);
+    }
+
     public static function stdClassToArray($stdClass)
     {
         return json_decode(json_encode($stdClass), true);

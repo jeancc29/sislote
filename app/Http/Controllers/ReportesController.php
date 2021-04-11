@@ -58,6 +58,12 @@ class ReportesController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
             if(isset($datos["datosMovil"]))
                 $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
@@ -68,20 +74,44 @@ class ReportesController extends Controller
             ], 201);
         }
 
+        // return Response::json(["data" => $datos]);
+
         $consultaLoteria = isset($datos["loteria"]) ? " AND s.idLoteria = {$datos['loteria']['id']}" : '';
         $consultaSorteo = isset($datos["sorteo"]) ? " AND s.idSorteo = {$datos['sorteo']['id']}" : '';
+        $consultaJugada = isset($datos["jugada"]) ? " AND s.jugada = {$datos['jugada']}" : '';
+        $consultaLoteriaPremio = isset($datos["loteria"]) ? " AND awards.idLoteria = {$datos['loteria']['id']}" : '';
+        $fechaInicial = $datos["fechaInicial"];
+        $fechaFinal = $datos["fechaFinal"];
         $data = \DB::connection($datos["servidor"])->select("
-            SELECT 
-            * 
-            FROM salesdetails AS s 
-            WHERE 
-                s.created_at BETWEEN '$fechaInicial' and '$fechaFinal'
-                $consultaLoteria
-                $consultaSorteo
+        SELECT 
+        s.jugada,
+        SUM(s.monto) AS monto,
+        SUM(s.premio) AS premio,
+        COUNT(s.jugada) AS cantidadVecesQueSeHaJugado,
+        IF(
+            LENGTH(s.jugada) != 2,
+            NULL,
+            (SELECT 
+                COUNT(awards.numeroGanador) 
+            FROM awards 
+            WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND awards.numeroGanador regexp CONCAT('(^', s.jugada, '|\d\d', s.jugada , '\d\d', '|\d\d\d\d', s.jugada, ')') $consultaLoteriaPremio)
+        ) AS cantidadVecesQueHaSalido,
+        s.idSorteo
+        FROM salesdetails AS s 
+        WHERE 
+            s.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal')
+            AND s.created_at BETWEEN '$fechaInicial' and '$fechaFinal'
+            $consultaLoteria
+            $consultaSorteo
+            $consultaJugada
+        GROUP BY s.jugada, s.idSorteo
+        ORDER BY monto desc
         ");
 
         return Response::json([
-            "data" => $data
+            "data" => $data,
+            "sorteos" => ($datos["retornarSorteos"] == true) ? \App\Draws::on($datos["servidor"])->get() : [],
+            "loterias" => ($datos["retornarLoterias"] == true) ? \App\Lotteries::on($datos["servidor"])->whereStatus(1)->get() : []
         ]);
 
     }
@@ -330,6 +360,7 @@ class ReportesController extends Controller
             $datos = \Helper::jwtDecode($datos);
             if(isset($datos["datosMovil"]))
                 $datos = $datos["datosMovil"];
+            
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([

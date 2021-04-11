@@ -1,5 +1,5 @@
 <?php
-
+// vendor/bin/phpunit --filter test_indexAdd_loan
 namespace Tests\Feature;
 
 use Tests\TestCase;
@@ -22,17 +22,28 @@ class ReportesTest extends TestCase
     {
         $this->withoutExceptionHandling();
         // $tipo = \App\Type::whereRenglon("gasto")->first();
-        $response = $this->post(route('reportes.jugadas'), [
-            "data" => [
-                "id" => 1,
-                "usuario" => "jeancc29",
-                "idEmpresa" => 1, 
-                "idCliente" => 1, 
-                "usuario" => ["usuario" => "jeancc29", "id" => 1, "idEmpresa" => 1],
-                // "tipo" => \App\Classes\Helper::stdClassToArray($tipo),
-                "pago" => ["descripcion" => "Caja1", "id" => 1, "balance" => 100],
-            ]
+        
+        $data =  [
+            "loteria" => ["id" => 15],
+            // "sorteo" => ["id" => 2],
+            // "loteria" => null,
+            // "sorteo" => null,
+            "retornarSorteos" => true,
+            "retornarLoterias" => true,
+            "fechaInicial" => "2021-03-25 00:00",
+            "fechaFinal" => "2021-04-25 23:59:59",
+            "servidor" => "valentin",
+            "status" => 1,
+            // "tipo" => \App\Classes\Helper::stdClassToArray($tipo),
+        ];
+        $jwt = \App\Classes\Helper::jwtEncoder($data);
+        // $tipo = \App\Type::whereRenglon("gasto")->first();
+        $response = $this->post(route('reporte.jugadas'), [
+            "datos" => $jwt
         ]);
+        $array = \App\Classes\Helper::stdClassToArray($response->getData());
+        $json = json_encode($array);
+        echo $json;
 
         $response->assertStatus(200);
         // $response->assertSessionHasErrors('email');

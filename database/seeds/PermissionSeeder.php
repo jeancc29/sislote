@@ -286,6 +286,12 @@ class PermissionSeeder extends Seeder
             'idTipo' => 5
         ]);
 
+        p::on($servidor)->create([
+            'descripcion' => 'Ver reporte jugadas',
+            'status' => 1,
+            'idTipo' => 5
+        ]);
+
         p::on($servidor)->create(["descripcion" => "Manejar monedas", "status" => 1, "idTipo" => 9]);
         p::on($servidor)->create(["descripcion" => "Ver Dashboard", "status" => 1, "idTipo" => 6]);
     }
