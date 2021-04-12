@@ -124,7 +124,7 @@ class ReportesController extends Controller
                         (SELECT 
                             COUNT(awards.numeroGanador) 
                         FROM awards 
-                        WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND awards.numeroGanador regexp CONCAT('(^', j.jugada, '|\\d\\d', j.jugada , '\\d\\d', '|\\d\\d\\d\\d', j.jugada, ')') $consultaLoteriaPremio)
+                        WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND (awards.primera = j.jugada OR awards.segunda = j.jugada OR awards.tercera = j.jugada) $consultaLoteriaPremio)
                     ) AS cantidadVecesQueHaSalido
             FROM (
                 SELECT 
