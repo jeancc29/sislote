@@ -76,37 +76,176 @@ class ReportesController extends Controller
 
         // return Response::json(["data" => $datos]);
 
-        $consultaLoteria = isset($datos["loteria"]) ? " AND s.idLoteria = {$datos['loteria']['id']}" : '';
-        $consultaSorteo = isset($datos["sorteo"]) ? " AND s.idSorteo = {$datos['sorteo']['id']}" : '';
-        $consultaJugada = isset($datos["jugada"]) ? " AND s.jugada = {$datos['jugada']}" : '';
+        $consultaLoteria = isset($datos["loteria"]) ? " AND salesdetails.idLoteria = {$datos['loteria']['id']}" : '';
+        $consultaSorteo = isset($datos["sorteo"]) ? " AND salesdetails.idSorteo = {$datos['sorteo']['id']}" : '';
+        $consultaJugada = isset($datos["jugada"]) ? " AND salesdetails.jugada = {$datos['jugada']}" : '';
         $consultaLoteriaPremio = isset($datos["loteria"]) ? " AND awards.idLoteria = {$datos['loteria']['id']}" : '';
         $fechaInicial = $datos["fechaInicial"];
         $fechaFinal = $datos["fechaFinal"];
+        $limite = isset($datos["limite"]) ? $datos["limite"] : 20;
+        // $data = \DB::connection($datos["servidor"])->select("
+        // SELECT 
+        // s.jugada,
+        // SUM(s.monto) AS monto,
+        // SUM(s.premio) AS premio,
+        // COUNT(s.jugada) AS cantidadVecesQueSeHaJugado,
+        // IF(
+        //     LENGTH(s.jugada) != 2,
+        //     NULL,
+        //     (SELECT 
+        //         COUNT(awards.numeroGanador) 
+        //     FROM awards 
+        //     WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND awards.numeroGanador regexp CONCAT('(^', s.jugada, '|\d\d', s.jugada , '\d\d', '|\d\d\d\d', s.jugada, ')') $consultaLoteriaPremio)
+        // ) AS cantidadVecesQueHaSalido,
+        // s.idSorteo
+        // FROM salesdetails AS s 
+        // WHERE 
+        //     s.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal')
+        //     AND s.created_at BETWEEN '$fechaInicial' and '$fechaFinal'
+        //     $consultaLoteria
+        //     $consultaSorteo
+        //     $consultaJugada
+        // GROUP BY s.jugada, s.idSorteo
+        // ORDER BY monto desc
+        // ");
+
+
         $data = \DB::connection($datos["servidor"])->select("
-        SELECT 
-        s.jugada,
-        SUM(s.monto) AS monto,
-        SUM(s.premio) AS premio,
-        COUNT(s.jugada) AS cantidadVecesQueSeHaJugado,
-        IF(
-            LENGTH(s.jugada) != 2,
-            NULL,
-            (SELECT 
-                COUNT(awards.numeroGanador) 
-            FROM awards 
-            WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND awards.numeroGanador regexp CONCAT('(^', s.jugada, '|\d\d', s.jugada , '\d\d', '|\d\d\d\d', s.jugada, ')') $consultaLoteriaPremio)
-        ) AS cantidadVecesQueHaSalido,
-        s.idSorteo
-        FROM salesdetails AS s 
-        WHERE 
-            s.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal')
-            AND s.created_at BETWEEN '$fechaInicial' and '$fechaFinal'
-            $consultaLoteria
-            $consultaSorteo
-            $consultaJugada
-        GROUP BY s.jugada, s.idSorteo
-        ORDER BY monto desc
+            SELECT
+            j.jugada,
+                    j.idSorteo,
+                    j.rankJugada,
+                    j.monto,
+                    j.premio,
+                    j.cantidadVecesQueSeHaJugado,
+                    IF(
+                        j.idSorteo != 1,
+                        NULL,
+                        (SELECT 
+                            COUNT(awards.numeroGanador) 
+                        FROM awards 
+                        WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND awards.numeroGanador regexp CONCAT('(^', j.jugada, '|\\d\\d', j.jugada , '\\d\\d', '|\\d\\d\\d\\d', j.jugada, ')') $consultaLoteriaPremio)
+                    ) AS cantidadVecesQueHaSalido
+            FROM (
+                SELECT 
+                    j.jugada,
+                    j.idSorteo,
+                    j.rankJugada,
+                    j.monto,
+                    j.premio,
+                    j.cantidadVecesQueSeHaJugado
+                FROM (
+                    select 
+                    j.jugada,
+                    j.idSorteo,
+                    
+                    j.monto,
+                    j.premio,
+                    j.cantidadVecesQueSeHaJugado,
+                    Rank() over (Partition BY idSorteo ORDER BY j.monto DESC ) AS rankJugada
+                    from (SELECT 
+                        SUM(monto) AS monto, 
+                        SUM(premio) AS premio, 
+                        jugada,
+                        idSorteo, 
+                        COUNT(jugada) AS cantidadVecesQueSeHaJugado
+                        
+                        FROM salesdetails
+                        WHERE 
+                        salesdetails.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal')
+                        AND created_at between '$fechaInicial' and '$fechaFinal' 
+                        $consultaLoteria
+                        $consultaSorteo
+                        $consultaJugada
+                        GROUP BY jugada, idSorteo
+                        ) as j
+                ) AS j
+                WHERE rankJugada <= $limite
+            ) AS j
         ");
+        // $data = \DB::connection($datos["servidor"])->select("
+        // SELECT
+        // j.jugada,
+        //         j.idSorteo,
+        //         j.rankJugada,
+        //         j.monto,
+        //         j.premio,
+        //         j.cantidadVecesQueSeHaJugado,
+        //         IF(
+        //             j.idSorteo != 1,
+        //             NULL,
+        //             (SELECT 
+        //                 COUNT(awards.numeroGanador) 
+        //             FROM awards 
+        //             WHERE awards.created_at BETWEEN '2021-04-01 00:00' and '2021-04-12 23:00' AND awards.numeroGanador regexp CONCAT('(^', j.jugada, '|\d\d', j.jugada , '\d\d', '|\d\d\d\d', j.jugada, ')')   )
+        //         ) AS cantidadVecesQueHaSalido
+        // FROM (
+        //     SELECT 
+        //         j.jugada,
+        //         j.idSorteo,
+        //         j.rankJugada,
+        //         j.monto,
+        //         j.premio,
+        //         j.cantidadVecesQueSeHaJugado
+        //     FROM (
+        //         SELECT 
+        //             SUM(monto) AS monto, 
+        //             SUM(premio) AS premio, 
+        //             jugada,
+        //             idSorteo, 
+        //             COUNT(jugada) AS cantidadVecesQueSeHaJugado,
+        //             Rank() over (Partition BY idSorteo ORDER BY id DESC ) AS rankJugada
+        //             FROM salesdetails
+        //             WHERE created_at between '2021-04-01 00:00' AND '2021-04-12 23:00' 
+        //             GROUP BY jugada, idSorteo
+        //             ORDER BY idSorteo ASC, monto desc
+        //     ) AS j
+        //     WHERE rankJugada <= 10
+        // ) AS j
+        
+        // ");
+
+        // $data = \DB::connection($datos["servidor"])->select("
+        //     SELECT 
+        //         draws.id,
+        //         draws.descripcion,
+        //         (
+        //             SELECT
+        //                 JSON_ARRAYAGG(
+        //                     JSON_OBJECT(
+        //                         'jugada', j.jugada
+        //                     )
+        //                 )
+        //             FROM (
+        //                 SELECT 
+        //                 s.jugada,
+        //                 SUM(s.monto) AS monto,
+        //                 SUM(s.premio) AS premio,
+        //                 COUNT(s.jugada) AS cantidadVecesQueSeHaJugado,
+        //                 IF(
+        //                     LENGTH(s.jugada) != 2,
+        //                     NULL,
+        //                     (SELECT 
+        //                         COUNT(awards.numeroGanador) 
+        //                     FROM awards 
+        //                     WHERE awards.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND awards.numeroGanador regexp CONCAT('(^', s.jugada, '|\d\d', s.jugada , '\d\d', '|\d\d\d\d', s.jugada, ')') $consultaLoteriaPremio)
+        //                 ) AS cantidadVecesQueHaSalido,
+        //                 s.idSorteo
+        //                 FROM salesdetails AS s 
+        //                 WHERE 
+        //                     s.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal')
+        //                     AND s.created_at BETWEEN '$fechaInicial' and '$fechaFinal'
+        //                     AND s.idSorteo = draws.id
+        //                     $consultaLoteria
+        //                     $consultaJugada
+        //                 GROUP BY s.jugada, s.idSorteo
+        //                 ORDER BY monto desc
+        //                 LIMIT 50
+        //             ) AS j
+        //         ) AS jugadas
+        //     FROM draws
+
+        // ");
 
         return Response::json([
             "data" => $data,
