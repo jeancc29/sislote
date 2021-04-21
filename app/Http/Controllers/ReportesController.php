@@ -1260,7 +1260,7 @@ class ReportesController extends Controller
                 IF(lo.pick3 IS NOT NULL AND lo.pick3 != '' AND lo.pick3 != 'null', lo.pick3, NULL) AS pick3,
                 IF(lo.pick4 IS NOT NULL AND lo.pick4 != '' AND lo.pick4 != 'null', lo.pick4, NULL) AS pick4,
                 IF(lo.ventas IS NOT NULL AND lo.ventas != '' AND lo.ventas != 'null', lo.ventas, 0) AS ventas,
-                IF(lo.premios IS NOT NULL AND lo.premios != '' AND lo.premios != 'null', lo.premios, 0) AS premios,
+                IF(lo.premios IS NOT NULL AND lo.premios != '' AND lo.premios != 'null', lo.premios, NULL) AS premios,
                 IF(lo.comisiones IS NOT NULL AND lo.comisiones != '' AND lo.comisiones != 'null', lo.comisiones, 0) AS comisiones,
                 IF(lo.neto IS NOT NULL AND lo.neto != '' AND lo.neto != 'null', lo.neto, 0) AS neto
             FROM (
@@ -1268,10 +1268,10 @@ class ReportesController extends Controller
                     lo.id,
                     lo.descripcion,
                     lo.abreviatura,
-                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.ventas')) AS ventas,
-                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.premios')) AS premios,
-                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.comisiones')) AS comisiones,
-                    SUM(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.ventas')) - (JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.comisiones')) + JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.premios')))) AS neto,
+                    ROUND(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.ventas')), 0) AS ventas,
+                    ROUND(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.premios')), 0) AS premios,
+                    ROUND(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.comisiones')), 0) AS comisiones,
+                    SUM(ROUND(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.ventas')), 0) - (ROUND(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.comisiones')), 0) + ROUND(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.premios')), 0) ) ) AS neto,
                     JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.primera')) AS primera,
                     JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.segunda')) AS segunda,
                     JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.tercera')) AS tercera,
