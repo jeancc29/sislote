@@ -1152,19 +1152,29 @@ class ReportesController extends Controller
         
         ///NUEVO QUERY
         $dataVentas = \DB::connection($datos["servidor"])->select("
-                SELECT 
-                    COUNT(IF(s.status = 1, s.id, NULL)) AS pendientes,
-                    COUNT(IF((s.status = 1 OR s.status = 2) AND s.premios > 0, s.id, NULL)) AS ganadores,
-                    COUNT(IF(s.status = 3, s.id, NULL)) AS perdedores,
-                    COUNT(s.id) AS total,
-                    SUM(s.descuentoMonto) AS descuentos,
-                    SUM(s.premios) AS premios,
-                    SUM(s.total) AS ventas
-                FROM sales s
-                WHERE 
-                    s.status NOT IN(0, 5) 
-                    AND s.idBanca = {$datos['idBanca']}
-                    AND s.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
+                SELECT
+                s.pendientes,
+                s.ganadores,
+                s.perdedores,
+                s.total,
+                IF(s.descuentos IS NOT NULL, s.descuentos, 0) descuentos,
+                IF(s.premios IS NOT NULL, s.premios, 0) premios,
+                IF(s.ventas IS NOT NULL, s.ventas, 0) ventas
+                FROM (
+                    SELECT 
+                        COUNT(IF(s.status = 1, s.id, NULL)) AS pendientes,
+                        COUNT(IF((s.status = 1 OR s.status = 2) AND s.premios > 0, s.id, NULL)) AS ganadores,
+                        COUNT(IF(s.status = 3, s.id, NULL)) AS perdedores,
+                        COUNT(s.id) AS total,
+                        SUM(s.descuentoMonto) AS descuentos,
+                        SUM(s.premios) AS premios,
+                        SUM(s.total) AS ventas
+                    FROM sales s
+                    WHERE 
+                        s.status NOT IN(0, 5) 
+                        AND s.idBanca = {$datos['idBanca']}
+                        AND s.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
+            ) AS s
         ");
 
         $pendientes = $dataVentas[0]->pendientes;
@@ -1249,19 +1259,19 @@ class ReportesController extends Controller
                 IF(lo.tercera IS NOT NULL AND lo.tercera != '' AND lo.tercera != 'null', lo.tercera, NULL) AS tercera,
                 IF(lo.pick3 IS NOT NULL AND lo.pick3 != '' AND lo.pick3 != 'null', lo.pick3, NULL) AS pick3,
                 IF(lo.pick4 IS NOT NULL AND lo.pick4 != '' AND lo.pick4 != 'null', lo.pick4, NULL) AS pick4,
-                lo.ventas,
-                lo.premios,
-                lo.comisiones,
-                lo.neto
+                IF(lo.ventas IS NOT NULL AND lo.ventas != '' AND lo.ventas != 'null', lo.ventas, 0) AS ventas,
+                IF(lo.premios IS NOT NULL AND lo.premios != '' AND lo.premios != 'null', lo.premios, 0) AS premios,
+                IF(lo.comisiones IS NOT NULL AND lo.comisiones != '' AND lo.comisiones != 'null', lo.comisiones, 0) AS comisiones,
+                IF(lo.neto IS NOT NULL AND lo.neto != '' AND lo.neto != 'null', lo.neto, 0) AS neto
             FROM (
                 SELECT
                     lo.id,
                     lo.descripcion,
                     lo.abreviatura,
-                    JSON_EXTRACT(lo.dataVentas, '$.ventas') AS ventas,
-                    JSON_EXTRACT(lo.dataVentas, '$.premios') AS premios,
-                    JSON_EXTRACT(lo.dataVentas, '$.comisiones') AS comisiones,
-                    SUM(JSON_EXTRACT(lo.dataVentas, '$.ventas') - (JSON_EXTRACT(lo.dataVentas, '$.comisiones') + JSON_EXTRACT(lo.dataVentas, '$.premios'))) AS neto,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.ventas')) AS ventas,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.premios')) AS premios,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.comisiones')) AS comisiones,
+                    SUM(JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.ventas')) - (JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.comisiones')) + JSON_UNQUOTE(JSON_EXTRACT(lo.dataVentas, '$.premios')))) AS neto,
                     JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.primera')) AS primera,
                     JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.segunda')) AS segunda,
                     JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.tercera')) AS tercera,
