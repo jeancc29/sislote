@@ -120,7 +120,7 @@ Route::post('/bloqueos/sucias/eliminar', 'BlocksdirtyController@destroy');
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
 Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
-Route::post('/reportes/ventas/', 'ReportesController@ventas');
+Route::post('/reportes/ventas/', 'ReportesController@ventas')->name("reporte.ventas");
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
 Route::post('/reportes/historico/', 'ReportesController@historico');
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
@@ -167,3 +167,7 @@ Route::get('/grupos', 'GroupController@index');
 Route::post('/grupos/guardar', 'GroupController@store');
 Route::post('/grupos/eliminar', 'GroupController@destroy');
 Route::post('/grupos/pordefecto', 'GroupController@pordefecto');
+
+
+Route::post('/ajustes', 'SettingsController@index')->name("settings.index");
+Route::post('/ajustes/guardar', 'SettingsController@store')->name("settings.store");

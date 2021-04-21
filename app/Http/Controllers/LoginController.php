@@ -257,7 +257,8 @@ class LoginController extends Controller
         "apiKey" => \config("data.apiKey"),
         "tipoUsuario" => $tipoUsuario,
         "servidores" => \App\Server::on("mysql")->get(),
-        "realtime" => $realtime
+        "realtime" => $realtime,
+        "ajustes" => \App\Settings::customFirst($u->servidor)
     ], 201);
     }
 

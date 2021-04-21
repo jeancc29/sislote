@@ -1084,6 +1084,14 @@ class ReportesController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+
             if(isset($datos["datosMovil"]))
                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
@@ -1096,14 +1104,14 @@ class ReportesController extends Controller
     
         if(!isset($datos['fechaFinal'])){
             $fecha = getdate(strtotime($datos['fecha']));
-            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
-            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+            $fechaInicial = $fecha['year'].'-'. \App\Classes\Helper::toDosDigitos(strval($fecha['mon'])).'-'. \App\Classes\Helper::toDosDigitos(strval($fecha['mday'])) . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.\App\Classes\Helper::toDosDigitos(strval($fecha['mon'])).'-'.\App\Classes\Helper::toDosDigitos(strval($fecha['mday'])) . ' 23:50:00';
             $fechaParaImprimirChadreMovil = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'];
         }else{
             $fecha = getdate(strtotime($datos['fecha']));
             $fechaF = getdate(strtotime($datos['fechaFinal']));
-            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
-            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+            $fechaInicial = $fecha['year'].'-'.\App\Classes\Helper::toDosDigitos(strval($fecha['mon'])).'-'. \App\Classes\Helper::toDosDigitos(strval($fecha['mday'])) . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'. \App\Classes\Helper::toDosDigitos(strval($fechaF['mon'])) .'-'. \App\Classes\Helper::toDosDigitos(strval($fechaF['mday'])) . ' 23:50:00';
             $fechaParaImprimirChadreMovil = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'];
 
         }
@@ -1142,164 +1150,233 @@ class ReportesController extends Controller
     
         //$fecha = getdate(strtotime($datos['fecha']));
         
+        ///NUEVO QUERY
+        $dataVentas = \DB::connection($datos["servidor"])->select("
+                SELECT 
+                    COUNT(IF(s.status = 1, s.id, NULL)) AS pendientes,
+                    COUNT(IF((s.status = 1 OR s.status = 2) AND s.premios > 0, s.id, NULL)) AS ganadores,
+                    COUNT(IF(s.status = 3, s.id, NULL)) AS perdedores,
+                    COUNT(s.id) AS total,
+                    SUM(s.descuentoMonto) AS descuentos,
+                    SUM(s.premios) AS premios,
+                    SUM(s.total) AS ventas
+                FROM sales s
+                WHERE 
+                    s.status NOT IN(0, 5) 
+                    AND s.idBanca = {$datos['idBanca']}
+                    AND s.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
+        ");
+
+        $pendientes = $dataVentas[0]->pendientes;
+        $ganadores = $dataVentas[0]->ganadores;
+        $perdedores = $dataVentas[0]->perdedores;
+        $total = $dataVentas[0]->total;
+        $premios = $dataVentas[0]->premios;
+        $ventas = $dataVentas[0]->ventas;
+        $descuentos = $dataVentas[0]->descuentos;
     
-        $pendientes = Sales::
-            on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereStatus(1)
-            ->where('idBanca', $datos['idBanca'])
-            ->count();
+        // $pendientes = Sales::
+        //     on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereStatus(1)
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->count();
     
-        $ganadores = Sales::on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereStatus('2')
-            ->where('idBanca', $datos['idBanca'])
-            ->count();
-        $premios = Sales::on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereStatus('2')
-            ->where('idBanca', $datos['idBanca'])
-            ->sum("premios");
+        // $ganadores = Sales::on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereStatus('2')
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->count();
+        // $premios = Sales::on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereStatus('2')
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->sum("premios");
                     
                 
-        $perdedores = Sales::on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereStatus('3')
-            ->where('idBanca', $datos['idBanca'])
-            ->count();
+        // $perdedores = Sales::on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereStatus('3')
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->count();
     
-        $total = Sales::on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereIn('status', array(1,2,3))
-            ->where('idBanca', $datos['idBanca'])
-            ->count();
+        // $total = Sales::on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereIn('status', array(1,2,3))
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->count();
     
-        $ventas = Sales::on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereNotIn('status', [0,5])
-            ->where('idBanca', $datos['idBanca'])
-            ->sum('total');
+        // $ventas = Sales::on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereNotIn('status', [0,5])
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->sum('total');
     
-        //AQUI COMIENSA LAS COMISIONES
+        // //AQUI COMIENSA LAS COMISIONES
 
-        //AQUI TERMINAN LAS COMISIONES
+        // //AQUI TERMINAN LAS COMISIONES
 
-        $descuentos = Sales::on($datos['servidor'])
-            ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereNotIn('status', [0,5])
-            ->where('idBanca', $datos['idBanca'])
-            ->sum('descuentoMonto');
+        // $descuentos = Sales::on($datos['servidor'])
+        //     ->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereNotIn('status', [0,5])
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->sum('descuentoMonto');
     
-                    // $premios = Sales::whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                    // ->whereIn('status', array(1,2))
-                    // ->where('idBanca', $datos['idBanca'])
-                    // ->sum('premios');
+                    
 
-        $idVentasPremios = Sales::on($datos['servidor'])
-            ->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-            ->whereIn('status', array(1,2))
-            ->where('idBanca', $datos['idBanca'])
-            ->get();
+        // $idVentasPremios = Sales::on($datos['servidor'])
+        //     ->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //     ->whereIn('status', array(1,2))
+        //     ->where('idBanca', $datos['idBanca'])
+        //     ->get();
 
-        $idVentasPremios = collect($idVentasPremios)->map(function($v){
-            return $v['id'];
-        });
+        // $idVentasPremios = collect($idVentasPremios)->map(function($v){
+        //     return $v['id'];
+        // });
 
-        $premios = Salesdetails::on($datos['servidor'])->whereIn('idVenta', $idVentasPremios)->sum('premio');
+        // $premios = Salesdetails::on($datos['servidor'])->whereIn('idVenta', $idVentasPremios)->sum('premio');
     
         //Obtener loterias con el monto total jugado y con los premios totales
     
-                    
+        ///NUEVO QUERY
+        $loterias = \DB::connection($datos["servidor"])->select("
+            SELECT
+                lo.id,
+                lo.descripcion,
+                lo.abreviatura,
+                JSON_EXTRACT(lo.dataVentas, '$.ventas') AS ventas,
+                JSON_EXTRACT(lo.dataVentas, '$.premios') AS premios,
+                JSON_EXTRACT(lo.dataVentas, '$.comisiones') AS comisiones,
+                SUM(JSON_EXTRACT(lo.dataVentas, '$.ventas') - (JSON_EXTRACT(lo.dataVentas, '$.comisiones') + JSON_EXTRACT(lo.dataVentas, '$.premios'))) AS neto,
+                JSON_EXTRACT(lo.dataNumerosGanadores, '$.primera') AS primera,
+                JSON_EXTRACT(lo.dataNumerosGanadores, '$.segunda') AS segunda,
+                JSON_EXTRACT(lo.dataNumerosGanadores, '$.tercera') AS tercera,
+                JSON_EXTRACT(lo.dataNumerosGanadores, '$.pick3') AS pick3,
+                JSON_EXTRACT(lo.dataNumerosGanadores, '$.pick4') AS pick4
+            FROM (
+                SELECT
+                    l.id,
+                    l.descripcion,
+                    l.abreviatura,
+                    (
+                        SELECT 
+                            JSON_OBJECT(
+                                'ventas', SUM(sd.monto),
+                                'premios', SUM(sd.premio),
+                                'comisiones', SUM(sd.comision)
+                            )
+                        FROM salesdetails sd 
+                        WHERE 
+                            sd.idLoteria = l.id 
+                            AND sd.idVenta IN(SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' AND '$fechaFinal' AND sales.idBanca = {$datos['idBanca']}) 
+                    ) AS dataVentas,
+                (
+                    SELECT
+                        JSON_OBJECT(
+                            'primera', awards.primera,
+                            'segunda', awards.segunda,
+                            'tercera', awards.tercera,
+                            'pick3', awards.pick3,
+                            'pick4', awards.pick4
+                        )
+                    FROM awards
+                    WHERE awards.idLoteria = l.id AND awards.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
+                ) AS dataNumerosGanadores
+                FROM lotteries AS l
+                WHERE l.status = 1
+            ) AS lo
+            GROUP BY lo.id
+        ");            
     
                     
-        $loterias = Lotteries::on($datos['servidor'])
-            ->selectRaw('
-                id, 
-                descripcion, 
-                abreviatura,
-                (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as ventas,
-                (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as premios,
-                (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
-                (select substring(numeroGanador, 3, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as segunda,
-                (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera,
-                (select pick3 from awards where idLoteria = lotteries.id and created_at between ? and ?) as pick3,
-                (select pick4 from awards where idLoteria = lotteries.id and created_at between ? and ?) as pick4
-                ', [$datos['idBanca'], $fechaInicial, $fechaFinal, //Parametros para ventas
-                    $datos['idBanca'], $fechaInicial, $fechaFinal, //Parametros para premios
-                    $fechaInicial, $fechaFinal, //Parametros primera
-                    $fechaInicial, $fechaFinal, //Parametros segunda
-                    $fechaInicial, $fechaFinal, //Parametros tercera
-                    $fechaInicial, $fechaFinal, //Parametros pick3
-                    $fechaInicial, $fechaFinal //Parametros pick4
-                    ])
-            ->where('lotteries.status', '=', '1')
-            ->get();
+        // $loterias = Lotteries::on($datos['servidor'])
+        //     ->selectRaw('
+        //         id, 
+        //         descripcion, 
+        //         abreviatura,
+        //         (select sum(sd.monto) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as ventas,
+        //         (select sum(sd.premio) from salesdetails as sd inner join sales as s on s.id = sd.idVenta where s.status != 0 and sd.idLoteria = lotteries.id and s.idBanca = ? and s.created_at between ? and ?) as premios,
+        //         (select substring(numeroGanador, 1, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as primera,
+        //         (select substring(numeroGanador, 3, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as segunda,
+        //         (select substring(numeroGanador, 5, 2) from awards where idLoteria = lotteries.id and created_at between ? and ?) as tercera,
+        //         (select pick3 from awards where idLoteria = lotteries.id and created_at between ? and ?) as pick3,
+        //         (select pick4 from awards where idLoteria = lotteries.id and created_at between ? and ?) as pick4
+        //         ', [$datos['idBanca'], $fechaInicial, $fechaFinal, //Parametros para ventas
+        //             $datos['idBanca'], $fechaInicial, $fechaFinal, //Parametros para premios
+        //             $fechaInicial, $fechaFinal, //Parametros primera
+        //             $fechaInicial, $fechaFinal, //Parametros segunda
+        //             $fechaInicial, $fechaFinal, //Parametros tercera
+        //             $fechaInicial, $fechaFinal, //Parametros pick3
+        //             $fechaInicial, $fechaFinal //Parametros pick4
+        //             ])
+        //     ->where('lotteries.status', '=', '1')
+        //     ->get();
 
-                    $loterias = collect($loterias)->map(function($d) use($datos, $fechaInicial, $fechaFinal){
-                        $datosComisiones = Commissions::on($datos['servidor'])->where(['idBanca' => $datos['idBanca'], 'idLoteria' => $d['id']])->first();
-                        $comisionesMonto = 0;
-                        $idVentasDeEstaBanca = Sales::on($datos['servidor'])->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->whereNotIn('status', [0,5])->get();
-                        $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
-                            return $id->id;
-                        });
-                        if($datosComisiones != null){
-                            if($datosComisiones['directo'] > 0){
-                                $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Directo')->first();
-                                if($sorteo != null){
-                                    //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                                    $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                                        ->whereIn('idVenta', $idVentasDeEstaBanca)
-                                        ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
-                                        ->sum('monto');
-                                }
-                            }
+        //             $loterias = collect($loterias)->map(function($d) use($datos, $fechaInicial, $fechaFinal){
+        //                 $datosComisiones = Commissions::on($datos['servidor'])->where(['idBanca' => $datos['idBanca'], 'idLoteria' => $d['id']])->first();
+        //                 $comisionesMonto = 0;
+        //                 $idVentasDeEstaBanca = Sales::on($datos['servidor'])->select('id')->whereBetween('created_at', array($fechaInicial, $fechaFinal))->where('idBanca', $datos['idBanca'])->whereNotIn('status', [0,5])->get();
+        //                 $idVentasDeEstaBanca = collect($idVentasDeEstaBanca)->map(function($id){
+        //                     return $id->id;
+        //                 });
+        //                 if($datosComisiones != null){
+        //                     if($datosComisiones['directo'] > 0){
+        //                         $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Directo')->first();
+        //                         if($sorteo != null){
+        //                             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+        //                             $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //                                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+        //                                 ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
+        //                                 ->sum('monto');
+        //                         }
+        //                     }
             
-                            if($datosComisiones['pale'] > 0){
-                                $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Pale')->first();
-                                if($sorteo != null){
-                                    //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                                    $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                                        ->whereIn('idVenta', $idVentasDeEstaBanca)
-                                        ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
-                                        ->sum('monto');
-                                }
-                            }
+        //                     if($datosComisiones['pale'] > 0){
+        //                         $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Pale')->first();
+        //                         if($sorteo != null){
+        //                             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+        //                             $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //                                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+        //                                 ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
+        //                                 ->sum('monto');
+        //                         }
+        //                     }
             
-                            if($datosComisiones['tripleta'] > 0){
-                                $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Tripleta')->first();
-                                if($sorteo != null){
-                                    //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                                    $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                                        ->whereIn('idVenta', $idVentasDeEstaBanca)
-                                        ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
-                                        ->sum('monto');
-                                }
-                            }
+        //                     if($datosComisiones['tripleta'] > 0){
+        //                         $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Tripleta')->first();
+        //                         if($sorteo != null){
+        //                             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+        //                             $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //                                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+        //                                 ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
+        //                                 ->sum('monto');
+        //                         }
+        //                     }
             
-                            if($datosComisiones['superPale'] > 0){
-                                $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Super pale')->first();
-                                if($sorteo != null){
-                                    //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
-                                    $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
-                                        ->whereIn('idVenta', $idVentasDeEstaBanca)
-                                        ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
-                                        ->sum('monto');
-                                }
-                            }
-                        }
-                        $comisionesMonto = round($comisionesMonto);
-                        if($d->ventas == null)
-                            $d->ventas = 0;
-                        if($d->premios == null)
-                            $d->premios = 0;
-                        if($d->primera == null)
-                            $d->primera = "";
-                        if($d->segunda == null)
-                            $d->segunda = "";
-                        if($d->tercera == null)
-                            $d->tercera = "";
-                        return ['id' => $d->id, 'descripcion' => $d->descripcion, 'abreviatura' => $d->abreviatura, 'comisiones' => $comisionesMonto, 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera,'pick3' => $d->pick3, 'pick4' => $d->pick4, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
-                    });
+        //                     if($datosComisiones['superPale'] > 0){
+        //                         $sorteo = Draws::on($datos['servidor'])->whereDescripcion('Super pale')->first();
+        //                         if($sorteo != null){
+        //                             //Obtenemos la sumatoria del campo monto de acuerdo a la loteria, banca, sorteo y rango de fecha
+        //                             $comisionesMonto += ($datosComisiones['directo'] / 100) * Salesdetails::on($datos['servidor'])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        //                                 ->whereIn('idVenta', $idVentasDeEstaBanca)
+        //                                 ->where(['idLoteria' => $datosComisiones['idLoteria'], 'idSorteo' => $sorteo->id])
+        //                                 ->sum('monto');
+        //                         }
+        //                     }
+        //                 }
+        //                 $comisionesMonto = round($comisionesMonto);
+        //                 if($d->ventas == null)
+        //                     $d->ventas = 0;
+        //                 if($d->premios == null)
+        //                     $d->premios = 0;
+        //                 if($d->primera == null)
+        //                     $d->primera = "";
+        //                 if($d->segunda == null)
+        //                     $d->segunda = "";
+        //                 if($d->tercera == null)
+        //                     $d->tercera = "";
+        //                 return ['id' => $d->id, 'descripcion' => $d->descripcion, 'abreviatura' => $d->abreviatura, 'comisiones' => $comisionesMonto, 'ventas' => $d->ventas, 'premios' => $d->premios, 'primera' => $d->primera, 'segunda' => $d->segunda, 'tercera' => $d->tercera,'pick3' => $d->pick3, 'pick4' => $d->pick4, 'neto' => ($d->ventas) - ((int)$d->premios + $comisionesMonto)];
+        //             });
     
       
         $ticketsGanadores = Sales::on($datos['servidor'])
@@ -1334,6 +1411,8 @@ class ReportesController extends Controller
         return Response::json([
             'errores' => 0,
             'fecha' => $fechaParaImprimirChadreMovil,
+            'fechaInicial' => "$fechaInicial",
+            'fechaFinal' => "$fechaFinal",
             'balanceHastaLaFecha' => $balanceHastaLaFecha,
             'pendientes' => $pendientes,
             'perdedores' => $perdedores,

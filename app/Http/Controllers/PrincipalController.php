@@ -254,7 +254,8 @@ class PrincipalController extends Controller
             'idUsuario' => $datos['idUsuario'],
             'idBanca' => $data[0]->idBanca,
             'culo' => $idBanca,
-            'loteriasTodas' => Lotteries::on($datos["servidor"])->select("id", "descripcion")->whereStatus(1)->get()
+            'loteriasTodas' => Lotteries::on($datos["servidor"])->select("id", "descripcion")->whereStatus(1)->get(),
+            "ajustes" => \App\Settings::customFirst($datos["servidor"])
         ], 201);
     }
 
@@ -935,12 +936,15 @@ class PrincipalController extends Controller
             
             
             if($venta != null){
-                if(($usuario->roles->descripcion != "Administrador" && $usuario->roles->descripcion != "Programador") && $venta->compartido == 1){
-                    return Response::json([
-                        'errores' => 1,
-                        'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
-                    ], 201);
+                if(\App\Settings::puedeCancelarTicketsPorWhatsapp($datos["servidor"]) == false){
+                    if(($usuario->roles->descripcion != "Administrador" && $usuario->roles->descripcion != "Programador") && $venta->compartido == 1){
+                        return Response::json([
+                            'errores' => 1,
+                            'mensaje' => "Los tickets compartidos solo pueden cancelarse por el administrador"
+                        ], 201);
+                    }
                 }
+
                 $banca = Branches::on($datos["servidor"])->whereId($datos['idBanca'])->first();
                 $minutoTicketJugado =  getdate(strtotime($venta['created_at']));
                 $minutoActual = $fecha['minutes'];

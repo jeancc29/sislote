@@ -17,6 +17,8 @@ class PermissionRoleSeeder extends Seeder
         $servidores = \App\Server::on("mysql")->get();
         foreach ($servidores as $ser):
         $servidor = $ser->descripcion;
+        if(\App\Classes\Helper::dbExists($servidor) == false)
+                continue;
         //$dueño = r::where('descripcion', 'Dueno')->get()->first()->value('id');
         $administrador = r::on($servidor)->where('descripcion', 'Administrador')->get()->first()->id;
         $supervisor = r::on($servidor)->where('descripcion', 'Supervisor')->get()->first()->id;

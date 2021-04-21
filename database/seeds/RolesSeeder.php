@@ -24,7 +24,8 @@ class RolesSeeder extends Seeder
         //Se crean los roles en la DB de cada cliente
         foreach ($servidores as $ser):
         $servidor = $ser->descripcion;
-
+            if(\App\Classes\Helper::dbExists($servidor) == false)
+                continue;
             $this->crearRoles($servidor);
 
         endforeach;

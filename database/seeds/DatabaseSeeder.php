@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
                     // 'branches', 
                     // 'generals', 
                     // 'days', 
-                    // 'types', 
+                    'types', 
                     // 'entities', 
                     // 'drawsrelations', 
                     // 'frecuencies',
@@ -42,12 +42,15 @@ class DatabaseSeeder extends Seeder
         $this->call('RolesSeeder');
         $this->call('PermissionRoleSeeder');
         $this->call('UsersSeeder');
+
+
+
         // $this->call('BlockslotteriesSeeder');
         // $this->call('BranchesSeeder');
         // $this->call('GeneralsSeeder');
         // $this->call('DaysSeeder');
         // $this->call('FrecuencySeeder');
-        // $this->call('TypesSeeder');
+        $this->call('TypesSeeder');
         // $this->call('EntitySeeder');
     }
 
@@ -56,6 +59,9 @@ class DatabaseSeeder extends Seeder
         $servidores = \App\Server::on("mysql")->get();
         foreach ($servidores as $ser):
         $servidor = $ser->descripcion;
+
+            if(\App\Classes\Helper::dbExists($servidor) == false)
+                continue;
 
             DB::connection($servidor)->statement('SET FOREIGN_KEY_CHECKS = 0');
             foreach($tables as $t){

@@ -701,6 +701,13 @@ class Helper{
         return $ans;
     }
 
+    static function toDosDigitos($string){
+        $str = $string;
+        $pad = "00";
+        $ans = substr($pad, 0, strlen($pad) - strlen($str)) . $str;
+        return $ans;
+    }
+
     static function isNumber($number){
         $c = true;
         try {
@@ -2355,5 +2362,10 @@ static function save($datos, $fecha){
         $loteria = \App\Lotteries::on($server->descripcion)->whereDescripcion("La Suerte")->first();
         \App\Classes\AwardsClass::actualizarStatusDelTicket($server->descripcion, $loteria->id, $fecha);
         endforeach;
+    }
+
+    public static function dbExists($servidor){
+        $result = \DB::select("SHOW DATABASES LIKE '$servidor'");
+        return count($result) > 0;
     }
 }
