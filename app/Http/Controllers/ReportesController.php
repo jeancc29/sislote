@@ -1244,48 +1244,63 @@ class ReportesController extends Controller
                 lo.id,
                 lo.descripcion,
                 lo.abreviatura,
-                JSON_EXTRACT(lo.dataVentas, '$.ventas') AS ventas,
-                JSON_EXTRACT(lo.dataVentas, '$.premios') AS premios,
-                JSON_EXTRACT(lo.dataVentas, '$.comisiones') AS comisiones,
-                SUM(JSON_EXTRACT(lo.dataVentas, '$.ventas') - (JSON_EXTRACT(lo.dataVentas, '$.comisiones') + JSON_EXTRACT(lo.dataVentas, '$.premios'))) AS neto,
-                JSON_EXTRACT(lo.dataNumerosGanadores, '$.primera') AS primera,
-                JSON_EXTRACT(lo.dataNumerosGanadores, '$.segunda') AS segunda,
-                JSON_EXTRACT(lo.dataNumerosGanadores, '$.tercera') AS tercera,
-                JSON_EXTRACT(lo.dataNumerosGanadores, '$.pick3') AS pick3,
-                JSON_EXTRACT(lo.dataNumerosGanadores, '$.pick4') AS pick4
+                IF(lo.primera IS NOT NULL AND lo.primera != '' AND lo.primera != 'null', lo.primera, NULL) AS primera,
+                IF(lo.segunda IS NOT NULL AND lo.segunda != '' AND lo.segunda != 'null', lo.segunda, NULL) AS segunda,
+                IF(lo.tercera IS NOT NULL AND lo.tercera != '' AND lo.tercera != 'null', lo.tercera, NULL) AS tercera,
+                IF(lo.pick3 IS NOT NULL AND lo.pick3 != '' AND lo.pick3 != 'null', lo.pick3, NULL) AS pick3,
+                IF(lo.pick4 IS NOT NULL AND lo.pick4 != '' AND lo.pick4 != 'null', lo.pick4, NULL) AS pick4,
+                lo.ventas,
+                lo.premios,
+                lo.comisiones,
+                lo.neto
             FROM (
                 SELECT
-                    l.id,
-                    l.descripcion,
-                    l.abreviatura,
-                    (
-                        SELECT 
-                            JSON_OBJECT(
-                                'ventas', SUM(sd.monto),
-                                'premios', SUM(sd.premio),
-                                'comisiones', SUM(sd.comision)
-                            )
-                        FROM salesdetails sd 
-                        WHERE 
-                            sd.idLoteria = l.id 
-                            AND sd.idVenta IN(SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' AND '$fechaFinal' AND sales.idBanca = {$datos['idBanca']}) 
-                    ) AS dataVentas,
-                (
+                    lo.id,
+                    lo.descripcion,
+                    lo.abreviatura,
+                    JSON_EXTRACT(lo.dataVentas, '$.ventas') AS ventas,
+                    JSON_EXTRACT(lo.dataVentas, '$.premios') AS premios,
+                    JSON_EXTRACT(lo.dataVentas, '$.comisiones') AS comisiones,
+                    SUM(JSON_EXTRACT(lo.dataVentas, '$.ventas') - (JSON_EXTRACT(lo.dataVentas, '$.comisiones') + JSON_EXTRACT(lo.dataVentas, '$.premios'))) AS neto,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.primera')) AS primera,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.segunda')) AS segunda,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.tercera')) AS tercera,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.pick3')) AS pick3,
+                    JSON_UNQUOTE(JSON_EXTRACT(lo.dataNumerosGanadores, '$.pick4')) AS pick4
+                FROM (
                     SELECT
-                        JSON_OBJECT(
-                            'primera', awards.primera,
-                            'segunda', awards.segunda,
-                            'tercera', awards.tercera,
-                            'pick3', awards.pick3,
-                            'pick4', awards.pick4
-                        )
-                    FROM awards
-                    WHERE awards.idLoteria = l.id AND awards.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
-                ) AS dataNumerosGanadores
-                FROM lotteries AS l
-                WHERE l.status = 1
+                        l.id,
+                        l.descripcion,
+                        l.abreviatura,
+                        (
+                            SELECT 
+                                JSON_OBJECT(
+                                    'ventas', SUM(sd.monto),
+                                    'premios', SUM(sd.premio),
+                                    'comisiones', SUM(sd.comision)
+                                )
+                            FROM salesdetails sd 
+                            WHERE 
+                                sd.idLoteria = l.id 
+                                AND sd.idVenta IN(SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' AND '$fechaFinal' AND sales.idBanca = {$datos['idBanca']}) 
+                        ) AS dataVentas,
+                    (
+                        SELECT
+                            JSON_OBJECT(
+                                'primera', awards.primera,
+                                'segunda', awards.segunda,
+                                'tercera', awards.tercera,
+                                'pick3', awards.pick3,
+                                'pick4', awards.pick4
+                            )
+                        FROM awards
+                        WHERE awards.idLoteria = l.id AND awards.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
+                    ) AS dataNumerosGanadores
+                    FROM lotteries AS l
+                    WHERE l.status = 1
+                ) AS lo
+                GROUP BY lo.id
             ) AS lo
-            GROUP BY lo.id
         ");            
     
                     
