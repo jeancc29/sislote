@@ -409,7 +409,7 @@ class LoginController extends Controller
                 'bancaObject' => $banca,
                 "apiKey" => \config("data.apiKey"),
                 "tipoUsuario" => $tipoUsuario,
-                "servidores" => \App\Server::on("mysql")->where('descripcion', '!=', $u->servidor)->get(),
+                "servidores" => \App\Server::on("mysql")->get(),
                 "ajustes" => \App\Settings::customFirst($u->servidor)
             ], 201);
             
