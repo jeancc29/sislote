@@ -84,10 +84,7 @@ class SettingsController extends Controller
                 $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
-            return Response::json([
-                'errores' => 1,
-                'mensaje' => 'Token incorrecto',
-            ], 404);
+            abort(404, "Token incorrecto");
         }
 
         $usuario = \App\Users::on($datos["servidor"])->whereId($datos['usuario']["id"])->first();
