@@ -93,8 +93,10 @@ class UsersClass{
                 }
                 if($servidor == "mysql"){
                     //Si el usuario existe con un servidor diferente eso quiere decir que no se puede usar ese usuario
+                    //Si el usuario existe en la tabla Users de la base de datos principal 'mysql' y el valor del campo 'servidor' es diferente
+                    //al valor del campo 'servidor' de la base de datos del se esta intentando guardar el usuario, eso quiere decir que el usuario existe
                     if($this->servidor != $usuario->servidor){
-                        abort(403, 'El usuario ya existe, elija uno diferente');
+                        abort(403, "El usuario ya existe, elija uno diferente {$this->servidor} : {$usuario->servidor}");
                     }
                 }
             }else{

@@ -92,10 +92,11 @@ class SettingsController extends Controller
 
         $usuario = \App\Users::on($datos["servidor"])->whereId($datos['usuario']["id"])->first();
         if(!$usuario->tienePermiso("Ver ajustes") == true){
-            return Response::json([
-                'errores' => 1,
-                'mensaje' => 'No tiene permisos para realizar esta accion'
-            ], 404);
+            abort(404, "No tiene permisos para realizar esta accion");
+            // return Response::json([
+            //     'errores' => 1,
+            //     'mensaje' => 'No tiene permisos para realizar esta accion'
+            // ], 404);
         }
         
         try {

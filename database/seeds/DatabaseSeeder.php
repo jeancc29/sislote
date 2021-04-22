@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->truncateTables([
-                    // 'users',
                     // 'permissions', 
                     // 'roles', 
                     // 'permission_role', 
@@ -41,7 +40,7 @@ class DatabaseSeeder extends Seeder
         // $this->call('PermissionSeeder');
         // $this->call('RolesSeeder');
         // $this->call('PermissionRoleSeeder');
-        // $this->call('UsersSeeder');
+        $this->call('UsersSeeder');
 
 
 
