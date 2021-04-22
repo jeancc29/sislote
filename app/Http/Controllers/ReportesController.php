@@ -1304,7 +1304,7 @@ class ReportesController extends Controller
                                 'pick4', awards.pick4
                             )
                         FROM awards
-                        WHERE awards.idLoteria = l.id AND awards.created_at BETWEEN '$fechaInicial' AND '$fechaFinal'
+                        WHERE awards.idLoteria = l.id AND awards.created_at BETWEEN '$fechaInicial' AND '$fechaFinal' limit 1
                     ) AS dataNumerosGanadores
                     FROM lotteries AS l
                     WHERE l.status = 1
