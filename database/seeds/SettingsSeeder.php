@@ -12,9 +12,38 @@ class SettingsSeeder extends Seeder
      */
     public function run()
     {
-        $idMoneda = c::whereDescripcion("Dolar")->first();
-        s::create([
-            'idMoneda' => $idMoneda->id
-        ]);
+        $servidores = \App\Server::on("mysql")->get();
+        
+
+        //creamos o actualizamos, los usuarios jean y sistema en las DB correspondientes a cada cliente
+        foreach ($servidores as $ser):
+            $servidor = $ser->descripcion;
+
+            if(\App\Classes\Helper::dbExists($servidor) == false)
+                continue;
+
+                // $moneda = c::whereDescripcion("Dolar")->first();
+                $tipoFormato1 = \App\Types::on($servidor)->where(["descripcion" => "Formato de ticket 1", "renglon" => "ticket"])->first();
+                $tipoFormato2 = \App\Types::on($servidor)->where(["descripcion" => "Formato de ticket 2", "renglon" => "ticket"])->first();
+                $settings = \App\Settings::on($servidor)->first();
+                $moneda = \App\Coins::on($servidor)->orderBy("pordefecto", "desc")->first();
+
+                if($settings != null){
+                    if($settings->idTipoFormatoTicket == null)
+                        $settings->idTipoFormatoTicket = ($tipoFormato1 != null) ? $tipoFormato1->id : null;
+
+                    $settings->save();
+                }else{
+                    \App\Settings::on($servidor)->create([
+                        "idMoneda" => $moneda->id,
+                        "consorcio" => "",
+                        "idTipoFormatoTicket" => ($tipoFormato1 != null) ? $tipoFormato1->id : null,
+                    ]);
+                }
+                
+
+        endforeach;
+
+        
     }
 }
