@@ -654,7 +654,9 @@ class ReportesController extends Controller
         
       
         /************************** QUERY NUEVO *******************************/
-        $bancas = \DB::connection($datos["servidor"])
+        $bancas = [];
+        if(isset($datos["opcion"]) == false){
+            $bancas = \DB::connection($datos["servidor"])
             ->select(
                 "
                 select
@@ -689,7 +691,66 @@ class ReportesController extends Controller
                 branches.descripcion, 
                 branches.idMoneda,
                 branches.codigo 
-                from branches where id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) limit 20");
+                from branches 
+                where 
+                    id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) limit 20");
+        }else{
+            if($datos["opcion"] == "Sin ventas"){
+                $bancas = \DB::connection($datos["servidor"])
+                ->select("
+                select 
+                (select 0) as descuento, 
+                (select 0) as comision, 
+                (select 0) as monto, 
+                (select 0) as premio, 
+                (select 0) as tickets, 
+                (select 0) as ticketsPendientes, 
+                (select 0) as ticketsGanadores, 
+                (select 0) as ticketsPerdedores,
+                branches.id as idBanca, 
+                branches.descripcion, 
+                branches.idMoneda,
+                branches.codigo 
+                from branches 
+                where 
+                    id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) limit {$datos['limite']}
+                ");
+            }else{
+                $queryOpcion = "";
+                if($datos["opcion"] == "Con premios")
+                    $queryOpcion = "having premio > 0";
+                if($datos["opcion"] == "Con tickets pendientes")
+                    $queryOpcion = "having ticketsPendientes > 0";
+
+                $bancas = \DB::connection($datos["servidor"])
+                ->select(
+                    "
+                    select
+                    (select sum(sales.descuentoMonto) from sales where sales.status not in(0, 5) and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') descuento, 
+                    sum(sd.comision) as comision, 
+                    sum(sd.monto) as monto, 
+                    sum(sd.premio) as premio, 
+                    (select count(id) from sales where sales.status not in(0, 5) and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') tickets, 
+                    (select count(id) from sales where sales.status = 1 and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') ticketsPendientes, 
+                    (select count(id) from sales where sales.status = 2 and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') ticketsGanadores, 
+                    (select count(id) from sales where sales.status = 3 and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') ticketsPerdedores, 
+                    s.idBanca, 
+                    b.descripcion,
+                    b.idMoneda,
+                    b.codigo 
+                    from sales s 
+                    inner join salesdetails sd on s.id = sd.idVenta inner join branches b on b.id = s.idBanca 
+                    where s.status not in(0, 5) and 
+                    s.created_at between '$fechaInicial' AND '$fechaFinal' 
+                    group by s.idBanca, b.descripcion, b.idMoneda, b.codigo 
+                    $queryOpcion
+                    limit {$datos['limite']}
+                    ");
+            }
+            
+        }
+
+        
 
                 $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal, $fechaActualCarbon, $fechaFinalSinHora, $datos){
                     $ventas = $d->monto;
