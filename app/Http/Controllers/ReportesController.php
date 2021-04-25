@@ -83,6 +83,7 @@ class ReportesController extends Controller
         $fechaInicial = $datos["fechaInicial"];
         $fechaFinal = $datos["fechaFinal"];
         $limite = isset($datos["limite"]) ? $datos["limite"] : 20;
+        $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->first()->id;
         // $data = \DB::connection($datos["servidor"])->select("
         // SELECT 
         // s.jugada,
@@ -152,7 +153,7 @@ class ReportesController extends Controller
                         
                         FROM salesdetails
                         WHERE 
-                        salesdetails.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal')
+                        salesdetails.idVenta in (SELECT sales.id FROM sales WHERE sales.status NOT IN(0, 5) AND sales.created_at BETWEEN '$fechaInicial' and '$fechaFinal' AND sales.idBanca IN(SELECT branches.id FROM branches WHERE branches.status = 1 AND branches.idMoneda = $idMoneda) )
                         AND created_at between '$fechaInicial' and '$fechaFinal' 
                         $consultaLoteria
                         $consultaSorteo
@@ -250,7 +251,8 @@ class ReportesController extends Controller
         return Response::json([
             "data" => $data,
             "sorteos" => ($datos["retornarSorteos"] == true) ? \App\Draws::on($datos["servidor"])->get() : [],
-            "loterias" => ($datos["retornarLoterias"] == true) ? \App\Lotteries::on($datos["servidor"])->whereStatus(1)->get() : []
+            "loterias" => ($datos["retornarLoterias"] == true) ? \App\Lotteries::on($datos["servidor"])->whereStatus(1)->get() : [],
+            "monedas" => isset($datos["retornarMonedas"]) ? ($datos["retornarMonedas"] == true) ? \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->get() : [] : []
         ]);
 
     }
@@ -655,6 +657,7 @@ class ReportesController extends Controller
       
         /************************** QUERY NUEVO *******************************/
         $bancas = [];
+        $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->first()->id;
         if(isset($datos["opcion"]) == false){
             $bancas = \DB::connection($datos["servidor"])
             ->select(
@@ -713,7 +716,9 @@ class ReportesController extends Controller
                 branches.codigo 
                 from branches 
                 where 
-                    id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) limit {$datos['limite']}
+                    id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca)
+                    AND branches.idMoneda = $idMoneda
+                     limit {$datos['limite']}
                 ");
             }else{
                 $queryOpcion = "";
@@ -740,8 +745,9 @@ class ReportesController extends Controller
                     b.codigo 
                     from sales s 
                     inner join salesdetails sd on s.id = sd.idVenta inner join branches b on b.id = s.idBanca 
-                    where s.status not in(0, 5) and 
-                    s.created_at between '$fechaInicial' AND '$fechaFinal' 
+                    where s.status not in(0, 5) 
+                    AND s.idBanca in(SELECT branches.id FROM branches WHERE branches.idMoneda = $idMoneda)
+                    and s.created_at between '$fechaInicial' AND '$fechaFinal' 
                     group by s.idBanca, b.descripcion, b.idMoneda, b.codigo 
                     $queryOpcion
                     limit {$datos['limite']}
