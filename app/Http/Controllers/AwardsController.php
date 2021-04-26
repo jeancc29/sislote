@@ -349,6 +349,7 @@ class AwardsController extends Controller
         if(!$awardsClass->loteriaAbreDiaActual()){
             continue;
             // return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
+        
         }  
         if($awardsClass->insertarPremio() == false){
             return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
