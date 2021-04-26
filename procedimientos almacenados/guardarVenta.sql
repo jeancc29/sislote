@@ -177,6 +177,11 @@ then
          set @idLoteriaSuperpale = JSON_EXTRACT(jugadas, CONCAT('$[', @contadorJugadas, '].idLoteriaSuperpale'));
          set @idLoteriaSuperpale = JSON_UNQUOTE(@idLoteriaSuperpale);
 
+                if NOT exists(select bl.id from branches_lotteries bl where bl.idLoteria = @idLoteria AND bl.idBanca = idBanca)
+                then
+					set @mensaje = CONCAT('La loteria ', (SELECT l.descripcion FROM lotteries l WHERE l.id = @idLoteria AND l.status = 1 LIMIT 1), ' no pertenece a esta banca');
+                    SIGNAL SQLSTATE '45000';
+                end if;
         
 				if exists(select id from awards where idLoteria = @idLoteria and date(created_at) = date(now()) )
                 then
@@ -466,7 +471,14 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
 				inner join days d on d.id = dl.idDia
-				where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
+				where l.id not in(
+                    select idLoteria 
+                    from awards 
+                    where date(created_at) = date(now())
+                    union
+                    select lotteries.id as idLoteria from lotteries where lotteries.id not in(SELECT bl.idLoteria FROM branches_lotteries bl WHERE bl.idBanca = idBanca) and lotteries.status = 1
+
+                    ) and d.wday = wday and l.status = 1 order by dl.horaCierre asc;
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
 				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
@@ -474,7 +486,14 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id
             inner join days d on d.id = dl.idDia
-            where l.id not in(select idLoteria from awards where date(created_at) = date(now())) and d.wday = wday and l.status = 1 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
+            where l.id not in(
+                select idLoteria 
+                from awards 
+                where 
+                    date(created_at) = date(now())
+                union
+                select lotteries.id as idLoteria from lotteries where lotteries.id not in(SELECT bl.idLoteria FROM branches_lotteries bl WHERE bl.idBanca = idBanca) and lotteries.status = 1
+                ) and d.wday = wday and l.status = 1 and DATE_FORMAT(now(),'%H:%i:%s') < DATE_FORMAT(concat(date(now()), ' ', dl.horaCierre),'%H:%i:%s') order by dl.horaCierre asc; 
 		
         
         -- select JSON_ARRAYAGG(JSON_OBJECT(
