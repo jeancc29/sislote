@@ -347,7 +347,8 @@ class AwardsController extends Controller
         //     return Response::json(['errores' => 1,'mensaje' => 'Datos invalidos para la loteria ' . $awardsClass->getLoteriaDescripcion()], 201);
         // }
         if(!$awardsClass->loteriaAbreDiaActual()){
-            return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
+            continue;
+            // return Response::json(['errores' => 1,'mensaje' => 'La loteria ' . $awardsClass->getLoteriaDescripcion() .' no abre este dia '], 201);
         }  
         if($awardsClass->insertarPremio() == false){
             return Response::json(['errores' => 1,'mensaje' => 'Error al insertar premio'], 201);
