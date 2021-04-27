@@ -42,6 +42,9 @@
                         <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                           <i class="fa fa-google-plus"></i>
                         </a>
+                        <a href="https://drive.google.com/file/d/1iB4Ys2uFp0UoARzkONgRlAG1A2F4sRda/view?usp=sharing" class="btn btn-just-icon btn-link btn-white">
+                          <i class="fa fa-download"></i>
+                        </a>
                       </div>
                     </div>
                     <div class="card-body ">
