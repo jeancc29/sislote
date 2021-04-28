@@ -696,7 +696,9 @@ class ReportesController extends Controller
                 branches.codigo 
                 from branches 
                 where 
-                    id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' and branches.status = 1 group by idBanca) limit 20");
+                    id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) 
+                    AND status = 1
+                    limit 20");
         }else{
             if($datos["opcion"] == "Sin ventas"){
                 $bancas = \DB::connection($datos["servidor"])
