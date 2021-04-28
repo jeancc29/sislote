@@ -159,8 +159,8 @@
                                 <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Neto</th>
                                 <!-- <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Caida</th>
                                 <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Final</th> -->
-                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance a la fecha</th>
                                 <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance</th>
+                                <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Balance mas ventas</th>
                                 <th scope="col" class="text-center font-weight-bold" style="font-size: 12px;">Caida acumulada</th>
                             </tr>
                         </thead>
