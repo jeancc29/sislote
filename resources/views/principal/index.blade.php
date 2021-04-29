@@ -997,7 +997,7 @@
                             <th scope="col" class="text-center">Cancelado por</th>
                             <th scope="col" class="text-center">Fecha cancelado</th>
                             <th scope="col" class="text-center">Estado</th>
-                            <!-- <th scope="col" class="text-center">Marcar pago</th> -->
+                            <!-- <th scope="col" class="text-center">Cancelar</th> -->
                             <th scope="col" class="text-center">Imprimir</th>
 
                             
@@ -1014,10 +1014,12 @@
                                 <td scope="col" class="text-center">@{{c.usuario}}</td>
                                 <td scope="col" class="text-center">@{{c.total}}</td>
                                 <td scope="col" class="text-center">@{{c.premio}}</td>
-                                <td scope="col" class="text-center">@{{c.razon}}</td>
+                                <td scope="col" class="text-center">@{{c.usuarioCancelacion.id}}</td>
                                 <td scope="col" class="text-center">@{{toFecha(c.fechaCancelacion.date) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <td scope="col" class="text-center">@{{estado(c.status)}}</td>
-                                <!-- <td scope="col" class="text-center">Marcar pago</td> -->
+                                <!-- <td scope="col" class="text-center">
+                                    <a ng-click="cancelar(c.codigoBarra)" href="javascript:void(0)" class="btn btn-outline-primary px-1 py-1"><i class="material-icons">delete</i></a>
+                                </td> -->
                                 <td scope="col" class="text-center">
                                     <a ng-click="imprimirTicket(c)" href="javascript:void(0)" class="btn btn-outline-primary px-1 py-1"><i class="material-icons">print</i></a>
                                 </td>
@@ -1765,7 +1767,7 @@
             <div class="modal-content">
 
                  <div class="modal-header">
-                    <h3 class="modal-title" id="exampleModalLabel">Pagar</h3>
+                    <h3 class="modal-title" id="exampleModalLabel">Cancelar</h3>
                     <!-- <div style="display: @{{seleccionado}}" class="alert alert-primary d-inline ml-5 " role="alert">
                         @{{titulo_seleccionado}} : @{{seleccionado.nombre}} - @{{seleccionado.identificacion}}
                     </div> -->

@@ -1044,7 +1044,7 @@ myApp
             $scope.datos.monitoreo.servidor = $scope.datos.servidor;
             
           var jwt = helperService.createJWT($scope.datos.monitoreo);
-          $http.post(rutaGlobal+"/api/reportes/monitoreo", {'action':'sp_ventas_buscar', 'datos': jwt})
+          $http.post(rutaGlobal+"/api/monitoreo/tickets", {'action':'sp_ventas_buscar', 'datos': jwt})
              .then(function(response){
                 // console.log('monitoreo ',response);
                 if(response.data.errores == 0){
@@ -1538,7 +1538,8 @@ myApp
         }
 
         $scope.cancelar = function(){
-
+            // $scope.datos.cancelar.codigoBarra = codigoBarra;
+            console.log("cancelar: ", $scope.datos.cancelar.codigoBarra);
             if($scope.datos.cancelar.codigoBarra == null || $scope.datos.cancelar.codigoBarra == undefined)
             {
                 alert('El codigo del ticket no debe estar vacio');
@@ -1554,8 +1555,13 @@ myApp
             if($scope.datos.cancelar.razon == null || $scope.datos.cancelar.razon == undefined)
             {
                 alert('La razon no debe estar vacia');
+
+
                 return;
             }
+
+
+            // $scope.datos.cancelar.razon = "";
 
             $scope.datos.cancelar.servidor = $scope.datos.servidor;
             $scope.datos.cancelar.idUsuario = $scope.datos.idUsuario;
@@ -1573,7 +1579,7 @@ myApp
                     return;
                 }else if(response.data.errores == 0){
                     $scope.datos.cancelar.codigoBarra = null;
-                    $scope.inicializarDatos(response);
+                    // $scope.inicializarDatos(response);
                     alert(response.data.mensaje);
                 }
 

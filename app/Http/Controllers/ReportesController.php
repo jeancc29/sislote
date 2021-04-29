@@ -659,6 +659,7 @@ class ReportesController extends Controller
         $bancas = [];
         $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->first()->id;
         if(isset($datos["opcion"]) == false){
+            $limite = isset($datos["limite"]) ? $datos["limite"] : 30;
             $bancas = \DB::connection($datos["servidor"])
             ->select(
                 "
@@ -698,7 +699,7 @@ class ReportesController extends Controller
                 where 
                     id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca) 
                     AND status = 1
-                    limit 20");
+                    limit $limite");
         }else{
             if($datos["opcion"] == "Sin ventas"){
                 $bancas = \DB::connection($datos["servidor"])

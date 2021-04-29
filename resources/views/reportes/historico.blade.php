@@ -84,6 +84,25 @@
                             <input ng-model="datos.fechaHasta" id="fechaBusquedaHasta" type="date" class="form-control" required>
                             </div>
                         </div>
+                        <div class="col-3">
+
+                                <div class="input-group ">
+                                <!-- <label class="d-none d-sm-block text-right col-sm-3 col-form-label  font-weight-bold " style="color: black;">Tipo regla</label>                               -->
+                                    <!-- <div  class=" col-sm-12 col-10"> -->
+                            <label for="limiteBusqueda" class="bmd-label-floating font-weight-bold" style="color: black;">Filas a mostrar</label>
+
+                                        <select 
+                                            ng-change="cbxLimiteChanged()"
+                                            id="limiteBusqueda"
+                                            ng-model="selectedLimite"
+                                            ng-options="o for o in optionsLimite"
+                                            class="selectpicker col-12" 
+                                            data-style="select-with-transition" 
+                                            title="Seleccionar filas">
+                                        </select>
+                                    <!-- </div> -->
+                                </div> <!-- END INPUT GROUP -->
+                            </div>
                         
 
                         
@@ -216,7 +235,7 @@
     <div class="panel panel-chat " ng-show="mostrarVentanaTicket">
         <div class="row">
             <div class="col-12">
-                <div style="cursor:pointer" class="bg-success w-25 p-2 text-white text-center font-weight-bold" ng-click="mostrarVentanaTicket = !mostrarVentanaTicket">
+                <div style="cursor:pointer" class="bg-success w-25 p-2 text-white text-center font-weight-bold" >
                     Cerrar
                 </div>
             </div>

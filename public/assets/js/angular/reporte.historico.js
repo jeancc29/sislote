@@ -18,6 +18,8 @@ myApp
 
          $scope.optionsTipoCliente = [];
         $scope.selectedTipoCliente = {};
+        $scope.optionsLimite = [30, 70, 110, 150];
+        $scope.selectedLimite = 30;
         $scope.es_cliente = false;
         $scope.datos =  {
             "descripcionBanca" : null,
@@ -166,8 +168,8 @@ myApp
 
       
         $scope.seleccionarTicket = function(ticket){
-            $scope.mostrarVentanaTicket = true;
-            $scope.datos.selectedTicket = ticket;
+            // $scope.mostrarVentanaTicket = true;
+            // $scope.datos.selectedTicket = ticket;
         }
 
        
@@ -176,6 +178,7 @@ myApp
             $scope.datos.idUsuario = idUsuarioGlobal;
             $scope.datos.layout = 'Principal';
             $scope.datos.servidor = servidorGlobal;
+            $scope.datos.limite = $scope.selectedLimite;
             var jwt = helperService.createJWT($scope.datos);
             $scope.cargando = true;
             $http.post(rutaGlobal+"/api/reportes/historico", {'action':'sp_ventas_buscar', 'datos': jwt})
@@ -498,6 +501,10 @@ myApp
                 }
 
             });
+        }
+
+        $scope.cbxLimiteChanged = function(){
+            console.log("cbxLimiteChanged value: ", $scope.selectedLimite);
         }
 
         $scope.toFecha = function(fecha){
