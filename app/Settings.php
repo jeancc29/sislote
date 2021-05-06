@@ -13,6 +13,7 @@ class Settings extends Model
         'idTipoFormatoTicket',
         'imprimirNombreBanca',
         'cancelarTicketWhatsapp',
+        'pagarTicketEnCualquierBanca',
     ];
 
     public static function customFirst($servidor){
@@ -41,6 +42,17 @@ class Settings extends Model
             return false;
 
         if($ajuste->cancelarTicketWhatsapp == true)
+            return true;
+        
+        return false;
+    }
+
+    public static function puedePagarTicketEnCualquierBanca($servidor){
+        $ajuste = Settings::on($servidor)->first();
+        if($ajuste == null)
+            return false;
+
+        if($ajuste->pagarTicketEnCualquierBanca == true)
             return true;
         
         return false;

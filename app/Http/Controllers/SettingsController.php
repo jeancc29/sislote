@@ -109,6 +109,7 @@ class SettingsController extends Controller
                     "imprimirNombreConsorcio" => $datos["ajustes"]["imprimirNombreConsorcio"],
                     "cancelarTicketWhatsapp" => $datos["ajustes"]["cancelarTicketWhatsapp"],
                     "imprimirNombreBanca" => $datos["ajustes"]["imprimirNombreBanca"],
+                    "pagarTicketEnCualquierBanca" => $datos["ajustes"]["pagarTicketEnCualquierBanca"],
                     "idTipoFormatoTicket" => ($datos["ajustes"]["tipoFormatoTicket"] != null) ? $datos["ajustes"]["tipoFormatoTicket"]["id"] : null
                 ]
             );
