@@ -500,7 +500,7 @@ class PrincipalController extends Controller
         $fecha = getdate();
     
         $errores = 0;
-        $mensaje = '';
+        $mensaje = 'Se ha pagado correctamente';
         $loterias = null;
         $jugadas = null;
         $venta = null;
@@ -517,14 +517,17 @@ class PrincipalController extends Controller
                 if(\App\Settings::puedePagarTicketEnCualquierBanca($datos["servidor"]) == false){
                     $usuario = \App\Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
                     if($usuario->esBancaAsignada($venta->idBanca) == false){
-                        $errores = 1;
-                        $mensaje = "El ticket no pertenece a esta banca";
 
-                        return Response::json([
-                            'errores' => $errores,
-                            'mensaje' => $mensaje,
-                            'venta' => null,
-                        ], 201);
+                        if($usuario->esAdministradorOProgramador() == false){
+                            $errores = 1;
+                            $mensaje = "El ticket no pertenece a esta banca";
+
+                            return Response::json([
+                                'errores' => $errores,
+                                'mensaje' => $mensaje,
+                                'venta' => null,
+                            ], 201);
+                        }
                     }
                 }
     

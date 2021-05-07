@@ -74,4 +74,12 @@ class Users extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function esAdministradorOProgramador(){
+        $rol = $this->roles;
+        if($rol == null)
+            return false;
+
+        return $rol->descripcion == "Programador" || $rol->descripcion == "Administrador"; 
+    }
 }
