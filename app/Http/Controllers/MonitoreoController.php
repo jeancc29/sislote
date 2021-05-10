@@ -587,13 +587,13 @@ class MonitoreoController extends Controller
         //https://stackoverflow.com/questions/19529864/mysql-using-sum-and-case
         //https://stackoverflow.com/questions/6878090/mysql-sum-with-case-statement
         $monitoreo = \DB::connection($datos["servidor"])->select("select 
-        s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, 
+        s.id, s.total, s.pagado, s.status, s.idTicket, DATE_FORMAT(s.created_at, '%d/%m/%Y %h:%i %p') created_at, 
         t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
         sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
         sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
         (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
         (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
-        (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
+        (select DATE_FORMAT(cancellations.created_at, '%d/%m/%Y %h:%i %p') from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
         from sales s  inner join salesdetails sd on s.id = sd.idVenta 
         inner join users u on u.id = s.idUsuario 
         inner join tickets t on t.id = s.idTicket 
