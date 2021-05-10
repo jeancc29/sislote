@@ -592,7 +592,7 @@ class MonitoreoController extends Controller
         sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
         sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
         (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
-        (select JSON_OBJECT('id', users.id, 'usuario', users.usuario) from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
+        (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
         (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
         from sales s  inner join salesdetails sd on s.id = sd.idVenta 
         inner join users u on u.id = s.idUsuario 

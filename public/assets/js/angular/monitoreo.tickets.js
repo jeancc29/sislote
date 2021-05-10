@@ -597,8 +597,15 @@ myApp
         }
 
         $scope.toFecha = function(fecha){
-            if(fecha != undefined && fecha != null )
-                return new Date(fecha);
+            // if(fecha != undefined && fecha != null )
+            //     return new Date(fecha);
+            // else
+            //     return '-';
+
+            if(fecha != undefined && fecha != null ){
+                var date = new Date(fecha);
+                return moment(date).format("DD/MM/YYYY hh:mm a");
+            }
             else
                 return '-';
         }
