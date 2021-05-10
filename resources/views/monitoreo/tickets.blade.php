@@ -217,7 +217,7 @@
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuario}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.total}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.premio}}</td>
-                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuarioCancelacion.usuario}}</td>
+                                <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{c.usuarioCancelacion}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{toFecha(c.fechaCancelacion) | date:"dd/MM/yyyy hh:mm a"}}</td>
                                 <td ng-click="seleccionarTicket(c)" scope="col" class="text-center" style="font-size: 11px">@{{estado(c.status)}}</td>
                                 <td scope="col" class="text-center" style="font-size: 11px">
