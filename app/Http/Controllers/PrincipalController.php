@@ -616,7 +616,7 @@ class PrincipalController extends Controller
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
-            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [0,5])->get()->first();
+            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [5])->get()->first();
             
             if($venta != null){
                 
