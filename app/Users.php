@@ -49,9 +49,9 @@ class Users extends Authenticatable implements JWTSubject
     }
 
     public function esBancaAsignada($idBanca){
-        $banca = Branches::whereId($idBanca)->first();
-        if($banca != null){
-            if($banca->id == $idBanca)
+        $bancaUsuario = Branches::on($this->servidor)->where(["idUsuario" => $this->id, "status" => 1])->first();
+        if($bancaUsuario != null){
+            if($bancaUsuario->id == $idBanca)
                 return true;
         }
         return false;
@@ -73,5 +73,13 @@ class Users extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function esAdministradorOProgramador(){
+        $rol = $this->roles;
+        if($rol == null)
+            return false;
+
+        return $rol->descripcion == "Programador" || $rol->descripcion == "Administrador"; 
     }
 }

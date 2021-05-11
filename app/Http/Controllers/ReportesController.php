@@ -1677,22 +1677,54 @@ class ReportesController extends Controller
         }
     
         $fecha = getdate(strtotime($datos['fecha']));
+        $monitoreo = [];
+        if(isset($datos['fechaFinal'])){
+            $fecha = getdate(strtotime($datos['fecha']));
+            $fechaF = getdate(strtotime($datos['fechaFinal']));
+            $fechaInicial = $fecha['year'].'-'.\App\Classes\Helper::toDosDigitos(strval($fecha['mon'])).'-'. \App\Classes\Helper::toDosDigitos(strval($fecha['mday'])) . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'. \App\Classes\Helper::toDosDigitos(strval($fechaF['mon'])) .'-'. \App\Classes\Helper::toDosDigitos(strval($fechaF['mday'])) . ' 23:50:00';
+        
+
+            // $monitoreo = Sales::on($datos["servidor"])->select('id', 'idTicket', 'idBanca', 'total', 'status', 'premios', 'created_at')->whereBetween('sales.created_at', array($fechaInicial, $fechaFinal))
+            //         ->where('idBanca', $datos['idBanca'])
+            //         ->where('status', '!=', '5')
+            //         ->orderBy('id', 'desc')
+            //         ->get();
+            $consulta = "";
+            $monitoreo = \DB::connection($datos["servidor"])->select("select 
+            s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, 
+            t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
+            sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
+            sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
+            (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
+            (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
+            (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
+            from sales s  inner join salesdetails sd on s.id = sd.idVenta 
+            inner join users u on u.id = s.idUsuario 
+            inner join tickets t on t.id = s.idTicket 
+            inner join branches b on b.id = s.idBanca 
+            where s.created_at between '{$fechaInicial}' and '{$fechaFinal}' and s.status != 5 and s.idBanca = {$datos['idBanca']} {$consulta} 
+            group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, razon, fechaCancelacion, usuarioCancelacion 
+            order by s.created_at desc");
+        
+        }else{
+            $monitoreo = Sales::on($datos["servidor"])->select('id', 'idTicket', 'idBanca', 'total', 'status', 'premios', 'created_at')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
+                ->where('idBanca', $datos['idBanca'])
+                ->where('status', '!=', '5')
+                ->orderBy('id', 'desc')
+                ->get();
+        }
     
-    
-    
-        $monitoreo = Sales::on($datos["servidor"])->select('id', 'idTicket', 'idBanca', 'total', 'status')->whereBetween('sales.created_at', array($fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00', $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00'))
-                    ->where('idBanca', $datos['idBanca'])
-                    ->where('status', '!=', '5')
-                    ->orderBy('id', 'desc')
-                    ->get();
+        
     
        // return $ventas;
-        
-       $monitoreo = collect($monitoreo)->map(function($m) use($datos){
-           $codigo = Branches::on($datos["servidor"])->select('codigo')->whereId($m['idBanca'])->first();
-           $codigoBarra = Tickets::on($datos["servidor"])->whereId($m['idTicket'])->first();
-           return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'codigoBarra' =>$codigoBarra['codigoBarra'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
-       });
+    
+       if(isset($datos['fechaFinal']) == false)
+            $monitoreo = collect($monitoreo)->map(function($m) use($datos){
+                $codigo = Branches::on($datos["servidor"])->select('codigo')->whereId($m['idBanca'])->first();
+                $codigoBarra = Tickets::on($datos["servidor"])->whereId($m['idTicket'])->first();
+                return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'premios' =>$m['premios'], 'created_at' => \App\Classes\Helper::stdClassToArray($m["created_at"])["date"], 'codigoBarra' =>$codigoBarra['codigoBarra'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
+            });
     
         return Response::json([
             'monitoreo' => $monitoreo,

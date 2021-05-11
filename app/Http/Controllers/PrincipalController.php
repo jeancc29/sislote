@@ -481,6 +481,8 @@ class PrincipalController extends Controller
             ], 201);
         }
 
+
+
         if(isset($datos['codigoBarra'])){
             if(!(new Helper)->isNumber($datos['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
@@ -498,7 +500,7 @@ class PrincipalController extends Controller
         $fecha = getdate();
     
         $errores = 0;
-        $mensaje = '';
+        $mensaje = 'Se ha pagado correctamente';
         $loterias = null;
         $jugadas = null;
         $venta = null;
@@ -512,6 +514,22 @@ class PrincipalController extends Controller
             if($venta != null){
                 // $venta['pagado'] = 1;
                 // $venta->save();
+                if(\App\Settings::puedePagarTicketEnCualquierBanca($datos["servidor"]) == false){
+                    $usuario = \App\Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+                    if($usuario->esBancaAsignada($venta->idBanca) == false){
+
+                        if($usuario->esAdministradorOProgramador() == false){
+                            $errores = 1;
+                            $mensaje = "El ticket no pertenece a esta banca";
+
+                            return Response::json([
+                                'errores' => $errores,
+                                'mensaje' => $mensaje,
+                                'venta' => null,
+                            ], 201);
+                        }
+                    }
+                }
     
                 if(Helper::pagar($datos['servidor'], $venta->id, $datos['idUsuario'])){
                     $venta = Sales::on($datos['servidor'])->whereId($venta->id)->first();
@@ -598,7 +616,7 @@ class PrincipalController extends Controller
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
-            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [0,5])->get()->first();
+            $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [5])->get()->first();
             
             if($venta != null){
                 
