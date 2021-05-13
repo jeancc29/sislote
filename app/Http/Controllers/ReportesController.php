@@ -1723,7 +1723,7 @@ class ReportesController extends Controller
             $monitoreo = collect($monitoreo)->map(function($m) use($datos){
                 $codigo = Branches::on($datos["servidor"])->select('codigo')->whereId($m['idBanca'])->first();
                 $codigoBarra = Tickets::on($datos["servidor"])->whereId($m['idTicket'])->first();
-                return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'premios' =>$m['premios'], 'created_at' => \App\Classes\Helper::stdClassToArray($m["created_at"])["date"], 'codigoBarra' =>$codigoBarra['codigoBarra'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
+                return ['id' =>$m['id'], 'total' =>$m['total'], 'status' =>$m['status'], 'idTicket' =>$m['idTicket'], 'premios' =>$m['premios'], 'created_at' => $m["created_at"], 'codigoBarra' =>$codigoBarra['codigoBarra'], 'idBanca' =>$m['idBanca'], 'codigo' =>$codigo['codigo']];
             });
     
         return Response::json([
