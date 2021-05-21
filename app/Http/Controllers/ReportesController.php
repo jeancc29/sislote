@@ -821,6 +821,7 @@ class ReportesController extends Controller
             'apiKey' => '',
             'idEmpresa' => '',
             'limite' => '',
+            'opcion' => '',
         ]);
 
 
