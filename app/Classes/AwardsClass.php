@@ -653,10 +653,22 @@ class AwardsClass{
                     $hayPremiadoEnPrimera = true;
                     $contador++;
                 }
+                else if($this->segunda == $segundoParDeNumeros && $hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                else if($this->tercera == $segundoParDeNumeros && $hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
+                    $contador++;
+                }
                 break;
             case $this->segunda:
                 if($hayPremiadoEnSegunda == false){
                     $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                else if($this->tercera == $segundoParDeNumeros && $hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
                     $contador++;
                 }
                 break;
@@ -668,18 +680,28 @@ class AwardsClass{
                 break;
         }
 
-        
-
         switch ($tercerParDeNumeros) {
             case $this->primera:
                 if($hayPremiadoEnPrimera == false){
                     $hayPremiadoEnPrimera = true;
                     $contador++;
                 }
+                else if($this->segunda == $tercerParDeNumeros && $hayPremiadoEnSegunda == false){
+                    $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                else if($this->tercera == $tercerParDeNumeros && $hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
+                    $contador++;
+                }
                 break;
             case $this->segunda:
                 if($hayPremiadoEnSegunda == false){
                     $hayPremiadoEnSegunda = true;
+                    $contador++;
+                }
+                else if($this->tercera == $tercerParDeNumeros && $hayPremiadoEnTercera == false){
+                    $hayPremiadoEnTercera = true;
                     $contador++;
                 }
                 break;
