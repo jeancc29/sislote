@@ -123,6 +123,7 @@ Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
 Route::post('/reportes/ventas/', 'ReportesController@ventas')->name("reporte.ventas");
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
 Route::post('/reportes/historico/', 'ReportesController@historico');
+Route::get('/historico/', 'ReportesController@historicoApi')->name("historicoApi");
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
 Route::post('/reportes/ticketsPendientesDePago/', 'ReportesController@ticketsPendientesDePago');
 Route::post('/reportes/ticketsPendientesDePagoIndex/', 'ReportesController@ticketsPendientesDePagoIndex');

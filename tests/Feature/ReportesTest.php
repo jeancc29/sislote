@@ -80,4 +80,31 @@ class ReportesTest extends TestCase
         $response->assertStatus(201);
         // $response->assertSessionHasErrors('email');
     }
+
+    public function test_ventas_reportes()
+    {
+        $this->withoutExceptionHandling();
+        // $tipo = \App\Type::whereRenglon("gasto")->first();
+        
+        $data =  [
+            "retornarLoterias" => false,
+            "fechaDesde" => "2021-04-18 00:00",
+            "fechaHasta" => "2021-04-19 23:59:59",
+            "idBanca" => 18,
+            "status" => 1,
+            "idUsuario" => 1,
+            // "tipo" => \App\Classes\Helper::stdClassToArray($tipo),
+        ];
+        $jwt = \App\Classes\Helper::jwtEncoder($data);
+        // $tipo = \App\Type::whereRenglon("gasto")->first();
+        $response = $this->post(route('reporte.ventas'), [
+            "datos" => $jwt
+        ]);
+        $array = \App\Classes\Helper::stdClassToArray($response->getData());
+        $json = json_encode($array);
+        echo $json;
+
+        $response->assertStatus(201);
+        // $response->assertSessionHasErrors('email');
+    }
 }
