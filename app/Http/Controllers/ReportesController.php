@@ -945,9 +945,7 @@ class ReportesController extends Controller
                     
         
                     return [
-                        'id' => $d->idBanca, 
                         'descripcion' => strtoupper ($d->descripcion), 
-                        'idMoneda' => $d->idMoneda,
                         'codigo' => $d->codigo, 'ventas' => $ventas, 
                         'descuentos' => $descuentos, 
                         'premios' => $premios, 
@@ -957,7 +955,6 @@ class ReportesController extends Controller
                         'pendientes' => $ticketsPendientes,
                         'ganadores' =>$ticketsGanadores,
                         'perdedores' => $ticketsPerdedores,
-                        'monedas' => Coins::on($datos["servidor"])->orderBy('pordefecto', 1)->get()
                     ];
                 });
         } catch (\Throwable $th) {
