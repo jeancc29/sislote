@@ -950,7 +950,7 @@ class ReportesController extends Controller
                         'descuentos' => $descuentos, 
                         'premios' => $premios, 
                         'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
-                        'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
+                        'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
                         'balanceActual' => round(($balance + $totalNeto), 2),
                         'pendientes' => $ticketsPendientes,
                         'ganadores' =>$ticketsGanadores,
