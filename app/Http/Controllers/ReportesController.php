@@ -702,6 +702,7 @@ class ReportesController extends Controller
                     limit $limite");
         }else{
             if($datos["opcion"] == "Sin ventas"){
+                $limite = $datos['limite'] == 20 ? 40 : $datos['limite'];
                 $bancas = \DB::connection($datos["servidor"])
                 ->select("
                 select 
@@ -721,10 +722,11 @@ class ReportesController extends Controller
                 where 
                     id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca)
                     AND branches.idMoneda = $idMoneda
-                     limit {$datos['limite']}
+                     limit {$limite}
                 ");
             }else{
                 $queryOpcion = "";
+                $limite = $datos['limite'] == 20 ? 40 : $datos['limite'];
                 if($datos["opcion"] == "Con premios")
                     $queryOpcion = "having premio > 0";
                 if($datos["opcion"] == "Con tickets pendientes")
@@ -753,7 +755,7 @@ class ReportesController extends Controller
                     and s.created_at between '$fechaInicial' AND '$fechaFinal' 
                     group by s.idBanca, b.descripcion, b.idMoneda, b.codigo 
                     $queryOpcion
-                    limit {$datos['limite']}
+                    limit {$limite}
                     ");
             }
             

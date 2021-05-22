@@ -95,9 +95,9 @@ class ReportesTest extends TestCase
             "idUsuario" => 1,
             // "tipo" => \App\Classes\Helper::stdClassToArray($tipo),
         ];
-        $jwt = \App\Classes\Helper::jwtEncoder($data);
+        // $jwt = \App\Classes\Helper::jwtEncoder($data);
         // $tipo = \App\Type::whereRenglon("gasto")->first();
-        $response = $this->post(route('reporte.ventas'), [
+        $response = $this->post(route('historicoApi'), [
             "datos" => $jwt
         ]);
         $array = \App\Classes\Helper::stdClassToArray($response->getData());
