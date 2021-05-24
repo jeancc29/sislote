@@ -77,7 +77,7 @@ class GroupController extends Controller
 
         $grupo = Group::on($datos["servidor"])->whereDescripcion($datos["grupo"]["descripcion"])->first();
         if($grupo != null){
-            if($grupo->id != $datos["id"])
+            if($grupo->id != $datos["grupo"]["id"])
                 return Response::json([
                     "mensaje" => "El grupo ya existe, debe crear un grupo diferente"
                 ], 402);
