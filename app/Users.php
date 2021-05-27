@@ -18,7 +18,7 @@ class Users extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'nombres', 'email', 'password', 'status', 'usuario', 'idRole', "servidor"
+        'nombres', 'email', 'password', 'status', 'usuario', 'idRole', "servidor", "idGrupo"
     ];
 
     /**
@@ -39,6 +39,11 @@ class Users extends Authenticatable implements JWTSubject
     public function roles()
     {
         return $this->hasOne('App\Roles', 'id', 'idRole');
+    }
+
+    public function group()
+    {
+        return $this->hasOne('App\Group', 'id', 'idGrupo');
     }
 
     public function tienePermiso($permiso){

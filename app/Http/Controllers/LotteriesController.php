@@ -65,6 +65,8 @@ class LotteriesController extends Controller
         ]);
         try {
             $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,
@@ -136,6 +138,8 @@ class LotteriesController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,
@@ -292,7 +296,8 @@ class LotteriesController extends Controller
             'loterias' => LotteriesResource::collection(Lotteries::on($datos["servidor"])->whereIn('status', [1,0])->get())->servidor($datos["servidor"]),
             'dias' => Days::on($datos["servidor"])->get(),
             'sorteos' => Draws::on($datos["servidor"])->get(),
-            'aa' => $sorteos
+            'aa' => $sorteos,
+            "data" => (new LotteriesResource($loteria))->servidor($datos["servidor"])
         ], 201);
     }
 
@@ -349,6 +354,8 @@ class LotteriesController extends Controller
 
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             return Response::json([
                 'errores' => 1,
@@ -362,6 +369,7 @@ class LotteriesController extends Controller
             $loteria->save();
 
             return Response::json([
+                "data" => $loteria,
                 'errores' => 0,
                 'mensaje' => 'Se ha eliminado correctamente'
             ], 201);

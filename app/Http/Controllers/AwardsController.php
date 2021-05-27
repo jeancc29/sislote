@@ -453,7 +453,8 @@ class AwardsController extends Controller
             //Buscar jugadas super pale de esa loteria, ya sea esta la loteria primaria o loteria superpale de la tabla salesdetails
             // return Response::json(['errores' => 1,'mensaje' => $awardsClass->getJugadasSuperpaleDeFechaDada($l['id'])], 201);
             foreach($awardsClass->getJugadasSuperpaleDeFechaDada($l['id']) as $j){
-                
+                if($l['id'] != $j["idLoteria"] && $l['id'] != $j["idLoteriaSuperpale"])
+                    continue;
     
                 $j['premio'] = 0;
                 $contador = 0;
