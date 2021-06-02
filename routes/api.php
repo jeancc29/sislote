@@ -83,6 +83,7 @@ Route::post('/loterias/guardar', 'LotteriesController@store');
 Route::post('/loterias/eliminar', 'LotteriesController@destroy');
 
 Route::get('/bancas', 'BranchesController@index');
+Route::get('/v2/bancas', 'BranchesController@indexV2');
 Route::post('/bancas/get', 'BranchesController@show');
 Route::post('/bancas/getDatos', 'BranchesController@getDatos');
 Route::post('/bancas/guardar', 'BranchesController@store');
@@ -142,6 +143,7 @@ Route::post('/transacciones/buscarTransaccion', 'TransactionsController@buscarTr
 
 Route::post('/monitoreo/tickets', 'MonitoreoController@monitoreo');
 Route::post('/balance/bancas', 'BalancesController@index');
+// Route::post('/balance/v2/bancas', 'BalancesController@indexV2');
 Route::post('/balance/bancos', 'BalancesController@bancos');
 Route::post('/versiones', 'AndroidversionsController@index');
 Route::post('/versiones/guardar', 'AndroidversionsController@store');

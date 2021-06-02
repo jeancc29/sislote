@@ -165,6 +165,103 @@ class Branches extends Model
         return ($ventas > $this->limiteVenta);
     }
    
-   
+    public static function customAll($servidor){
+        return \DB::connection($servidor)->select("
+            select 
+                b.id,
+                b.descripcion,
+                b.codigo,
+                b.dueno,
+                b.status,
+                JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject
+            FROM branches b 
+            INNER JOIN users u ON u.id = b.idUsuario
+            INNER JOIN coins c ON c.id = b.idMoneda
+            WHERE b.status != 2
+        ");
+    }
+
+
+    public static function customFirst($servidor, $id){
+        $data = \DB::connection($servidor)->select("
+            select 
+                b.id,
+                b.descripcion,
+                b.codigo,
+                b.dueno,
+                b.status,
+                JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', c.id,
+                                'idLoteria', c.idLoteria,
+                                'directo', c.directo,
+                                'pale', c.pale,
+                                'tripleta', c.tripleta,
+                                'superPale', c.superPale,
+                                'pick3Straight', c.pick3Straight,
+                                'pick3Box', c.pick3Box,
+                                'pick4Straight', c.pick4Straight,
+                                'pick4Box', c.pick4Box
+                            )
+                    )
+                    FROM commissions c 
+                    INNER JOIN lotteries l ON l.id = c.idLoteria
+                    WHERE c.idBanca = b.id
+                ) AS comisiones,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', p.id,
+                                'idLoteria', p.idLoteria,
+                                'primera', p.primera,
+                                'segunda', p.segunda,
+                                'tercera', p.tercera,
+                                'primeraSegunda', p.primeraSegunda,
+                                'primeraTercera', p.primeraTercera,
+                                'segundaTercera', p.segundaTercera,
+                                'tresNumeros', p.tresNumeros,
+                                'dosNumeros', p.dosNumeros,
+                                'primerPago', p.primerPago,
+                                'pick3TodosEnSecuencia', p.pick3TodosEnSecuencia,
+                                'pick36Way', p.pick36Way,
+                                'pick4TodosEnSecuencia', p.pick4TodosEnSecuencia,
+                                'pick44Way', p.pick44Way,
+                                'pick46Way', p.pick46Way,
+                                'pick412Way', p.pick412Way,
+                                'pick424Way', p.pick424Way
+                            )
+                    )
+                    FROM payscombinations p
+                    INNER JOIN lotteries l ON l.id = p.idLoteria
+                    WHERE p.idBanca = b.id
+                ) AS pagosCombinaciones,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', l.id,
+                                'descripcion', l.descripcion,
+                                'abreviatura', l.abreviatura
+                                
+                            )
+                    )
+                    FROM branches_lotteries bl
+                    INNER JOIN lotteries l ON l.id = bl.idLoteria
+                    WHERE bl.idBanca = b.id
+                ) AS loterias
+            FROM branches b 
+            INNER JOIN users u ON u.id = b.idUsuario
+            INNER JOIN coins c ON c.id = b.idMoneda
+            WHERE b.status != 2 AND b.id = $id
+        ");
+
+        return count($data) > 0 ? $data[0] : null;
+    }
 
 }

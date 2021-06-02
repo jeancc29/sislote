@@ -118,4 +118,27 @@ class Lotteries extends Model
         return $abierta;
     }
 
+    public static function customAll($servidor){
+        return \DB::connection($servidor)->select("
+            SELECT
+                l.id,
+                l.descripcion,
+                l.abreviatura,
+                (
+                    SELECT 
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', draws.id,
+                                'descripcion', draws.descripcion
+                            )
+                        )
+                    FROM draws
+                    INNER JOIN draw_lottery dl on dl.idSorteo = draws.id
+                    WHERE dl.idLoteria = l.id
+                ) sorteos
+            FROM lotteries l
+            WHERE l.status != 2
+        ");
+    }
+
 }

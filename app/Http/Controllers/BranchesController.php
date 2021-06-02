@@ -96,6 +96,69 @@ class BranchesController extends Controller
 
     }
 
+    public function indexV2()
+    {
+        
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+
+        // try {
+        //     $datos = \Helper::jwtDecode($datos["token"]);
+        //     if(isset($datos["datosMovil"]))
+        //         $datos = $datos["datosMovil"];
+        // } catch (\Throwable $th) {
+        //     return Response::json([
+        //         'errores' => 1,
+        //         'mensaje' => 'Token incorrecto'
+        //     ], 201);
+        // }
+
+        $datos = request()->validate([
+            // 'fecha' => 'required',
+            // 'idUsuario' => 'required',
+            // 'idMoneda' => 'required',
+            // 'servidor' => 'required',
+            'token' => ''
+        ]);
+
+        try {
+            // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
+            // $datos = json_decode(json_encode($datos), true);
+            $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        
+       
+        // $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
+        $idUsuarios = [];
+        if($datos["retornarUsuarios"]){
+            $idUsuarios = Branches::on($datos["servidor"])->select("idUsuario")->whereIn("status", [0,1])->get();
+            $idUsuarios = collect($idUsuarios)->map(function($d){
+                return $d["idUsuario"];
+            });
+        }
+
+        return Response::json([
+            'bancas' => $datos["retornarBancas"] == true ? Branches::customAll($datos["servidor"]) : [],
+            'usuarios' => $datos["retornarUsuarios"] == true ? Users::on($datos["servidor"])->whereIn('status', array(0, 1))->whereNotIn("id", $idUsuarios)->get() : [],
+            'monedas' => $datos["retornarMonedas"] == true ? Coins::on($datos["servidor"])->get() : [],
+            'loterias' => $datos["retornarLoterias"] == true ? Lotteries::customAll($datos["servidor"]) : [],
+            'frecuencias' => $datos["retornarFrecuencias"] == true ? Frecuency::on($datos["servidor"])->get() : [],
+            'dias' => $datos["retornarDias"] == true ? Days::on($datos["servidor"])->get() : [],
+            'grupos' => $datos["retornarGrupos"] == true ? \App\Group::on($datos["servidor"])->whereStatus(1)->get() : [],
+            'data' => isset($datos["data"]) ? Branches::customFirst($datos["servidor"], $datos["data"]["id"]) : null
+        ], 201);
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *
