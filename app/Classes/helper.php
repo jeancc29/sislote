@@ -2368,4 +2368,28 @@ static function save($datos, $fecha){
         $result = \DB::select("SHOW DATABASES LIKE '$servidor'");
         return count($result) > 0;
     }
+
+    public static function createIdTicket($servidor, $idBanca, $uuid, $createNew = false){
+        $ticket = null;
+        if($createNew)
+            $ticket = Tickets::on($servidor)->create([
+                "idBanca" => $idBanca,
+                "uuid" => $uuid,
+                "codigoBarra" => '',
+            ]);
+        else{
+            $ticket = Tickets::on($servidor)->where(["idBanca" => $idBanca, "uuid" => $uuid])->orderBy("id", "desc")->limit(1)->first();
+            if($ticket == null)
+                $ticket = Tickets::on($servidor)->create([
+                    "idBanca" => $idBanca,
+                    "uuid" => $uuid,
+                    "codigoBarra" => '',
+                ]);
+            
+            // if(Sales::on($servidor))
+
+        }
+
+        return $ticket;
+    }
 }

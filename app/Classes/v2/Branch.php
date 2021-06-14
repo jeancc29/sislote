@@ -1,5 +1,5 @@
 <?php
-namespace App\Classes;
+namespace App\Classes\v2;
 
 use App\Branches;
 use Request;
@@ -40,7 +40,7 @@ use App\Http\Resources\UsersResource;
 
 use Illuminate\Support\Facades\Crypt;
 
-class BranchesClass{
+class Branch{
     private $servidor;
     private $datos;
     function __construct($servidor, $datos) {
@@ -50,20 +50,20 @@ class BranchesClass{
 
     public static function save($data) : Branches
     {
-        $this->tienePermisoUsuario($data);
-        $this->usuarioYaTieneBancaAsignada($data);
-        $banca = $this->updateOrCreate($data);
+       Branch::tienePermisoUsuario($data);
+       Branch::usuarioYaTieneBancaAsignada($data);
+        $banca = Branch::updateOrCreate($data);
 
-        $this->agregarLoterias($data, $banca);
-        $this->agregarDias($banca);
-        $this->agregarComisiones($banca);
-        $this->agregarPagosCombinaciones($banca);
-        $this->agregarGastosAutomaticos($banca);
+        Branch::agregarLoterias($data, $banca);
+        Branch::agregarDias($data, $banca);
+        Branch::agregarComisiones($data, $banca);
+        Branch::agregarPagosCombinaciones($data, $banca);
+        Branch::agregarGastosAutomaticos($data, $banca);
 
         return $banca;
     }
 
-    private function tienePermisoUsuario($data)
+    private static function tienePermisoUsuario($data)
     {
         $usuario = Users::on($data["servidor"])->whereId($data['usuarioData']["id"])->first();
         if(!$usuario->tienePermiso('Manejar bancas')){
@@ -71,7 +71,7 @@ class BranchesClass{
         }
     }
 
-    private function usuarioYaTieneBancaAsignada($data)
+    private static function usuarioYaTieneBancaAsignada($data)
     {
         if(Branches::on($data["servidor"])->where(['idUsuario'=> $data['usuario']["id"], 'status' => 1])->whereNotIn('id', [$data["id"]])->first() != null){
             abort(403, 'Este usuario ya tiene una banca registrada y solo se permite un usuario por banca');
@@ -88,16 +88,17 @@ class BranchesClass{
         // }
     }
 
-    private function updateOrCreate($data)
+    private static function updateOrCreate($data)
     {
         return Branches::on($data["servidor"])->updateOrCreate(
-            ["id" => $data["id"]]
+            ["id" => $data["id"]],
             [
             'descripcion' => $data['descripcion'],
-            'ip' => $data['ip'],
+            // 'ip' => $data['ip'],
+            'ip' => isset($data['ip']) ? $data["ip"] : '',
             'codigo' => $data['codigo'],
             'idUsuario' => $data['usuario']["id"],
-            'idMoneda' => $data['moneda']["id"],
+            'idMoneda' => $data['monedaObject']["id"],
             'dueno' => $data['dueno'],
             'localidad' => $data['localidad'],
             'limiteVenta' => $data['limiteVenta'],
@@ -110,11 +111,12 @@ class BranchesClass{
             'piepagina3' => $data['piepagina3'],
             'piepagina4' => $data['piepagina4'],
             'status' => $data['status'],
-            'imprimirCodigoQr' => $data['imprimirCodigoQr']
+            'imprimirCodigoQr' => $data['imprimirCodigoQr'],
+            'idGrupo' => isset($data['grupo']) ? $data["grupo"]["id"] : null,
         ]);
     }
 
-    private function agregarLoterias($data, $banca)
+    private static function agregarLoterias($data, $banca)
     {
         //Eliminamos las loterias para luego agregarlos nuevamentes
         $banca->loterias()->detach();
@@ -131,205 +133,151 @@ class BranchesClass{
         $banca->loterias()->attach($loterias_seleccionadas);
     }
 
-    private function agregarDias(Branches $banca)
+    private static function agregarDias($data, Branches $banca)
     {
         //Eliminamos los dias para luego agregarlos nuevamentes
         $banca->dias()->detach();
-        $dias = Days::on($banca["servidor"])->get();
-        $dias = collect($dias)->map(function($d) use($banca){
-            switch ($d['descripcion']) {
-                case 'Lunes':
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["lunes"]["aperturaGuardar"], 'horaCierre' => $this->datos["lunes"]["cierreGuardar"] ];
-                    break;
-                case 'Martes':
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["martes"]["aperturaGuardar"], 'horaCierre' => $this->datos["martes"]["cierreGuardar"] ];
-                    break;
-                case 'Miercoles':
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["miercoles"]["aperturaGuardar"], 'horaCierre' => $this->datos["miercoles"]["cierreGuardar"] ];
-                    break;
-                case 'Jueves':
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["jueves"]["aperturaGuardar"], 'horaCierre' => $this->datos["jueves"]["cierreGuardar"] ];
-                    break;
-                case 'Viernes':
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["viernes"]["aperturaGuardar"], 'horaCierre' => $this->datos["viernes"]["cierreGuardar"] ];
-                    break;
-                case 'Sabado':
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["sabado"]["aperturaGuardar"], 'horaCierre' => $this->datos["sabado"]["cierreGuardar"] ];
-                    break;
-                
-                default:
-                    return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $this->datos["domingo"]["aperturaGuardar"], 'horaCierre' => $this->datos["domingo"]["cierreGuardar"] ];
-                    break;
-            }
+        $dias = collect($data['dias']);
+       
+        //Mapeamos la collecion para obtener los atributos idLoteria y idBanca
+        $diasToMap = collect($dias)->map(function($d) use($banca){
+            return ['idDia' => $d['id'], 'idBanca' => $banca['id'], 'horaApertura' => $d['horaApertura'], 'horaCierre' => $d['horaCierre']];
         });
         
-        $banca->dias()->attach($dias);
+        $banca->dias()->attach($diasToMap);
     }
     
-    private function agregarComisiones(Branches $banca)
+    private static function agregarComisiones($data, Branches $banca)
     {
-        //Obtengo y guardo en un objeto los id de las loterias que han sido recibidas
-        $idLoterias = collect($this->datos['loteriasSeleccionadas'])->map(function($id){
-            return $id['id'];
-        });
         //Eliminamos las loterias que no esten incluidas en las loterias que han sido recibidas
         // Commissions::where('idBanca', $banca['id'])->whereNotIn('idLoteria', $idLoterias)->delete();
-        Commissions::on($banca["servidor"])->where('idBanca', $banca['id'])->delete();
-        foreach($this->datos['loteriasSeleccionadas'] as $l){
-            if($banca->loterias()->wherePivot('idLoteria', $l['id'])->first() != null){
-                Commissions::on($banca["servidor"])->create([
+        Commissions::on($data["servidor"])->where('idBanca', $banca['id'])->delete();
+        foreach($data['comisiones'] as $l){
+            if($banca->loterias()->wherePivot('idLoteria', $l['idLoteria'])->first() != null){
+                Commissions::on($data["servidor"])->create([
                     'idBanca' => $banca['id'],
-                    'idLoteria' => $l['id'],
-                    'directo' => $l['comisiones']['directo'],
-                    'pale' => $l['comisiones']['pale'],
-                    'tripleta' => $l['comisiones']['tripleta'],
-                    'superPale' => $l['comisiones']['superPale'],
-                    'pick3Straight' => $l['comisiones']['pick3Straight'],
-                    'pick3Box' => $l['comisiones']['pick3Box'],
-                    'pick4Straight' => $l['comisiones']['pick4Straight'],
-                    'pick4Box' => $l['comisiones']['pick4Box'],
+                    'idLoteria' => $l['idLoteria'],
+                    'directo' => $l['directo'],
+                    'pale' => $l['pale'],
+                    'tripleta' => $l['tripleta'],
+                    'superPale' => $l['superPale'],
+                    'pick3Straight' => $l['pick3Straight'],
+                    'pick3Box' => $l['pick3Box'],
+                    'pick4Straight' => $l['pick4Straight'],
+                    'pick4Box' => $l['pick4Box'],
                 ]);
             }
         }
 
-        Helper::cambiarComisionesATickets($banca["servidor"], $banca['id']);
+        Helper::cambiarComisionesATickets($data["servidor"], $banca['id']);
     }
 
-    private function agregarPagosCombinaciones(Branches $banca)
+    private static function agregarPagosCombinaciones($data, Branches $banca)
     {
-        //Obtengo y guardo en un objeto los id de las loterias que han sido recibidas
-        $idLoterias = collect($this->datos['loteriasSeleccionadas'])->map(function($id){
-            return $id['id'];
-        });
-        // return Response::json([
-        //     'errores' => 0,
-        //     'mensaje' => 'Se ha guardado correctamente',
-        //     'banca' => $this->datos['loteriasSeleccionadas']
-        // ], 201);
-        //Eliminamos las loterias que no esten incluidas en las loterias que han sido recibidas
-        // Payscombinations::where('idBanca', $banca['id'])->whereNotIn('idLoteria', $idLoterias)->delete();
-        
-        Payscombinations::on($banca["servidor"])->where('idBanca', $banca['id'])->delete();
-        foreach($this->datos['loteriasSeleccionadas'] as $l){
-            if($banca->loterias()->wherePivot('idLoteria', $l['id'])->first() != null){
+        Payscombinations::on($data["servidor"])->where('idBanca', $banca['id'])->delete();
+        foreach($data['pagosCombinaciones'] as $l){
+            if($banca->loterias()->wherePivot('idLoteria', $l['idLoteria'])->first() != null){
               
-                if((new Helper)->isNumber($l['pagosCombinaciones']['primera']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo primera no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['primera']) == false){
+                    return abort(404, 'Campo primera no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['segunda']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo segunda no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['segunda']) == false){
+                    return abort(404, 'Campo segunda no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['tercera']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo tercera no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['tercera']) == false){
+                    return abort(404, 'Campo tercera no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['primeraSegunda']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo primeraSegunda no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['primeraSegunda']) == false){
+                    return abort(404, 'Campo primeraSegunda no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['primeraTercera']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo primeraTercera no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['primeraTercera']) == false){
+                    return abort(404, 'Campo primeraTercera no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['segundaTercera']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo segundaTercera no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['segundaTercera']) == false){
+                    return abort(404, 'Campo segundaTercera no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['tresNumeros']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo tresNumeros no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['tresNumeros']) == false){
+                    return abort(404, 'Campo tresNumeros no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['dosNumeros']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo dosNumeros no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['dosNumeros']) == false){
+                    return abort(404, 'Campo dosNumeros no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['primerPago']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo primerPago no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['primerPago']) == false){
+                    return abort(404, 'Campo primerPago no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick3TodosEnSecuencia']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick3 TodosEnSecuencia no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick3TodosEnSecuencia']) == false){
+                    return abort(404, 'Campo pick3 TodosEnSecuencia no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick33Way']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick3 3-way no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick33Way']) == false){
+                    return abort(404, 'Campo pick3 3-way no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick36Way']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick3 6-way no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick36Way']) == false){
+                    return abort(404, 'Campo pick3 6-way no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick4TodosEnSecuencia']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 TodosEnSecuencia no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick4TodosEnSecuencia']) == false){
+                    return abort(404, 'Campo pick4 TodosEnSecuencia no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick44Way']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 4-way no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick44Way']) == false){
+                    return abort(404, 'Campo pick4 4-way no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick46Way']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 6-way no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick46Way']) == false){
+                    return abort(404, 'Campo pick4 6-way no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick412Way']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 12-way no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick412Way']) == false){
+                    return abort(404, 'Campo pick4 12-way no tiene formato correcto');
                 }
-                if((new Helper)->isNumber($l['pagosCombinaciones']['pick424Way']) == false){
-                    return Response::json(['errores' => 1,'mensaje' => 'Campo pick4 24-way no tiene formato correcto'], 201);
+                if((new Helper)->isNumber($l['pick424Way']) == false){
+                    return abort(404, 'Campo pick4 24-way no tiene formato correcto');
                 }
-                Payscombinations::on($banca["servidor"])->create([
+                Payscombinations::on($data["servidor"])->create([
                     'idBanca' => $banca['id'],
-                    'idLoteria' => $l['id'],
-                    'primera' => (int)$l['pagosCombinaciones']['primera'],
-                    'segunda' => (int)$l['pagosCombinaciones']['segunda'],
-                    'tercera' => (int)$l['pagosCombinaciones']['tercera'],
-                    'primeraSegunda' => (int)$l['pagosCombinaciones']['primeraSegunda'],
-                    'primeraTercera' => (int)$l['pagosCombinaciones']['primeraTercera'],
-                    'segundaTercera' => (int)$l['pagosCombinaciones']['segundaTercera'],
-                    'tresNumeros' => (int)$l['pagosCombinaciones']['tresNumeros'],
-                    'dosNumeros' => (int)$l['pagosCombinaciones']['dosNumeros'],
-                    'primerPago' => (int)$l['pagosCombinaciones']['primerPago'],
-                    'pick3TodosEnSecuencia' => (int)$l['pagosCombinaciones']['pick3TodosEnSecuencia'],
-                    'pick33Way' => (int)$l['pagosCombinaciones']['pick33Way'],
-                    'pick36Way' => (int)$l['pagosCombinaciones']['pick36Way'],
-                    'pick4TodosEnSecuencia' => (int)$l['pagosCombinaciones']['pick4TodosEnSecuencia'],
-                    'pick44Way' => (int)$l['pagosCombinaciones']['pick44Way'],
-                    'pick46Way' => (int)$l['pagosCombinaciones']['pick46Way'],
-                    'pick412Way' => (int)$l['pagosCombinaciones']['pick412Way'],
-                    'pick424Way' => (int)$l['pagosCombinaciones']['pick424Way'],
+                    'idLoteria' => $l['idLoteria'],
+                    'primera' => (int)$l['primera'],
+                    'segunda' => (int)$l['segunda'],
+                    'tercera' => (int)$l['tercera'],
+                    'primeraSegunda' => (int)$l['primeraSegunda'],
+                    'primeraTercera' => (int)$l['primeraTercera'],
+                    'segundaTercera' => (int)$l['segundaTercera'],
+                    'tresNumeros' => (int)$l['tresNumeros'],
+                    'dosNumeros' => (int)$l['dosNumeros'],
+                    'primerPago' => (int)$l['primerPago'],
+                    'pick3TodosEnSecuencia' => (int)$l['pick3TodosEnSecuencia'],
+                    'pick33Way' => (int)$l['pick33Way'],
+                    'pick36Way' => (int)$l['pick36Way'],
+                    'pick4TodosEnSecuencia' => (int)$l['pick4TodosEnSecuencia'],
+                    'pick44Way' => (int)$l['pick44Way'],
+                    'pick46Way' => (int)$l['pick46Way'],
+                    'pick412Way' => (int)$l['pick412Way'],
+                    'pick424Way' => (int)$l['pick424Way'],
                 ]);
             }
         }
     }
 
-    private function agregarGastosAutomaticos(Branches $banca)
+    private static function agregarGastosAutomaticos($data, Branches $banca)
     {
-        $idGastos = collect($this->datos['gastos'])->map(function($d){
+        $idGastos = collect($data['gastos'])->map(function($d){
             return $d['id'];
         });
-         Automaticexpenses::on($banca["servidor"])->where('idBanca', $banca['id'])->whereNotIn('id', $idGastos)->delete();
-         foreach($this->datos['gastos'] as $l){
-            $gasto = Automaticexpenses::on($banca["servidor"])->where(['idBanca' => $banca['id'], 'id' => $l['id']])->first();
-            
-
-            
+         Automaticexpenses::on($data["servidor"])->where('idBanca', $banca['id'])->whereNotIn('id', $idGastos)->delete();
+         foreach($data['gastos'] as $l){
+            $gasto = Automaticexpenses::on($data["servidor"])->where(['idBanca' => $banca['id'], 'id' => $l['id']])->first();
             if($gasto != null){
-                
-                // if($l['fechaInicio'] != $gasto['fechaInicio']){
-                //     //Fecha actual
-                //     $first = Carbon::now();
-                //     //Fecha modificada
-                //     $second = new Carbon($l['fechaInicio']);
-                //     if($first->greaterThan($second)){
-                //         return Response::json([
-                //             'errores' => 1,
-                //             'mensaje' => 'La fecha modificada de un gasto debe ser mayor o igual a la fecha actual'
-                //         ], 201);
-                //     }
-                // }
-
 
                 $gasto['descripcion'] = $l['descripcion'];
                 $gasto['monto'] = $l['monto'];
                 $gasto['idFrecuencia'] = $l['frecuencia']['id'];
                 if(strtolower($l['frecuencia']['descripcion']) == strtolower("SEMANAL")){
-                    $gasto['idDia'] = $l['idDia'];
+                    $gasto['idDia'] = $l['dia']['id'];
                 }
                 // $gasto['fechaInicio'] = $l['fechaInicio'];
                 $gasto->save();
             }else{
                 $idDia = null;
                 if(strtolower($l['frecuencia']['descripcion']) == strtolower("SEMANAL")){
-                    $idDia = $l['idDia'];
+                    $idDia = $l['dia']['id'];
                 }
-                Automaticexpenses::on($banca["servidor"])->create([
+                Automaticexpenses::on($data["servidor"])->create([
                     'idBanca' => $banca['id'],
                     'descripcion' => $l['descripcion'],
                     'monto' => $l['monto'],

@@ -74,6 +74,7 @@ Route::post('/principal/duplicar', 'PrincipalController@duplicar');
 Route::post('/principal/cancelar', 'PrincipalController@cancelar');
 Route::post('/principal/cancelarMovil', 'PrincipalController@cancelarMovil');
 Route::post('/principal/eliminar', 'PrincipalController@eliminar');
+Route::post('/principal/createIdTicket', 'PrincipalController@createIdTicket');
 
 Route::post('/imagen/guardar', 'PrincipalController@imagen');
 Route::post('/principal/sms', 'PrincipalController@sms');
@@ -87,6 +88,7 @@ Route::get('/v2/bancas', 'BranchesController@indexV2');
 Route::post('/bancas/get', 'BranchesController@show');
 Route::post('/bancas/getDatos', 'BranchesController@getDatos');
 Route::post('/bancas/guardar', 'BranchesController@store');
+Route::post('/bancas/v2/guardar', 'BranchesController@storeV2');
 Route::post('/bancas/eliminar', 'BranchesController@destroy');
 
 Route::get('/usuarios', 'UsersController@index');
@@ -124,6 +126,7 @@ Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
 Route::post('/reportes/ventas/', 'ReportesController@ventas')->name("reporte.ventas");
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
 Route::post('/reportes/historico/', 'ReportesController@historico');
+Route::post('/reportes/v2/historico/', 'ReportesController@historicoV2');
 Route::get('/historico/', 'ReportesController@historicoApi')->name("historicoApi");
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
 Route::post('/reportes/ticketsPendientesDePago/', 'ReportesController@ticketsPendientesDePago');

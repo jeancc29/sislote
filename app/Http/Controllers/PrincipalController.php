@@ -1986,4 +1986,32 @@ class PrincipalController extends Controller
     {
         //
     }
+
+    public function createIdTicket(Request $request)
+    {
+        
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+       
+        if($datos["idBanca"] == null)
+            abort(404, "El id de la banca no puede ser nulo");
+
+        $ticket = \App\Classes\Helper::createIdTicket($datos["servidor"], $datos["idBanca"], $datos["uuid"], $datos["createNew"]);
+    
+        return Response::json([
+            'ticket' => $ticket
+        ], 201);
+    }
+    
 }

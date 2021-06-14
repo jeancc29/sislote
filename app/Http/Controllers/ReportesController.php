@@ -809,6 +809,169 @@ class ReportesController extends Controller
         ], 201);
     }
 
+    public function historicoV2()
+    {
+        $controlador = Route::getCurrentRoute()->getName();
+        $fecha = getdate();
+        $fechaActualCarbon = Carbon::now();
+       
+
+        
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+            
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
+
+        $usuario = Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if(!$usuario->tienePermiso("Ver historico ventas") == true){
+            abort(404, "No tiene permiso para realizar esta accion");
+        }
+    
+        $fechaFinalSinHora = new Carbon($datos['fechaHasta']);
+        $fechaFinalSinHora = $fechaFinalSinHora->toDateString();
+        $fecha = getdate();
+  
+        if($datos['fechaDesde'] != null && $datos['fechaHasta'] != null){
+            $fecha = getdate(strtotime($datos['fechaDesde']));
+            $fechaF = getdate(strtotime($datos['fechaHasta']));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+    
+       
+      
+        /************************** QUERY NUEVO *******************************/
+        $bancas = [];
+        $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->first()->id;
+        $bancasPertenencientesAEsteUsuario = Branches::getBancasOfHisGroupOrAll($usuario);
+        $arrayOfId = $bancasPertenencientesAEsteUsuario->map(function($d){
+            return $d["id"];
+        });
+
+        // abort(404, "$arrayOfId");
+        $idBancas = implode(", ", $arrayOfId->toArray());
+        
+            if($datos["opcion"] == "Sin ventas"){
+                $limite = $datos['limite'] == 20 ? 40 : $datos['limite'];
+                $bancas = \DB::connection($datos["servidor"])
+                ->select("
+                select 
+                (select 0) as descuento, 
+                (select 0) as comision, 
+                (select 0) as monto, 
+                (select 0) as premio, 
+                (select 0) as tickets, 
+                (select 0) as ticketsPendientes, 
+                (select 0) as ticketsGanadores, 
+                (select 0) as ticketsPerdedores,
+                branches.id as idBanca, 
+                branches.descripcion, 
+                branches.idMoneda,
+                branches.codigo 
+                from branches 
+                where 
+                    id in($idBancas)
+                    AND id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca)
+                    
+                    AND branches.idMoneda = $idMoneda
+                     limit {$limite}
+                ");
+            }else{
+                $queryOpcion = "";
+                $limite = $datos['limite'] == 20 ? 40 : $datos['limite'];
+                if($datos["opcion"] == "Con premios")
+                    $queryOpcion = "having premio > 0";
+                if($datos["opcion"] == "Con tickets pendientes")
+                    $queryOpcion = "having ticketsPendientes > 0";
+
+                $bancas = \DB::connection($datos["servidor"])
+                ->select(
+                    "
+                    select
+                    (select sum(sales.descuentoMonto) from sales where sales.status not in(0, 5) and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') descuento, 
+                    sum(sd.comision) as comision, 
+                    sum(sd.monto) as monto, 
+                    sum(sd.premio) as premio, 
+                    (select count(id) from sales where sales.status not in(0, 5) and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') tickets, 
+                    (select count(id) from sales where sales.status = 1 and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') ticketsPendientes, 
+                    (select count(id) from sales where sales.status = 2 and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') ticketsGanadores, 
+                    (select count(id) from sales where sales.status = 3 and sales.idBanca = s.idBanca and sales.created_at between '$fechaInicial' AND '$fechaFinal') ticketsPerdedores, 
+                    s.idBanca, 
+                    b.descripcion,
+                    b.idMoneda,
+                    b.codigo 
+                    from sales s 
+                    inner join salesdetails sd on s.id = sd.idVenta inner join branches b on b.id = s.idBanca 
+                    where s.status not in(0, 5) 
+                    AND s.idBanca in(SELECT branches.id FROM branches WHERE branches.id in($idBancas) AND branches.idMoneda = $idMoneda)
+                    and s.created_at between '$fechaInicial' AND '$fechaFinal' 
+                    group by s.idBanca, b.descripcion, b.idMoneda, b.codigo 
+                    $queryOpcion
+                    limit {$limite}
+                    ");
+            }
+            
+
+        
+
+                $bancas = collect($bancas)->map(function($d) use($fechaInicial, $fechaFinal, $fechaActualCarbon, $fechaFinalSinHora, $datos){
+                    $ventas = $d->monto;
+                    $descuentos = $d->descuento;
+                    $premios = $d->premio;
+                    $comisiones = $d->comision;
+                    $tickets = $d->tickets;
+                    $ticketsPendientes = $d->ticketsPendientes;
+                    $ticketsGanadores = $d->ticketsGanadores;
+                    $ticketsPerdedores = $d->ticketsPerdedores;
+                    $totalNeto = (double)$d->monto - ((double)$d->descuento + (double)$d->premio + (double)$d->comision);
+                    $balance = Helper::saldoPorFecha($datos["servidor"], $d->idBanca, 1, $fechaFinalSinHora);
+                    $caidaAcumulada = Helper::saldoPorFecha($datos["servidor"], $d->idBanca, 3, $fechaFinalSinHora);
+        
+                   
+                    
+        
+                    return [
+                        'id' => $d->idBanca, 
+                        'descripcion' => strtoupper ($d->descripcion), 
+                        'idMoneda' => $d->idMoneda,
+                        'codigo' => $d->codigo, 'ventas' => $ventas, 
+                        'descuentos' => $descuentos, 
+                        'premios' => $premios, 
+                        'comisiones' => $comisiones, 'totalNeto' => round($totalNeto, 2), 'balance' => $balance, 
+                        'caidaAcumulada' => $caidaAcumulada, 'tickets' => $tickets, 'ticketsPendientes' => $ticketsPendientes,
+                        'balanceActual' => round(($balance + $totalNeto), 2),
+                        'pendientes' => $ticketsPendientes,
+                        'ganadores' =>$ticketsGanadores,
+                        'perdedores' => $ticketsPerdedores,
+                        'monedas' => Coins::on($datos["servidor"])->orderBy('pordefecto', 1)->get()
+                    ];
+                });
+    
+        return Response::json([
+            'monedas' => Coins::on($datos['servidor'])->orderBy('pordefecto', 1)->get(),
+            'bancas' => $bancas,
+            'fechaInicial' => $fechaInicial,
+            'fechaFinal' => $fechaFinal,
+            'a' => $datos['fechaDesde'], 
+            'sumar' => ($fechaFinalSinHora == $fechaActualCarbon->toDateString() && ($fechaActualCarbon->hour == 23 && $fechaActualCarbon->minute > 54) == false),
+            'sin' => $fechaFinalSinHora == $fechaActualCarbon->toDateString(),
+            'af' =>$fechaFinalSinHora,
+            'af1' =>$fechaActualCarbon->toDateString(),
+        ], 201);
+    }
+
     public function historicoApi()
     {
         $controlador = Route::getCurrentRoute()->getName();
@@ -1377,8 +1540,21 @@ class ReportesController extends Controller
             $datos['idBanca'] = Branches::on($datos['servidor'])->where(['id' => $datos['idBanca'], 'status' => 1])->first();
             if($datos['idBanca'] != null)
                 $datos['idBanca'] = $datos['idBanca']->id;
+            else{
+                $banca = Branches::getFirstBancaOfHisGroup($usuario);
+                $banca = $banca != null ? $banca : Branches::getFirstBanca($usuario);
+                if($banca == null)
+                    abort(404, "No hay bancas registradas");
+                
+                $datos["idBanca"] = $banca->id;
+            }
         }else{
-            $datos['idBanca'] = Branches::on($datos['servidor'])->where(['idUsuario' => $datos['idUsuario'], 'status' => 1])->first()->id;
+            $banca = Branches::getFirstBancaOfHisGroup($usuario);
+            $banca = $banca != null ? $banca : Branches::getFirstBanca($usuario);
+            if($banca != null)
+                $datos['idBanca'] = $banca->id;
+            else
+                abort(404, "No hay bancas registradas en este servidor");
         }
     
         //$fecha = getdate(strtotime($datos['fecha']));
@@ -1664,7 +1840,6 @@ class ReportesController extends Controller
             $comisiones = 0;
             $neto = $ventas -  ($premios + $descuentos + $comisionesMonto);
 
-            
 
         return Response::json([
             'errores' => 0,
@@ -1683,7 +1858,7 @@ class ReportesController extends Controller
             'loterias' => $loterias,
             'ticketsGanadores' => SalesResource::collection($ticketsGanadores)->servidor($datos['servidor']),
             'banca' => Branches::on($datos['servidor'])->whereId($datos['idBanca'])->first(),
-            'bancas' => Branches::on($datos['servidor'])->select('id', 'descripcion')->whereStatus(1)->get(),
+            'bancas' => Branches::getBancasOfHisGroupOrAll($usuario),
             'premios' => $premios,
             'balanceActual' => round(($balanceHastaLaFecha + $neto), 2),
             'comisiones' => round($comisionesMonto, 2)

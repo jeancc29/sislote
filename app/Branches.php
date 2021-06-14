@@ -12,6 +12,7 @@ class Branches extends Model
         'codigo', 
         'idUsuario',
         'idMoneda',
+        'idGrupo',
         'dueno',
         'localidad',
         'balanceDesactivacion',
@@ -190,9 +191,20 @@ class Branches extends Model
                 b.descripcion,
                 b.codigo,
                 b.dueno,
+                b.localidad,
                 b.status,
                 JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', g.id, 'descripcion', g.descripcion) grupo,
                 JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject,
+                b.limiteVenta,
+                b.balanceDesactivacion,
+                b.descontar,
+                b.deCada,
+                b.minutosCancelarTicket,
+                b.piepagina1,
+                b.piepagina2,
+                b.piepagina3,
+                b.piepagina4,
                 (
                     SELECT
                         JSON_ARRAYAGG(
@@ -229,6 +241,7 @@ class Branches extends Model
                                 'dosNumeros', p.dosNumeros,
                                 'primerPago', p.primerPago,
                                 'pick3TodosEnSecuencia', p.pick3TodosEnSecuencia,
+                                'pick33Way', p.pick33Way,
                                 'pick36Way', p.pick36Way,
                                 'pick4TodosEnSecuencia', p.pick4TodosEnSecuencia,
                                 'pick44Way', p.pick44Way,
@@ -254,14 +267,65 @@ class Branches extends Model
                     FROM branches_lotteries bl
                     INNER JOIN lotteries l ON l.id = bl.idLoteria
                     WHERE bl.idBanca = b.id
-                ) AS loterias
+                ) AS loterias,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', a.id,
+                                'descripcion', a.descripcion,
+                                'monto', a.monto,
+                                'created_at', a.created_at,
+                                'frecuencia', (SELECT JSON_OBJECT('id', f.id, 'descripcion', f.descripcion)),
+                                'dia', (SELECT JSON_OBJECT('id', d.id, 'descripcion', d.descripcion))
+                            )
+                    )
+                    FROM Automaticexpenses a
+                    INNER JOIN frecuencies f ON f.id = a.idFrecuencia
+                    LEFT JOIN days d ON d.id = a.idDia
+                    WHERE a.idBanca = b.id
+                ) AS gastos
             FROM branches b 
             INNER JOIN users u ON u.id = b.idUsuario
             INNER JOIN coins c ON c.id = b.idMoneda
+            LEFT JOIN $servidor.groups g ON g.id = b.idGrupo
             WHERE b.status != 2 AND b.id = $id
         ");
 
         return count($data) > 0 ? $data[0] : null;
+    }
+
+    public static function getFirstBanca($usuario){
+        return Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->first();
+    }
+
+    public static function getFirstBancaOfHisGroup($usuario){
+        $grupo = $usuario->group;
+        if($grupo == null)
+            return null;
+
+        $banca = Branches::on($usuario->getConnectionName())->where("idGrupo", $grupo->id)->where("status", "!=", 2)->first();
+        if($banca == null)
+            abort(404, "No hay bancas registradas en su grupo");
+
+        return $banca;
+    }
+
+    public static function getBancasOfHisGroupOrAll($usuario){
+        $grupo = $usuario->group;
+        if($grupo == null){
+            $data = Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->get();
+            if(count($data) == 0)
+                abort(404, "No hay bancas registradas");
+            
+            return $data;
+        }
+
+        $data = Branches::on($usuario->getConnectionName())->where("idGrupo", $grupo->id)->where("status", "!=", 2)->get();
+        if(count($data) == 0)
+            abort(404, "No hay bancas registradas en su grupo");
+
+        return $data;
     }
 
 }

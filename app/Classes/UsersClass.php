@@ -153,8 +153,10 @@ class UsersClass{
         if($fotoPerfil != null)
             $usuario["foto"] = $fotoPerfil;
 
-        if($this->datos["grupo"] != null)
-            $usuario["idGrupo"] = $this->datos["grupo"]["id"];
+        if(isset($this->datos["grupo"])){
+            if($this->datos["grupo"] != null)
+                $usuario["idGrupo"] = $this->datos["grupo"]["id"];
+        }
 
         if(!empty($this->datos['password']) && !empty($this->datos['confirmar'])){
             if($this->datos['password'] == $this->datos['confirmar']){
@@ -185,8 +187,10 @@ class UsersClass{
             $fotoPerfil = $this->guardarFoto($this->datos["foto"], $this->datos["usuario"]);
 
 
-        if($this->datos["grupo"] != null)
-            $arrayOfData["idGrupo"] = $this->datos["grupo"]["id"];
+        if(isset($this->datos["grupo"])){
+            if($this->datos["grupo"] != null)
+                $arrayOfData["idGrupo"] = $this->datos["grupo"]["id"];
+        }
 
         $usuario = Users::on($servidor)->create($arrayOfData);
         return $usuario;

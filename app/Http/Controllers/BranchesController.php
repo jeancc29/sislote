@@ -139,8 +139,15 @@ class BranchesController extends Controller
        
         // $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
         $idUsuarios = [];
+        $idUsuarioBanca = null;
         if($datos["retornarUsuarios"]){
-            $idUsuarios = Branches::on($datos["servidor"])->select("idUsuario")->whereIn("status", [0,1])->get();
+            $idUsuarioBanca = isset($datos["data"]) ? $datos["data"]["usuario"]["id"] : null;
+
+            if(isset($idUsuarioBanca))
+                $idUsuarios = Branches::on($datos["servidor"])->select("idUsuario")->whereIn("status", [0,1])->where("idUsuario", "!=", $idUsuarioBanca)->get();
+            else
+                $idUsuarios = Branches::on($datos["servidor"])->select("idUsuario")->whereIn("status", [0,1])->get();
+
             $idUsuarios = collect($idUsuarios)->map(function($d){
                 return $d["idUsuario"];
             });
@@ -154,7 +161,8 @@ class BranchesController extends Controller
             'frecuencias' => $datos["retornarFrecuencias"] == true ? Frecuency::on($datos["servidor"])->get() : [],
             'dias' => $datos["retornarDias"] == true ? Days::on($datos["servidor"])->get() : [],
             'grupos' => $datos["retornarGrupos"] == true ? \App\Group::on($datos["servidor"])->whereStatus(1)->get() : [],
-            'data' => isset($datos["data"]) ? Branches::customFirst($datos["servidor"], $datos["data"]["id"]) : null
+            'data' => isset($datos["data"]) ? Branches::customFirst($datos["servidor"], $datos["data"]["id"]) : null,
+            'idUsuarioBanca' => $idUsuarioBanca
         ], 201);
 
     }
@@ -228,6 +236,7 @@ class BranchesController extends Controller
 
         $branchesClass = new \App\Classes\BranchesClass($datos["servidor"], $datos);
         $banca = $branchesClass->save();
+        event(new \App\Events\BranchesEvent($banca));
         
         $errores = 0;
         $mensaje = '';
@@ -239,6 +248,36 @@ class BranchesController extends Controller
             'bancas' => BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get())->servidor($datos["servidor"]),
             'gastos' => $datos['gastos'],
             'bancaServidor' => $banca->getConnectionName()
+        ], 201);
+    }
+
+    public function storeV2(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $banca = \App\Classes\v2\Branch::save($datos);
+        event(new \App\Events\BranchesEvent($banca));
+        
+        $errores = 0;
+        $mensaje = '';
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => Branches::customFirst($datos["servidor"], $banca->id)
         ], 201);
     }
 

@@ -22,6 +22,7 @@ class BranchesResourceSmall extends JsonResource
             'idMoneda' => $this->idMoneda,
             'descontar' => $this->descontar,
             'deCada' => $this->deCada,
+            'limiteVenta' => $this->limiteVenta,
             'moneda' => ($moneda != null) ? $moneda->descripcion : null,
             'monedaAbreviatura' => ($moneda != null) ? $moneda->abreviatura : null,
             'monedaColor' => ($moneda != null) ? $moneda->color : null,
