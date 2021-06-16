@@ -261,7 +261,6 @@ class Branches extends Model
                                 'id', l.id,
                                 'descripcion', l.descripcion,
                                 'abreviatura', l.abreviatura
-                                
                             )
                     )
                     FROM branches_lotteries bl
@@ -284,7 +283,24 @@ class Branches extends Model
                     INNER JOIN frecuencies f ON f.id = a.idFrecuencia
                     LEFT JOIN days d ON d.id = a.idDia
                     WHERE a.idBanca = b.id
-                ) AS gastos
+                ) AS gastos,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', d.id,
+                                'descripcion', d.descripcion,
+                                'wday', d.wday,
+                                'created_at', d.created_at,
+                                'horaApertura', bd.horaApertura,
+                                'horaCierre', bd.horaCierre
+                            )
+                    )
+                    FROM days d
+                    INNER JOIN branches_days bd ON bd.idDia = d.id
+                    WHERE bd.idBanca = b.id
+                ) AS dias
+
             FROM branches b 
             INNER JOIN users u ON u.id = b.idUsuario
             INNER JOIN coins c ON c.id = b.idMoneda

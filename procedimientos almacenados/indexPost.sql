@@ -42,6 +42,7 @@ BEGIN
 	-- aqui terminamos con el idBanca select json_objectagg('idBanca', idBanca);
     
     
+    set @idBancaOIdPrimeraBanca = idBanca;
     if idBanca = 0 then
 		select JSON_ARRAYAGG(JSON_OBJECT(
 				'id', id, 'total', total
@@ -49,6 +50,7 @@ BEGIN
 		
         select sum(total) from sales where date(created_at) = date(now()) and status not in(0, 5) into total_ventas;
 		select count(jugada) from salesdetails where date(created_at) = date(now()) and status not in(0, 5) into total_jugadas;
+        select id FROM branches WHERE status = 1 ORDER BY id asc LIMIT 1 INTO @idBancaOIdPrimeraBanca;
     else 
 		
 select JSON_ARRAYAGG(JSON_OBJECT(
@@ -91,7 +93,44 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'limiteVenta', b.limiteVenta,
                 'idMoneda', b.idMoneda,
                 'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
-                'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)
+                'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
+                'loterias', IF(
+                    b.id != @idBancaOIdPrimeraBanca, 
+                    null, 
+                    (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', l.id,
+                                'descripcion', l.descripcion,
+                                'abreviatura', l.abreviatura
+                            )
+                    )
+                    FROM branches_lotteries bl
+                    INNER JOIN lotteries l ON l.id = bl.idLoteria
+                    WHERE bl.idBanca = b.id
+                )
+                ),
+                'dias', IF(
+                    b.id != @idBancaOIdPrimeraBanca, 
+                    null, 
+                   (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', d.id,
+                                'descripcion', d.descripcion,
+                                'wday', d.wday,
+                                'created_at', d.created_at,
+                                'horaApertura', bd.horaApertura,
+                                'horaCierre', bd.horaCierre
+                            )
+                    )
+                    FROM days d
+                    INNER JOIN branches_days bd ON bd.idDia = d.id
+                    WHERE bd.idBanca = b.id
+                )
+                )
 			)) as bancas from branches b
             inner join users u on u.id = b.idUsuario where b.status = 1 into bancas;
             
@@ -108,7 +147,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 			then
 				INSERT INTO TempTable(loterias) select JSON_OBJECT(
 					'id', l.id, 'descripcion', l.descripcion, 'abreviatura', 
-                    l.abreviatura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
+                    l.abreviatura, 'horaApertura', dl.horaApertura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
                     'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 				) as loterias from lotteries l
 				inner join day_lottery dl on dl.idLoteria = l.id
@@ -117,7 +156,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
 	else
     INSERT INTO TempTable(loterias) select JSON_OBJECT(
 				'id', l.id, 'descripcion', l.descripcion, 'abreviatura', l.abreviatura, 
-                'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
+                'horaApertura', dl.horaApertura, 'horaCierre', dl.horaCierre, 'minutosExtras', dl.minutosExtras,
                 'sorteos', (select JSON_ARRAYAGG(JSON_OBJECT('id', d.id, 'descripcion', d.descripcion)) from draws d where id in(select dl.idSorteo from draw_lottery dl where dl.idLoteria = l.id))
 			) as loterias from lotteries l
             inner join day_lottery dl on dl.idLoteria = l.id
