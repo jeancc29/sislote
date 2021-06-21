@@ -23,7 +23,7 @@ class BranchesEvent implements ShouldBroadcast
     public function __construct($branch)
     {
         $this->room = $branch->getConnectionName();
-        $this->branch = $branch;
+        $this->branch = \App\Branches::customFirst($this->room, $branch->id);
     }
 
     /**

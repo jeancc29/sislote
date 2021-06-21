@@ -314,7 +314,7 @@ then
 				-- set @idStock = 1;
                
                if @idStock = -1 then
-					set @mensaje = concat('No hay bloqueos registrados ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria));
+					set @mensaje = concat('No hay bloqueos registrados en la loteria ', (select descripcion from lotteries where id = @idLoteria));
                     SIGNAL SQLSTATE '45000';
                end if;
                 

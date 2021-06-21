@@ -1357,7 +1357,7 @@ class Helper{
                 $loteria = Lotteries::on($servidor)->whereId($l["idLoteria"])->first();
                 $fecha = getdate();
                 $dia = $loteria->dias()->whereWday($fecha['wday'])->first();
-                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaCierre' => $dia->pivot->horaCierre, 'minutosExtras' => $dia->pivot->minutosExtras];
+                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaApertura' => $dia->pivot->horaApertura, 'horaCierre' => $dia->pivot->horaCierre, 'minutosExtras' => $dia->pivot->minutosExtras, 'sorteos' => $loteria->sorteos];
             });
 
         return $loterias;
