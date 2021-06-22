@@ -263,6 +263,16 @@ class AwardsController extends Controller
 
         $fecha = getdate();
 
+        $usuario = \App\Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if($usuario == null){
+            abort(404, "No tiene permiso para realizar esta accion");
+            return;
+        }
+        if($usuario->usuario != "jean"){
+            abort(404, "No tiene permiso para realizar esta accion");
+            return;
+        }
+
         if($datos['layout'] == "vistaSencilla" || $datos['layout'] == "vistaPremiosModal"){
 
             $fechaRequest = new Carbon($datos['fecha']);
@@ -598,6 +608,16 @@ class AwardsController extends Controller
                 'mensaje' => 'Token incorrecto',
                 'token' => $datos
             ], 201);
+        }
+
+        $usuario = \App\Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if($usuario == null){
+            abort(404, "No tiene permiso para realizar esta accion");
+            return;
+        }
+        if($usuario->usuario != "jean"){
+            abort(404, "No tiene permiso para realizar esta accion");
+            return;
         }
     
             $fecha = getdate();
