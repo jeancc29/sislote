@@ -101,8 +101,23 @@ io.on('connection', function(socket){
       socket.emit('ticket', response.data.ticket)
     })
     .catch(function (error) {
-      console.log('axisresponse error: ', error);
+      // console.log('axisresponse error: ', error);
       socket.emit('ticket', {"message" : error.code})
+    });
+  })
+  socket.on('guardarVenta', function(jwt){
+    console.log('guardarVenta Recieved: ' + jwt);
+    // socket.emit('idTicket', 123456789);
+    axios.post('http://127.0.0.1:8000/api/principal/storeMobileV2', {
+      "datos" :jwt
+    })
+    .then(function (response) {
+      console.log('axisresponse guardarVenta: ', response.data);
+      socket.emit('recibirVenta', response.data.idTicket)
+    })
+    .catch(function (error) {
+      console.log('axisresponse error guardarVenta: ', error);
+      socket.emit('recibirVenta', {"message" : error.code})
     });
   })
 });

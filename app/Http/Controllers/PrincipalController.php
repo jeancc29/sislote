@@ -1276,6 +1276,117 @@ class PrincipalController extends Controller
         ], 201);
     }
 
+    public function storeMobileV2(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        try {
+            $venta = \App\Sales::on($datos["servidor"])->where(["idTicket" => $datos["sale"]["idTicket"]])->first();
+        if($venta != null){
+            if($venta->idBanca == $datos["sale"]["idBanca"])
+                return Response::json([
+                    "data" => $venta->idTicket,
+                ]);
+            else
+                abort(404, "Este ticket no pertenece a esta banca");
+        }
+        
+        \DB::connection($datos["servidor"])->beginTransaction();
+        $idVenta = \App\Sales::on($datos["servidor"])->max("id");
+        if($idVenta == null)
+            $idVenta = 0;
+        $idVenta++;
+        $venta = \App\Sales::on($datos["servidor"])->create([
+            "id" => $idVenta,
+            "compartido" => $datos["sale"]["compartido"],
+            "idUsuario" => $datos["sale"]["idUsuario"],
+            "idBanca" => $datos["sale"]["idBanca"],
+            "total" => $datos["sale"]["total"],
+            "subTotal" => $datos["sale"]["subTotal"],
+            "descuentoMonto" => $datos["sale"]["descuentoMonto"],
+            "hayDescuento" => $datos["sale"]["hayDescuento"],
+            "idTicket" => $datos["sale"]["idTicket"],
+            "created_at" => $datos["sale"]["created_at"],
+            "updated_at" => $datos["sale"]["updated_at"],
+        ]);
+
+        foreach ($datos["salesdetails"] as $detail) {
+            $montoDisponible = \DB::connection($datos["servidor"])->select("select montoDisponible({$detail['jugada']}, {$detail['idLoteria']}, {$venta->idBanca}, {$detail['idLoteriaSuperpale']}) as montoDisponible")[0]->montoDisponible;
+            $jugada = $detail["jugada"];
+
+            //Si la jugada es de tipo Pick 3, Pick 4 o Super pale, le quitamos el ultimo caracter
+            // ya que este es un caracter especial
+            $ultimoCaracterDeLaJugada = substr($jugada, -1, 1); 
+            if($ultimoCaracterDeLaJugada == '-' || $ultimoCaracterDeLaJugada == '+' || $ultimoCaracterDeLaJugada == 'S')
+                $jugada = substr($jugada, 0, strlen($jugada) - 1);
+            
+            $comision = 0;
+            $idStock = \DB::connection($datos["servidor"])->select("select insertarBloqueo($jugada, {$detail['idLoteria']}, {$detail['idSorteo']}, '{$detail['sorteoDescripcion']}', {$venta->idBanca}, {$detail['idLoteriaSuperpale']}, {$detail['monto']}) as idStock")[0]->idStock;
+            
+            if($idStock == null)
+            abort(404, "Error idStock $idStock");
+            $datosComisiones = \App\Commissions::on($datos["servidor"])->where(["idBanca" => $venta->idBanca, "idLoteria" => $detail["idLoteria"]])->orderBy("id", "desc")->first();
+            if($detail["sorteoDescripcion"] == 'Directo')
+                $comision = ($datosComisiones->directo / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pale')
+                $comision = ($datosComisiones->pale / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Tripleta')
+                $comision = ($datosComisiones->tripleta / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Super pale')
+                $comision = ($datosComisiones->superPale / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 3 Straight')
+                $comision = ($datosComisiones->pick3Straight / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 3 Box')
+                $comision = ($datosComisiones->pick3Box / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 4 Straight')
+                $comision = ($datosComisiones->pick4Straight / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 4 Box')
+                $comision = ($datosComisiones->pick4Box / 100) * $detail["monto"];
+            
+            if($comision == null)
+                $comision = 0;
+
+            \App\Realtime::on($datos["servidor"])->create(["idAfectado" => $idStock, 'tabla' => 'stocks']);
+            \App\Salesdetails::on($datos["servidor"])->create([
+                "idVenta" => $venta->id,
+                "idLoteria" => $detail["idLoteria"],
+                "idSorteo" => $detail["idSorteo"],
+                "jugada" => $jugada,
+                "monto" => $detail["monto"],
+                "premio" => $detail["premio"],
+                "comision" => $detail["comision"],
+                "idStock" => $idStock,
+                "idLoteriaSuperpale" => $detail["idLoteriaSuperpale"],
+                "created_at" => $detail["created_at"],
+                "updated_at" => $detail["updated_at"],
+            ]);
+        }
+        \DB::connection($datos["servidor"])->commit();
+        event(new RealtimeStockEvent($datos["servidor"], true));
+
+        return Response::json([
+            'idTicket' => isset($venta) ? $venta->idTicket : null,
+        ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            \DB::connection($datos["servidor"])->rollback();
+            abort(404, $th->getMessage());
+        }
+        
+    }
+
 
     public function storeMovil(Request $request)
     {

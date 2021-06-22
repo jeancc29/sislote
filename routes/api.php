@@ -65,6 +65,7 @@ Route::post('/principal/indexPost', 'PrincipalController@indexPost');
 // Route::post('/principal/indexPostPrueba', 'PrincipalController@indexPostPrueba');
 Route::post('/principal/guardar', 'PrincipalController@store');
 Route::post('/principal/guardarMovil', 'PrincipalController@storeMovil');
+Route::post('/principal/storeMobileV2', 'PrincipalController@storeMobileV2');
 Route::post('/principal/montodisponible', 'PrincipalController@montodisponible');
 Route::post('/principal/pruebahttp', 'PrincipalController@pruebahttp');
 Route::post('/principal/pagar', 'PrincipalController@pagar');

@@ -310,7 +310,7 @@ then
 				
                 /******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
                 
-                set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale));
+                set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale, null));
 				-- set @idStock = 1;
                
                if @idStock = -1 then
