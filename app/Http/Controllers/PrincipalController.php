@@ -1044,13 +1044,33 @@ class PrincipalController extends Controller
         $idVentas = collect($ventas)->map(function($id){
             return $id->id;
         });
+
+        $sale = 
+        ($errores == 1) ?
+        null
+        :
+        \DB::connection($datos["servidor"])->select("select 
+            s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, 
+            t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
+            sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
+            sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
+            (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
+            (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
+            (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
+            from sales s  inner join salesdetails sd on s.id = sd.idVenta 
+            inner join users u on u.id = s.idUsuario 
+            inner join tickets t on t.id = s.idTicket 
+            inner join branches b on b.id = s.idBanca 
+            where s.id = {$venta->id}
+            group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, razon, fechaCancelacion, usuarioCancelacion 
+            order by s.created_at desc");
     
     
     
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'ticket' => ($errores == 0) ? (new SalesResource($venta))->servidor($datos["servidor"]) : []
+            'ticket' => $sale != null ? count($sale) > 0 ? $sale[0] : null : null
         ], 201);
     }
 
@@ -1335,7 +1355,7 @@ class PrincipalController extends Controller
             //Si la jugada es de tipo Pick 3, Pick 4 o Super pale, le quitamos el ultimo caracter
             // ya que este es un caracter especial
             $ultimoCaracterDeLaJugada = substr($jugada, -1, 1); 
-            if($ultimoCaracterDeLaJugada == '-' || $ultimoCaracterDeLaJugada == '+' || $ultimoCaracterDeLaJugada == 'S')
+            if($ultimoCaracterDeLaJugada == '-' || $ultimoCaracterDeLaJugada == '+' || $ultimoCaracterDeLaJugada == 'S' || $ultimoCaracterDeLaJugada == 's')
                 $jugada = substr($jugada, 0, strlen($jugada) - 1);
             
             $comision = 0;

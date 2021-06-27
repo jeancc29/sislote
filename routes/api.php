@@ -124,6 +124,7 @@ Route::post('/bloqueos/sucias/eliminar', 'BlocksdirtyController@destroy');
 Route::post('/reportes/monitoreo/', 'ReportesController@monitoreo');
 Route::post('/reportes/monitoreoMovil/', 'ReportesController@monitoreoMovil');
 Route::post('/reportes/getTicketById/', 'ReportesController@getTicketById');
+Route::post('/reportes/v2/getTicketById/', 'ReportesController@getTicketByIdV2');
 Route::post('/reportes/ventas/', 'ReportesController@ventas')->name("reporte.ventas");
 Route::post('/reportes/jugadas/', 'ReportesController@jugadas');
 Route::post('/reportes/historico/', 'ReportesController@historico');

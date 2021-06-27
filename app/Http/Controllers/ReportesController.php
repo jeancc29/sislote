@@ -2031,7 +2031,7 @@ class ReportesController extends Controller
             $consulta = "";
             $monitoreo = \DB::connection($datos["servidor"])->select("select 
             s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, 
-            t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
+            t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
             sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
             sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
             (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
@@ -2111,6 +2111,44 @@ class ReportesController extends Controller
             'ticket' => $ticket,
             'errores' => 0,
             'mensaje' => "El ticket no existe",
+        ], 201);
+    }
+
+    public function getTicketByIdV2()
+    {
+        // $datos = request()->validate([
+        //     'datos.idTicket' => 'required',
+        //     'datos.idUsuario' => 'required'
+        // ])['datos'];
+    
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
+       
+
+        $sale = Sales::customFirst($datos["servidor"], $datos['idVenta']);
+        if($sale == null){
+            return Response::json([
+                'errores' => 0,
+                'mensaje' => "El ticket no existe",
+            ], 201);
+        }
+
+        $salesdetails = \App\Salesdetails::customAll($datos["servidor"], $sale->id);
+    
+        
+        return Response::json([
+            'sale' => $sale,
+            'salesdetails' => $salesdetails
         ], 201);
     }
 
