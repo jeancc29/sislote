@@ -254,11 +254,12 @@ class LoginController extends Controller
         'administrador' => $administrador,
         'usuario' => $u,
         'bancaObject' => new BranchesResourceSmall($banca),
+        'bancaObject2' => $banca != null ? \App\Branches::customFirst($u->servidor, $banca->id) : null,
         "apiKey" => \config("data.apiKey"),
         "tipoUsuario" => $tipoUsuario,
         "servidores" => \App\Server::on("mysql")->get(),
         "realtime" => $realtime,
-        "ajustes" => \App\Settings::customFirst($u->servidor)
+        "ajustes" => \App\Settings::customFirst($u->servidor),
     ], 201);
     }
 

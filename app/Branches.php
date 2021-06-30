@@ -12,6 +12,7 @@ class Branches extends Model
         'codigo', 
         'idUsuario',
         'idMoneda',
+        'idGrupo',
         'dueno',
         'localidad',
         'balanceDesactivacion',
@@ -165,6 +166,201 @@ class Branches extends Model
         return ($ventas > $this->limiteVenta);
     }
    
-   
+    public static function customAll($servidor){
+        return \DB::connection($servidor)->select("
+            select 
+                b.id,
+                b.descripcion,
+                b.codigo,
+                b.dueno,
+                b.status,
+                JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject
+            FROM branches b 
+            INNER JOIN users u ON u.id = b.idUsuario
+            INNER JOIN coins c ON c.id = b.idMoneda
+            WHERE b.status != 2
+        ");
+    }
+
+
+    public static function customFirst($servidor, $id){
+        $data = \DB::connection($servidor)->select("
+            select 
+                b.id,
+                b.descripcion,
+                b.codigo,
+                b.dueno,
+                b.localidad,
+                b.status,
+                JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', g.id, 'descripcion', g.descripcion) grupo,
+                JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject,
+                b.limiteVenta,
+                b.balanceDesactivacion,
+                b.descontar,
+                b.deCada,
+                b.minutosCancelarTicket,
+                b.piepagina1,
+                b.piepagina2,
+                b.piepagina3,
+                b.piepagina4,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', c.id,
+                                'idLoteria', c.idLoteria,
+                                'directo', c.directo,
+                                'pale', c.pale,
+                                'tripleta', c.tripleta,
+                                'superPale', c.superPale,
+                                'pick3Straight', c.pick3Straight,
+                                'pick3Box', c.pick3Box,
+                                'pick4Straight', c.pick4Straight,
+                                'pick4Box', c.pick4Box
+                            )
+                    )
+                    FROM commissions c 
+                    INNER JOIN lotteries l ON l.id = c.idLoteria
+                    WHERE c.idBanca = b.id
+                ) AS comisiones,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', p.id,
+                                'idLoteria', p.idLoteria,
+                                'primera', p.primera,
+                                'segunda', p.segunda,
+                                'tercera', p.tercera,
+                                'primeraSegunda', p.primeraSegunda,
+                                'primeraTercera', p.primeraTercera,
+                                'segundaTercera', p.segundaTercera,
+                                'tresNumeros', p.tresNumeros,
+                                'dosNumeros', p.dosNumeros,
+                                'primerPago', p.primerPago,
+                                'pick3TodosEnSecuencia', p.pick3TodosEnSecuencia,
+                                'pick33Way', p.pick33Way,
+                                'pick36Way', p.pick36Way,
+                                'pick4TodosEnSecuencia', p.pick4TodosEnSecuencia,
+                                'pick44Way', p.pick44Way,
+                                'pick46Way', p.pick46Way,
+                                'pick412Way', p.pick412Way,
+                                'pick424Way', p.pick424Way
+                            )
+                    )
+                    FROM payscombinations p
+                    INNER JOIN lotteries l ON l.id = p.idLoteria
+                    WHERE p.idBanca = b.id
+                ) AS pagosCombinaciones,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', l.id,
+                                'descripcion', l.descripcion,
+                                'abreviatura', l.abreviatura
+                            )
+                    )
+                    FROM branches_lotteries bl
+                    INNER JOIN lotteries l ON l.id = bl.idLoteria
+                    WHERE bl.idBanca = b.id
+                ) AS loterias,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', a.id,
+                                'descripcion', a.descripcion,
+                                'monto', a.monto,
+                                'created_at', a.created_at,
+                                'frecuencia', (SELECT JSON_OBJECT('id', f.id, 'descripcion', f.descripcion)),
+                                'dia', (SELECT JSON_OBJECT('id', d.id, 'descripcion', d.descripcion))
+                            )
+                    )
+                    FROM Automaticexpenses a
+                    INNER JOIN frecuencies f ON f.id = a.idFrecuencia
+                    LEFT JOIN days d ON d.id = a.idDia
+                    WHERE a.idBanca = b.id
+                ) AS gastos,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', d.id,
+                                'descripcion', d.descripcion,
+                                'wday', d.wday,
+                                'created_at', d.created_at,
+                                'horaApertura', bd.horaApertura,
+                                'horaCierre', bd.horaCierre
+                            )
+                    )
+                    FROM days d
+                    INNER JOIN branches_days bd ON bd.idDia = d.id
+                    WHERE bd.idBanca = b.id
+                ) AS dias,
+                (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id) as ventasDelDia
+            FROM branches b 
+            INNER JOIN users u ON u.id = b.idUsuario
+            INNER JOIN coins c ON c.id = b.idMoneda
+            LEFT JOIN $servidor.groups g ON g.id = b.idGrupo
+            WHERE b.status != 2 AND b.id = $id
+        ");
+
+        return count($data) > 0 ? $data[0] : null;
+    }
+
+    public static function getFirstBanca($usuario){
+        return Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->first();
+    }
+
+    public static function getFirstBancaOfHisGroup($usuario){
+        $grupo = $usuario->group;
+        if($grupo == null)
+            return null;
+
+        $banca = Branches::on($usuario->getConnectionName())->where("idGrupo", $grupo->id)->where("status", "!=", 2)->first();
+        if($banca == null)
+            abort(404, "No hay bancas registradas en su grupo");
+
+        return $banca;
+    }
+
+    public static function getBancasOfHisGroupOrAll($usuario){
+        $grupo = $usuario->group;
+        if($grupo == null){
+            $data = Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->get();
+            if(count($data) == 0)
+                abort(404, "No hay bancas registradas");
+            
+            return $data;
+        }
+
+        $data = Branches::on($usuario->getConnectionName())->where("idGrupo", $grupo->id)->where("status", "!=", 2)->get();
+        if(count($data) == 0)
+            abort(404, "No hay bancas registradas en su grupo");
+
+        return $data;
+    }
+
+    public static function search($servidor, $data){
+        return \DB::connection($servidor)->select("
+            SELECT
+                b.id,
+                b.descripcion,
+                b.codigo,
+                b.dueno,
+                b.status,
+                JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject
+            FROM branches b
+            INNER JOIN users u ON u.id = b.idUsuario
+            INNER JOIN coins c ON c.id = b.idMoneda
+            WHERE 
+                b.status != 2
+                AND (b.descripcion LIKE '%{$data}%' OR b.codigo LIKE '%{$data}%')
+        ");
+    }
 
 }

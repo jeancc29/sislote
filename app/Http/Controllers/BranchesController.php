@@ -96,6 +96,77 @@ class BranchesController extends Controller
 
     }
 
+    public function indexV2()
+    {
+        
+        $datos = request()->validate([
+            'token' => ''
+        ]);
+
+        // try {
+        //     $datos = \Helper::jwtDecode($datos["token"]);
+        //     if(isset($datos["datosMovil"]))
+        //         $datos = $datos["datosMovil"];
+        // } catch (\Throwable $th) {
+        //     return Response::json([
+        //         'errores' => 1,
+        //         'mensaje' => 'Token incorrecto'
+        //     ], 201);
+        // }
+
+        $datos = request()->validate([
+            // 'fecha' => 'required',
+            // 'idUsuario' => 'required',
+            // 'idMoneda' => 'required',
+            // 'servidor' => 'required',
+            'token' => ''
+        ]);
+
+        try {
+            // $datos = JWT::decode($datos['token'], \config('data.apiKey'), array('HS256'));
+            // $datos = json_decode(json_encode($datos), true);
+            $datos = \Helper::jwtDecode($datos["token"]);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto'
+            ], 201);
+        }
+
+        
+       
+        // $bancas = Branches::select('id', 'descripcion', 'codigo')->whereIn('status', array(0, 1))->get();
+        $idUsuarios = [];
+        $idUsuarioBanca = null;
+        if($datos["retornarUsuarios"]){
+            $idUsuarioBanca = isset($datos["data"]) ? $datos["data"]["usuario"]["id"] : null;
+
+            if(isset($idUsuarioBanca))
+                $idUsuarios = Branches::on($datos["servidor"])->select("idUsuario")->whereIn("status", [0,1])->where("idUsuario", "!=", $idUsuarioBanca)->get();
+            else
+                $idUsuarios = Branches::on($datos["servidor"])->select("idUsuario")->whereIn("status", [0,1])->get();
+
+            $idUsuarios = collect($idUsuarios)->map(function($d){
+                return $d["idUsuario"];
+            });
+        }
+
+        return Response::json([
+            'bancas' => $datos["retornarBancas"] == true ? Branches::customAll($datos["servidor"]) : [],
+            'usuarios' => $datos["retornarUsuarios"] == true ? Users::on($datos["servidor"])->whereIn('status', array(0, 1))->whereNotIn("id", $idUsuarios)->get() : [],
+            'monedas' => $datos["retornarMonedas"] == true ? Coins::on($datos["servidor"])->get() : [],
+            'loterias' => $datos["retornarLoterias"] == true ? Lotteries::customAll($datos["servidor"]) : [],
+            'frecuencias' => $datos["retornarFrecuencias"] == true ? Frecuency::on($datos["servidor"])->get() : [],
+            'dias' => $datos["retornarDias"] == true ? Days::on($datos["servidor"])->get() : [],
+            'grupos' => $datos["retornarGrupos"] == true ? \App\Group::on($datos["servidor"])->whereStatus(1)->get() : [],
+            'data' => isset($datos["data"]) ? Branches::customFirst($datos["servidor"], $datos["data"]["id"]) : null,
+            'idUsuarioBanca' => $idUsuarioBanca
+        ], 201);
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -165,6 +236,7 @@ class BranchesController extends Controller
 
         $branchesClass = new \App\Classes\BranchesClass($datos["servidor"], $datos);
         $banca = $branchesClass->save();
+        event(new \App\Events\BranchesEvent($banca));
         
         $errores = 0;
         $mensaje = '';
@@ -176,6 +248,65 @@ class BranchesController extends Controller
             'bancas' => BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get())->servidor($datos["servidor"]),
             'gastos' => $datos['gastos'],
             'bancaServidor' => $banca->getConnectionName()
+        ], 201);
+    }
+
+    public function storeV2(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $banca = \App\Classes\v2\Branch::save($datos);
+        event(new \App\Events\BranchesEvent($banca));
+        
+        $errores = 0;
+        $mensaje = '';
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => Branches::customFirst($datos["servidor"], $banca->id)
+        ], 201);
+    }
+
+    public function getVentasDelDia(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $banca = Branches::customFirst($datos["servidor"], $datos["idBanca"]);
+        
+        $errores = 0;
+        $mensaje = '';
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => $banca
         ], 201);
     }
 
@@ -551,6 +682,30 @@ class BranchesController extends Controller
             'banca' => BranchesResource::collection(Branches::on($datos["servidor"])->whereId($banca->id)->get())->servidor($datos["servidor"]),
             'bancas' => BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get())->servidor($datos["servidor"]),
             'gastos' => $datos['gastos']
+        ], 201);
+    }
+
+    public function search(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => \App\Branches::search($datos["servidor"], $datos["search"])
         ], 201);
     }
 

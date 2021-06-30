@@ -387,7 +387,7 @@ class PrincipalController extends Controller
     
         if($esCodigoBarra){
             $idTicket = Tickets::on($codigoBarra["servidor"])->where('codigoBarra', $codigoBarra['codigoBarra'])->value('id');
-            if(strlen($codigoBarra['codigoBarra']) != 10 || is_numeric($codigoBarra['codigoBarra']) != true){
+            if((strlen($codigoBarra['codigoBarra']) != 10 && strlen($codigoBarra['codigoBarra']) != 14)|| is_numeric($codigoBarra['codigoBarra']) != true){
                 return Response::json([
                     'errores' => 1,
                     'mensaje' => "El numero de ticket no es correcto"
@@ -487,7 +487,7 @@ class PrincipalController extends Controller
             if(!(new Helper)->isNumber($datos['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
-            if(strlen($datos['codigoBarra']) != 10){
+            if(strlen($datos['codigoBarra']) != 10 && strlen($datos['codigoBarra']) != 14){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
         }
@@ -507,7 +507,7 @@ class PrincipalController extends Controller
         
     
     
-        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+        if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
             $idTicket = Tickets::on($datos['servidor'])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             $venta = Sales::on($datos['servidor'])->where('idTicket', $idTicket)->whereIn('status', [1,2])->wherePagado(0)->wherePagado(0)->get()->first();
     
@@ -592,7 +592,7 @@ class PrincipalController extends Controller
             if(!(new Helper)->isNumber($datos['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
-            if(strlen($datos['codigoBarra']) != 10){
+            if(strlen($datos['codigoBarra']) != 10 && strlen($datos['codigoBarra']) != 14){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
         }
@@ -612,7 +612,7 @@ class PrincipalController extends Controller
         
     
     
-        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+        if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
@@ -684,7 +684,7 @@ class PrincipalController extends Controller
             if(!(new Helper)->isNumber($datos['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
-            if(strlen($datos['codigoBarra']) != 10){
+            if(strlen($datos['codigoBarra']) != 10 && strlen($datos['codigoBarra']) != 14){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
         }
@@ -704,7 +704,7 @@ class PrincipalController extends Controller
         
     
     
-        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+        if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
@@ -791,7 +791,7 @@ class PrincipalController extends Controller
         
     
         
-        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+        if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [0, 5])->get()->first();
@@ -862,6 +862,8 @@ class PrincipalController extends Controller
                         'idUsuario' => $datos['idUsuario'],
                         'razon' => $datos['razon']
                     ]);
+                    event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($venta["idBanca"])->first()));
+
     
                     $mensaje = "El ticket se ha cancelado correctamente";
                 }else{
@@ -946,7 +948,7 @@ class PrincipalController extends Controller
         
     
         
-        if(strlen($datos['codigoBarra']) == 10 && is_numeric($datos['codigoBarra'])){
+        if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
             //Obtenemos el ticket
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             $venta = Sales::on($datos["servidor"])->where('idTicket', $idTicket)->whereNotIn('status', [0, 5])->get()->first();
@@ -1019,6 +1021,7 @@ class PrincipalController extends Controller
                         'idUsuario' => $datos['idUsuario'],
                         'razon' => $datos['razon']
                     ]);
+                    event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($venta["idBanca"])->first()));
     
                     $mensaje = "El ticket se ha cancelado correctamente";
                 }else{
@@ -1044,13 +1047,33 @@ class PrincipalController extends Controller
         $idVentas = collect($ventas)->map(function($id){
             return $id->id;
         });
+
+        $sale = 
+        ($errores == 1) ?
+        null
+        :
+        \DB::connection($datos["servidor"])->select("select 
+            s.id, s.total, s.pagado, s.status, s.idTicket, s.created_at, 
+            t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
+            sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
+            sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
+            (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 
+            (select users.usuario from users where users.id = (select cancellations.idUsuario from cancellations where cancellations.idTicket = s.idTicket)) as usuarioCancelacion, 
+            (select cancellations.created_at from cancellations where cancellations.idTicket = s.idTicket) as fechaCancelacion 
+            from sales s  inner join salesdetails sd on s.id = sd.idVenta 
+            inner join users u on u.id = s.idUsuario 
+            inner join tickets t on t.id = s.idTicket 
+            inner join branches b on b.id = s.idBanca 
+            where s.id = {$venta->id}
+            group by s.id, s.total, s.pagado, s.status, s.idTicket, t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, razon, fechaCancelacion, usuarioCancelacion 
+            order by s.created_at desc");
     
     
     
         return Response::json([
             'errores' => $errores,
             'mensaje' => $mensaje,
-            'ticket' => ($errores == 0) ? (new SalesResource($venta))->servidor($datos["servidor"]) : []
+            'ticket' => $sale != null ? count($sale) > 0 ? $sale[0] : null : null
         ], 201);
     }
 
@@ -1257,6 +1280,7 @@ class PrincipalController extends Controller
 
         $img = new TicketToHtmlClass($datos["servidor"], $data);
         event(new RealtimeStockEvent($datos["servidor"], true));
+        event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($datos['idBanca'])->first()));
 
         
          return Response::json([
@@ -1274,6 +1298,126 @@ class PrincipalController extends Controller
             'img' => $img->generate(),
             'venta' => ($data[0]->venta != null) ? json_decode($data[0]->venta)[0] : []
         ], 201);
+    }
+
+    public function storeMobileV2(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        try {
+            $venta = \App\Sales::on($datos["servidor"])->where(["idTicket" => $datos["sale"]["idTicket"]])->first();
+        if($venta != null){
+            if($venta->idBanca == $datos["sale"]["idBanca"])
+                return Response::json([
+                    "idTicket" => $venta->idTicket,
+                ]);
+            else
+                abort(404, "Este ticket no pertenece a esta banca");
+        }
+        
+        \DB::connection($datos["servidor"])->beginTransaction();
+        $idVenta = \App\Sales::on($datos["servidor"])->max("id");
+        if($idVenta == null)
+            $idVenta = 0;
+        $idVenta++;
+        $venta = \App\Sales::on($datos["servidor"])->create([
+            "id" => $idVenta,
+            "compartido" => $datos["sale"]["compartido"],
+            "idUsuario" => $datos["sale"]["idUsuario"],
+            "idBanca" => $datos["sale"]["idBanca"],
+            "total" => $datos["sale"]["total"],
+            "subTotal" => $datos["sale"]["subTotal"],
+            "descuentoMonto" => $datos["sale"]["descuentoMonto"],
+            "hayDescuento" => $datos["sale"]["hayDescuento"],
+            "idTicket" => $datos["sale"]["idTicket"],
+            "created_at" => $datos["sale"]["created_at"],
+            "updated_at" => $datos["sale"]["updated_at"],
+            "status" => 1
+        ]);
+
+        \App\Tickets::on($datos["servidor"])->updateOrCreate(
+            ["id" => $venta->idTicket],
+            ["codigoBarra" => $datos["sale"]["ticket"]["codigoBarra"]]
+        );
+
+        foreach ($datos["salesdetails"] as $detail) {
+            // $montoDisponible = \DB::connection($datos["servidor"])->select("select montoDisponible({$detail['jugada']}, {$detail['idLoteria']}, {$venta->idBanca}, {$detail['idLoteriaSuperpale']}) as montoDisponible")[0]->montoDisponible;
+            $jugada = $detail["jugada"];
+
+            //Si la jugada es de tipo Pick 3, Pick 4 o Super pale, le quitamos el ultimo caracter
+            // ya que este es un caracter especial
+            $ultimoCaracterDeLaJugada = substr($jugada, -1, 1); 
+            if($ultimoCaracterDeLaJugada == '-' || $ultimoCaracterDeLaJugada == '+' || $ultimoCaracterDeLaJugada == 'S' || $ultimoCaracterDeLaJugada == 's')
+                $jugada = substr($jugada, 0, strlen($jugada) - 1);
+            
+            $comision = 0;
+            $idStock = \DB::connection($datos["servidor"])->select("select insertarBloqueo('$jugada', {$detail['idLoteria']}, {$detail['idSorteo']}, '{$detail['sorteoDescripcion']}', {$venta->idBanca}, {$detail['idLoteriaSuperpale']}, {$detail['monto']}) as idStock")[0]->idStock;
+            
+            if($idStock == null)
+                abort(404, "Error idStock $idStock");
+
+            $datosComisiones = \App\Commissions::on($datos["servidor"])->where(["idBanca" => $venta->idBanca, "idLoteria" => $detail["idLoteria"]])->orderBy("id", "desc")->first();
+            if($detail["sorteoDescripcion"] == 'Directo')
+                $comision = ($datosComisiones->directo / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pale')
+                $comision = ($datosComisiones->pale / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Tripleta')
+                $comision = ($datosComisiones->tripleta / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Super pale')
+                $comision = ($datosComisiones->superPale / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 3 Straight')
+                $comision = ($datosComisiones->pick3Straight / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 3 Box')
+                $comision = ($datosComisiones->pick3Box / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 4 Straight')
+                $comision = ($datosComisiones->pick4Straight / 100) * $detail["monto"];
+            else if($detail["sorteoDescripcion"] == 'Pick 4 Box')
+                $comision = ($datosComisiones->pick4Box / 100) * $detail["monto"];
+            
+            if($comision == null)
+                $comision = 0;
+
+            \App\Realtime::on($datos["servidor"])->create(["idAfectado" => $idStock, 'tabla' => 'stocks']);
+            \App\Salesdetails::on($datos["servidor"])->create([
+                "idVenta" => $idVenta,
+                "idLoteria" => $detail["idLoteria"],
+                "idSorteo" => $detail["idSorteo"],
+                "jugada" => $jugada,
+                "monto" => $detail["monto"],
+                "premio" => $detail["premio"],
+                "comision" => $detail["comision"],
+                "idStock" => $idStock,
+                "idLoteriaSuperpale" => $detail["idLoteriaSuperpale"],
+                "created_at" => $detail["created_at"],
+                "updated_at" => $detail["updated_at"],
+            ]);
+        }
+        \DB::connection($datos["servidor"])->commit();
+        event(new RealtimeStockEvent($datos["servidor"], true));
+        event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($datos["sale"]["idBanca"])->first()));
+
+        return Response::json([
+            'idTicket' => isset($venta) ? $venta->idTicket : null,
+            "idVenta" => $idVenta,
+        ], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            \DB::connection($datos["servidor"])->rollback();
+            abort(404, $th->getMessage());
+        }
+        
     }
 
 
@@ -1986,4 +2130,32 @@ class PrincipalController extends Controller
     {
         //
     }
+
+    public function createIdTicket(Request $request)
+    {
+        
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+       
+        if($datos["idBanca"] == null)
+            abort(404, "El id de la banca no puede ser nulo");
+
+        $ticket = \App\Classes\Helper::createIdTicket($datos["servidor"], $datos["idBanca"], $datos["uuid"], $datos["createNew"]);
+    
+        return Response::json([
+            'ticket' => $ticket
+        ], 201);
+    }
+    
 }

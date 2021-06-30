@@ -125,8 +125,12 @@ BEGIN
         SIGNAL SQLSTATE '45000';
     end if;
     
-    
-    if total > (select limiteVenta from branches where id = idBanca)
+    SET @fechaInicial = (SELECT CONCAT(CAST(now() AS DATE), ' 00:00:00'));
+    SET @fechaFinal= (SELECT CONCAT(CAST(now() AS DATE), ' 23:59:59'));
+    SET @totalVendidoHoy = (SELECT IF(t.montoTotal IS NULL, 0, t.montoTotal) FROM (select sum(sd.monto) as montoTotal from salesdetails sd where sd.idVenta in(select sales.id from sales where sales.idBanca = idBanca AND sales.status NOT IN(0, 5) and sales.created_at between @fechaInicial AND @fechaFinal)) t);
+
+
+    if (@totalVendidoHoy + total) > (select limiteVenta from branches where id = idBanca)
     then
 		set @mensaje = 'Error: A excedido el limite de ventas de la banca';
         SIGNAL SQLSTATE '45000';
@@ -310,11 +314,11 @@ then
 				
                 /******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
                 
-                set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale));
+                set @idStock = (select insertarBloqueo(@jugada, @idLoteria, @idSorteo, @sorteo, idBanca, @idLoteriaSuperpale, null));
 				-- set @idStock = 1;
                
                if @idStock = -1 then
-					set @mensaje = concat('No hay bloqueos registrados ' , @jugada, ' en la loteria ', (select descripcion from lotteries where id = @idLoteria));
+					set @mensaje = concat('No hay bloqueos registrados en la loteria ', (select descripcion from lotteries where id = @idLoteria));
                     SIGNAL SQLSTATE '45000';
                end if;
                 
@@ -448,6 +452,7 @@ select JSON_ARRAYAGG(JSON_OBJECT(
                 'status', b.status,
                 'descontar', b.descontar,
                 'deCada', b.deCada,
+                'limiteVenta', b.limiteVenta,
                 'idMoneda', b.idMoneda,
                 'ventasDelDia', (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id),
                 'ticketsDelDia', (select count(sales.id) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id)

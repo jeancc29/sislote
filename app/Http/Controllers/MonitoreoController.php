@@ -588,7 +588,7 @@ class MonitoreoController extends Controller
         //https://stackoverflow.com/questions/6878090/mysql-sum-with-case-statement
         $monitoreo = \DB::connection($datos["servidor"])->select("select 
         s.id, s.total, s.pagado, s.status, s.idTicket, DATE_FORMAT(s.created_at, '%d/%m/%Y %h:%i %p') created_at, 
-        t.id, t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
+        t.codigoBarra, s.idUsuario, u.usuario, b.codigo, sum(sd.premio) as premio, 
         sum(IF(sd.pagado = 0, sd.premio, 0)) as montoAPagar, 
         sum(IF(sd.pagado = 1, sd.premio, 0)) as montoPagado, 
         (select cancellations.razon from cancellations where cancellations.idTicket = s.idTicket) as razon, 

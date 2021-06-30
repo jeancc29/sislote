@@ -146,6 +146,18 @@ class UsersClass{
         $usuario['status'] = $this->datos['status'];
         $usuario['servidor'] = $this->servidor;
 
+        $fotoPerfil = null;
+        if(isset($this->datos["foto"]))
+            $fotoPerfil = $this->guardarFoto($this->datos["foto"], $usuario['usuario']);
+
+        if($fotoPerfil != null)
+            $usuario["foto"] = $fotoPerfil;
+
+        if(isset($this->datos["grupo"])){
+            if($this->datos["grupo"] != null)
+                $usuario["idGrupo"] = $this->datos["grupo"]["id"];
+        }
+
         if(!empty($this->datos['password']) && !empty($this->datos['confirmar'])){
             if($this->datos['password'] == $this->datos['confirmar']){
                 $usuario['password'] = Crypt::encryptString($this->datos['password']);
@@ -159,7 +171,8 @@ class UsersClass{
     private function create($servidor)
     {
         $this->validarContrasena();
-        $usuario = Users::on($servidor)->create([
+
+        $arrayOfData = [
             'nombres' => $this->datos['nombres'],
             'email' => $this->datos['email'],
             'usuario' => $this->datos['usuario'],
@@ -167,7 +180,19 @@ class UsersClass{
             'idRole' => $this->datos['idTipoUsuario'],
             'status' => $this->datos['status'],
             'servidor' => $this->datos['servidor']
-        ]);
+        ];
+
+        $fotoPerfil = null;
+        if(isset($this->datos["foto"]))
+            $fotoPerfil = $this->guardarFoto($this->datos["foto"], $this->datos["usuario"]);
+
+
+        if(isset($this->datos["grupo"])){
+            if($this->datos["grupo"] != null)
+                $arrayOfData["idGrupo"] = $this->datos["grupo"]["id"];
+        }
+
+        $usuario = Users::on($servidor)->create($arrayOfData);
         return $usuario;
     }
 

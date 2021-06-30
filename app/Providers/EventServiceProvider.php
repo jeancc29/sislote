@@ -54,6 +54,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Blocksdirty::observe(BlocksdirtyObserver::class);
         \App\Blocksdirtygenerals::observe(BlocksdirtygeneralsObserver::class);
         \App\Notification::observe(NotificationObserver::class);
+        \App\Branches::observe(App\Observers\BranchesObserver::class);
         // Users::observe(UsersObserver::class);
     }
 }

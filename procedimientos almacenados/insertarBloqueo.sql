@@ -7,15 +7,39 @@ DROP function IF EXISTS `valentin`.`insertarBloqueo`;
 
 DELIMITER $$
 USE `valentin`$$
-CREATE DEFINER=`root`@`localhost` FUNCTION `insertarBloqueo`(jugada varchar(8), idLoteria int, idSorteo int, sorteo varchar(50), idBanca int, idLoteriaSuperpale int) RETURNS bigint
+CREATE DEFINER=`root`@`localhost` FUNCTION `insertarBloqueo`(jugada varchar(8), idLoteria int, idSorteo int, sorteo varchar(50), idBanca int, idLoteriaSuperpale int, monto decimal(20, 2)) RETURNS bigint
     READS SQL DATA
     DETERMINISTIC
 BEGIN
 
 	
 	/******************* INSERTAR BLOQUEO O ACTUALIZAR ************************/
+	declare idDia int;
+	declare wday int;
 	set @idStock = null;
 	set @idMoneda = (select b.idMoneda from branches b where b.id = idBanca);
+
+	if monto IS NOT NULL
+	THEN
+		SET @monto = monto;
+
+		-- Convert wday to wday laravel
+		set wday =  weekday(now());
+		-- le sumamos uno porque en mysql el wday del lunes comienza en el cero pero en php el wday del lunes empieza desde el 1
+		set wday = wday + 1;
+		-- si el wday es igual a 7 entonces lo hacemos igual a cero ya que el wday en php solo llega hasta el 6
+		if wday = 7 then
+			set wday = 0;
+		end if;
+            
+		set idDia = (select id from days where days.wday = wday);
+        
+	END IF;
+    
+    IF idDia IS NOT NULL
+    THEN
+     SET @idDia = idDia;
+	END IF;
     
     if sorteo != 'Super pale'
     then

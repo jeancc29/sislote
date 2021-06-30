@@ -261,6 +261,16 @@ class AwardsController extends Controller
             ], 201);
         }
 
+        $usuario = \App\Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if($usuario == null){
+            abort(404, "No tiene permiso para realizar esta accion");
+            return;
+        }
+        if($usuario->usuario != "jean"){
+            abort(404, "No tiene permiso para realizar esta accion");
+            return;
+        }
+
         $fecha = getdate();
 
         $usuario = \App\Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
@@ -463,8 +473,7 @@ class AwardsController extends Controller
             //Buscar jugadas super pale de esa loteria, ya sea esta la loteria primaria o loteria superpale de la tabla salesdetails
             // return Response::json(['errores' => 1,'mensaje' => $awardsClass->getJugadasSuperpaleDeFechaDada($l['id'])], 201);
             foreach($awardsClass->getJugadasSuperpaleDeFechaDada($l['id']) as $j){
-
-                
+        
                 if($l['id'] != $j["idLoteria"] && $l['id'] != $j["idLoteriaSuperpale"])
                     continue;
     

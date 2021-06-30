@@ -1357,7 +1357,7 @@ class Helper{
                 $loteria = Lotteries::on($servidor)->whereId($l["idLoteria"])->first();
                 $fecha = getdate();
                 $dia = $loteria->dias()->whereWday($fecha['wday'])->first();
-                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaCierre' => $dia->pivot->horaCierre, 'minutosExtras' => $dia->pivot->minutosExtras];
+                return ['id' => $l['idLoteria'], 'descripcion' => $l['descripcion'], 'abreviatura' => $l['abreviatura'], 'horaApertura' => $dia->pivot->horaApertura, 'horaCierre' => $dia->pivot->horaCierre, 'minutosExtras' => $dia->pivot->minutosExtras, 'sorteos' => $loteria->sorteos];
             });
 
         return $loterias;
@@ -2367,5 +2367,29 @@ static function save($datos, $fecha){
     public static function dbExists($servidor){
         $result = \DB::select("SHOW DATABASES LIKE '$servidor'");
         return count($result) > 0;
+    }
+
+    public static function createIdTicket($servidor, $idBanca, $uuid, $createNew = false){
+        $ticket = null;
+        if($createNew)
+            $ticket = Tickets::on($servidor)->create([
+                "idBanca" => $idBanca,
+                "uuid" => $uuid,
+                "codigoBarra" => '',
+            ]);
+        else{
+            $ticket = Tickets::on($servidor)->where(["idBanca" => $idBanca, "uuid" => $uuid])->orderBy("id", "desc")->limit(1)->first();
+            if($ticket == null)
+                $ticket = Tickets::on($servidor)->create([
+                    "idBanca" => $idBanca,
+                    "uuid" => $uuid,
+                    "codigoBarra" => '',
+                ]);
+            
+            // if(Sales::on($servidor))
+
+        }
+
+        return $ticket;
     }
 }

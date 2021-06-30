@@ -538,11 +538,18 @@ myApp
                 return false;
               var jugada = '';
               for (let index = 0; index < $scope.datos.jugada.length; index++) {
+                  if($scope.datos.jugada[index] == '+' || $scope.datos.jugada[index] == '-' || $scope.datos.jugada[index] == 's'){
+                    //LOS CARACTERES ESPECIALES QUE ESTAN ARRIBA DEBEN ESTAR EN LA ULTIMA POSICION DE LA JUGADA, DE LO CONTRARIO ES UNA JUGADA INCORRECTA
+                    if((index + 1) != $scope.datos.jugada.length)
+                        return false;
+                  }
                   if($scope.datos.jugada[index] != '+' && $scope.datos.jugada[index] != '-' && $scope.datos.jugada[index] != 's')
                    jugada += $scope.datos.jugada[index];
                   
               }
 
+            console.log("jugadaCorrecta: ", Number(jugada) == jugada);
+            console.log("jugadaCorrecta Number(jugada): ", Number(jugada));
               if(Number(jugada) == jugada)
                   return true;
               else

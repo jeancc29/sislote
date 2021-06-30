@@ -65,6 +65,16 @@ class UsersController extends Controller
         // $datos = \Helper::jwtDecode($datos["token"]);
         try {
             $datos = \Helper::jwtDecode($datos["token"]);
+
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -96,7 +106,8 @@ class UsersController extends Controller
         return Response::json([
             'usuarios' => UsersResource::collection($usuarios),
             'usuariosTipos' => RolesResource::collection($roles),
-            'permisos' => Permissions::on($datos["servidor"])->get()
+            'permisos' => Permissions::on($datos["servidor"])->get(),
+            "grupos" => \App\Group::on($datos["servidor"])->get(),
         ], 201);
     }
 
@@ -134,6 +145,16 @@ class UsersController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -379,6 +400,15 @@ class UsersController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["data"]))
+            $datos = $datos["data"];
+
+        if(isset($datos["data"]))
+            $datos = $datos["data"];
+
+
+        if(isset($datos["datosMovil"]))
+           $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -395,6 +425,7 @@ class UsersController extends Controller
             event(new UsersEvent($usuario));
 
             return Response::json([
+                'data' => $usuario,
                 'errores' => 0,
                 'mensaje' => 'Se ha eliminado correctamente'
             ], 201);
