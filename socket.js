@@ -93,7 +93,7 @@ io.on('connection', function(socket){
   socket.on('ticket', function(jwt){
     console.log('ticket Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);
-    axios.post('api/principal/createIdTicket', {
+    axios.post('http://loteriasdo.gq/api/principal/createIdTicket', {
       "datos" :jwt
     })
     .then(function (response) {
@@ -108,7 +108,7 @@ io.on('connection', function(socket){
   socket.on('obtenerVentasDelDia', function(jwt){
     console.log('obtenerVentasDelDia Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);
-    axios.post('api/bancas/getVentasDelDia', {
+    axios.post('http://loteriasdo.gq/api/bancas/getVentasDelDia', {
       "datos" :jwt
     })
     .then(function (response) {
@@ -116,14 +116,14 @@ io.on('connection', function(socket){
       socket.emit('obtenerVentasDelDia', response.data.data)
     })
     .catch(function (error) {
-      console.log('axisresponse obtenerVentasDelDia error: ', error);
+      // console.log('axisresponse error: ', error);
       socket.emit('obtenerVentasDelDia', {"message" : error.code})
     });
   });
   socket.on('guardarVenta', function(jwt){
     console.log('guardarVenta Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);
-    axios.post('api/principal/storeMobileV2', {
+    axios.post('http://loteriasdo.gq/api/principal/storeMobileV2', {
       "datos" :jwt
     })
     .then(function (response) {
