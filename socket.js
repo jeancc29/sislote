@@ -6,8 +6,8 @@ var Redis = require('ioredis');
 var redis = new Redis();
 var jwtAuth = require('socketio-jwt-auth');
 var axios = require("axios");
-// var process = require('dotenv').config({path: '/var/www/html/sislote/.env'});
-var process = require('dotenv').config();
+var process = require('dotenv').config({path: '/var/www/html/sislote/.env'});
+// var process = require('dotenv').config();
 
 
 //user auth
