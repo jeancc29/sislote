@@ -101,7 +101,7 @@ io.on('connection', function(socket){
       socket.emit('ticket', response.data.ticket)
     })
     .catch(function (error) {
-      // console.log('axisresponse error: ', error);
+      console.log('axisresponse ticket error: ', error);
       socket.emit('ticket', {"message" : error.code})
     });
   });
@@ -116,7 +116,7 @@ io.on('connection', function(socket){
       socket.emit('obtenerVentasDelDia', response.data.data)
     })
     .catch(function (error) {
-      // console.log('axisresponse error: ', error);
+      console.log('axisresponse obtenerVentasDelDia error: ', error);
       socket.emit('obtenerVentasDelDia', {"message" : error.code})
     });
   });
