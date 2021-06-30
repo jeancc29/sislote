@@ -240,6 +240,7 @@ class CoinsController extends Controller
         //     $entidad->status = 2;
         //     $entidad->save();
         // }
+        
 
         return Response::json([
             'errores' => 0,
