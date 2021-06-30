@@ -612,7 +612,8 @@ class PrincipalController extends Controller
         
     
     
-        if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
+        // if((strlen($datos['codigoBarra']) == 10 || strlen($datos['codigoBarra']) == 14) && is_numeric($datos['codigoBarra'])){
+        if(is_numeric($datos['codigoBarra'])){
             $idTicket = Tickets::on($datos["servidor"])->where('codigoBarra', $datos['codigoBarra'])->value('id');
             //->wherePagado(0)
             // $venta = Sales::where('idTicket', $idTicket)->whereStatus(2)->get()->first();
