@@ -592,9 +592,9 @@ class PrincipalController extends Controller
             if(!(new Helper)->isNumber($datos['codigoBarra'])){
                 return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
             }
-            if(strlen($datos['codigoBarra']) != 10 && strlen($datos['codigoBarra']) != 14){
-                return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
-            }
+            // if(strlen($datos['codigoBarra']) != 10 && strlen($datos['codigoBarra']) != 14){
+            //     return Response::json(['errores' => 1, 'mensaje' => "Codigo de barra incorrecto"], 201);
+            // }
         }
         else if(isset($datos['codigoQr']) && !isset($datos['codigoBarra'])){
             $datos['codigoBarra'] = base64_decode($datos['codigoQr']);
