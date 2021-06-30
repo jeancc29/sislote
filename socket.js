@@ -93,7 +93,7 @@ io.on('connection', function(socket){
   socket.on('ticket', function(jwt){
     console.log('ticket Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);
-    axios.post('http://127.0.0.1:8000/api/principal/createIdTicket', {
+    axios.post('api/principal/createIdTicket', {
       "datos" :jwt
     })
     .then(function (response) {
@@ -108,7 +108,7 @@ io.on('connection', function(socket){
   socket.on('obtenerVentasDelDia', function(jwt){
     console.log('obtenerVentasDelDia Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);
-    axios.post('http://127.0.0.1:8000/api/bancas/getVentasDelDia', {
+    axios.post('api/bancas/getVentasDelDia', {
       "datos" :jwt
     })
     .then(function (response) {
@@ -123,7 +123,7 @@ io.on('connection', function(socket){
   socket.on('guardarVenta', function(jwt){
     console.log('guardarVenta Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);
-    axios.post('http://127.0.0.1:8000/api/principal/storeMobileV2', {
+    axios.post('api/principal/storeMobileV2', {
       "datos" :jwt
     })
     .then(function (response) {
