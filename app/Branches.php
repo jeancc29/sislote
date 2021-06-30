@@ -279,7 +279,7 @@ class Branches extends Model
                                 'dia', (SELECT JSON_OBJECT('id', d.id, 'descripcion', d.descripcion))
                             )
                     )
-                    FROM Automaticexpenses a
+                    FROM automaticexpenses a
                     INNER JOIN frecuencies f ON f.id = a.idFrecuencia
                     LEFT JOIN days d ON d.id = a.idDia
                     WHERE a.idBanca = b.id
