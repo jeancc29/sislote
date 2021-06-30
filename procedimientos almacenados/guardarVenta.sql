@@ -125,8 +125,12 @@ BEGIN
         SIGNAL SQLSTATE '45000';
     end if;
     
-    
-    if total > (select limiteVenta from branches where id = idBanca)
+    SET @fechaInicial = (SELECT CONCAT(CAST(now() AS DATE), ' 00:00:00'));
+    SET @fechaFinal= (SELECT CONCAT(CAST(now() AS DATE), ' 23:59:59'));
+    SET @totalVendidoHoy = (SELECT IF(t.montoTotal IS NULL, 0, t.montoTotal) FROM (select sum(sd.monto) as montoTotal from salesdetails sd where sd.idVenta in(select sales.id from sales where sales.idBanca = idBanca AND sales.status NOT IN(0, 5) and sales.created_at between @fechaInicial AND @fechaFinal)) t);
+
+
+    if (@totalVendidoHoy + total) > (select limiteVenta from branches where id = idBanca)
     then
 		set @mensaje = 'Error: A excedido el limite de ventas de la banca';
         SIGNAL SQLSTATE '45000';

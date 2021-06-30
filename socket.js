@@ -104,7 +104,22 @@ io.on('connection', function(socket){
       // console.log('axisresponse error: ', error);
       socket.emit('ticket', {"message" : error.code})
     });
-  })
+  });
+  socket.on('obtenerVentasDelDia', function(jwt){
+    console.log('obtenerVentasDelDia Recieved: ' + jwt);
+    // socket.emit('idTicket', 123456789);
+    axios.post('http://127.0.0.1:8000/api/bancas/getVentasDelDia', {
+      "datos" :jwt
+    })
+    .then(function (response) {
+      console.log('axisresponse obtenerVentasDelDia: ', response.data);
+      socket.emit('obtenerVentasDelDia', response.data.data)
+    })
+    .catch(function (error) {
+      // console.log('axisresponse error: ', error);
+      socket.emit('obtenerVentasDelDia', {"message" : error.code})
+    });
+  });
   socket.on('guardarVenta', function(jwt){
     console.log('guardarVenta Recieved: ' + jwt);
     // socket.emit('idTicket', 123456789);

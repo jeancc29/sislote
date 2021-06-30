@@ -862,6 +862,8 @@ class PrincipalController extends Controller
                         'idUsuario' => $datos['idUsuario'],
                         'razon' => $datos['razon']
                     ]);
+                    event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($venta["idBanca"])->first()));
+
     
                     $mensaje = "El ticket se ha cancelado correctamente";
                 }else{
@@ -1019,6 +1021,7 @@ class PrincipalController extends Controller
                         'idUsuario' => $datos['idUsuario'],
                         'razon' => $datos['razon']
                     ]);
+                    event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($venta["idBanca"])->first()));
     
                     $mensaje = "El ticket se ha cancelado correctamente";
                 }else{
@@ -1277,6 +1280,7 @@ class PrincipalController extends Controller
 
         $img = new TicketToHtmlClass($datos["servidor"], $data);
         event(new RealtimeStockEvent($datos["servidor"], true));
+        event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($datos['idBanca'])->first()));
 
         
          return Response::json([
@@ -1402,6 +1406,7 @@ class PrincipalController extends Controller
         }
         \DB::connection($datos["servidor"])->commit();
         event(new RealtimeStockEvent($datos["servidor"], true));
+        event(new \App\Events\BranchesEvent(\App\Branches::on($datos["servidor"])->whereId($datos["sale"]["idBanca"])->first()));
 
         return Response::json([
             'idTicket' => isset($venta) ? $venta->idTicket : null,

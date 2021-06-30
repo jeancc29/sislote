@@ -299,8 +299,8 @@ class Branches extends Model
                     FROM days d
                     INNER JOIN branches_days bd ON bd.idDia = d.id
                     WHERE bd.idBanca = b.id
-                ) AS dias
-
+                ) AS dias,
+                (select sum(sales.total) from sales where date(created_at) = date(now()) and status not in(0, 5) and sales.idBanca = b.id) as ventasDelDia
             FROM branches b 
             INNER JOIN users u ON u.id = b.idUsuario
             INNER JOIN coins c ON c.id = b.idMoneda
@@ -342,6 +342,25 @@ class Branches extends Model
             abort(404, "No hay bancas registradas en su grupo");
 
         return $data;
+    }
+
+    public static function search($servidor, $data){
+        return \DB::connection($servidor)->select("
+            SELECT
+                b.id,
+                b.descripcion,
+                b.codigo,
+                b.dueno,
+                b.status,
+                JSON_OBJECT('id', u.id, 'usuario', u.usuario, 'nombres', u.nombres) usuario,
+                JSON_OBJECT('id', c.id, 'descripcion', c.descripcion, 'abreviatura', c.abreviatura, 'color', c.color) monedaObject
+            FROM branches b
+            INNER JOIN users u ON u.id = b.idUsuario
+            INNER JOIN coins c ON c.id = b.idMoneda
+            WHERE 
+                b.status != 2
+                AND (b.descripcion LIKE '%{$data}%' OR b.codigo LIKE '%{$data}%')
+        ");
     }
 
 }

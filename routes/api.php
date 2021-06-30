@@ -91,6 +91,8 @@ Route::post('/bancas/getDatos', 'BranchesController@getDatos');
 Route::post('/bancas/guardar', 'BranchesController@store');
 Route::post('/bancas/v2/guardar', 'BranchesController@storeV2');
 Route::post('/bancas/eliminar', 'BranchesController@destroy');
+Route::post('/bancas/search', 'BranchesController@search');
+Route::post('/bancas/getVentasDelDia', 'BranchesController@getVentasDelDia');
 
 Route::get('/usuarios', 'UsersController@index');
 Route::post('/usuarios/guardar', 'UsersController@store');

@@ -281,6 +281,35 @@ class BranchesController extends Controller
         ], 201);
     }
 
+    public function getVentasDelDia(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $banca = Branches::customFirst($datos["servidor"], $datos["idBanca"]);
+        
+        $errores = 0;
+        $mensaje = '';
+    
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => $banca
+        ], 201);
+    }
+
     public function storeViejo(Request $request)
     {
         // $datos = request()->validate([
@@ -653,6 +682,30 @@ class BranchesController extends Controller
             'banca' => BranchesResource::collection(Branches::on($datos["servidor"])->whereId($banca->id)->get())->servidor($datos["servidor"]),
             'bancas' => BranchesResource::collection(Branches::on($datos["servidor"])->whereIn('status', array(0, 1))->get())->servidor($datos["servidor"]),
             'gastos' => $datos['gastos']
+        ], 201);
+    }
+
+    public function search(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => \App\Branches::search($datos["servidor"], $datos["search"])
         ], 201);
     }
 
