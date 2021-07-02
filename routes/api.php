@@ -98,6 +98,8 @@ Route::get('/usuarios', 'UsersController@index');
 Route::post('/usuarios/guardar', 'UsersController@store');
 Route::post('/usuarios/eliminar', 'UsersController@destroy');
 Route::post('/usuarios/sesiones', 'UserssesionsController@buscar');
+Route::post('/v2/usuarios/sesiones', 'UserssesionsController@buscarV2');
+Route::post('/usuarios/search', 'UsersController@search')->name("users.search");
 
 Route::get('/horarios', 'HorariosController@index');
 Route::post('/horarios/normal/guardar', 'HorariosController@store');

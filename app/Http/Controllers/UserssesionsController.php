@@ -69,6 +69,8 @@ class UserssesionsController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
         } catch (\Throwable $th) {
             //throw $th;
             return Response::json([
@@ -135,6 +137,73 @@ class UserssesionsController extends Controller
                 $ultimoInicioSesionCelular = $fecha . " " . $hora;
             }
 
+           $banca = Branches::on($datos["servidor"])->where('idUsuario', $d['id'])->first();
+           if($banca != null){
+               $banca = $banca->descripcion;
+           }else{
+            $banca = "-";
+           }
+            return ['usuario' => $d['usuario'], 'banca' => $banca, 'primerInicioSesionPC' => $primerInicioSesionPC, 'ultimoInicioSesionPC' => $ultimoInicioSesionPC, 'primerInicioSesionCelular' => $primerInicioSesionCelular, 'ultimoInicioSesionCelular' => $ultimoInicioSesionCelular];
+
+            
+        });
+
+        return Response::json([
+            'sesiones' => $sesiones,
+            'fecha' => $fecha
+        ], 201);
+    }
+
+    public function buscarV2()
+    {
+        // $datos = request()->validate([
+        //     'datos.idUsuario' => 'required',
+        //     'datos.fecha' => 'required'
+        // ])['datos'];
+
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+               $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        $fecha = getdate(strtotime($datos['fecha']));
+        $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+        $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+
+        
+        $usuarios = Userssesions::on($datos["servidor"])->select('idUsuario')->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+        ->groupBy('idUsuario')
+        ->get();
+
+        $usuarios = collect($usuarios)->map(function($d){
+            return $d->idUsuario;
+        });
+
+        $usuarios = Users::on($datos["servidor"])->whereIn('id', $usuarios)->get();
+
+        $sesiones = collect($usuarios)->map(function($d) use($fechaInicial, $fechaFinal, $datos){
+           
+            $primerInicioSesionPC = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                ->where(['idUsuario' => $d['id'], 'esCelular' => 0])->min('created_at');
+            $ultimoInicioSesionPC = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                ->where(['idUsuario' => $d['id'], 'esCelular' => 0])->max('created_at');
+            $primerInicioSesionCelular = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                ->where(['idUsuario' => $d['id'], 'esCelular' => 1])->min('created_at');
+            $ultimoInicioSesionCelular = Userssesions::on($datos["servidor"])->whereBetween('created_at', array($fechaInicial, $fechaFinal))
+                ->where(['idUsuario' => $d['id'], 'esCelular' => 1])->max('created_at');
+            
+            
+                
+               
            $banca = Branches::on($datos["servidor"])->where('idUsuario', $d['id'])->first();
            if($banca != null){
                $banca = $banca->descripcion;

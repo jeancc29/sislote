@@ -111,6 +111,30 @@ class UsersController extends Controller
         ], 201);
     }
 
+    public function search(Request $request)
+    {
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+                'token' => $datos
+            ], 201);
+        }
+
+        return Response::json([
+            'errores' => 0,
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => \App\Users::search($datos["servidor"], $datos["search"])
+        ], 201);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -180,11 +204,13 @@ class UsersController extends Controller
         $usuario = $usersClass->save();
            
         $usuario = Users::on($datos["servidor"])->whereId($usuario->id)->first();
-        event(new UsersEvent(new UsersResource($usuario)));
+        $usuario = new UsersResource($usuario);
+        event(new UsersEvent($usuario));
     
         return Response::json([
             'errores' => 0,
-            'mensaje' => 'Se ha guardado correctamente'
+            'mensaje' => 'Se ha guardado correctamente',
+            'data' => $usuario
         ], 201);
     }
 

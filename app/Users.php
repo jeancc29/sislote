@@ -87,4 +87,40 @@ class Users extends Authenticatable implements JWTSubject
 
         return $rol->descripcion == "Programador" || $rol->descripcion == "Administrador"; 
     }
+
+    public static function search($servidor, $data){
+        return \DB::connection($servidor)->select("
+            SELECT
+                u.id,
+                u.nombres,
+                u.email,
+                u.usuario,
+                u.idRole as idTipoUsuario,
+                u.status,
+                t.descripcion tipoUsuario,
+                JSON_OBJECT('id', t.id, 'descripcion', t.descripcion) tipoUsuarioObject,
+                IF(g.id IS NULL, NULL, JSON_OBJECT('id', g.id, 'descripcion', g.descripcion, 'codigo', g.codigo)) grupo,
+                u.idGrupo,
+                u.created_at,
+                u.updated_at,
+                (
+                    SELECT
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'id', permissions.id, 
+                                'descripcion', permissions.descripcion
+                            )
+                        )
+                    FROM permissions INNER JOIN permission_user as pu ON pu.idPermiso = permissions.id
+                    WHERE pu.idUsuario = u.id
+                ) permisos
+
+            FROM users u
+            INNER JOIN types t ON t.id = u.idRole
+            LEFT JOIN $servidor.groups g ON g.id = u.idGrupo
+            WHERE 
+                u.status != 2
+                AND (u.nombres LIKE '%{$data}%' OR u.usuario LIKE '%{$data}%')
+        ");
+    }
 }
