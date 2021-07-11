@@ -327,17 +327,23 @@ class Branches extends Model
         return $banca;
     }
 
-    public static function getBancasOfHisGroupOrAll($usuario){
-        $grupo = $usuario->group;
-        if($grupo == null){
-            $data = Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->get();
+    public static function getBancasOfHisGroupOrAll($usuario, $idGrupo = null, $moneda = null){
+        if($idGrupo == null){
+            if($moneda != null)
+                $data = Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->where("idMoneda", $moneda["id"])->get();
+            else
+                $data = Branches::on($usuario->getConnectionName())->where("status", "!=", 2)->get();
             if(count($data) == 0)
                 abort(404, "No hay bancas registradas");
             
             return $data;
         }
 
-        $data = Branches::on($usuario->getConnectionName())->where("idGrupo", $grupo->id)->where("status", "!=", 2)->get();
+        if($moneda != null)
+            $data = Branches::on($usuario->getConnectionName())->where("idGrupo", $idGrupo)->where("idMoneda", $moneda["id"])->where("status", "!=", 2)->get();
+        else
+            $data = Branches::on($usuario->getConnectionName())->where("idGrupo", $idGrupo)->where("status", "!=", 2)->get();
+
         if(count($data) == 0)
             abort(404, "No hay bancas registradas en su grupo");
 

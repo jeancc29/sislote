@@ -135,6 +135,7 @@ Route::post('/reportes/historico/', 'ReportesController@historico');
 Route::post('/reportes/v2/historico/', 'ReportesController@historicoV2');
 Route::get('/historico/', 'ReportesController@historicoApi')->name("historicoApi");
 Route::post('/reportes/ventasporfecha/', 'ReportesController@ventasporfecha');
+Route::post('/reportes/v2/ventasPorfecha/', 'ReportesController@ventasPorfechaV2')->name("reportes.ventasPorfechaV2");
 Route::post('/reportes/ticketsPendientesDePago/', 'ReportesController@ticketsPendientesDePago');
 Route::post('/reportes/ticketsPendientesDePagoIndex/', 'ReportesController@ticketsPendientesDePagoIndex');
 Route::post('/reportes/reporteJugadas/', 'ReportesController@reporteJugadas')->name("reporte.jugadas");

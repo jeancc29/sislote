@@ -81,30 +81,32 @@ class ReportesTest extends TestCase
         // $response->assertSessionHasErrors('email');
     }
 
-    public function test_ventas_reportes()
+    public function test_ventasPorFechaV2_reportes()
     {
         $this->withoutExceptionHandling();
         // $tipo = \App\Type::whereRenglon("gasto")->first();
         
         $data =  [
-            "retornarLoterias" => false,
-            "fechaDesde" => "2021-04-18 00:00",
-            "fechaHasta" => "2021-04-19 23:59:59",
-            "idBanca" => 18,
-            "status" => 1,
-            "idUsuario" => 1,
+            "retornarBancas" => false,
+            "retornarMonedas" => false,
+            "fechaDesde" => "2021-06-29 00:00",
+            "fechaHasta" => "2021-07-02 23:59:59",
+            "bancas" => [],
+            "moneda" => null,
+            "servidor" => "valentin",
+            "idUsuario" => 1
             // "tipo" => \App\Classes\Helper::stdClassToArray($tipo),
         ];
-        // $jwt = \App\Classes\Helper::jwtEncoder($data);
+        $jwt = \App\Classes\Helper::jwtEncoder($data);
         // $tipo = \App\Type::whereRenglon("gasto")->first();
-        $response = $this->post(route('historicoApi'), [
+        $response = $this->post(route('reportes.ventasPorFechaV2'), [
             "datos" => $jwt
         ]);
         $array = \App\Classes\Helper::stdClassToArray($response->getData());
         $json = json_encode($array);
         echo $json;
 
-        $response->assertStatus(201);
+        $response->assertStatus(200);
         // $response->assertSessionHasErrors('email');
     }
 }

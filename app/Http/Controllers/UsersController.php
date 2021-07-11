@@ -116,6 +116,9 @@ class UsersController extends Controller
         $datos = request()['datos'];
         try {
             $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+                
             if(isset($datos["datosMovil"]))
                 $datos = $datos["datosMovil"];
 

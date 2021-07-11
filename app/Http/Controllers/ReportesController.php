@@ -853,17 +853,40 @@ class ReportesController extends Controller
        
       
         /************************** QUERY NUEVO *******************************/
-        $bancas = [];
-        $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->first()->id;
-        $bancasPertenencientesAEsteUsuario = Branches::getBancasOfHisGroupOrAll($usuario);
-        $arrayOfId = $bancasPertenencientesAEsteUsuario->map(function($d){
-            return $d["id"];
-        });
+        // $bancas = [];
+        // $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : \App\Coins::on($datos["servidor"])->orderBy("pordefecto", "desc")->first()->id;
+        // $bancasPertenencientesAEsteUsuario = Branches::getBancasOfHisGroupOrAll($usuario, $datos["idGrupo"]);
+        // $arrayOfId = $bancasPertenencientesAEsteUsuario->map(function($d){
+        //     return $d["id"];
+        // });
 
-        // abort(404, "$arrayOfId");
-        $idBancas = implode(", ", $arrayOfId->toArray());
+        // // abort(404, "$arrayOfId");
+        // $idBancas = implode(", ", $arrayOfId->toArray());
+
+        // if(count($datos["bancas"]) > 0){
+        //     $data = implode(", ", $datos["bancas"]);
+        //     $queryBanca .= "AND branches.id in($data) ";
+        // }
         
+        $grupos = [];
+        $queryBanca = "";
+        if(count($datos["grupos"]) > 0){
+            $data = implode(", ", $datos["grupos"]);
+            $queryBanca .= "AND branches.idGrupo in($data) ";
+            $grupos = \App\Group::on($datos["servidor"])->whereIn("id", $datos["grupos"])->get();
+            // abort(404, "Error query banca: $queryBanca");
+        }else{
+            $grupos = \App\Group::on($datos["servidor"])->where("status", "!=", 2)->get();
+        }
+
+        if(count($datos["monedas"]) > 0){
+            $data = implode(", ", $datos["monedas"]);
+            $queryBanca .= " AND branches.idMoneda in($data) ";
+        }
+
             if($datos["opcion"] == "Sin ventas"){
+                if(isset($queryBanca))
+                    $queryBanca = " AND ";
                 $limite = $datos['limite'] == 20 ? 40 : $datos['limite'];
                 $bancas = \DB::connection($datos["servidor"])
                 ->select("
@@ -882,10 +905,9 @@ class ReportesController extends Controller
                 branches.codigo 
                 from branches 
                 where 
-                    id in($idBancas)
-                    AND id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca)
-                    
-                    AND branches.idMoneda = $idMoneda
+                    branches.status != 2
+                    AND branches.id not in(select idBanca from sales where status not in(0, 5) and created_at between '{$fechaInicial}' and '{$fechaFinal}' group by idBanca)
+                    $queryBanca 
                      limit {$limite}
                 ");
             }else{
@@ -895,6 +917,8 @@ class ReportesController extends Controller
                     $queryOpcion = "having premio > 0";
                 if($datos["opcion"] == "Con tickets pendientes")
                     $queryOpcion = "having ticketsPendientes > 0";
+
+                
 
                 $bancas = \DB::connection($datos["servidor"])
                 ->select(
@@ -915,7 +939,7 @@ class ReportesController extends Controller
                     from sales s 
                     inner join salesdetails sd on s.id = sd.idVenta inner join branches b on b.id = s.idBanca 
                     where s.status not in(0, 5) 
-                    AND s.idBanca in(SELECT branches.id FROM branches WHERE branches.id in($idBancas) AND branches.idMoneda = $idMoneda)
+                    AND s.idBanca in(SELECT branches.id FROM branches WHERE branches.status != 2 $queryBanca)
                     and s.created_at between '$fechaInicial' AND '$fechaFinal' 
                     group by s.idBanca, b.descripcion, b.idMoneda, b.codigo 
                     $queryOpcion
@@ -961,6 +985,7 @@ class ReportesController extends Controller
     
         return Response::json([
             'monedas' => Coins::on($datos['servidor'])->orderBy('pordefecto', 1)->get(),
+            'grupos' => $grupos,
             'bancas' => $bancas,
             'fechaInicial' => $fechaInicial,
             'fechaFinal' => $fechaFinal,
@@ -969,6 +994,7 @@ class ReportesController extends Controller
             'sin' => $fechaFinalSinHora == $fechaActualCarbon->toDateString(),
             'af' =>$fechaFinalSinHora,
             'af1' =>$fechaActualCarbon->toDateString(),
+            "query" => $queryBanca
         ], 201);
     }
 
@@ -1465,6 +1491,121 @@ class ReportesController extends Controller
             'monedas' => Coins::on($datos["servidor"])->orderBy('pordefecto', 1)->get(),
             'bancas' => Branches::on($datos["servidor"])->select('id', 'descripcion', 'idMoneda')->whereStatus(1)->get()
         ], 201);
+    }
+
+    public function ventasPorfechaV2()
+    {
+        $controlador = Route::getCurrentRoute()->getName();
+        
+        $datos = request()['datos'];
+        try {
+            $datos = \Helper::jwtDecode($datos);
+            if(isset($datos["data"]))
+                $datos = $datos["data"];
+
+            if(isset($datos["datosMovil"]))
+                $datos = $datos["datosMovil"];
+        } catch (\Throwable $th) {
+            //throw $th;
+            return Response::json([
+                'errores' => 1,
+                'mensaje' => 'Token incorrecto',
+            ], 201);
+        }
+    
+        $fecha = getdate();
+  
+        if($datos['fechaDesde'] != null && $datos['fechaHasta'] != null){
+            $fecha = getdate(strtotime($datos['fechaDesde']));
+            $fechaF = getdate(strtotime($datos['fechaHasta']));
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fechaF['year'].'-'.$fechaF['mon'].'-'.$fechaF['mday'] . ' 23:50:00';
+        }else{
+            $fechaInicial = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 00:00:00';
+            $fechaFinal = $fecha['year'].'-'.$fecha['mon'].'-'.$fecha['mday'] . ' 23:50:00';
+        }
+
+        $usuario = Users::on($datos["servidor"])->whereId($datos["idUsuario"])->first();
+        if(!$usuario->tienePermiso("Ver ventas por fecha") == true){
+            abort(404, "No tiene permiso para realizar esta accion");
+        }
+
+        $falso = false;
+
+        // NOS ASEGURAMOS DE RETORNAR SOLO LAS BANCAS Y GRUPOS QUE PERTENENCEN A ESTE USUARIO
+        $bancas = [];
+        if(count($datos["bancas"]) == 0){
+            $bancasPertenencientesAEsteUsuario = Branches::getBancasOfHisGroupOrAll($usuario, $datos["idGrupo"], $datos["moneda"]);
+            $bancas = $datos["retornarBancas"] == true ? $bancasPertenencientesAEsteUsuario : [];
+            $datos['bancas'] = $bancasPertenencientesAEsteUsuario;
+        }
+
+        if(count($datos["bancas"]) > 0)
+        $datos['bancas'] = collect($datos['bancas'])->map(function($b){
+            return $b['id'];
+        });
+        // $count = count($datos['bancas']);
+        // abort(404, "Error bancas mayor: {$datos['bancas'][0]}");
+
+        $idBancas = count($datos["bancas"]) > 0 ? implode(", ", $datos['bancas']->toArray()) : null;
+        $idMoneda = isset($datos["moneda"]) ? $datos["moneda"]["id"] : null;
+        $queryOpcion = "";
+        
+        if($idMoneda != null){
+            if($idBancas == null){
+                $bancas = \App\Branches::on($datos["servidor"])->where("idMoneda", $idMoneda)->get();
+
+                $arrayOfIdBancas = collect($bancas)->map(function($b){
+                    return $b['id'];
+                });
+                if(count($bancas) > 0)
+                    $idBancas = $limit = implode(", ", $datos['bancas']);
+
+                $queryOpcion = "having ticketsPendientes > 0";
+            }
+            
+        }
+
+        if($idBancas != null)
+            $queryOpcion = "AND s.idBanca IN($idBancas)";
+
+        $ventas = \DB::connection($datos["servidor"])->select("
+            SELECT
+                date(s.created_at) created_at,
+                SUM(sd.monto) total,
+                SUM(sd.premio) premios,
+                SUM(sd.comision) comisiones,
+                SUM(s.descuentoMonto) descuentoMonto
+            FROM sales s
+            INNER JOIN salesdetails sd on sd.idVenta = s.id
+            WHERE 
+                s.status NOT IN(0, 5) 
+                AND s.created_at BETWEEN '{$fechaInicial}' AND '{$fechaFinal}'
+                $queryOpcion
+            GROUP BY date(s.created_at)
+            ORDER BY date(s.created_at) ASC
+        ");
+           
+        $ventas = collect($ventas)->map(function($d){
+              
+            $totalNeto = $d->total - ($d->descuentoMonto + $d->premios  + $d->comisiones);
+
+            return ['created_at' => $d->created_at, 'ventas' => $d->total, 
+                'descuentoMonto' => $d->descuentoMonto, 
+                'premios' => $d->premios, 
+                'comisiones' => $d->comisiones, 
+                'neto' => round($totalNeto, 2)];
+        });
+        
+        
+        return Response::json([
+            'data' => $ventas,
+            'fechaInicial' => $fechaInicial,
+            'fechaFinal' => $fechaFinal,
+            'a' => $falso,
+            'monedas' => $datos["retornarMonedas"] == true ? Coins::on($datos["servidor"])->orderBy('pordefecto', 1)->get() : [],
+            'bancas' => $datos["retornarBancas"] == true ? $bancas : []
+        ], 200);
     }
 
     public function ventas()

@@ -107,7 +107,7 @@ class PermissionRoleSeeder extends Seeder
 
           // SUPERVISOR
           $permisos = p::on($servidor)->whereIn("descripcion", [
-              "Manejar usuarios", "Ver inicios de sesion", "Marcar ticket como pagado", "Manejar bancas", "Vender tickets", "Acceso al sistema", "Manejar resultados"
+              "Manejar usuarios", "Ver inicios de sesion", "Marcar ticket como pagado", "Manejar bancas", "Vender tickets", "Acceso al sistema", "Manejar resultados", "Ver ventas por fecha"
             ])->get();
          foreach($permisos as $permiso){
             DB::connection($servidor)->table('permission_role')->insert(['idRole' => $supervisor,'idPermiso' => $permiso->id]);
@@ -122,7 +122,7 @@ class PermissionRoleSeeder extends Seeder
 
           // BANQUERO
           $permisos = p::on($servidor)->whereIn("descripcion", [
-             "Marcar ticket como pagado", "Vender tickets", "Acceso al sistema", "Monitorear ticket"
+             "Marcar ticket como pagado", "Vender tickets", "Acceso al sistema", "Monitorear ticket", "Ver ventas"
           ])->get();
        foreach($permisos as $permiso){
           DB::connection($servidor)->table('permission_role')->insert(['idRole' => $banquero,'idPermiso' => $permiso->id]);
